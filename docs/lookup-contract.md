@@ -1,9 +1,9 @@
-# Evidence packet contract 1.5.0
+# Evidence packet contract 1.6.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.5.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.6.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -435,3 +435,13 @@ The two death-spawn display names are reviewed labels from the pinned CTW-data
 `land_units_onscreen_name_wh3_dlc25_nur_inf_nurglings_summoned` (Nurglings).
 This catalog is not imported; no retained localization record is fabricated.
 Summon unit identity and mechanics retain their casting-record provenance.
+
+## Exploding Unit visual indicator
+
+`wh2_dlc15_unit_abilities_exploding_unit` exposes a `visual_indicator`
+effect with a concise purpose, based on its retained tooltip explicitly describing
+a hidden persistent banner visual effect indicating that a unit explodes.
+The mapping requires that supporting tooltip and includes its provenance.
+It is not a damage event or numerical modifier; attack/projectile/explosion
+evidence remains separately represented. Its empty phase therefore does not
+produce a phase_effect_unknown warning. No other empty phase is reclassified.
