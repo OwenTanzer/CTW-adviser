@@ -1,0 +1,289 @@
+{
+  "status": "passed",
+  "errors": [],
+  "source_commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+  "files_verified": 134,
+  "datasets_verified": 72,
+  "roster_files": 25,
+  "roster_rows": 3181,
+  "distinct_unit_keys": 2409,
+  "relations": [
+    {
+      "name": "weapon projectile_key",
+      "unresolved_count": 0,
+      "policy": "reject",
+      "unresolved_keys": []
+    },
+    {
+      "name": "projectile explosion",
+      "unresolved_count": 0,
+      "policy": "reject",
+      "unresolved_keys": []
+    },
+    {
+      "name": "weapon melee",
+      "unresolved_count": 0,
+      "policy": "reject",
+      "unresolved_keys": []
+    },
+    {
+      "name": "weapon missile",
+      "unresolved_count": 0,
+      "policy": "reject",
+      "unresolved_keys": []
+    },
+    {
+      "name": "linked ability definition",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "linked ability casting",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "linked attribute definition",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "battle_vortexs_tables.contact_effect",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "battle_vortexs_tables.subsequent_vortex",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_behaviour_groups_to_types_tables.group",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_behaviour_to_ability_junctions_tables.ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_contact_phase_groups_tables.contact_phase_id",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_intensity_settings_tables.ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_intensity_settings_tables.intensity_source",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_intensity_settings_tables.intensity_type",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_phase_attribute_effects_tables.attribute",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_phase_attribute_effects_tables.phase",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_phase_stat_effects_tables.phase",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_phase_stat_effects_tables.stat",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_phases_tables.imbue_contact",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_phases_tables.spreading",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_spreadings_tables.phase",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_auto_deactivate_flags_tables.deactivate_flag",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_auto_deactivate_flags_tables.special_ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_invalid_target_flags_tables.invalid_target",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_invalid_target_flags_tables.special_ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_invalid_usage_flags_tables.invalid_usage_flag",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_invalid_usage_flags_tables.special_ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_recharge_contexts_tables.recharge_context",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_recharge_contexts_tables.special_ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_special_ability_phase_junctions_tables.phase",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "special_ability_to_special_ability_phase_junctions_tables.special_ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_abilities_tables.overpower_option",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_abilities_tables.type",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_abilities_tables.source_type",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_abilities_tables.superseded_abilities_set",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_ability_superseded_abilities_set_elements_tables.set_key",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_ability_superseded_abilities_set_elements_tables.superseded_ability_key",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_special_abilities_tables.key",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_special_abilities_tables.bombardment",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_special_abilities_tables.vortex",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_special_abilities_tables.parent_ability",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_special_abilities_tables.formation",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_special_abilities_tables.behaviour",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    },
+    {
+      "name": "unit_stat_modifiers_tables.stat",
+      "unresolved_count": 0,
+      "policy": "record_gap",
+      "unresolved_keys": []
+    }
+  ],
+  "coverage_boundary": {
+    "structural_validation": "Pinned published upstream audit plus local hash/header/type/key/count and selected join checks. Not a rerun of the complete upstream extraction validators.",
+    "semantic_coverage": "partial; preserve native unknowns and unresolved references",
+    "runtime_coverage": "unverified; this step does not classify every ability, calculate effects or prove payload closure",
+    "raw_passthrough_fields": "TEXT deliberately preserves extension tokens whose types are not established by the unit builder; reviewed native type refinement is required before numeric use.",
+    "next_step": "Commit packet schema and source-backed/synthetic fixtures before implementing the importer."
+  }
+}
