@@ -90,6 +90,72 @@ class QueryTests(unittest.TestCase):
         self.assertFalse(any('failure_context' in e for e in rats['effects']))
         self.assertTrue(any(e.get('trigger') == 'on_death' for e in rats['effects']))
 
+    def test_survival_family_preserves_different_sequences_and_conditional_damage(self):
+        cases = {
+            'wh2_dlc15_unit_passive_fiery_rebirth': (0.25, 2, True),
+            'wh2_main_unit_passive_rebirth': (0.25, 2, False),
+            'wh2_pro08_character_passive_heroic_fortitude': (0.12, 1, False),
+            'wh3_main_daemon_body_passive_restore_the_blighted': (0.25, 2, False),
+        }
+        for key, (healing, phase_count, blast) in cases.items():
+            with self.subTest(key=key):
+                detail = self.q.get_passive_detail(key)
+                m = detail['mechanic']
+                self.assertEqual(len(m['phases']), phase_count)
+                self.assertEqual(next(e for e in m['effects'] if e['kind'] == 'healing')['native_parameters']['heal_amount'], healing)
+                failure = [e for e in m['effects'] if 'failure_context' in e]
+                self.assertEqual(len(failure), 1)
+                f = failure[0]['failure_context']
+                self.assertEqual(f['miscast_chance'], 0.5)
+                self.assertEqual(f['explosion_base_damage'] + f['explosion_ap_damage'], 0)
+                self.assertEqual(f['contact_damage_amount'], 6650)
+                self.assertFalse(f['contact_affects_enemies'])
+                self.assertFalse(any(e['kind'] == 'periodic_damage' for e in m['effects']))
+                self.assertEqual(any(n['kind'] == 'native_vortices' for n in detail['payload_graph']['nodes']), blast)
+                self.assertIn('Failure chance: 50%', m['summary'])
+                self.assertEqual(m['requires_effect_enabling'], key.endswith('restore_the_blighted'))
+                unit_key = self.q.rows('unit_abilities', 'ability_key', key)[0]['unit_key']
+                self.check(self.q.get_unit_profile(unit_key, limit=128))
+
+    def test_death_payloads_explain_entity_scope_and_retain_contact_modifiers(self):
+        from ctw_adviser.queries import DEATH_PAYLOAD_PASSIVES
+        whole_unit = {'wh3_dlc25_unit_passive_abandon_ship', 'wh3_dlc27_unit_passive_split_up', 'wh3_dlc29_unit_passive_curse_of_the_fallen'}
+        for key in DEATH_PAYLOAD_PASSIVES:
+            with self.subTest(key=key):
+                detail = self.q.get_passive_detail(key)
+                m = detail['mechanic']; graph = detail['payload_graph']
+                event = m['conditions']['activates_when'][0]
+                self.assertEqual(event['key'], 'vortex_on_death' if key in whole_unit else 'vortex_on_entity_death')
+                self.assertGreaterEqual(len(event['provenance_refs']), 2)
+                self.assertTrue(any(n['kind'] == 'native_vortices' for n in graph['nodes']))
+                self.assertFalse(any('failure_context' in e for e in m['effects']))
+                self.assertNotIn('While active: linked', m['summary'])
+                unit_key = self.q.rows('unit_abilities', 'ability_key', key)[0]['unit_key']
+                self.check(self.q.get_unit_profile(unit_key))
+        d = self.q.get_passive_detail('wh3_dlc29_unit_passive_pestilent_perfection')
+        effect = next(n for n in d['payload_graph']['nodes'] if n['kind'] == 'native_phase_stat_effects')
+        self.assertEqual(effect['native_parameters']['stat'], 'stat_morale')
+        self.assertEqual(effect['native_parameters']['value'], -10)
+        self.assertTrue(any(e['to'] == effect['id'] and e['relationship'] == 'phase_effect' for e in d['payload_graph']['edges']))
+        self.assertIn('leadership -10', d['mechanic']['summary'])
+
+    def test_split_up_keeps_low_health_summon_separate_from_death_blast(self):
+        packet = self.q.get_unit_profile('wh3_dlc27_hef_mon_sea_elemental')
+        unit = self.check(packet)
+        abilities = {m['key']: m for m in unit['passives']['abilities']}
+        death = abilities['wh3_dlc27_unit_passive_split_up']
+        summon = abilities['wh3_dlc27_unit_passive_split_up_hidden']
+        self.assertFalse(any(e['kind'] == 'summon' for e in death['effects']))
+        spawn = next(e for e in summon['effects'] if e['kind'] == 'summon')
+        self.assertEqual(spawn['unit_name'], 'Oceanids')
+        self.assertNotEqual(spawn['trigger'], 'on_death')
+        self.assertIn('25%', spawn['trigger_basis'])
+        self.assertEqual(summon['conditions']['activates_when'], [])
+        self.assertEqual(summon['conditions']['deactivates_when'][0]['key'], 'health_above_25%')
+        pulses = [n['native_parameters'] for n in packet['payload_graph']['nodes'] if n['kind'] == 'native_vortices']
+        self.assertEqual(sorted(n['damage'] for n in pulses), [0, 50])
+        self.assertTrue(all(n['detonation_force'] == 350 for n in pulses))
+
     def test_exploding_unit_is_source_backed_visual_indicator(self):
         key = 'wh2_dlc15_unit_abilities_exploding_unit'
         detail = self.q.get_passive_detail(key, include_diagnostics=True)

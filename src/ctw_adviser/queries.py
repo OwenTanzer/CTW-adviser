@@ -11,6 +11,23 @@ from .store import open_snapshot, quote
 
 PACKET_VERSION = '1.8.0'
 
+# Reviewed families share payload handling, not necessarily phase sequences.
+SURVIVAL_PASSIVES = {
+    'wh2_main_unit_passive_too_horrible_to_die',
+    'wh2_dlc15_unit_passive_fiery_rebirth',
+    'wh2_main_unit_passive_rebirth',
+    'wh2_pro08_character_passive_heroic_fortitude',
+    'wh3_main_daemon_body_passive_restore_the_blighted',
+}
+DEATH_PAYLOAD_PASSIVES = {
+    'wh3_dlc24_unit_passive_sour_discharge': 'The Sourguts',
+    'wh3_dlc25_unit_passive_abandon_ship': 'the Land Ship',
+    'wh3_dlc26_unit_abilities_force_of_total_destruction': 'the Mangler Squigs',
+    'wh3_dlc26_unit_passive_bloodstorm': 'the Bloodwake Berserkers',
+    'wh3_dlc27_unit_passive_split_up': 'the Sea Elemental',
+    'wh3_dlc29_unit_passive_curse_of_the_fallen': 'the Khemric Titan',
+    'wh3_dlc29_unit_passive_pestilent_perfection': 'the Pusbags',
+}
 EXPLAINED_PASSIVES = {
     'wh2_dlc11_unit_passive_gaseous_demise':
         'Melee engagement enables this one-use detonation. A buffer phase precedes a phase that damages the Corpse itself. '
@@ -25,6 +42,13 @@ EXPLAINED_PASSIVES = {
         'Self-damage and explosion damage are separate. Exact activation, interruption and self-destruction timing remain unverified.',
     'wh2_main_unit_passive_the_rats_emerge': None,
     'wh2_main_unit_passive_too_horrible_to_die': None,
+    **dict.fromkeys(SURVIVAL_PASSIVES),
+    **dict.fromkeys(DEATH_PAYLOAD_PASSIVES),
+    'wh3_dlc27_unit_passive_split_up_hidden':
+        'Separate low-health summon route for the Sea Elemental: summons Oceanids at the host position, with one use. '
+        'It is disabled above 25% health; exact threshold equality and event timing remain unverified. '
+        'Its outward pulse has zero damage but retains a knockback force setting. '
+        'The damaging death blast belongs to the other Split Up ability; these are not one death-triggered summon.',
 }
 
 
@@ -614,7 +638,19 @@ class Packet:
                         mechanic['effects'].append({'kind': 'payload_reference', 'phase_ref': None,
                                                      'node_ref': self.detail('record', edge['target_record']),
                                                      'relationship': edge['relation'], 'provenance_refs': self.refs(source)})
-        if key == 'wh2_main_unit_passive_too_horrible_to_die' and casting and casting['miscast_explosion']:
+        if key in DEATH_PAYLOAD_PASSIVES and casting:
+            for behavior in self.q.rows('native_special_ability_behaviour_groups_to_types', 'group', casting['behaviour']):
+                event = {
+                    'vortex_on_death': 'the host unit dies, releasing the linked blast',
+                    'vortex_on_entity_death': 'an individual entity in the host unit dies, releasing the linked blast',
+                }.get(behavior['behaviour'])
+                if event:
+                    event_refs = self.refs(casting, behavior)
+                    mechanic['conditions']['activates_when'].append({
+                        'key': behavior['behaviour'], 'summary': event + ' (interpreted from the behavior definition; exact scheduling unverified)',
+                        'provenance_refs': event_refs})
+                    mechanic['provenance_refs'] += event_refs
+        if key in SURVIVAL_PASSIVES and casting and casting['miscast_explosion']:
             explosion = self.q.one('explosions', 'explosion_key', casting['miscast_explosion'])
             if explosion:
                 phase = self.q.one('native_ability_phases', 'id', explosion['contact_phase_effect']) if explosion['contact_phase_effect'] else None
@@ -643,6 +679,7 @@ class Packet:
                 unit_name = {
                     'wh2_main_skv_inf_skavenslave_spearmen_0_summoned': 'Skavenslave Spears',
                     'wh3_dlc25_nur_inf_nurglings_summoned': 'Nurglings',
+                    'wh3_dlc27_hef_inf_oceanids_split_up_summoned': 'Oceanids',
                 }.get(unit_key)
             spawn_refs = self.refs(casting) + unit_refs
             # This is a reviewed interpretation of two death-spawn definitions,
@@ -661,11 +698,17 @@ class Packet:
                 'native_parameters': self.native('native_ability_casting', casting,
                     ('spawn_is_transformation', 'spawn_is_decoy', 'spawn_shares_health_and_fatigue')),
                 'provenance_refs': list(dict.fromkeys(spawn_refs))})
+            if key == 'wh3_dlc27_unit_passive_split_up_hidden':
+                mechanic['effects'][-1]['trigger_basis'] = (
+                    'Low-health summon route, disabled above 25% health. Exact threshold equality and event scheduling unverified; not the death-blast route.')
         if not mechanic['effects']:
             mechanic['effects'].append({'kind': 'unresolved', 'phase_ref': None, 'native_kind': 'passive_definition',
                                          'native_parameters': {}, 'reason': 'No mapped effects in the retained definition.', 'provenance_refs': classification})
             self.gap(gaps, 'effect_meaning_unknown', 'abilities', key + ': no mapped effect.', classification)
         if key in EXPLAINED_PASSIVES:
+            for effect in mechanic['effects']:
+                if effect.get('native_kind') == 'phase' and effect['phase_ref'] == 'wh2_main_unit_passive_rebirth_buffer':
+                    effect['reason'] = 'Buffer phase before the healing phase; duration setting 1, with no numerical modifier. Exact transition timing unverified.'
             self.passive_payloads(mechanic, gaps)
             _, tooltip_refs = self.loc('unit_abilities_tooltip_text_' + key)
             mechanic['provenance_refs'] += tooltip_refs
@@ -760,7 +803,7 @@ class Packet:
                     if 'contact_damage_amount' in f:
                         text += f'; delivers a contact effect with damage amount {f["contact_damage_amount"]}, interval setting {f["contact_hp_change_frequency"]}, duration setting {f["contact_duration"]}, maximum affected entities {f["contact_max_damaged_entities"]}'
                         text += '; contact effect affects allies: ' + str(f['contact_affects_allies']).lower() + ', enemies: ' + str(f['contact_affects_enemies']).lower()
-                    text += ' (failure scheduling, effective damage and exact recipients unverified; death summon is a separate mechanic)'
+                    text += ' (failure scheduling, effective damage and exact recipients unverified)'
 
             elif effect.get('native_parameters'):
                 parameters = {k: v for k, v in effect['native_parameters'].items()
@@ -808,6 +851,55 @@ class Packet:
 
     def explained_summary(self, mechanic):
         key = mechanic.get('key')
+        if key in DEATH_PAYLOAD_PASSIVES:
+            vortex = self.q.one('native_vortices', 'vortex_key', mechanic['native_parameters']['vortex'])
+            if vortex:
+                entity_event = any(c['key'] == 'vortex_on_entity_death' for c in mechanic['conditions']['activates_when'])
+                subject = DEATH_PAYLOAD_PASSIVES[key]
+                result = (f'An individual entity dying in {subject}' if entity_event else f'The death of {subject}')
+                result += ' releases an expanding blast'
+                result += ' that can hit allies and enemies. ' if boolean(vortex['affects_allies']) else ' that can hit enemies without affecting allies. '
+                if key == 'wh3_dlc26_unit_abilities_force_of_total_destruction':
+                    result += ('A separate phase damages the Mangler Squigs themselves; its relationship to the death-triggered blast '
+                               'and wind-up is not established by the behavior record. ')
+                elif key == 'wh3_dlc27_unit_passive_split_up':
+                    result += ('This is the damaging death route. The separate hidden Split Up ability summons Oceanids at low health '
+                               'and carries a zero-damage pulse; do not count that summon as a death effect. ')
+                elif key == 'wh3_dlc25_unit_passive_abandon_ship':
+                    result += 'This Land Ship ability is distinct from the Necrofex summon ability with the same name. '
+                elif key == 'wh3_dlc29_unit_passive_pestilent_perfection':
+                    phase = self.q.one('native_ability_phases', 'id', vortex['contact_effect'])
+                    if phase:
+                        stats = self.q.rows('native_phase_stat_effects', 'phase', phase['id'])
+                        for stat in stats:
+                            if stat['stat'] == 'stat_morale' and stat['how'] == 'add':
+                                result += f'The blast also delivers a contact effect: leadership {stat["value"]:+g}, duration setting {phase["duration"]:g}. '
+                                mechanic['provenance_refs'] += self.refs(vortex, phase, stat)
+                result += 'Damage, radius, delay and duration settings are retained separately; exact hit scheduling and overlap remain unverified.'
+                return result
+        if key in SURVIVAL_PASSIVES and key != 'wh2_main_unit_passive_too_horrible_to_die':
+            f = next((e['failure_context'] for e in mechanic['effects'] if 'failure_context' in e), None)
+            heal = next((e for e in mechanic['effects'] if e['kind'] == 'healing'), None)
+            if f and f['miscast_chance'] is not None and heal:
+                has_buffer = any(p['key'] == 'wh2_main_unit_passive_rebirth_buffer' for p in mechanic['phases'])
+                result = 'Low-health survival mechanic, disabled above 10% health. '
+                result += 'A buffer phase precedes healing. ' if has_buffer else 'The retained sequence has a healing phase and no buffer phase. '
+                n = heal['native_parameters']
+                duration = next(p['duration'] for p in mechanic['phases'] if p['key'] == heal['phase_ref'])
+                result += f'Healing amount setting: {n["heal_amount"]:g}; interval setting: {n["hp_change_frequency"]:g}; duration setting: {duration:g}. '
+                result += f'Failure chance: {f["miscast_chance"]:.0%} (interpreted from the casting definition). '
+                result += ('Failure uses a zero-direct-damage explosion to deliver a damaging contact effect, '
+                           'with allies enabled and enemies excluded; exact contact recipients are unverified. ')
+                if key == 'wh2_dlc15_unit_passive_fiery_rebirth':
+                    result += ('Fiery Rebirth also has a separate expanding magical, flaming blast that can hit allies and enemies; '
+                               'its timing relative to success or failure remains unverified. ')
+                if mechanic['native_parameters']['num_uses'] == 1:
+                    result += 'One use. '
+                else:
+                    result += 'Use and recharge settings are -1 sentinels; repeatability is not established. '
+                if mechanic.get('requires_effect_enabling'):
+                    result += 'Requires effect enabling. '
+                return result + 'Threshold equality, failure scheduling, healing units and caps remain unverified.'
         if key == 'wh2_main_unit_passive_the_rats_emerge':
             spawn = next((e for e in mechanic['effects'] if e['kind'] == 'summon' and e['trigger'] == 'on_death'), None)
             if spawn:
@@ -855,7 +947,14 @@ class Packet:
             if table not in allowed:
                 continue
             parent = add(rid, table, row)
-            for edge in self.q.rows('relation_edges', 'source_record', rid, 'relation,target_key_json,edge_ordinal'):
+            edges = self.q.rows('relation_edges', 'source_record', rid, 'relation,target_key_json,edge_ordinal')
+            if table == 'native_ability_phases':
+                # Effect rows reference their owning phase; include that reverse
+                # ownership link just as weapon contact payloads do.
+                for effect_table in ('native_phase_stat_effects', 'native_phase_attribute_effects'):
+                    edges += [{'target_record': effect['record_id'], 'relation': 'phase_effect', 'edge_ordinal': None}
+                              for effect in self.q.rows(effect_table, 'phase', row['id'], 'record_id')]
+            for edge in edges:
                 target = edge['target_record']
                 if not target:
                     self.gap(gaps, 'payload_dependency_' + edge['status'], 'abilities', edge['relation'] + ': ' + edge['target_key_json'], self.refs(row))
@@ -869,7 +968,7 @@ class Packet:
                     continue
                 child_id = add(target, child_table, child)
                 item = {'from': parent, 'to': child_id, 'relationship': edge['relation'],
-                        'order': edge['edge_ordinal'], 'provenance_refs': self.refs(row)}
+                        'order': edge['edge_ordinal'], 'provenance_refs': self.refs(child if edge['relation'] == 'phase_effect' else row)}
                 if item not in graph['edges']:
                     graph['edges'].append(item)
                 queue.append((target, depth + 1))
