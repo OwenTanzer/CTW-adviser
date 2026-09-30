@@ -467,7 +467,7 @@ Bloated Corpse, Explosive Squig and Hell Pit Abomination explanations distinguis
 self-damage, outward payloads and conditional failure. See issue #2 comment
 5911263008 for the source trace and remaining execution questions.
 
-For these five reviewed abilities, existing payload references also expand into
+For individually reviewed abilities, existing payload references also expand into
 the packet's existing payload_graph: bombardments, projectiles, explosions,
 vortices and contact phases keep their original mechanical parameters and record
 identity. Shared definitions appear once; separate ability references remain.
@@ -477,3 +477,38 @@ payload_graph alongside its existing full source graph. Ordinary source document
 remains optional. Retained parameters support downstream calculations but do not
 certify per-target hit counts, damage totals or engine scheduling. Payload damage
 is never copied into ordinary melee or ranged weapon statistics.
+
+The next reviewed batch extends this treatment to Fiery Rebirth, Rebirth,
+Heroic Fortitude and Restore the Blighted, plus seven death-payload abilities
+and the hidden Split Up summon companion. These changes use the existing 1.8.0
+packet fields; no additional mechanic schema or source import is introduced.
+The four survival abilities expose the conditional failure explosion/contact
+chain without treating it as an unconditional periodic effect. Their differences
+remain explicit: Heroic Fortitude has no buffer phase; Fiery Rebirth also has an
+outward blast; Restore the Blighted requires effect enabling. Negative use and
+recharge sentinels do not establish repeatability or a fixed use count.
+
+For the seven reviewed death-payload abilities, `activates_when` explains the
+blast's death event using the casting behavior and group-to-type record as
+provenance. `vortex_on_entity_death` means an individual entity's death;
+`vortex_on_death` means the host unit's death. These are reviewed interpretations
+of behavior evidence, not inversions of deactivation flags or proof of exact
+engine scheduling. Force of Total Destruction's self-damage phase remains
+separate from its death-triggered outward blast; the behavior does not establish
+the self-damage phase's timing. Condition-table coverage alone cannot establish
+complete trigger coverage.
+
+Sea Elemental's Split Up death blast and hidden low-health summon remain two
+records. The latter is disabled above 25% health, summons Oceanids once at the
+host position and carries a zero-damage pulse with a force setting. Its exact
+activation boundary remains unverified; its summon is not labeled `on_death`.
+Oceanids is a reviewed display label from the pinned land-unit localization,
+using the same convention as the previously reviewed summoned-unit labels.
+
+Contact phases include their owning stat/attribute effect rows in the bounded
+calculation graph, following the same reverse ownership links as weapon contact
+payloads. Pestilent Perfection therefore exposes both its outward damage and
+its leadership -10 contact effect (duration setting 10). Ordinary summaries
+retain essential timing/overlap qualifications; full source documentation and
+development diagnostics remain opt-in. The reviewed buffer's role is described,
+but its existing diagnostic is retained until engine timing is established.
