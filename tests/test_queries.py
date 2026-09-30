@@ -134,7 +134,7 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(unit['melee']['attack'], 22)
         passive = next(m for m in unit['passives']['abilities'] if m['key'].endswith('martial_prowess'))
         self.assertEqual(passive['conditions']['deactivates_when'][0]['key'], 'health_below_25%')
-        self.assertIn('health_below_25%', passive['summary'])
+        self.assertIn('Deactivates when: health below 25%', passive['summary'])
         self.assertNotIn('Deactivation flags: Hit Points greater', passive['summary'])
         self.assertEqual(passive['phases'][0]['duration'], -1)
 
@@ -269,6 +269,34 @@ class QueryTests(unittest.TestCase):
             self.assertIn(wording, summary)
             self.assertNotIn('native type', summary)
             self.assertNotIn('native value', summary)
+
+    def test_recharge_and_usage_conditions_are_visible_with_correct_roles(self):
+        wounds = self.q.get_passive_detail('wh3_main_unit_passive_single_entity', include_diagnostics=True)
+        mechanic = wounds['mechanic']
+        self.assertEqual(mechanic['conditions']['recharges_when'][0]['key'], 'health_below_25%')
+        self.assertEqual(mechanic['conditions']['activates_when'], [])
+        self.assertEqual(mechanic['conditions']['deactivates_when'], [])
+        self.assertEqual(mechanic['conditions']['unresolved'], [])
+        self.assertIn('Readiness/recharge conditions: health below 25%', mechanic['summary'])
+        self.assertIn('initial recharge: 5.0', mechanic['summary'])
+        self.assertNotIn('greater than 25%', mechanic['summary'])
+        self.assertTrue(any(g['code'] == 'recharge_activation_boundary' for g in wounds['gaps']))
+        for key, wording in (
+            ('wh3_main_unit_passive_cloud_of_flies', 'engaged in melee'),
+            ('wh_dlc04_unit_passive_strength_of_the_penitent', 'losing melee combat'),
+            ('wh2_main_unit_passive_another_takes_its_place', 'health below 50% of base health'),
+            ('wh3_dlc23_unit_passive_extra_reload', 'ammunition below 80%'),
+        ):
+            mechanic = self.q.get_passive_detail(key)['mechanic']
+            self.assertIn(wording, mechanic['summary'])
+            self.assertTrue(mechanic['conditions']['recharges_when'])
+            self.assertEqual(mechanic['conditions']['unresolved'], [])
+        for row in self.q.db.execute('SELECT special_ability,invalid_usage_flag FROM native_special_ability_to_invalid_usage_flags'):
+            mechanic = self.q.get_passive_detail(row['special_ability'])['mechanic']
+            self.assertEqual(mechanic['conditions']['unavailable_when'][0]['key'], row['invalid_usage_flag'])
+            self.assertIn('Unavailable when:', mechanic['summary'])
+        packet = self.q.get_unit_profile('wh2_main_lzd_mon_kroxigors')
+        self.check(packet)
 
     def test_section_pagination_exhausts_inventory_once(self):
         for section, field in [('attributes', 'attributes'), ('abilities', 'abilities')]:
