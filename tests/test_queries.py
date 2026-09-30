@@ -40,6 +40,27 @@ class QueryTests(unittest.TestCase):
         packet_checks(packet)
         return packet['units'][0]
 
+    def test_death_summons_expose_existing_casting_evidence(self):
+        cases = (
+            ('wh2_main_unit_passive_the_rats_emerge', 'wh2_main_skv_inf_skavenslave_spearmen_0_summoned'),
+            ('wh3_dlc25_unit_passive_nurgling_emergence', 'wh3_dlc25_nur_inf_nurglings_summoned'),
+        )
+        for key, spawned in cases:
+            detail = self.q.get_passive_detail(key, include_diagnostics=True)
+            mechanic = detail['mechanic']
+            summon = next(e for e in mechanic['effects'] if e['kind'] == 'summon')
+            self.assertEqual(summon['unit_key'], spawned)
+            self.assertEqual(summon['trigger'], 'on_death')
+            self.assertEqual(summon['spawn_type'], 'unit_position')
+            self.assertEqual(summon['num_uses'], 1)
+            self.assertIn('upon the host dying', mechanic['summary'])
+            self.assertIn('the host unit is alive', mechanic['summary'])
+            self.assertNotIn('No mapped effects', mechanic['summary'])
+            self.assertTrue(any(c['key'] == 'unit_alive' for c in mechanic['conditions']['deactivates_when']))
+            link = self.q.rows('unit_abilities', 'ability_key', key)[0]
+            unit = self.check(self.q.get_unit_profile(link['unit_key']))
+            self.assertTrue(any(e['kind'] == 'summon' for m in unit['passives']['abilities'] if m['key'] == key for e in m['effects']))
+
     def test_ambiguous_mounts_and_exact_names(self):
         result = self.q.resolve_unit('Teclis')
         self.assertEqual(result['status'], 'ambiguous')

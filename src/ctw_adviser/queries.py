@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.4.0'
+PACKET_VERSION = '1.5.0'
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
 CONDITION_TEXT = {
@@ -520,7 +520,7 @@ class Packet:
             text, refs = self.loc('special_ability_invalid_usage_flags_description_' + key)
         # Shared UI wording often states eligibility, opposite to the flag.
         # Explain the encoded predicate; preserve localization through evidence.
-        meaning = CONDITION_TEXT.get(key)
+        meaning = 'the host unit is alive' if key == 'unit_alive' else CONDITION_TEXT.get(key)
         health = re.fullmatch(r'health_(above|below)_(\d+)%(_base)?', key)
         if health:
             meaning = 'health ' + health[1] + ' ' + health[2] + '%' + (' of base health' if health[3] else '')
@@ -596,6 +596,33 @@ class Packet:
                         mechanic['effects'].append({'kind': 'payload_reference', 'phase_ref': None,
                                                      'node_ref': self.detail('record', edge['target_record']),
                                                      'relationship': edge['relation'], 'provenance_refs': self.refs(source)})
+        if casting and casting['spawned_unit']:
+            unit_key = casting['spawned_unit']
+            unit_name, unit_refs = self.loc('land_units_onscreen_name_' + unit_key)
+            # Reviewed display labels from the pinned tree's land_units localization;
+            # that catalog is not imported, so do not invent retained row references.
+            if unit_name is None:
+                unit_name = {
+                    'wh2_main_skv_inf_skavenslave_spearmen_0_summoned': 'Skavenslave Spears',
+                    'wh3_dlc25_nur_inf_nurglings_summoned': 'Nurglings',
+                }.get(unit_key)
+            spawn_refs = self.refs(casting) + unit_refs
+            # This is a reviewed interpretation of two death-spawn definitions,
+            # not a generic inversion of arbitrary deactivation predicates.
+            death_spawn = key in ('wh2_main_unit_passive_the_rats_emerge',
+                                  'wh3_dlc25_unit_passive_nurgling_emergence') and any(
+                c['key'] == 'unit_alive' for c in mechanic['conditions']['deactivates_when'])
+            if death_spawn:
+                spawn_refs += [r for c in mechanic['conditions']['deactivates_when']
+                               if c['key'] == 'unit_alive' for r in c['provenance_refs']]
+            mechanic['effects'].append({
+                'kind': 'summon', 'phase_ref': None, 'unit_key': unit_key,
+                'unit_name': unit_name, 'trigger': 'on_death' if death_spawn else 'unresolved',
+                'trigger_basis': 'Reviewed interpretation of passive summon with unit_alive deactivation; exact death-event scheduling unverified.' if death_spawn else 'Activation event not established by summon fields.',
+                'spawn_type': casting['spawn_type'], 'num_uses': casting['num_uses'],
+                'native_parameters': self.native('native_ability_casting', casting,
+                    ('spawn_is_transformation', 'spawn_is_decoy', 'spawn_shares_health_and_fatigue')),
+                'provenance_refs': list(dict.fromkeys(spawn_refs))})
         if not mechanic['effects']:
             mechanic['effects'].append({'kind': 'unresolved', 'phase_ref': None, 'native_kind': 'passive_definition',
                                          'native_parameters': {}, 'reason': 'No mapped effects in the retained definition.', 'provenance_refs': classification})
@@ -667,6 +694,12 @@ class Packet:
                 effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + refs))
                 verb = {'grant': 'Grants ', 'remove': 'Removes '}.get(effect['operation'])
                 text = verb + name if verb else name + ': application rule unknown (source token: ' + str(effect['native_parameters']['attribute_type']) + ')'
+            elif kind == 'summon':
+                text = 'Summons ' + (effect['unit_name'] or effect['unit_key'])
+                text += ' upon the host dying' if effect['trigger'] == 'on_death' else ' (activation event unresolved)'
+                text += ' at the host position' if effect['spawn_type'] == 'unit_position' else '; spawn placement: ' + str(effect['spawn_type'])
+                if effect['num_uses'] is not None and effect['num_uses'] >= 0:
+                    text += f'; uses: {effect["num_uses"]:g}'
             elif kind == 'payload_reference':
                 text = 'linked ' + effect['relationship']
             elif effect.get('native_parameters'):
@@ -689,7 +722,7 @@ class Packet:
             text = text.rstrip('.')
             if prefix + text not in pieces:
                 pieces.append(prefix + text)
-        result = 'While active: ' + '; '.join(pieces) + '.'
+        result = ('Effect: ' if all(e['kind'] == 'summon' for e in mechanic['effects']) else 'While active: ') + '; '.join(pieces) + '.'
         for category, label in (
             ('activates_when', 'Activation conditions'),
             ('recharges_when', 'Readiness/recharge conditions'),
