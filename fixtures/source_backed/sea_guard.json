@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "mode": "combined",
   "snapshot": {
     "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
@@ -28,7 +28,10 @@
         "unit_key": "wh2_main_hef_inf_lothern_sea_guard_0",
         "subculture_key": "wh2_main_sc_hef_high_elves",
         "name": "Lothern Sea Guard",
-        "unit_type": "infantry"
+        "unit_type": "infantry",
+        "faction_name": [
+          "High Elves"
+        ]
       },
       "body": {
         "entity_count": 90.0,
@@ -436,6 +439,7 @@
       "source_id": "s_0150606dbf1a",
       "logical_record": 159,
       "key": {
+        "subculture_key": "wh2_main_sc_hef_high_elves",
         "unit_key": "wh2_main_hef_inf_lothern_sea_guard_0"
       },
       "source_line": null,

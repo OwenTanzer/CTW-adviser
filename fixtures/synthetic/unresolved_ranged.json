@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "mode": "combined",
   "snapshot": {
     "commit": "0000000000000000000000000000000000000000",
@@ -27,6 +27,9 @@
       "identity": {
         "unit_key": "synthetic_melee_only",
         "subculture_key": "synthetic_roster",
+        "faction_name": [
+          "Synthetic faction"
+        ],
         "name": "SYNTHETIC melee-only unit",
         "unit_type": "synthetic_monster"
       },

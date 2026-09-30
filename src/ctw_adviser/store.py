@@ -25,7 +25,7 @@ def convert(value: str, kind: str):
     return value
 
 
-def create_native_table(db, name, columns, keys):
+def create_native_table(db, name, columns, keys, *, constraints=()):
     declarations = ['record_id TEXT PRIMARY KEY REFERENCES record_provenance(id)']
     for col in columns:
         field = quote(col['name'])
@@ -36,7 +36,7 @@ def create_native_table(db, name, columns, keys):
         if col['type'] == 'BOOLEAN':
             definition += f' CHECK({field} IN (0,1))'
         declarations.append(definition)
-    db.execute(f'CREATE TABLE {quote(name)} ({",".join(declarations)}) STRICT')
+    db.execute(f'CREATE TABLE {quote(name)} ({",".join([*declarations, *constraints])}) STRICT')
     # NULL remains NULL in the table; tagged JSON key serialization provides
     # source-identity uniqueness even for native blank key components.
     present = {c['name'] for c in columns}
@@ -53,7 +53,7 @@ def open_snapshot(path: Path) -> sqlite3.Connection:
     db = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)
     db.execute('PRAGMA foreign_keys=ON')
     db.execute('PRAGMA query_only=ON')
-    if db.execute('SELECT schema_version FROM snapshot').fetchone() != (1,):
+    if db.execute('SELECT schema_version FROM snapshot').fetchone() != (2,):
         db.close()
         raise ValueError('unsupported snapshot schema')
     db.row_factory = sqlite3.Row
@@ -72,7 +72,8 @@ def inspect_snapshot(path: Path) -> dict:
     with closing(open_snapshot(path)) as db:
         return {
             'snapshot': dict(db.execute('SELECT * FROM snapshot').fetchone()),
-            'roster_rows': db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0],
+            'roster_rows': db.execute('SELECT count(*) FROM unit_availability').fetchone()[0],
+            'unit_profiles': db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0],
             'unit_identities': dict(db.execute(
                 'SELECT namespace,count(*) FROM unit_identity GROUP BY namespace').fetchall()),
             'classifications': dict(db.execute(

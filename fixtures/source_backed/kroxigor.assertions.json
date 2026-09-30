@@ -24,6 +24,12 @@
     "conversion": "text"
   },
   {
+    "pointer": "/units/0/identity/faction_name/0",
+    "evidence_ref": "s_ca1c9a7d1041_124",
+    "column": "faction_name",
+    "conversion": "text"
+  },
+  {
     "pointer": "/units/0/body/entity_count",
     "evidence_ref": "s_ca1c9a7d1041_124",
     "column": "entity_count",

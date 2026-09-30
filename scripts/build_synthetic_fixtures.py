@@ -18,7 +18,7 @@ def synthetic():
   elif isinstance(x,list):
    for v in x:rewrite(v)
  rewrite(p)
- u=p['units'][0];u['identity']={'unit_key':'synthetic_hybrid','subculture_key':'synthetic_roster','name':'SYNTHETIC hybrid — invented schema exercise','unit_type':'synthetic_monster'}
+ u=p['units'][0];u['identity']={'unit_key':'synthetic_hybrid','subculture_key':'synthetic_roster','faction_name':['Synthetic faction'],'name':'SYNTHETIC hybrid — invented schema exercise','unit_type':'synthetic_monster'}
  u['passives']['attributes']=[{'key':'synthetic_attribute','name':'Synthetic attribute','summary':'Invented behavioral tag for schema validation.','provenance_refs':['synthetic']}]
  for i,c in enumerate(u['body']['components']):c['id']='component:'+str(i)
  u['coverage']['gaps']=[{'code':'synthetic','section':s,'summary':'Invented test case; no assertion about game behavior.','provenance_refs':['synthetic']} for s in ['weapons','abilities','activated_options']]

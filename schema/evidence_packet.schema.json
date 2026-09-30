@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ctw-adviser:evidence-packet:1.0.0",
-  "title": "CTW adviser evidence packet v1",
+  "$id": "urn:ctw-adviser:evidence-packet:1.1.0",
+  "title": "CTW adviser evidence packet v1.1",
   "type": "object",
   "properties": {
     "schema_version": {
-      "const": "1.0.0"
+      "const": "1.1.0"
     },
     "mode": {
       "enum": [
@@ -238,6 +238,14 @@
           "type": "string",
           "minLength": 1
         },
+        "faction_name": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
         "name": {
           "anyOf": [
             {
@@ -265,6 +273,7 @@
       "required": [
         "unit_key",
         "subculture_key",
+        "faction_name",
         "name",
         "unit_type"
       ],

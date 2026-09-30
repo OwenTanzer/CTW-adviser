@@ -190,7 +190,7 @@ def select_records(specs, records, edges):
 
 def table_name(path, role):
     if role == 'roster':
-        return 'unit_profiles'
+        return 'unit_roster_records'
     if '/source_exports/db/' in path:
         return Path(path).parent.name.removesuffix('_tables')
     if role == 'selected_native_definition':
@@ -237,9 +237,9 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
         try:
             db.executescript((ROOT / 'schema/store.sql').read_text(encoding='utf-8'))
             db.execute('BEGIN IMMEDIATE')
-            snapshot_id = lock['source_commit'] + ':' + lock['contract_sha256'] + ':store1'
+            snapshot_id = lock['source_commit'] + ':' + lock['contract_sha256'] + ':store2'
             db.execute('INSERT INTO snapshot VALUES(?,?,?,?,?,?,?)',
-                       (snapshot_id, 1, lock['source_commit'], lock['contract_sha256'],
+                       (snapshot_id, 2, lock['source_commit'], lock['contract_sha256'],
                         compact(contract['baseline']), compact(lock['owners']),
                         compact({'structural': 'validated selected records and dependency edges',
                                  'semantic': 'partial; raw conditions/effects retained without application',
@@ -349,6 +349,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
                             raise ValueError('unresolved required relation: ' + edge['name'])
                         db.execute('INSERT INTO coverage_gaps(record_id,kind,detail) VALUES(?,?,?)',
                                    (rid, 'unresolved_reference', edge['name'] + ':' + compact(values)))
+            normalize_roster(db, next(s for s in specs.values() if s['role'] == 'roster'))
             import_payload_lineage(db, source_root)
             import_localization(db, source_root, lock, options)
             record_semantic_gaps(db)
@@ -458,14 +459,66 @@ def record_semantic_gaps(db):
                    (rid[0], 'targetability_unknown', 'Source does not establish secondary-component targetability.'))
 
 
+AVAILABILITY_FIELDS = {
+    'faction_name', 'faction_key', 'subculture_key', 'military_group',
+    'roster_scope', 'is_faction_exclusive', 'military_group_count',
+    'permitted_faction_count', 'availability_notes',
+}
+
+
+def normalize_roster(db, spec):
+    """Split source roster records into shared profiles and qualified availability."""
+    columns = spec['columns']
+    profile_columns = [c for c in columns if c['name'] not in AVAILABILITY_FIELDS]
+    availability_columns = [c for c in columns if c['name'] in AVAILABILITY_FIELDS or c['name'] == 'unit_key']
+    db.row_factory = sqlite3.Row
+    rows = [dict(r) for r in db.execute('SELECT * FROM unit_roster_records ORDER BY unit_key,record_id')]
+    db.row_factory = None
+    profiles = {}
+    factions = defaultdict(set)
+    for row in rows:
+        key = row['unit_key']
+        values = tuple(row[c['name']] for c in profile_columns)
+        if key in profiles and profiles[key][1] != values:
+            raise ValueError('conflicting base profile fields: ' + key)
+        profiles.setdefault(key, (row['record_id'], values))
+        factions[key].add(row['faction_name'])
+    create_native_table(db, 'unit_profiles', profile_columns, ['unit_key'])
+    db.execute('CREATE UNIQUE INDEX profile_identity ON unit_profiles(unit_key)')
+    db.execute("ALTER TABLE unit_profiles ADD COLUMN faction_name TEXT NOT NULL DEFAULT '[]' "
+               "CHECK(json_valid(faction_name) AND json_type(faction_name)='array')")
+    create_native_table(db, 'unit_availability', availability_columns, ['unit_key', 'faction_key', 'subculture_key'],
+                        constraints=['FOREIGN KEY(unit_key) REFERENCES unit_profiles(unit_key)'])
+    for key, (rid, values) in sorted(profiles.items()):
+        names = ['record_id'] + [c['name'] for c in profile_columns] + ['faction_name']
+        db.execute(f'INSERT INTO unit_profiles ({",".join(map(quote,names))}) '
+                   f'VALUES({",".join("?" for _ in names)})',
+                   (rid, *values, compact(sorted(factions[key]))))
+    names = ['record_id'] + [c['name'] for c in availability_columns]
+    db.executemany(f'INSERT INTO unit_availability ({",".join(map(quote,names))}) '
+                   f'VALUES({",".join("?" for _ in names)})',
+                   [tuple(row[n] for n in names) for row in rows])
+    # The compatibility view reconstructs every original roster field and locator,
+    # without storing repeated combat statistics. dataset_tables points here.
+    db.execute('DROP TABLE unit_roster_records')
+    projection = ['a.record_id'] + [f'{"a" if c["name"] in AVAILABILITY_FIELDS else "p"}.{quote(c["name"])}'
+                                  for c in columns]
+    db.execute('CREATE VIEW unit_roster_records AS SELECT ' + ','.join(projection) +
+               ' FROM unit_availability a JOIN unit_profiles p ON p.unit_key=a.unit_key')
+
+
 def validate_candidate(db, specs, records, selected):
     if db.execute('PRAGMA integrity_check').fetchone() != ('ok',):
         raise ValueError('candidate integrity failure')
     if db.execute('PRAGMA foreign_key_check').fetchall():
         raise ValueError('candidate foreign key failure')
     expected = sum(len(records[p]) for p, s in specs.items() if s['role'] == 'roster')
-    if db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0] != expected:
+    if db.execute('SELECT count(*) FROM unit_availability').fetchone()[0] != expected:
         raise ValueError('roster reconciliation failure')
+    expected_profiles = {r['unit_key'] for p, s in specs.items() if s['role'] == 'roster'
+                         for _, r in records[p].values()}
+    if db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0] != len(expected_profiles):
+        raise ValueError('profile reconciliation failure')
     for path, spec in specs.items():
         expected = sum(rid in selected for rid in records[path])
         actual = db.execute('SELECT count(*) FROM record_provenance WHERE source_file=?', (path,)).fetchone()[0]
@@ -477,8 +530,7 @@ def validate_candidate(db, specs, records, selected):
                                'WHERE source_file=? GROUP BY native_key_json HAVING count(*)>1', (path,)).fetchall()
         if duplicate:
             raise ValueError('duplicate native identity: ' + path)
-    db.execute('CREATE UNIQUE INDEX roster_identity ON unit_profiles '
-               '(game,patch,unit_scale,subculture_key,unit_key)')
+    db.execute('CREATE UNIQUE INDEX roster_identity ON unit_availability(subculture_key,unit_key)')
 
 
 def report_candidate(db):
@@ -492,7 +544,8 @@ def report_candidate(db):
         plans[label] = [r[3] for r in db.execute('EXPLAIN QUERY PLAN ' + sql, params)]
         if any('SCAN ' in detail for detail in plans[label]):
             raise ValueError('unindexed ordinary access: ' + label)
-    return {'roster_rows': db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0],
+    return {'roster_rows': db.execute('SELECT count(*) FROM unit_availability').fetchone()[0],
+            'unit_profiles': db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0],
             'unit_identities': dict(db.execute('SELECT namespace,count(*) FROM unit_identity GROUP BY namespace')),
             'classifications': dict(db.execute('SELECT classification,count(*) FROM ability_option_metadata GROUP BY classification')),
             'retained_records': db.execute('SELECT count(*) FROM record_provenance').fetchone()[0],

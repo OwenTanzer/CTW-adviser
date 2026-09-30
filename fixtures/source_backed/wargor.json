@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "mode": "combined",
   "snapshot": {
     "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
@@ -28,7 +28,10 @@
         "unit_key": "wh2_dlc17_bst_cha_wargor_0",
         "subculture_key": "wh_dlc03_sc_bst_beastmen",
         "name": "Wargor",
-        "unit_type": "character"
+        "unit_type": "character",
+        "faction_name": [
+          "Beastmen"
+        ]
       },
       "body": {
         "entity_count": 1.0,
@@ -316,6 +319,7 @@
       "source_id": "s_b7f7d596cc89",
       "logical_record": 11,
       "key": {
+        "subculture_key": "wh_dlc03_sc_bst_beastmen",
         "unit_key": "wh2_dlc17_bst_cha_wargor_0"
       },
       "source_line": null,

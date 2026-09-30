@@ -6,6 +6,8 @@ owns rebuildable serving artifacts and, in later increments, matchup calculation
 Current implementation: issue #2, phases 1–2 — pinned contracts and fixtures,
 plus an offline STRICT SQLite snapshot builder with indexed relations and
 provenance. The query/packet interface and combat evaluator are later work.
+Each base unit appears once, with list-valued faction names and linked,
+source-qualified availability records.
 
 With Python 3.11+ and SQLite 3.37+:
 
