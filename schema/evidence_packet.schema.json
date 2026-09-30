@@ -1,14 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ctw-adviser:evidence-packet:1.3.0",
-  "title": "CTW adviser evidence packet v1.3 (accepts v1.1 and v1.2 fixtures)",
+  "$id": "urn:ctw-adviser:evidence-packet:1.4.0",
+  "title": "CTW adviser evidence packet v1.4 (accepts earlier fixtures)",
   "type": "object",
   "properties": {
     "schema_version": {
       "enum": [
         "1.1.0",
         "1.2.0",
-        "1.3.0"
+        "1.3.0",
+        "1.4.0"
       ]
     },
     "mode": {
@@ -1349,6 +1350,27 @@
           "minItems": 0
         },
         "recipient_requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "minItems": 0
+        },
+        "recharges_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "minItems": 0
+        },
+        "unavailable_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "minItems": 0
+        },
+        "invalid_targets": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/condition"

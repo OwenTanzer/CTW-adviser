@@ -9,9 +9,23 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.3.0'
+PACKET_VERSION = '1.4.0'
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
+CONDITION_TEXT = {
+    'engaged_in_melee': 'engaged in melee',
+    'engaged_in_melee_anything': 'engaged in melee with any opponent',
+    'out_of_melee': 'not engaged in melee',
+    'out_of_melee_anything': 'not engaged in melee with any opponent',
+    'losing_melee_combat': 'losing melee combat',
+    'winning_melee_combat': 'winning melee combat',
+    'have_ammo_below_threshold': 'ammunition below the configured threshold (threshold value not established)',
+    'morale_is_broken_or_lower': 'morale state is broken or worse',
+    'moving': 'moving', 'climbing': 'climbing',
+    'manning_equipment': 'manning equipment', 'no_spells_active': 'no spells active',
+    'climbing_manning_eq_on_platform': 'climbing/equipment/platform state (combination rule not established)',
+    'unit_is_not_pre_murderous_prowess': 'not in the pre-Murderous-Prowess state (state definition not established)',
+}
 STAT_NAMES = {
     'stat_melee_attack': 'melee_attack', 'stat_melee_defence': 'melee_defence',
     'stat_charge_bonus': 'charge_bonus', 'stat_resistance_physical': 'physical_resistance',
@@ -504,12 +518,25 @@ class Packet:
         text, refs = self.loc('special_ability_invalid_usage_flags_alt_description_' + key)
         if text is None:
             text, refs = self.loc('special_ability_invalid_usage_flags_description_' + key)
-        if text is None:
-            text = kind.capitalize() + ' condition: ' + key + '; meaning not established.'
+        # Shared UI wording often states eligibility, opposite to the flag.
+        # Explain the encoded predicate; preserve localization through evidence.
+        meaning = CONDITION_TEXT.get(key)
+        health = re.fullmatch(r'health_(above|below)_(\d+)%(_base)?', key)
+        if health:
+            meaning = 'health ' + health[1] + ' ' + health[2] + '%' + (' of base health' if health[3] else '')
+        if key == 'have_ammo_below_threshold' and text:
+            threshold = re.search(r'Ammunition above (\d+(?:\.\d+)?)%', text)
+            if threshold:
+                meaning = 'ammunition below ' + threshold[1] + '% (threshold inferred from source UI wording)'
+                self.gap(gaps, 'ammo_threshold_from_ui', 'abilities', key + ': threshold comes from selected UI wording rather than a numeric condition field.', self.refs(row) + refs)
+        if meaning is None and text is None:
+            meaning = key.replace('_', ' ') + ' (exact predicate not established)'
             self.gap(gaps, 'condition_meaning_unknown', 'abilities', key + ': no selected wording.', self.refs(row))
-        if '{{' in text:
-            self.gap(gaps, 'unresolved_localization', 'abilities', key + ': unresolved condition substitution.', refs)
-        return {'key': key, 'summary': kind.capitalize() + ' condition (' + key + '). Source UI wording: ' + text,
+        elif meaning is None:
+            meaning = key.replace('_', ' ')
+        if key in ('climbing_manning_eq_on_platform', 'unit_is_not_pre_murderous_prowess'):
+            self.gap(gaps, 'condition_predicate_detail', 'abilities', key + ': exact state/composition needs verification.', self.refs(row))
+        return {'key': key, 'summary': meaning,
                 'provenance_refs': self.refs(row) + refs}
 
     def mechanic(self, link, option, gaps):
@@ -523,16 +550,18 @@ class Packet:
                     'requires_effect_enabling': boolean(option['requires_effect_enabling']),
                     'classification_evidence': classification, 'summary': '',
                     'native_parameters': self.native('native_ability_casting', casting or {}, CASTING_FIELDS),
-                    'conditions': {k: [] for k in ('activates_when', 'deactivates_when', 'recipient_requirements', 'unresolved')},
+                    'conditions': {k: [] for k in ('activates_when', 'deactivates_when', 'recipient_requirements', 'recharges_when', 'unavailable_when', 'invalid_targets', 'unresolved')},
                     'phases': [], 'effects': [], 'provenance_refs': refs,
                     'detail_ref': self.detail('record', definition['record_id'])}
         for table, field, category, wording in (
             ('native_special_ability_to_auto_deactivate_flags', 'deactivate_flag', 'deactivates_when', 'deactivation'),
-            ('native_special_ability_to_invalid_usage_flags', 'invalid_usage_flag', 'unresolved', 'invalid usage'),
-            ('native_special_ability_to_invalid_target_flags', 'invalid_target', 'recipient_requirements', 'invalid target'),
-            ('native_special_ability_to_recharge_contexts', 'recharge_context', 'unresolved', 'recharge')):
+            ('native_special_ability_to_invalid_usage_flags', 'invalid_usage_flag', 'unavailable_when', 'invalid usage'),
+            ('native_special_ability_to_invalid_target_flags', 'invalid_target', 'invalid_targets', 'invalid target'),
+            ('native_special_ability_to_recharge_contexts', 'recharge_context', 'recharges_when', 'recharge')):
             for row in self.q.rows(table, 'special_ability', key):
                 mechanic['conditions'][category].append(self.condition(row, row[field], wording, gaps))
+        if mechanic['conditions']['recharges_when']:
+            self.gap(gaps, 'recharge_activation_boundary', 'abilities', key + ': recharge predicates and timer settings do not certify threshold equality, interrupted progress, reactivation or removal of an existing phase.', refs[:3])
         if mechanic['conditions']['deactivates_when']:
             self.gap(gaps, 'activation_boundary', 'abilities', key + ': deactivation evidence alone does not establish activation, threshold equality or refresh.', refs[:3])
         for phase_link in self.q.rows('native_ability_phase_links', 'special_ability', key,
@@ -661,9 +690,26 @@ class Packet:
             if prefix + text not in pieces:
                 pieces.append(prefix + text)
         result = 'While active: ' + '; '.join(pieces) + '.'
-        conditions = mechanic['conditions']['deactivates_when']
-        if conditions:
-            result += ' Deactivation flags: ' + ', '.join(c['key'] for c in conditions) + '.'
+        for category, label in (
+            ('activates_when', 'Activation conditions'),
+            ('recharges_when', 'Readiness/recharge conditions'),
+            ('deactivates_when', 'Deactivates when'),
+            ('unavailable_when', 'Unavailable when'),
+            ('invalid_targets', 'Excluded target conditions'),
+            ('recipient_requirements', 'Recipient requirements'),
+            ('unresolved', 'Other conditions'),
+        ):
+            conditions = mechanic['conditions'].get(category, [])
+            if conditions:
+                result += ' ' + label + ': ' + '; '.join(c['summary'] for c in conditions) + '.'
+        if mechanic['conditions'].get('recharges_when'):
+            timers = mechanic['native_parameters']
+            settings = []
+            for field, label in (('initial_recharge', 'initial recharge'), ('recharge_time', 'subsequent recharge')):
+                if timers.get(field) is not None and timers[field] >= 0:
+                    settings.append(label + ': ' + str(timers[field]))
+            if settings:
+                result += ' Recharge timer settings: ' + '; '.join(settings) + '.'
         return result
 
     def traits(self, kind, attack, row, component=None, normalized=False):

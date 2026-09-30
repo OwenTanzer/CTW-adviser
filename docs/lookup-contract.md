@@ -1,9 +1,9 @@
-# Evidence packet contract 1.3.0
+# Evidence packet contract 1.4.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts the reviewed 1.1.0 and 1.2.0 examples. Runtime packets use 1.3.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.4.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -338,10 +338,31 @@ deactivation flags. Plain-language summaries describe mechanical facts rather
 than calling them “native values” or “native types”. Unknown quantity units,
 timing, scaling and engine behavior are qualified explicitly, without replacing
 available numbers or claiming the uncertainty has been solved.
-Condition localization is labeled **source UI wording**:
-it can describe an eligibility requirement rather than the meaning of the
-deactivation token. It is never inverted into an activation rule. Unresolved
-localization substitutions stay visible with gaps. Flavor ability tooltips are
+Condition summaries explain the encoded predicate rather than substituting UI
+wording, which often describes the opposite eligibility state. Original keys and
+localization provenance remain available. Missing UI text does not make a clear
+predicate such as climbing or manning equipment unknowable. Composite/state
+definitions still receive specific qualifications.
+
+Conditions have distinct roles: `recharges_when` comes from recharge contexts,
+`unavailable_when` from invalid-usage flags, and `invalid_targets` from target
+exclusions. Deactivation remains `deactivates_when`; `activates_when` is not
+filled by mechanically inverting another category. Every populated role appears
+in the ordinary passive summary. `unresolved` is reserved for unclassified
+conditions rather than a catch-all for recharge or usage evidence. Legacy
+`recipient_requirements` remains accepted for earlier fixtures.
+
+The pinned recharge inventory is 22 passives with seven predicate keys. Wounds
+has `health_below_25%`, initial recharge 5 and no health-based deactivation link.
+Its threshold is a readiness gate, not proof of immediate activation or automatic
+removal after healing. Summaries expose nonnegative initial/subsequent timer
+settings; negative sentinels remain unchanged in casting evidence. Progress
+reset/pause, threshold equality and reactivation remain separate runtime gaps.
+The ammunition threshold is absent from the condition key, but selected UI text
+says ammunition above 80%; the below-threshold predicate therefore exposes 80%
+as an explicitly labeled UI-derived interpretation, with an inspection diagnostic.
+
+Flavor ability tooltips are
 available through localization/provenance, not substituted for numeric effects.
 
 Runtime provenance now includes optional `source_path` and `lineage_refs`.
