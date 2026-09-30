@@ -1,0 +1,27 @@
+{
+  "title": "CTW-adviser · Phase 2 inspection",
+  "description": "Read-only roster, native definitions, relationships and provenance. Source: CTW-data 3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196. Activated abilities retain bounded metadata; coverage_gaps records unresolved semantics.",
+  "source": "CTW-data pinned source",
+  "source_url": "https://github.com/OwenTanzer/CTW-data/tree/3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+  "databases": {
+    "ctw": {
+      "title": "CTW snapshot",
+      "tables": {
+        "unit_profiles": {
+          "description": "3,181 roster rows across 2,409 distinct unit identities. Faction availability can produce multiple rows for a unit.",
+          "label_column": "unit_name",
+          "facets": ["tactical_category", "subculture_key", "roster_scope"]
+        },
+        "coverage_gaps": {"description": "Known limits in the retained native definitions; these are not inferred combat effects."},
+        "source_files": {"description": "Locked source paths and byte hashes used to build this snapshot."}
+      },
+      "queries": {
+        "find_units": {
+          "title": "Find units by name",
+          "description": "Enter part of a unit name, such as Kroxigor. An empty name shows the roster.",
+          "sql": "select unit_name, unit_key, faction_name, tactical_category, entity_count, total_hp, armour, melee_attack, melee_defence, weapon_base_damage, weapon_ap_damage, speed, multiplayer_cost from unit_profiles where unit_name like '%' || :name || '%' order by unit_name, faction_name"
+        }
+      }
+    }
+  }
+}
