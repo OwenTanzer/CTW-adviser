@@ -34,6 +34,14 @@ available through `unit_availability`. Mount-only identities absent from
 the rosters are classified as external. Roster permissions remain separate and
 never transfer through shared inclusion or mount links.
 
+For characters with explicit mount links, `unit_name` includes the mount variant
+in parentheses; unmounted base versions use `(on foot)`. Bases already carrying
+a mount/platform are labeled accordingly. `source_unit_name` preserves the exact
+upstream name and the reconstruction view returns that original name. Labels are
+presentation derived from pinned mount icons/identifiers, not certified localized
+names or combat facts. Missing identifiers produce an explicit unresolved label.
+Unit keys, combat statistics, mount links and availability remain unchanged.
+
 Normalized relation tables retain their stems, e.g. `unit_components`,
 `unit_weapon_links`, `unit_attributes`, `projectiles` and `explosions`. Shared
 definitions use `native_`, e.g. `native_ability_phases`. Raw weapon supplements

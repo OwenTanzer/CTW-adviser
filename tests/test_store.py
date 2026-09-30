@@ -97,6 +97,22 @@ class PinnedStoreTests(unittest.TestCase):
         self.assertEqual(self.output.read_bytes(), before)
         self.assertFalse(list(self.directory.glob('*.candidate')))
 
+    def test_mount_qualified_names_preserve_source_names(self):
+        with closing(open_snapshot(self.output)) as db:
+            names = [r[0] for r in db.execute(
+                "SELECT unit_name FROM unit_profiles WHERE source_unit_name='Teclis' ORDER BY unit_name")]
+            self.assertEqual(names, ['Teclis (Arcane Phoenix)', 'Teclis (Barded Ithilmar Steed)', 'Teclis (on foot)'])
+            self.assertEqual(db.execute("SELECT count(*) FROM unit_roster_records WHERE unit_name='Teclis'").fetchone()[0], 3)
+            for key, label in [('wh2_dlc16_wef_cha_sisters_of_twilight_0', 'Great Eagle'),
+                               ('wh2_main_lzd_cha_lord_mazdamundi_0', 'Palanquin')]:
+                name, source = db.execute('SELECT unit_name,source_unit_name FROM unit_profiles WHERE unit_key=?',
+                                          (key,)).fetchone()
+                self.assertEqual(name, f'{source} ({label})')
+            self.assertEqual(db.execute("SELECT unit_name FROM unit_profiles WHERE unit_key='wh2_main_lzd_mon_kroxigors'").fetchone()[0], 'Kroxigor')
+        from ctw_adviser.build import mount_label
+        self.assertEqual(mount_label('character', 'character_chaos_steed', 'placeholder'), 'Chaos Steed')
+        self.assertEqual(mount_label('character', 'unidentified', 'placeholder'), 'mount unresolved: unidentified')
+
     def test_every_retained_native_field_matches_source(self):
         contract = json.loads((ROOT / 'schema/import_contract.json').read_text(encoding='utf-8'))
         with closing(open_snapshot(self.output)) as db:
