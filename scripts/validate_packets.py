@@ -88,7 +88,7 @@ def packet_checks(p):
         ranged=u['ranged'];status=u['coverage']['ranged']
         melee_status=u['coverage']['melee']
         gaps=u['coverage'].get('gaps')
-        if gaps is None and (p['schema_version'] not in ('1.3.0','1.4.0','1.5.0','1.6.0') or 'diagnostic_count' not in u['coverage']):raise ValueError('missing diagnostic coverage')
+        if gaps is None and (p['schema_version'] not in ('1.3.0','1.4.0','1.5.0','1.6.0','1.7.0') or 'diagnostic_count' not in u['coverage']):raise ValueError('missing diagnostic coverage')
         if gaps is not None and 'diagnostic_count' in u['coverage'] and u['coverage']['diagnostic_count']!=len(gaps):raise ValueError('diagnostic count mismatch')
         if (u['melee'] is None)==(melee_status=='present'):raise ValueError('melee absence/status contradiction')
         if gaps is not None and melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in gaps):raise ValueError('missing melee gap')

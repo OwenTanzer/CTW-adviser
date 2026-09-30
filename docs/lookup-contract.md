@@ -1,9 +1,9 @@
-# Evidence packet contract 1.6.0
+# Evidence packet contract 1.7.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.6.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.7.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -445,3 +445,15 @@ The mapping requires that supporting tooltip and includes its provenance.
 It is not a damage event or numerical modifier; attack/projectile/explosion
 evidence remains separately represented. Its empty phase therefore does not
 produce a phase_effect_unknown warning. No other empty phase is reclassified.
+
+## Too Horrible to Die failure branch
+
+Its existing miscast payload reference now carries optional `failure_context`:
+casting failure chance and global-bonus flag, explosion direct damage/radius,
+and linked contact-phase damage, timing and recipient flags. The default summary
+interprets miscast_chance 0.5 as a 50% failure chance and qualifies runtime execution.
+The explosion's zero direct damage does not erase its damaging contact effect.
+This is conditional failure evidence, not an unconditional extra damage event.
+The Rats Emerge remains a separately conditioned death summon; no mutually
+exclusive heal-versus-summon coin flip or guaranteed death is asserted.
+Full casting/explosion/contact provenance remains available on request.

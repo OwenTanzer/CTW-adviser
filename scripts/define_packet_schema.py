@@ -46,6 +46,8 @@ effects={
  'payload_reference':{'node_ref':S,'relationship':S},
  'unresolved':{'native_kind':S,'native_parameters':native,'reason':S}}
 for name,properties in effects.items():defs['effect_'+name]=obj({'kind':const(name),**effect_common,**properties})
+defs['effect_payload_reference']['properties']['failure_context']=native
+
 defs['effect']={'oneOf':[ref('effect_'+name) for name in effects]}
 defs['mechanic']=obj({'requires_effect_enabling':B,'classification_evidence':refs,'key':S,'name':nullable(S),'culture_key':S,'summary':S,'native_parameters':native,'conditions':ref('conditions'),'phases':arr(ref('phase')),'effects':arr(ref('effect'),1),'provenance_refs':refs,'detail_ref':S})
 defs['attribute']=obj({'key':S,'name':nullable(S),'summary':S,'provenance_refs':refs})
@@ -62,8 +64,8 @@ defs['snapshot']=obj({'commit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'own
 defs['description']=obj({'summary':S,'provenance_refs':refs})
 defs['node']=obj({'id':S,'kind':S,'key':S,'native_parameters':native,'provenance_refs':refs})
 defs['edge']=obj({'from':S,'to':S,'relationship':S,'order':{'type':['integer','null']},'provenance_refs':refs})
-schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-adviser:evidence-packet:1.6.0','title':'CTW adviser evidence packet v1.6 (accepts earlier fixtures)',
- **obj({'schema_version':enum('1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0'),'mode':enum('combined','melee','missile'),'snapshot':ref('snapshot'),'units':arr(ref('unit'),1),
+schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-adviser:evidence-packet:1.7.0','title':'CTW adviser evidence packet v1.7 (accepts earlier fixtures)',
+ **obj({'schema_version':enum('1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0'),'mode':enum('combined','melee','missile'),'snapshot':ref('snapshot'),'units':arr(ref('unit'),1),
  'trait_descriptions':mapping(ref('description')),'sources':mapping(ref('source')),'provenance':mapping(ref('evidence')),'detail_refs':mapping(obj({'kind':S,'key':S})),
  'payload_graph':obj({'nodes':arr(ref('node')),'edges':arr(ref('edge'))}),'scenario':{'type':'object'}},['schema_version','mode','snapshot','units','trait_descriptions','sources','provenance','detail_refs','payload_graph']),'$defs':defs}
 if __name__=='__main__':
