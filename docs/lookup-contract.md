@@ -23,7 +23,7 @@ agent output. Stored `coverage_gaps` and generated query caveats remain availabl
 without copying diagnostic notes into a second serving file. Stable interpretation
 rules belong in this contract and issue #6's skill guidance.
 
-Native phase behavior with unmapped semantics is still `kind: unresolved`, but
+Phase behavior with unmapped semantics is still `kind: unresolved`, but
 its summary names the available parameters and exact values (for example,
 `Mana regeneration modifier: 0.4` or `Fatigue change ratio: -0.0025`). These
 labels describe source fields; they do not establish percent units, per-second
@@ -320,13 +320,25 @@ unknown operations remain native.
 
 Phase recipient edges, order and duration remain separate from effects. Damage,
 healing, resurrection and barrier healing retain native quantities/cadence.
-Attribute positive/negative tokens remain native unless a reviewed semantic
-mapping establishes grant/removal. Other phase behavior and intensity settings
+Attribute polarity is mapped to `operation: grant` for `positive` and
+`operation: remove` for `negative`, while the exact original token remains in
+`native_parameters.attribute_type`. This is a serving interpretation of the
+source application flag, supported by contrasting retained rows: positive
+Immune to Psychology/Silenced/Rampage versus negative Immune to Psychology,
+Rampage and charge defence against large. Positive does not mean beneficial.
+The phase links retain recipient and duration scope; the mapping does not
+certify activation, stacking or post-phase restoration. Unknown tokens stay
+unmapped with an explicit gap. Summaries say “Grants” or “Removes” and display
+the attribute name. Other phase behavior and intensity settings
 use the explicit unresolved subtype with raw values and gaps. Detail references
 retain replacement, behavior and payload dependencies. No modifiers are applied.
 
 Summaries use deterministic templates built from the emitted effects and exact
-deactivation flags. Condition localization is labeled **source UI wording**:
+deactivation flags. Plain-language summaries describe mechanical facts rather
+than calling them “native values” or “native types”. Unknown quantity units,
+timing, scaling and engine behavior are qualified explicitly, without replacing
+available numbers or claiming the uncertainty has been solved.
+Condition localization is labeled **source UI wording**:
 it can describe an eligibility requirement rather than the meaning of the
 deactivation token. It is never inverted into an activation rule. Unresolved
 localization substitutions stay visible with gaps. Flavor ability tooltips are

@@ -239,7 +239,7 @@ class QueryTests(unittest.TestCase):
         ):
             mechanic = self.q.get_passive_detail(key)['mechanic']
             self.assertIn(text, mechanic['summary'])
-            self.assertIn('units and engine interpretation unverified', mechanic['summary'])
+            self.assertIn('not verified', mechanic['summary'])
             self.assertNotIn('scalar modifier', mechanic['summary'])
             self.assertNotIn('..', mechanic['summary'])
             effect = next(e for e in mechanic['effects'] if e.get('native_kind') == 'phase_behavior')
@@ -250,6 +250,25 @@ class QueryTests(unittest.TestCase):
         self.assertIn('max amount: 1.3', mechanic['summary'])
         self.assertIn('effective scaling and stacking unverified', mechanic['summary'])
         self.assertNotIn('source path:', mechanic['summary'])
+
+    def test_attribute_polarity_describes_application_not_benefit(self):
+        from ctw_adviser.queries import Packet
+        cases = (
+            ('wh2_dlc10_lord_passive_boon_of_isha', 'immune_to_psychology', 'grant', 'Grants Immune to Psychology'),
+            ('wh2_dlc11_unit_contact_disrupted', 'silenced', 'grant', 'Grants Silenced'),
+            ('wh3_dlc26_character_passive_dreaded_aura', 'immune_to_psychology', 'remove', 'Removes Immune to Psychology'),
+            ('wh3_dlc26_unit_passive_runes_of_binding', 'rampage', 'remove', 'Removes Rampage'),
+        )
+        for phase_key, attribute, operation, wording in cases:
+            c = Packet(self.q)
+            effects = c.phase_effects(self.q.one('native_ability_phases', 'id', phase_key), [])
+            effect = next(e for e in effects if e.get('attribute_key') == attribute)
+            self.assertEqual(effect['operation'], operation)
+            self.assertEqual(effect['native_parameters']['attribute_type'], 'positive' if operation == 'grant' else 'negative')
+            summary = c.summary({'effects': effects, 'phases': [], 'conditions': {'deactivates_when': []}})
+            self.assertIn(wording, summary)
+            self.assertNotIn('native type', summary)
+            self.assertNotIn('native value', summary)
 
     def test_section_pagination_exhausts_inventory_once(self):
         for section, field in [('attributes', 'attributes'), ('abilities', 'abilities')]:
