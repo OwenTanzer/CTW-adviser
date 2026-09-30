@@ -1,9 +1,27 @@
-# Evidence packet contract 1.2.0
+# Evidence packet contract 1.3.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts the reviewed 1.1.0 examples. Runtime packets use 1.2.0.
+The schema still accepts the reviewed 1.1.0 and 1.2.0 examples. Runtime packets use 1.3.0.
+
+Development diagnostics are separate from ordinary agent output. Default packets
+omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
+the existing section states, counts/cursors and explicit melee/ranged status.
+The count signals available notes, not missing mechanics or a completeness score.
+Raw conditions, unresolved effects, nulls, provenance and source-specific
+qualifications stay in combat facts. Absence of diagnostic prose never certifies
+complete mechanical interpretation.
+
+Use `get_coverage_notes(unit, ...)` (CLI `coverage --db ... UNIT`) for a separate
+diagnostic response with identity, coverage notes and their evidence. It accepts
+the same context, mode and page options as ordinary queries. For inspection of
+the complete packet, pass `include_diagnostics=True` or CLI
+`--include-diagnostics`; passive detail supports the same opt-in. The read-only
+site includes diagnostics in its human view; JSON downloads default to compact
+agent output. Stored `coverage_gaps` and generated query caveats remain available
+without copying diagnostic notes into a second serving file. Stable interpretation
+rules belong in this contract and issue #6's skill guidance.
 
 ## Ordinary output
 

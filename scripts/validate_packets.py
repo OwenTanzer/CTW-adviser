@@ -87,8 +87,11 @@ def packet_checks(p):
         if names!=sorted(set(names)):raise ValueError('faction_name must be sorted and unique')
         ranged=u['ranged'];status=u['coverage']['ranged']
         melee_status=u['coverage']['melee']
+        gaps=u['coverage'].get('gaps')
+        if gaps is None and (p['schema_version']!='1.3.0' or 'diagnostic_count' not in u['coverage']):raise ValueError('missing diagnostic coverage')
+        if gaps is not None and 'diagnostic_count' in u['coverage'] and u['coverage']['diagnostic_count']!=len(gaps):raise ValueError('diagnostic count mismatch')
         if (u['melee'] is None)==(melee_status=='present'):raise ValueError('melee absence/status contradiction')
-        if melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in u['coverage']['gaps']):raise ValueError('missing melee gap')
+        if gaps is not None and melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in gaps):raise ValueError('missing melee gap')
         if (ranged is None and status!='known_none') or (ranged is not None and ranged['status']!=status):raise ValueError('ranged absence/status contradiction')
         sections=u['coverage']['sections'];names=[s['name'] for s in sections]
         if sorted(names)!=sorted(['components','weapons','attributes','abilities','activated_options']):raise ValueError('section coverage must be unique and exhaustive')
@@ -97,8 +100,8 @@ def packet_checks(p):
             offset=s.get('offset',0)
             if s['state']=='complete' and (s['total']!=s['returned']+offset or s['cursor'] is not None):raise ValueError('false complete section')
             if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned']+offset)):raise ValueError('partial section needs overflow/cursor')
-            if s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in u['coverage']['gaps']):raise ValueError('unqualified unresolved/omitted section')
-        if status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in u['coverage']['gaps']):raise ValueError('missing ranged gap')
+            if gaps is not None and s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in gaps):raise ValueError('unqualified unresolved/omitted section')
+        if gaps is not None and status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in gaps):raise ValueError('missing ranged gap')
         attacks={};components={c['id'] for c in u['body']['components']}
         if len(components)!=len(u['body']['components']):raise ValueError('duplicate component id')
         def add(a,kind,component=None):

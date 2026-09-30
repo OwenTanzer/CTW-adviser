@@ -204,6 +204,34 @@ class QueryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.q.get_passive_detail('wh2_main_unit_passive_martial_prowess', culture='invented_culture')
 
+    def test_diagnostics_are_opt_in_without_changing_combat_facts(self):
+        key = 'Kroxigor'
+        compact = self.q.get_unit_profile(key)
+        inspection = self.q.get_unit_profile(key, include_diagnostics=True)
+        self.check(compact)
+        self.check(inspection)
+        coverage = compact['units'][0]['coverage']
+        self.assertNotIn('gaps', coverage)
+        self.assertGreater(coverage['diagnostic_count'], 0)
+        self.assertEqual(coverage['diagnostic_count'], len(inspection['units'][0]['coverage']['gaps']))
+        for group in ('identity', 'body', 'movement', 'leadership', 'melee', 'ranged', 'passives', 'cost', 'activated_options'):
+            self.assertEqual(compact['units'][0][group], inspection['units'][0][group])
+        notes = self.q.get_coverage_notes(key)
+        self.assertEqual(notes['units'][0]['coverage'], inspection['units'][0]['coverage'])
+        self.assertNotIn('passives', notes['units'][0])
+        for gap in notes['units'][0]['coverage']['gaps']:
+            for ref in gap['provenance_refs']:
+                self.assertIn(ref, notes['provenance'])
+        passive_key = 'wh2_main_unit_passive_martial_prowess'
+        passive = self.q.get_passive_detail(passive_key)
+        detailed = self.q.get_passive_detail(passive_key, include_diagnostics=True)
+        self.assertNotIn('gaps', passive)
+        self.assertEqual(passive['mechanic'], detailed['mechanic'])
+        self.assertEqual(passive['diagnostic_count'], len(detailed['gaps']))
+        projected = self.q.get_combat_relations(key, 'abilities', limit=1)
+        self.check(projected)
+        self.assertEqual(projected['units'][0]['coverage']['ranged'], 'omitted')
+
     def test_section_pagination_exhausts_inventory_once(self):
         for section, field in [('attributes', 'attributes'), ('abilities', 'abilities')]:
             seen = []
