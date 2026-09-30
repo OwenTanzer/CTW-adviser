@@ -40,6 +40,20 @@ class QueryTests(unittest.TestCase):
         packet_checks(packet)
         return packet['units'][0]
 
+    def test_exploding_unit_is_source_backed_visual_indicator(self):
+        key = 'wh2_dlc15_unit_abilities_exploding_unit'
+        detail = self.q.get_passive_detail(key, include_diagnostics=True)
+        mechanic = detail['mechanic']
+        self.assertEqual([e['kind'] for e in mechanic['effects']], ['visual_indicator'])
+        effect = mechanic['effects'][0]
+        self.assertIn('banner visual effect', mechanic['summary'])
+        self.assertTrue(any('unit_abilities_tooltip_text_' + key in str(detail['provenance'][r]) for r in effect['provenance_refs']))
+        self.assertFalse(any(g['code'] == 'phase_effect_unknown' for g in detail['gaps']))
+        link = self.q.rows('unit_abilities', 'ability_key', key)[0]
+        self.check(self.q.get_unit_profile(link['unit_key']))
+        other = self.q.get_passive_detail('wh2_main_faction_abilities_murderous_prowess_indicator', include_diagnostics=True)
+        self.assertTrue(any(g['code'] == 'phase_effect_unknown' for g in other['gaps']))
+
     def test_death_summons_expose_existing_casting_evidence(self):
         cases = (
             ('wh2_main_unit_passive_the_rats_emerge', 'wh2_main_skv_inf_skavenslave_spearmen_0_summoned'),

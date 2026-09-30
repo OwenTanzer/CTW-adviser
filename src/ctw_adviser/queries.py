@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.5.0'
+PACKET_VERSION = '1.6.0'
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
 CONDITION_TEXT = {
@@ -664,6 +664,12 @@ class Packet:
             effects.append({'kind': 'unresolved', 'phase_ref': key, 'native_kind': 'phase_behavior',
                             'native_parameters': other, 'reason': 'Phase settings retained; exact units or engine rules require further verification.', 'provenance_refs': refs})
             self.gap(gaps, 'phase_behavior_semantics', 'abilities', key + ': phase behavior needs interpretation.', refs)
+        if key == 'wh2_dlc15_unit_abilities_exploding_unit':
+            tooltip, tooltip_refs = self.loc('unit_abilities_tooltip_text_' + key)
+            if tooltip and 'persistent banner VFX' in tooltip and 'indicate that a unit explodes' in tooltip:
+                effects.append({'kind': 'visual_indicator', 'phase_ref': key,
+                                'purpose': 'Persistent banner visual effect indicating that the unit explodes',
+                                'provenance_refs': list(dict.fromkeys(refs + tooltip_refs))})
         if not effects:
             effects.append({'kind': 'unresolved', 'phase_ref': key, 'native_kind': 'phase', 'native_parameters': {},
                             'reason': 'Phase has no mapped numerical effect; engine behavior is unresolved.', 'provenance_refs': refs})
@@ -700,6 +706,8 @@ class Packet:
                 text += ' at the host position' if effect['spawn_type'] == 'unit_position' else '; spawn placement: ' + str(effect['spawn_type'])
                 if effect['num_uses'] is not None and effect['num_uses'] >= 0:
                     text += f'; uses: {effect["num_uses"]:g}'
+            elif kind == 'visual_indicator':
+                text = effect['purpose']
             elif kind == 'payload_reference':
                 text = 'linked ' + effect['relationship']
             elif effect.get('native_parameters'):
@@ -722,7 +730,7 @@ class Packet:
             text = text.rstrip('.')
             if prefix + text not in pieces:
                 pieces.append(prefix + text)
-        result = ('Effect: ' if all(e['kind'] == 'summon' for e in mechanic['effects']) else 'While active: ') + '; '.join(pieces) + '.'
+        result = ('Effect: ' if all(e['kind'] in ('summon', 'visual_indicator') for e in mechanic['effects']) else 'While active: ') + '; '.join(pieces) + '.'
         for category, label in (
             ('activates_when', 'Activation conditions'),
             ('recharges_when', 'Readiness/recharge conditions'),
