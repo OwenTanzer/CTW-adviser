@@ -1,9 +1,9 @@
-# Evidence packet contract 1.7.0
+# Evidence packet contract 1.8.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.7.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.8.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -457,3 +457,23 @@ This is conditional failure evidence, not an unconditional extra damage event.
 The Rats Emerge remains a separately conditioned death summon; no mutually
 exclusive heal-versus-summon coin flip or guaranteed death is asserted.
 Full casting/explosion/contact provenance remains available on request.
+
+## Reviewed explanations and calculation payloads
+
+The three traced examples use concise, reviewed summaries in the existing mechanic
+envelope. No additional unit-mechanic schema is introduced. Literal conditions,
+phase sequence, self-damage/healing and summon fields remain accessible.
+Bloated Corpse, Explosive Squig and Hell Pit Abomination explanations distinguish
+self-damage, outward payloads and conditional failure. See issue #2 comment
+5911263008 for the source trace and remaining execution questions.
+
+For these five reviewed abilities, existing payload references also expand into
+the packet's existing payload_graph: bombardments, projectiles, explosions,
+vortices and contact phases keep their original mechanical parameters and record
+identity. Shared definitions appear once; separate ability references remain.
+Expansion is bounded to four edges/64 visited records per mechanic, with explicit
+detail-required diagnostics at a boundary. Passive detail exposes the same compact
+payload_graph alongside its existing full source graph. Ordinary source documentation
+remains optional. Retained parameters support downstream calculations but do not
+certify per-target hit counts, damage totals or engine scheduling. Payload damage
+is never copied into ordinary melee or ranged weapon statistics.

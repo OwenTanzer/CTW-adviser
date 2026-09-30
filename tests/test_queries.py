@@ -40,6 +40,38 @@ class QueryTests(unittest.TestCase):
         packet_checks(packet)
         return packet['units'][0]
 
+    def test_reviewed_explanations_keep_calculation_payloads_separate(self):
+        corpse_packet = self.q.get_unit_profile('wh2_dlc11_cst_mon_bloated_corpse_0')
+        corpse = self.check(corpse_packet)
+        self.assertEqual(corpse['melee']['base_damage'], 150)
+        self.assertEqual(corpse['melee']['ap_damage'], 300)
+        abilities = {m['key']: m for m in corpse['passives']['abilities']}
+        self.assertIn('Corpse itself', abilities['wh2_dlc11_unit_passive_gaseous_demise']['summary'])
+        routes = [next(e['node_ref'] for e in abilities[k]['effects'] if e['kind'] == 'payload_reference') for k in
+                  ('wh2_dlc11_unit_passive_gaseous_demise', 'wh2_dlc11_unit_passive_noxious_unstable_mark_ii')]
+        self.assertEqual(routes[0], routes[1])
+        blasts = [n for n in corpse_packet['payload_graph']['nodes'] if n['id'] == routes[0]]
+        self.assertEqual(len(blasts), 1)
+        self.assertEqual(blasts[0]['native_parameters']['damage_ap'], 72)
+        self.assertTrue(blasts[0]['native_parameters']['affects_allies'])
+        squig_packet = self.q.get_unit_profile('wh_twa03_def_inf_squig_explosive_0')
+        squig = self.check(squig_packet)
+        self.assertIsNone(squig['ranged'])
+        graph = squig_packet['payload_graph']
+        projectile = next(n for n in graph['nodes'] if n['kind'] == 'projectiles')
+        blast = next(n for n in graph['nodes'] if n['kind'] == 'explosions')
+        self.assertEqual(projectile['native_parameters']['base_damage'], 0)
+        self.assertEqual(projectile['native_parameters']['ap_damage'], 0)
+        self.assertEqual(blast['native_parameters']['base_damage'], 100)
+        self.assertEqual(blast['native_parameters']['ap_damage'], 200)
+        self.assertTrue(any(e['from'] == projectile['id'] and e['to'] == blast['id'] for e in graph['edges']))
+        detail = self.q.get_passive_detail('wh2_main_unit_passive_too_horrible_to_die')
+        contact = next(n for n in detail['payload_graph']['nodes'] if n['kind'] == 'native_ability_phases')
+        self.assertEqual(contact['native_parameters']['damage_amount'], 6650)
+        self.assertFalse(contact['native_parameters']['affects_enemies'])
+        self.assertNotIn('gaps', detail)
+        self.assertNotIn('source_path', contact['native_parameters'])
+
     def test_abomination_failure_branch_is_conditional_and_separate(self):
         unit = self.check(self.q.get_unit_profile('wh2_main_skv_mon_hell_pit_abomination'))
         abilities = {m['key']: m for m in unit['passives']['abilities']}
