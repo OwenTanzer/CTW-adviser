@@ -487,13 +487,15 @@ def normalize_roster(db, spec):
     db.execute('CREATE UNIQUE INDEX profile_identity ON unit_profiles(unit_key)')
     db.execute("ALTER TABLE unit_profiles ADD COLUMN faction_name TEXT NOT NULL DEFAULT '[]' "
                "CHECK(json_valid(faction_name) AND json_type(faction_name)='array')")
+    db.execute("ALTER TABLE unit_profiles ADD COLUMN source_unit_name TEXT NOT NULL DEFAULT ''")
+    db.execute('CREATE INDEX unit_profiles_source_unit_name_nocase ON unit_profiles(source_unit_name COLLATE NOCASE)')
     create_native_table(db, 'unit_availability', availability_columns, ['unit_key', 'faction_key', 'subculture_key'],
                         constraints=['FOREIGN KEY(unit_key) REFERENCES unit_profiles(unit_key)'])
     for key, (rid, values) in sorted(profiles.items()):
-        names = ['record_id'] + [c['name'] for c in profile_columns] + ['faction_name']
+        names = ['record_id'] + [c['name'] for c in profile_columns] + ['faction_name', 'source_unit_name']
         db.execute(f'INSERT INTO unit_profiles ({",".join(map(quote,names))}) '
                    f'VALUES({",".join("?" for _ in names)})',
-                   (rid, *values, compact(sorted(factions[key]))))
+                   (rid, *values, compact(sorted(factions[key])), values[[c['name'] for c in profile_columns].index('unit_name')]))
     names = ['record_id'] + [c['name'] for c in availability_columns]
     db.executemany(f'INSERT INTO unit_availability ({",".join(map(quote,names))}) '
                    f'VALUES({",".join("?" for _ in names)})',
@@ -501,10 +503,55 @@ def normalize_roster(db, spec):
     # The compatibility view reconstructs every original roster field and locator,
     # without storing repeated combat statistics. dataset_tables points here.
     db.execute('DROP TABLE unit_roster_records')
-    projection = ['a.record_id'] + [f'{"a" if c["name"] in AVAILABILITY_FIELDS else "p"}.{quote(c["name"])}'
+    projection = ['a.record_id'] + [('p.source_unit_name AS unit_name' if c['name'] == 'unit_name' else
+                                  f'{"a" if c["name"] in AVAILABILITY_FIELDS else "p"}.{quote(c["name"])}')
                                   for c in columns]
     db.execute('CREATE VIEW unit_roster_records AS SELECT ' + ','.join(projection) +
                ' FROM unit_availability a JOIN unit_profiles p ON p.unit_key=a.unit_key')
+    qualify_mount_names(db)
+
+
+def mount_label(base_key, mounted_key, icon):
+    """Presentation label derived from source identifiers, not localization."""
+    if icon and icon.lower().endswith('.png') and Path(icon).stem.startswith('mount_'):
+        token = Path(icon).stem.removeprefix('mount_')
+        token = {'hef_griffon': 'griffon', 'skeletal_steed_tmb': 'skeletal_steed'}.get(token, token)
+    elif icon and ' ' in icon and '/' not in icon:
+        return icon
+    elif mounted_key.startswith(base_key + '_'):
+        token = mounted_key[len(base_key) + 1:]
+    else:
+        return 'mount unresolved: ' + mounted_key
+    return ' '.join(word if word in ('of', 'the', 'with', 'a') else word.capitalize()
+                    for word in token.split('_'))
+
+
+def qualify_mount_names(db):
+    labels = {}
+    bases = set()
+    for base, mounted, icon in db.execute(
+            'SELECT base_unit_key,mounted_unit_key,icon_name FROM unit_mount_variants ORDER BY mounted_unit_key'):
+        label = mount_label(base, mounted, icon)
+        if mounted in labels and labels[mounted] != label:
+            raise ValueError('conflicting mount label: ' + mounted)
+        labels[mounted] = label
+        bases.add(base)
+    # These source base variants already carry a mount/platform.
+    base_mounts = {
+        'wh2_dlc16_wef_cha_sisters_of_twilight_0': 'Great Eagle',
+        'wh2_main_lzd_cha_lord_mazdamundi_0': 'Palanquin',
+    }
+    for base in sorted(bases - labels.keys()):
+        row = db.execute('SELECT source_mount_entity_key,source_engine_entity_key FROM unit_profiles WHERE unit_key=?',
+                         (base,)).fetchone()
+        if row is not None:
+            label = base_mounts.get(base)
+            if label is None:
+                label = 'base mount unresolved: ' + (row[0] or row[1]) if any(row) else 'on foot'
+            labels[base] = label
+    for key, label in sorted(labels.items()):
+        db.execute("UPDATE unit_profiles SET unit_name=source_unit_name || ' (' || ? || ')' WHERE unit_key=?",
+                   (label, key))
 
 
 def validate_candidate(db, specs, records, selected):
@@ -538,6 +585,7 @@ def report_candidate(db):
     for label, sql, params in [
         ('unit_key', 'SELECT record_id FROM unit_profiles WHERE unit_key=?', ('wh2_main_lzd_mon_kroxigors',)),
         ('unit_name', 'SELECT record_id FROM unit_profiles WHERE unit_name=? COLLATE NOCASE', ('Kroxigor',)),
+        ('source_unit_name', 'SELECT record_id FROM unit_profiles WHERE source_unit_name=? COLLATE NOCASE', ('Teclis',)),
         ('relations', 'SELECT record_id FROM unit_records WHERE unit_key=?', ('wh2_main_lzd_mon_kroxigors',)),
         ('reverse_edge', 'SELECT source_record FROM relation_edges WHERE target_record=?', ('example',)),
     ]:
