@@ -512,3 +512,21 @@ its leadership -10 contact effect (duration setting 10). Ordinary summaries
 retain essential timing/overlap qualifications; full source documentation and
 development diagnostics remain opt-in. The reviewed buffer's role is described,
 but its existing diagnostic is retained until engine timing is established.
+
+Kaboom! and Blow Apart use the same explanation/payload approach. Their host-death
+event is an individually reviewed interpretation of the unit-alive exclusion and
+the associated blast/tooltip evidence, not a generic inversion rule. Their contact
+penalties remain in the payload graph: leadership -8 for both, and speed x0.85 for
+Blow Apart, duration setting 10. The blasts affect allies and enemies; the contact
+phases affect enemies only. Blow Apart's self-targeted damage remains separate.
+
+The Necrofex Abandon Ship! is a one-use low-host-health summon disabled above 50%,
+with a separate self-damage phase. Death to All, Absolute Supremacy and Spirit-Essence
+of Chaos instead damage eligible enemy targets and summon Wight King, Zombies and
+Chaos Spawn respectively. Their above-20%-health exclusion applies to the target.
+Death to All excludes non-commanders; the other two exclude commanders. The Nagash
+abilities retain requires_effect_enabling. No caster-health or death trigger is
+invented. Their unit-position spawn setting does not establish caster-versus-target
+placement, a required kill, summon timing or lifetime. The existing trigger_basis
+and summary describe these specific unknowns; trigger remains unresolved. Summoned
+unit labels follow the same pinned-localization convention as earlier passes.

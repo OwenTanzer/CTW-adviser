@@ -29,6 +29,23 @@ DEATH_PAYLOAD_PASSIVES = {
     'wh3_dlc29_unit_passive_pestilent_perfection': 'the Pusbags',
 }
 EXPLAINED_PASSIVES = {
+    'wh2_dlc13_unit_passive_kaboom':
+        'One-use death blast for the Steam Tank variant carrying Kaboom!, interpreted from the unit-alive exclusion and explosion definition. '
+        'The expanding flaming blast can hit allies and enemies; its contact effect reduces enemy leadership by 8, with duration setting 10. '
+        'Blast parameters are separate from ordinary weapon damage. Exact death-event scheduling and hit counts remain unverified.',
+    'wh3_dlc26_unit_abilities_blow_apart':
+        'One-use death blast for the Colossal Squig, supported by the unit-alive exclusion and death tooltip. '
+        'The expanding blast can hit allies and enemies; its contact effect reduces enemy leadership by 8 and multiplies speed by 0.85, with duration setting 10. '
+        'A separate self-targeted damage phase is retained; it is not outward blast damage or proof of a living-unit suicide trigger. '
+        'Exact death-event scheduling, self-phase execution and hit counts remain unverified.',
+    'wh2_dlc11_unit_passive_abandon_ship':
+        'Necrofex low-health summon: summons a Zombie Pirate Deckhand Mob at the host position, with one use. '
+        'Disabled above 50% host health; exact threshold equality and summon timing remain unverified. '
+        'A separate self-targeted phase has damage amount 3, interval setting 1, duration setting 1 and maximum one affected entity. '
+        'This is distinct from the Land Ship death blast with the same ability name; summoned-unit lifetime remains unverified.',
+    'wh3_dlc29_lord_passive_arch_necromancer': None,
+    'wh3_dlc29_lord_passive_liche_ascendant': None,
+    'wh_dlc05_lord_abilities_spirit_essence_of_chaos': None,
     'wh2_dlc11_unit_passive_gaseous_demise':
         'Melee engagement enables this one-use detonation. A buffer phase precedes a phase that damages the Corpse itself. '
         'The ability also launches an expanding magical blast that can hit allies and enemies. '
@@ -51,6 +68,11 @@ EXPLAINED_PASSIVES = {
         'The damaging death blast belongs to the other Split Up ability; these are not one death-triggered summon.',
 }
 
+TARGET_SUMMON_PASSIVES = {
+    'wh3_dlc29_lord_passive_arch_necromancer': 'commander-class',
+    'wh3_dlc29_lord_passive_liche_ascendant': 'non-commander',
+    'wh_dlc05_lord_abilities_spirit_essence_of_chaos': 'non-commander',
+}
 
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
@@ -638,6 +660,14 @@ class Packet:
                         mechanic['effects'].append({'kind': 'payload_reference', 'phase_ref': None,
                                                      'node_ref': self.detail('record', edge['target_record']),
                                                      'relationship': edge['relation'], 'provenance_refs': self.refs(source)})
+        if key in ('wh2_dlc13_unit_passive_kaboom', 'wh3_dlc26_unit_abilities_blow_apart') and casting:
+            alive = [c for c in mechanic['conditions']['deactivates_when'] if c['key'] == 'unit_alive']
+            if alive and casting['vortex']:
+                _, tooltip_refs = self.loc('unit_abilities_tooltip_text_' + key)
+                mechanic['conditions']['activates_when'].append({
+                    'key': 'on_death',
+                    'summary': 'the host dies (reviewed interpretation of this death-blast definition and unit-alive exclusion; exact scheduling unverified)',
+                    'provenance_refs': list(dict.fromkeys(self.refs(casting) + tooltip_refs + [r for c in alive for r in c['provenance_refs']]))})
         if key in DEATH_PAYLOAD_PASSIVES and casting:
             for behavior in self.q.rows('native_special_ability_behaviour_groups_to_types', 'group', casting['behaviour']):
                 event = {
@@ -680,6 +710,10 @@ class Packet:
                     'wh2_main_skv_inf_skavenslave_spearmen_0_summoned': 'Skavenslave Spears',
                     'wh3_dlc25_nur_inf_nurglings_summoned': 'Nurglings',
                     'wh3_dlc27_hef_inf_oceanids_split_up_summoned': 'Oceanids',
+                    'wh2_dlc11_cst_inf_zombie_deckhands_mob_necrofex_summoned_0': 'Zombie Pirate Deckhand Mob',
+                    'wh_main_vmp_cha_wight_king_0_summoned': 'Wight King',
+                    'wh_main_vmp_inf_zombie_summoned': 'Zombies',
+                    'wh_dlc03_bst_mon_chaos_spawn_0_summoned': 'Chaos Spawn',
                 }.get(unit_key)
             spawn_refs = self.refs(casting) + unit_refs
             # This is a reviewed interpretation of two death-spawn definitions,
@@ -701,6 +735,15 @@ class Packet:
             if key == 'wh3_dlc27_unit_passive_split_up_hidden':
                 mechanic['effects'][-1]['trigger_basis'] = (
                     'Low-health summon route, disabled above 25% health. Exact threshold equality and event scheduling unverified; not the death-blast route.')
+            if key == 'wh2_dlc11_unit_passive_abandon_ship':
+                mechanic['effects'][-1]['trigger_basis'] = 'Host low-health summon, disabled above 50% host health; exact threshold equality and scheduling unverified.'
+            if key in TARGET_SUMMON_PASSIVES:
+                mechanic['effects'][-1]['trigger_basis'] = (
+                    'Enemy-targeted damage and summon; target health/class restrictions are not caster conditions. '
+                    'Whether summoning requires the target to die, exact timing and caster-versus-target placement anchor remain unverified.')
+            if key in TARGET_SUMMON_PASSIVES or key == 'wh2_dlc11_unit_passive_abandon_ship':
+                mechanic['effects'][-1]['provenance_refs'] = list(dict.fromkeys(spawn_refs + [
+                    r for role in ('invalid_targets', 'deactivates_when') for c in mechanic['conditions'][role] for r in c['provenance_refs']]))
         if not mechanic['effects']:
             mechanic['effects'].append({'kind': 'unresolved', 'phase_ref': None, 'native_kind': 'passive_definition',
                                          'native_parameters': {}, 'reason': 'No mapped effects in the retained definition.', 'provenance_refs': classification})
@@ -851,6 +894,21 @@ class Packet:
 
     def explained_summary(self, mechanic):
         key = mechanic.get('key')
+        if key in TARGET_SUMMON_PASSIVES:
+            spawn = next(e for e in mechanic['effects'] if e['kind'] == 'summon')
+            damage = next(e for e in mechanic['effects'] if e['kind'] == 'periodic_damage')
+            n = damage['native_parameters']; c = mechanic['native_parameters']
+            duration = next(p['duration'] for p in mechanic['phases'] if p['key'] == damage['phase_ref'])
+            result = (f'Damages one eligible enemy {TARGET_SUMMON_PASSIVES[key]} unit and summons {spawn["unit_name"]}. '
+                      'Targets above 20% health are excluded; this is a target-health restriction, not a caster-health trigger. '
+                      f'Target interception range setting: {c["target_intercept_range"]:g}. '
+                      f'Enemy damage phase: amount {n["damage_amount"]:g}, interval setting {n["hp_change_frequency"]:g}, '
+                      f'duration setting {duration:g}, maximum affected entities {n["max_damaged_entities"]:g}. '
+                      f'Uses: {spawn["num_uses"]:g}; recharge setting: {c["recharge_time"]:g}. ')
+            if mechanic['requires_effect_enabling']:
+                result += 'Requires effect enabling. '
+            return result + ('Summon placement uses the unit-position setting; whether this anchors to the caster or target is unverified. '
+                             'Exact threshold equality, target selection, damage timing, whether summoning requires a kill, and summoned-unit lifetime remain unverified.')
         if key in DEATH_PAYLOAD_PASSIVES:
             vortex = self.q.one('native_vortices', 'vortex_key', mechanic['native_parameters']['vortex'])
             if vortex:
