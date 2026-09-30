@@ -92,7 +92,8 @@ behavior junctions do not establish absence when missing.
 
 The locked contract supplies the base joins. Narrow additional payload edges
 and inbound attachments follow the selected native schemas and upstream payload
-conventions. No source pin or approved packet contract changes in this phase.
+conventions. The source pin and import contract are unchanged. Packet contract
+1.1.0 requires list-valued faction names; assembled packet queries remain phase 3.
 
 Activated/unresolved definitions and casting records use narrow
 `native_ability_definitions_metadata` and `native_ability_casting_metadata`
@@ -148,17 +149,24 @@ contact groups and lineage, reject writes and exercise failed installation.
 
 ## Verified pinned build
 
-On Windows with Python 3.12 and SQLite 3.49.1, the final pinned build retained
-3,181 roster rows, 2,409 main-unit identities and 46,257 evidence/lineage/text
+The current schema-3 build retains 2,379 distinct profiles representing
+3,181 roster rows, 2,409 original main-unit identities and 46,257 evidence/lineage/text
 records. Its 1,077 reachable ability identities classify as 499 core passives and
 578 activated options. All 36,196 stored dependency edges resolve; 312 explicit
 coverage gaps concern unsupported runtime behavior or targetability rather than
 broken references. These are evidence-coverage counts, not a completeness claim.
 
-The database is 56,279,040 bytes; this run built in 8.912 seconds. All four checked
-unit key/name and forward/reverse access plans use indexed SEARCH operations.
-All 41 tests pass, including full retained-field source comparison, byte-identical
-rebuilds, read-only access, invalid inputs and injected pre-install failure. The
-10 approved packet fixtures still pass schema/semantic/source validation. Timing
+All 45 tests pass, including full retained-field source comparison, exact source
+roster reconstruction, alias resolution, non-consolidation of distinct abilities,
+mount names, byte-identical rebuilds, read-only access, invalid inputs and injected
+pre-install failure. All 17 approved/generated packet examples pass
+schema/semantic/source validation. Checked profile, original-name, alias-key and
+forward/reverse access plans use indexed SEARCH operations.
+
+Historical baseline before profile consolidation: on Windows with Python 3.12
+and SQLite 3.49.1, the schema-1 database was 56,279,040 bytes and built in 8.912
+seconds; its four checked access plans used indexed SEARCH operations, with
+41 tests and 10 approved packet fixtures passing. These measurements describe
+that earlier layout, not the current schema-3 artifact. Timing
 depends on hardware/runtime; packet size and assembled-query performance belong
 to phase 3. Full reports remain reproducible under ignored `work/`.
