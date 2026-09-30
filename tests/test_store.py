@@ -60,15 +60,42 @@ class PinnedStoreTests(unittest.TestCase):
 
     def test_complete_roster_and_shared_identity(self):
         self.assertEqual(self.report['roster_rows'], 3181)
+        self.assertEqual(self.report['unit_profiles'], 2409)
         self.assertEqual(self.report['unit_identities']['roster'], 2409)
         self.assertEqual(self.report['integrity'], 'ok')
         self.assertFalse(self.report['foreign_key_errors'])
         with closing(open_snapshot(self.output)) as db:
-            # Shared inclusion is several profile rows, with one main-unit identity.
-            self.assertGreater(db.execute('SELECT count(*) FROM unit_profiles WHERE unit_key=?',
-                                         ('wh3_main_tze_inf_blue_horrors_0',)).fetchone()[0], 1)
+            # Shared inclusion is one profile with several qualified availability rows.
+            key = 'wh3_main_tze_inf_blue_horrors_0'
+            self.assertEqual(db.execute('SELECT count(*) FROM unit_profiles WHERE unit_key=?',
+                                        (key,)).fetchone()[0], 1)
+            self.assertGreater(db.execute('SELECT count(*) FROM unit_availability WHERE unit_key=?',
+                                          (key,)).fetchone()[0], 1)
+            for unit_key, names in db.execute('SELECT unit_key,faction_name FROM unit_profiles'):
+                expected = sorted({r[0] for r in db.execute(
+                    'SELECT faction_name FROM unit_availability WHERE unit_key=?', (unit_key,))})
+                self.assertEqual(json.loads(names), expected)
             self.assertEqual(db.execute('SELECT count(*) FROM unit_identity WHERE unit_key=?',
                                        ('wh3_main_tze_inf_blue_horrors_0',)).fetchone()[0], 1)
+
+    def test_conflicting_base_profile_preserves_previous_artifact(self):
+        from unittest.mock import patch
+        original = load_records
+
+        def conflicting(root, spec):
+            rows = original(root, spec)
+            if spec['role'] == 'roster':
+                for logical, row in rows.values():
+                    if row['unit_key'] == 'wh3_main_tze_inf_blue_horrors_0' and row['subculture_key'] == 'wh3_main_sc_tze_tzeentch':
+                        row['melee_attack'] = '999'
+            return rows
+
+        before = self.output.read_bytes()
+        with patch('ctw_adviser.build.load_records', side_effect=conflicting):
+            with self.assertRaisesRegex(ValueError, 'conflicting base profile fields'):
+                build_snapshot(SOURCE, self.output)
+        self.assertEqual(self.output.read_bytes(), before)
+        self.assertFalse(list(self.directory.glob('*.candidate')))
 
     def test_every_retained_native_field_matches_source(self):
         contract = json.loads((ROOT / 'schema/import_contract.json').read_text(encoding='utf-8'))

@@ -19,10 +19,18 @@ does not complete issue #2 or calculate combat results.
 `schema/store.sql` defines STRICT metadata, identity, provenance, classification,
 graph and coverage tables. Native evidence tables are generated from the existing
 locked column types and keys, with their mappings recorded in `dataset_tables`.
-All normalized columns survive in `unit_profiles`; its unique key is
-game/patch/scale/subculture/unit within the single snapshot. `unit_identity`
-stores each main-unit key once, scoped to the snapshot. `unit_records` connects
-profiles and unit relations to that identity. Mount-only identities absent from
+Schema version 2 stores each base profile once in `unit_profiles`, keyed by
+`unit_key` within the pinned game/patch/scale snapshot. `faction_name` is a sorted,
+unique JSON array, including for single-faction units. `unit_availability` retains
+each original faction/subculture-qualified roster entry, its restrictions, counts,
+notes and provenance locator. Conflicting base fields for a shared unit key reject
+the build. The current source has 2,409 profiles and 3,181 availability records.
+`unit_roster_records` is a lossless view reconstructing every original normalized
+column and source record; roster entries in `dataset_tables` point to this view.
+`unit_identity` stores each main-unit key once, scoped to the snapshot. `unit_records`
+connects original roster records and unit relations to that identity. A profile's
+`record_id` is a deterministic representative; all supporting roster evidence is
+available through `unit_availability`. Mount-only identities absent from
 the rosters are classified as external. Roster permissions remain separate and
 never transfer through shared inclusion or mount links.
 

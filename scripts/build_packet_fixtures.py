@@ -13,7 +13,7 @@ def dump(path,value):path.parent.mkdir(parents=True,exist_ok=True);path.write_te
 
 class Example:
  def __init__(self,root):
-  self.root=root;self.cache={};self.assertions=[];self.packet={'schema_version':'1.0.0','mode':'combined','snapshot':{'commit':'3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196','owners':{'units':{'patch':'9.0','build':'25507028','schema':4},'abilities':{'patch':'9.0.1','build':'25546563','schema':1}},'baseline':{'game':'warhammer_3','unit_scale':'ultra','rank':0,'context':'unmodified custom battle'}},'units':[],'trait_descriptions':{},'sources':{},'provenance':{},'detail_refs':{},'payload_graph':{'nodes':[],'edges':[]}}
+  self.root=root;self.cache={};self.assertions=[];self.packet={'schema_version':'1.1.0','mode':'combined','snapshot':{'commit':'3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196','owners':{'units':{'patch':'9.0','build':'25507028','schema':4},'abilities':{'patch':'9.0.1','build':'25546563','schema':1}},'baseline':{'game':'warhammer_3','unit_scale':'ultra','rank':0,'context':'unmodified custom battle'}},'units':[],'trait_descriptions':{},'sources':{},'provenance':{},'detail_refs':{},'payload_graph':{'nodes':[],'edges':[]}}
  def records(self,path):
   if path not in self.cache:
    with (self.root/path).open(encoding='utf-8',newline='') as f:self.cache[path]=list(enumerate(csv.DictReader(f,delimiter='\t' if path.endswith('.tsv') else ','),2))
@@ -39,6 +39,17 @@ def build(root,slug,race,key,approved):
  base='/units/0';u={};e.packet['units']=[u]
  def get(col,path,typ='number'):return e.get(r,ev,col,base+path,typ)
  u['identity']={k:get(c,'/identity/'+k,'text') for k,c in [('unit_key','unit_key'),('subculture_key','subculture_key'),('name','unit_name'),('unit_type','tactical_category')]}
+ # List all roster labels without transferring their qualified recruitment rules.
+ factions={}
+ for roster in sorted((root/UNIT/'normalized').glob('*.csv')):
+  source_path=roster.relative_to(root).as_posix()
+  for index,row in e.records(source_path):
+   if row['unit_key']==key:
+    factions.setdefault(row['faction_name'],(source_path,index,row))
+ u['identity']['faction_name']=[]
+ for name,(source_path,index,row) in sorted(factions.items()):
+  evidence=e.evidence(source_path,index,row,['subculture_key','unit_key'])
+  u['identity']['faction_name'].append(e.get(row,evidence,'faction_name',base+'/identity/faction_name/'+str(len(u['identity']['faction_name'])),'text'))
  u['body']={k:get(k,'/body/'+k) for k in ['entity_count','hp_per_entity','total_hp','barrier_health']};u['body']['size']=get('primary_target_size','/body/size','text');u['body']['components']=[]
  cp=UNIT+'lookups/unit_components__wh3__9.0__ultra.csv'
  for index,c in e.records(cp):
@@ -173,6 +184,6 @@ def main():
   for field in ['sources','provenance','detail_refs','trait_descriptions']:packet[field].update(second[field])
   for assertion in second_assertions:assertion['pointer']=assertion['pointer'].replace('/units/0/','/units/1/');assertions.append(assertion)
   path=f'work/generated_examples/{a}_vs_{b}.json';ap=f'work/generated_examples/{a}_vs_{b}.assertions.json';dump(ROOT/path,packet);dump(ROOT/ap,assertions);generated.append({'path':path,'kind':'source_backed','assertions':ap,'purpose':'Reproducible named pair; generated locally and not committed.'})
- dump(ROOT/'fixtures/manifest.json',{'schema_version':'1.0.0','fixtures':entries})
- dump(ROOT/'work/generated_examples/manifest.json',{'schema_version':'1.0.0','fixtures':generated})
+ dump(ROOT/'fixtures/manifest.json',{'schema_version':'1.1.0','fixtures':entries})
+ dump(ROOT/'work/generated_examples/manifest.json',{'schema_version':'1.1.0','fixtures':generated})
 if __name__=='__main__':main()

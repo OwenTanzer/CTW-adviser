@@ -18,7 +18,7 @@ defs={}
 defs['gap']=obj({'code':S,'section':S,'summary':S,'provenance_refs':arr(S)},['code','section','summary','provenance_refs'])
 defs['section']=obj({'name':enum('components','weapons','attributes','abilities','activated_options'),'state':enum('complete','partial','omitted','unresolved'),'returned':{'type':'integer','minimum':0},'total':{'type':['integer','null'],'minimum':0},'cursor':nullable(S)})
 defs['coverage']=obj({'melee':enum('present','known_none','unresolved','omitted'),'ranged':enum('present','known_none','unresolved','omitted'),'sections':arr(ref('section'),5),'gaps':arr(ref('gap'))})
-defs['identity']=obj({'unit_key':S,'subculture_key':S,'name':nullable(S),'unit_type':S,'traits':arr(S)},['unit_key','subculture_key','name','unit_type'])
+defs['identity']=obj({'unit_key':S,'subculture_key':S,'faction_name':arr(S,1),'name':nullable(S),'unit_type':S,'traits':arr(S)},['unit_key','subculture_key','faction_name','name','unit_type'])
 defs['component']=obj({'id':S,'role':S,'count':N,'hp_per_component':N,'bonus_hp_per_component':N,'known_hp_total':N,'size':nullable(S),'targetable':B,'primary':B,'provenance_refs':refs})
 defs['body']=obj({**numbers('entity_count','hp_per_entity','total_hp','barrier_health'),'size':nullable(S),'components':arr(ref('component'))})
 defs['scope']=obj({'attack_ref':S,'component_ref':nullable(S)})
@@ -60,8 +60,8 @@ defs['snapshot']=obj({'commit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'own
 defs['description']=obj({'summary':S,'provenance_refs':refs})
 defs['node']=obj({'id':S,'kind':S,'key':S,'native_parameters':native,'provenance_refs':refs})
 defs['edge']=obj({'from':S,'to':S,'relationship':S,'order':{'type':['integer','null']},'provenance_refs':refs})
-schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-adviser:evidence-packet:1.0.0','title':'CTW adviser evidence packet v1',
- **obj({'schema_version':const('1.0.0'),'mode':enum('combined','melee','missile'),'snapshot':ref('snapshot'),'units':arr(ref('unit'),1),
+schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-adviser:evidence-packet:1.1.0','title':'CTW adviser evidence packet v1.1',
+ **obj({'schema_version':const('1.1.0'),'mode':enum('combined','melee','missile'),'snapshot':ref('snapshot'),'units':arr(ref('unit'),1),
  'trait_descriptions':mapping(ref('description')),'sources':mapping(ref('source')),'provenance':mapping(ref('evidence')),'detail_refs':mapping(obj({'kind':S,'key':S})),
  'payload_graph':obj({'nodes':arr(ref('node')),'edges':arr(ref('edge'))})}),'$defs':defs}
 if __name__=='__main__':

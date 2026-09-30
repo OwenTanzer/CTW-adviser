@@ -82,6 +82,8 @@ def packet_checks(p):
         identity=(u['identity']['subculture_key'],u['identity']['unit_key'])
         if identity in seen_units:raise ValueError('duplicate qualified unit')
         seen_units.add(identity)
+        names=u['identity']['faction_name']
+        if names!=sorted(set(names)):raise ValueError('faction_name must be sorted and unique')
         ranged=u['ranged'];status=u['coverage']['ranged']
         melee_status=u['coverage']['melee']
         if (u['melee'] is None)==(melee_status=='present'):raise ValueError('melee absence/status contradiction')

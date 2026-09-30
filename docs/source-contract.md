@@ -30,6 +30,11 @@ validators, certify runtime mechanics, or establish complete passive payload clo
 
 ## Types, meaning and identity
 
+The pinned import contract describes original source roster identities, not
+the serving layout. Store schema 2 deduplicates base profiles by unit key and
+retains source-qualified roster records through linked availability and a
+lossless reconstruction view; this does not change the source contract or lock.
+
 Normalized types come from the upstream validator's explicit numeric/boolean
 lists and the builder's field expressions. Numeric unit fields use REAL as a
 lossless-for-this-source numeric serving input type; IDs and version tokens stay

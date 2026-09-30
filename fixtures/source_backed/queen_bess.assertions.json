@@ -24,6 +24,18 @@
     "conversion": "text"
   },
   {
+    "pointer": "/units/0/identity/faction_name/0",
+    "evidence_ref": "s_8c245bd0b3f0_53",
+    "column": "faction_name",
+    "conversion": "text"
+  },
+  {
+    "pointer": "/units/0/identity/faction_name/1",
+    "evidence_ref": "s_c37bf93887b5_4",
+    "column": "faction_name",
+    "conversion": "text"
+  },
+  {
     "pointer": "/units/0/body/entity_count",
     "evidence_ref": "s_c37bf93887b5_4",
     "column": "entity_count",
