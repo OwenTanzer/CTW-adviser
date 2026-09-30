@@ -1,6 +1,6 @@
 PRAGMA foreign_keys = ON;
 CREATE TABLE snapshot (
-  id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL CHECK(schema_version=2),
+  id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL CHECK(schema_version=3),
   source_commit TEXT NOT NULL, contract_sha256 TEXT NOT NULL,
   baseline_json TEXT NOT NULL CHECK(json_valid(baseline_json)),
   owners_json TEXT NOT NULL CHECK(json_valid(owners_json)),

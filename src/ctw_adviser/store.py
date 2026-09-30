@@ -53,7 +53,7 @@ def open_snapshot(path: Path) -> sqlite3.Connection:
     db = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)
     db.execute('PRAGMA foreign_keys=ON')
     db.execute('PRAGMA query_only=ON')
-    if db.execute('SELECT schema_version FROM snapshot').fetchone() != (2,):
+    if db.execute('SELECT schema_version FROM snapshot').fetchone() != (3,):
         db.close()
         raise ValueError('unsupported snapshot schema')
     db.row_factory = sqlite3.Row
@@ -74,6 +74,7 @@ def inspect_snapshot(path: Path) -> dict:
             'snapshot': dict(db.execute('SELECT * FROM snapshot').fetchone()),
             'roster_rows': db.execute('SELECT count(*) FROM unit_availability').fetchone()[0],
             'unit_profiles': db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0],
+            'source_unit_keys': db.execute('SELECT count(*) FROM unit_aliases').fetchone()[0],
             'unit_identities': dict(db.execute(
                 'SELECT namespace,count(*) FROM unit_identity GROUP BY namespace').fetchall()),
             'classifications': dict(db.execute(
