@@ -219,6 +219,10 @@
         ],
         "abilities": [
           {
+            "requires_effect_enabling": true,
+            "classification_evidence": [
+              "synthetic"
+            ],
             "key": "synthetic_compound",
             "name": "Synthetic compound passive",
             "culture_key": "*",
@@ -574,6 +578,10 @@
         ],
         "abilities": [
           {
+            "requires_effect_enabling": true,
+            "classification_evidence": [
+              "synthetic"
+            ],
             "key": "synthetic_compound",
             "name": "Synthetic compound passive",
             "culture_key": "*",

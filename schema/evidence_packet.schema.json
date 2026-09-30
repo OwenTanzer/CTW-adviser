@@ -1712,6 +1712,20 @@
     "mechanic": {
       "type": "object",
       "properties": {
+        "requires_effect_enabling": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "classification_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
         "key": {
           "type": "string",
           "minLength": 1
@@ -1777,6 +1791,8 @@
         }
       },
       "required": [
+        "requires_effect_enabling",
+        "classification_evidence",
         "key",
         "name",
         "culture_key",

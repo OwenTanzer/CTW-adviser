@@ -45,7 +45,7 @@ effects={
  'unresolved':{'native_kind':S,'native_parameters':native,'reason':S}}
 for name,properties in effects.items():defs['effect_'+name]=obj({'kind':const(name),**effect_common,**properties})
 defs['effect']={'oneOf':[ref('effect_'+name) for name in effects]}
-defs['mechanic']=obj({'key':S,'name':nullable(S),'culture_key':S,'summary':S,'native_parameters':native,'conditions':ref('conditions'),'phases':arr(ref('phase')),'effects':arr(ref('effect'),1),'provenance_refs':refs,'detail_ref':S})
+defs['mechanic']=obj({'requires_effect_enabling':B,'classification_evidence':refs,'key':S,'name':nullable(S),'culture_key':S,'summary':S,'native_parameters':native,'conditions':ref('conditions'),'phases':arr(ref('phase')),'effects':arr(ref('effect'),1),'provenance_refs':refs,'detail_ref':S})
 defs['attribute']=obj({'key':S,'name':nullable(S),'summary':S,'provenance_refs':refs})
 defs['option']=obj({'key':S,'name':nullable(S),'classification':enum('activated_option','unresolved'),'culture_key':S,'requires_effect_enabling':B,'classification_evidence':refs,'provenance_refs':refs,'detail_ref':S})
 defs['passives']=obj({'protection':obj(numbers('armour','shield_block_chance','physical_resistance','missile_resistance','spell_resistance','fire_resistance','ward_save')),

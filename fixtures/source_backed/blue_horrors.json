@@ -210,6 +210,11 @@
                 ]
               }
             ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_2482",
+              "s_05412a0a8b98_2476"
+            ],
             "native_parameters": {
               "effect_range": 0.0,
               "target_intercept_range": 0.0,
@@ -271,6 +276,11 @@
                   "s_d56bb4dc1aae_1989"
                 ]
               }
+            ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_2483",
+              "s_05412a0a8b98_2477"
             ],
             "native_parameters": {
               "effect_range": 0.0,

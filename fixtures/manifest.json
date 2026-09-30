@@ -2,6 +2,12 @@
   "schema_version": "1.0.0",
   "fixtures": [
     {
+      "path": "fixtures/source_backed/wargor.json",
+      "kind": "source_backed",
+      "assertions": "fixtures/source_backed/wargor.assertions.json",
+      "purpose": "Selected source projection; coverage gaps remain explicit."
+    },
+    {
       "path": "fixtures/source_backed/sea_guard.json",
       "kind": "source_backed",
       "assertions": "fixtures/source_backed/sea_guard.assertions.json",

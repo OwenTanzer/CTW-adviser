@@ -97,17 +97,17 @@ def packet_checks(p):
         if status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in u['coverage']['gaps']):raise ValueError('missing ranged gap')
         attacks={};components={c['id'] for c in u['body']['components']}
         if len(components)!=len(u['body']['components']):raise ValueError('duplicate component id')
-        def add(a,kind):
+        def add(a,kind,component=None):
             if a['id'] in attacks:raise ValueError('duplicate attack id')
-            attacks[a['id']]=kind
+            attacks[a['id']]={'kind':kind,'component':component}
         if u['melee']:
             add(u['melee'],'melee')
             for a in u['melee']['variants']:add(a,'melee')
         if ranged and status=='present':
             for a in [ranged,*ranged['variants']]:
-                add(a,'ranged')
+                add(a,'ranged',a['component_ref'])
                 if a['component_ref'] is not None and a['component_ref'] not in components:raise ValueError('unknown component')
-                if a['explosion']:add(a['explosion'],'explosion')
+                if a['explosion']:add(a['explosion'],'explosion',a['component_ref'])
         traits=u['passives']['attack_traits'];scoped=[]
         for kind in ('melee','ranged','explosion'):
             if traits[kind] is not None:scoped.append((kind,traits[kind]))
@@ -115,8 +115,10 @@ def packet_checks(p):
         seen=set()
         for kind,t in scoped:
             target=t['scope']['attack_ref']
-            if attacks.get(target)!=kind or target in seen:raise ValueError('wrong/duplicate attack trait scope')
+            if attacks.get(target,{}).get('kind')!=kind or target in seen:raise ValueError('wrong/duplicate attack trait scope')
             if t['scope']['component_ref'] is not None and t['scope']['component_ref'] not in components:raise ValueError('unknown trait component')
+            component=t['scope']['component_ref']
+            if component is not None and attacks[target]['component'] is not None and component!=attacks[target]['component']:raise ValueError('trait component conflicts with attack attachment')
             seen.add(target)
             for tag in ('magical','flaming','bonus_vs_infantry','bonus_vs_large'):
                 if t[tag] not in (False,0,None) and tag not in p['trait_descriptions']:raise ValueError('missing trait explanation')
@@ -126,7 +128,7 @@ def packet_checks(p):
             for e in m['effects']:
                 if e['phase_ref'] is not None and e['phase_ref'] not in phases:raise ValueError('unknown effect phase')
                 if e['kind']=='stat_modifier' and e['operation']!='native' and e['native_operation']!={'add':'add','multiply':'mult'}[e['operation']]:raise ValueError('operation mapping mismatch')
-        actual={'components':len(u['body']['components']),'weapons':sum(v!='explosion' for v in attacks.values()),'attributes':len(u['passives']['attributes']),'abilities':len(u['passives']['abilities']),'activated_options':len(u['activated_options'])}
+        actual={'components':len(u['body']['components']),'weapons':sum(v['kind']!='explosion' for v in attacks.values()),'attributes':len(u['passives']['attributes']),'abilities':len(u['passives']['abilities']),'activated_options':len(u['activated_options'])}
         if any(s['returned']!=actual[s['name']] for s in sections):raise ValueError('returned count differs from packet')
     graph=p['payload_graph'];nodes={n['id'] for n in graph['nodes']}
     if len(nodes)!=len(graph['nodes']):raise ValueError('duplicate graph node')
@@ -141,7 +143,19 @@ def pointer(p,path):
         part=part.replace('~1','/').replace('~0','~');p=p[int(part)] if isinstance(p,list) else p[part]
     return p
 
+QUALIFIED_PASSIVE_SUMMARY='Source classifies this linked mechanic as passive and requires effect enabling; access and effect behavior are not established by this fixture.'
+
+def reviewed_summary_checks(packet):
+    # Fixture-only reviewed text gate, not a general prose interpretation engine.
+    approved=json.loads((ROOT/'fixtures/design/approved-examples.json').read_text())
+    summaries={(m['key'],m['culture_key']):m['summary'] for u in approved.values() for m in u['passives']['abilities']}
+    summaries[('wh2_dlc17_hero_passive_will_of_the_dark_gods','*')]=QUALIFIED_PASSIVE_SUMMARY
+    for u in packet['units']:
+        for m in u['passives']['abilities']:
+            if summaries.get((m['key'],m['culture_key']))!=m['summary']:raise ValueError('passive summary differs from reviewed fixture text')
+
 def source_assertions(packet,assertions,source_root):
+    reviewed_summary_checks(packet)
     cache={}
     for s in packet['sources'].values():
         path=(source_root/s['path']).resolve()

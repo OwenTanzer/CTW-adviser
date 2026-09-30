@@ -186,6 +186,11 @@
                 ]
               }
             ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_858",
+              "s_05412a0a8b98_857"
+            ],
             "native_parameters": {
               "effect_range": 0.0,
               "target_intercept_range": 0.0,
@@ -258,6 +263,11 @@
                 ]
               }
             ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_1224",
+              "s_05412a0a8b98_1221"
+            ],
             "native_parameters": {
               "effect_range": 0.0,
               "target_intercept_range": 20.0,
@@ -329,6 +339,11 @@
                   "s_5513bd8dbb85_1202"
                 ]
               }
+            ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_1229",
+              "s_05412a0a8b98_1226"
             ],
             "native_parameters": {
               "effect_range": 0.0,

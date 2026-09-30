@@ -220,6 +220,11 @@
                 ]
               }
             ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_857",
+              "s_05412a0a8b98_856"
+            ],
             "native_parameters": {
               "effect_range": 0.0,
               "target_intercept_range": 0.0,

@@ -1,4 +1,4 @@
-"""Rebuild eight explicitly selected design examples; not a production importer."""
+"""Rebuild explicitly selected design examples; not a production importer."""
 import argparse
 import copy
 import csv
@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-CASES=[('sea_guard','high_elves','wh2_main_hef_inf_lothern_sea_guard_0'),('sea_guard_shields','high_elves','wh2_main_hef_inf_lothern_sea_guard_1'),('blue_horrors','tzeentch','wh3_main_tze_inf_blue_horrors_0'),('kroxigor','lizardmen','wh2_main_lzd_mon_kroxigors'),('reiksguard','empire','wh_main_emp_cav_reiksguard'),('doom_diver','greenskins','wh_main_grn_art_doom_diver_catapult'),('bloodletters','khorne','wh3_main_kho_inf_bloodletters_0'),('queen_bess','vampire_coast','wh2_dlc11_cst_art_queen_bess')]
+CASES=[('wargor','beastmen','wh2_dlc17_bst_cha_wargor_0'),('sea_guard','high_elves','wh2_main_hef_inf_lothern_sea_guard_0'),('sea_guard_shields','high_elves','wh2_main_hef_inf_lothern_sea_guard_1'),('blue_horrors','tzeentch','wh3_main_tze_inf_blue_horrors_0'),('kroxigor','lizardmen','wh2_main_lzd_mon_kroxigors'),('reiksguard','empire','wh_main_emp_cav_reiksguard'),('doom_diver','greenskins','wh_main_grn_art_doom_diver_catapult'),('bloodletters','khorne','wh3_main_kho_inf_bloodletters_0'),('queen_bess','vampire_coast','wh2_dlc11_cst_art_queen_bess')]
 UNIT='data/unit_stats/';TABLE=UNIT+'abilities/tables/'
 def dump(path,value):path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,indent=2)+'\n')
 
@@ -96,12 +96,22 @@ def build(root,slug,race,key,approved):
   if '{{' in summary:gaps.append({'code':'unresolved_localization','section':'attributes','summary':akey+': localization contains unresolved substitutions.','provenance_refs':arefs})
   if not source_text:gaps.append({'code':'attribute_meaning_unknown','section':'attributes','summary':akey+': no selected mechanical localization.','provenance_refs':[aev]})
   u['passives']['attributes'].append({'key':e.get(attribute,aev,'attribute_key',base+f'/passives/attributes/{i}/key','text'),'name':name,'summary':summary,'provenance_refs':arefs})
+ if slug=='wargor':
+  ability='wh2_dlc17_hero_passive_will_of_the_dark_gods';mp=base+'/passives/abilities/0'
+  definition,dev=e.select(TABLE+'ability_definitions.csv',key=ability);casting,cev=e.select(TABLE+'ability_casting.csv',key=ability)
+  if casting['passive']!='true':raise ValueError('qualification fixture is not passive')
+  link,lev=e.select(UNIT+'lookups/unit_abilities__wh3__9.0__ultra.csv',unit_key=key,ability_key=ability,culture_key='*')
+  from validate_packets import QUALIFIED_PASSIVE_SUMMARY
+  u['passives']['abilities'].append({'key':ability,'name':None,'culture_key':e.get(link,lev,'culture_key',mp+'/culture_key','text'),'requires_effect_enabling':e.get(definition,dev,'requires_effect_enabling',mp+'/requires_effect_enabling','boolean'),'classification_evidence':[dev,cev],'summary':QUALIFIED_PASSIVE_SUMMARY,'native_parameters':{},'conditions':{'activates_when':[],'deactivates_when':[],'recipient_requirements':[],'unresolved':[]},'phases':[],'effects':[{'kind':'unresolved','phase_ref':None,'native_kind':'passive_definition','native_parameters':{},'reason':'Effect expansion is outside this qualification fixture.','provenance_refs':[dev,cev]}],'provenance_refs':[dev,cev,lev],'detail_ref':e.detail('passive',ability)})
+  gaps.append({'code':'qualification_projection','section':'abilities','summary':'Passive classification and enabling requirement are shown; effects and activation conditions remain unresolved in this fixture.','provenance_refs':[dev,cev,lev]})
  design=approved.get(r['unit_name'])
  if design:
   for original in design['passives']['abilities']:
    m=copy.deepcopy(original);mi=len(u['passives']['abilities']);mp=base+f'/passives/abilities/{mi}'
    definition,dev=e.select(TABLE+'ability_definitions.csv',key=m['key']);casting,cev=e.select(TABLE+'ability_casting.csv',key=m['key'])
    if casting['passive']!='true':raise ValueError('approved passive not supported by casting definition')
+   m['requires_effect_enabling']=e.get(definition,dev,'requires_effect_enabling',mp+'/requires_effect_enabling','boolean')
+   m['classification_evidence']=[dev,cev]
    m['native_parameters']={field:e.get(casting,cev,field,mp+'/native_parameters/'+field) for field in ['effect_range','target_intercept_range','active_time','recharge_time','num_uses']}
    link,linkev=e.select(UNIT+'lookups/unit_abilities__wh3__9.0__ultra.csv',unit_key=key,ability_key=m['key'],culture_key=m['culture_key'])
    m['culture_key']=e.get(link,linkev,'culture_key',mp+'/culture_key','text')

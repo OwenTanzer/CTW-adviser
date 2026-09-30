@@ -23,7 +23,9 @@ Damage and ordinary timing remain in `melee` and `ranged`. **All magical/flaming
 tags and numeric target bonuses occur only under `passives.attack_traits`.**
 `melee`, `ranged` and `explosion` identify the default attack of each kind.
 Each trait object includes an explicit attack reference and optional component
-reference. Further profiles receive entries in `attack_traits.additional`, with
+reference. An explicit trait component must agree with its attack attachment;
+explosions inherit the component of their parent ranged profile. A null trait
+component leaves the attack reference authoritative. Further profiles receive entries in `attack_traits.additional`, with
 their own kind and scope. A unit-level trait never implicitly propagates to
 every weapon, explosion, passive-damage event or transformed form.
 
@@ -76,7 +78,8 @@ identity; source-backed fixtures preserve deterministic pinned source order.
 
 ## Passives and activated options
 
-A passive contains identity, name, culture, a concise summary, native casting
+A passive requires `requires_effect_enabling` (boolean or unknown/null) and
+nonempty `classification_evidence`, alongside identity, name, culture, a concise summary, native casting
 parameters, conditions, phases, typed effects, provenance and an optional-detail
 reference. Essential explanation and supported effects remain inline. Unknown
 names are null; missing explanations are explicit qualified statements with gaps.
@@ -166,3 +169,16 @@ query responses must pass these same structural and semantic checks.
 This increment establishes the output contract before Store and index work.
 The importer must replace projection gaps with general inventories or explicit
 source limitations; the design fixtures do not waive roster-wide acceptance.
+
+### Review corrections
+
+Source-backed passive fixtures copy and assert `requires_effect_enabling` from
+ability definitions and retain definition/casting classification references.
+The Wargor qualification fixture demonstrates a source-confirmed true flag;
+its effect expansion is explicitly unresolved, and the link does not establish
+access or activity. Synthetic cases exercise the same required envelope.
+
+Source validation also checks passive summaries against the reviewed examples
+or the fixed qualification-only template. This rejects edited fixture prose;
+it is a bounded fixture gate, not a general free-text semantic validator.
+Changes to approved explanations require review alongside their typed effects.

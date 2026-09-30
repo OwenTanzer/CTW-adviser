@@ -258,6 +258,12 @@
     "conversion": "text"
   },
   {
+    "pointer": "/units/0/passives/abilities/0/requires_effect_enabling",
+    "evidence_ref": "s_69a2a77f6deb_858",
+    "column": "requires_effect_enabling",
+    "conversion": "boolean"
+  },
+  {
     "pointer": "/units/0/passives/abilities/0/native_parameters/effect_range",
     "evidence_ref": "s_05412a0a8b98_857",
     "column": "effect_range",
@@ -378,6 +384,12 @@
     "conversion": "operation"
   },
   {
+    "pointer": "/units/0/passives/abilities/1/requires_effect_enabling",
+    "evidence_ref": "s_69a2a77f6deb_1224",
+    "column": "requires_effect_enabling",
+    "conversion": "boolean"
+  },
+  {
     "pointer": "/units/0/passives/abilities/1/native_parameters/effect_range",
     "evidence_ref": "s_05412a0a8b98_1221",
     "column": "effect_range",
@@ -478,6 +490,12 @@
     "evidence_ref": "s_5513bd8dbb85_1195",
     "column": "how",
     "conversion": "operation"
+  },
+  {
+    "pointer": "/units/0/passives/abilities/2/requires_effect_enabling",
+    "evidence_ref": "s_69a2a77f6deb_1229",
+    "column": "requires_effect_enabling",
+    "conversion": "boolean"
   },
   {
     "pointer": "/units/0/passives/abilities/2/native_parameters/effect_range",

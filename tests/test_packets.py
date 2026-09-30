@@ -32,6 +32,23 @@ class PacketContractTests(unittest.TestCase):
  def test_passives_require_inline_effects_and_summary(self):
   for field in ['summary','effects']:
    p=self.packet();del p['units'][0]['passives']['abilities'][0][field];self.reject(p)
+ def test_passive_qualifications_required(self):
+  for field in ['requires_effect_enabling','classification_evidence']:
+   p=self.packet();del p['units'][0]['passives']['abilities'][0][field];self.reject(p)
+  p=self.packet();p['units'][0]['passives']['abilities'][0]['classification_evidence']=['missing'];self.reject(p)
+ def test_qualified_source_passive(self):
+  p=self.packet('source_backed/wargor');self.check(p)
+  self.assertIs(p['units'][0]['passives']['abilities'][0]['requires_effect_enabling'],True)
+ def test_trait_component_must_match_attachment(self):
+  for kind in ['ranged','explosion']:
+   p=self.packet('source_backed/queen_bess');u=p['units'][0]
+   self.assertEqual(u['ranged']['component_ref'],'component:0')
+   u['passives']['attack_traits'][kind]['scope']['component_ref']='component:0';self.check(p)
+   u['passives']['attack_traits'][kind]['scope']['component_ref']='component:1';self.reject(p)
+ def test_reviewed_passive_summary_rejects_invented_claim(self):
+  p=self.packet();v.reviewed_summary_checks(p)
+  p['units'][0]['passives']['abilities'][0]['summary']='While active: grants 999 armour.'
+  with self.assertRaisesRegex(ValueError,'reviewed fixture text'):v.reviewed_summary_checks(p)
  def test_activated_options_cannot_contain_effect_payload(self):
   p=self.packet('synthetic/compound_and_variants');p['units'][0]['activated_options'][0]['effects']=[];self.reject(p)
  def test_overflow_cannot_silently_drop_cursor(self):

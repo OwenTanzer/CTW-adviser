@@ -396,6 +396,12 @@
     "conversion": "text"
   },
   {
+    "pointer": "/units/0/passives/abilities/0/requires_effect_enabling",
+    "evidence_ref": "s_69a2a77f6deb_2482",
+    "column": "requires_effect_enabling",
+    "conversion": "boolean"
+  },
+  {
     "pointer": "/units/0/passives/abilities/0/native_parameters/effect_range",
     "evidence_ref": "s_05412a0a8b98_2476",
     "column": "effect_range",
@@ -478,6 +484,12 @@
     "evidence_ref": "s_d56bb4dc1aae_1988",
     "column": "max_damaged_entities",
     "conversion": "number"
+  },
+  {
+    "pointer": "/units/0/passives/abilities/1/requires_effect_enabling",
+    "evidence_ref": "s_69a2a77f6deb_2483",
+    "column": "requires_effect_enabling",
+    "conversion": "boolean"
   },
   {
     "pointer": "/units/0/passives/abilities/1/native_parameters/effect_range",
