@@ -1,9 +1,9 @@
-# Evidence packet contract 1.4.0
+# Evidence packet contract 1.5.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.4.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.5.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -410,3 +410,28 @@ Source validation also checks passive summaries against the reviewed examples
 or the fixed qualification-only template. This rejects edited fixture prose;
 it is a bounded fixture gate, not a general free-text semantic validator.
 Changes to approved explanations require review alongside their typed effects.
+
+## Passive summons
+
+Casting definitions with a populated `spawned_unit` produce a `summon` effect
+containing the exact unit key, localized name where retained, spawn type, use
+limit and transformation/decoy/shared-health settings. Ordinary summaries expose
+these facts; no imported base stat is changed. Unknown summon names keep the key.
+
+The Rats Emerge and Nurgling Emergence are reviewed death-spawn interpretations:
+the casting passive flag, one-use summon at unit_position and unit_alive
+deactivation predicate support `trigger: on_death`. Their condition records remain
+unchanged. This mapping does not generically invert other deactivation predicates.
+The Rats Emerge tooltip additionally describes spawning on death. Exact scheduling,
+spawn entity counts, degradation and other runtime rules are not established here;
+the retained summon-runtime diagnostic stays available through coverage opt-in.
+Other passive summons retain an unresolved trigger unless separately established.
+The structured trigger_basis records the interpretation and its limitation.
+
+The two death-spawn display names are reviewed labels from the pinned CTW-data
+`data/unit_stats/source_exports/text/db/land_units__.loc.tsv`: keys
+`land_units_onscreen_name_wh2_main_skv_inf_skavenslave_spearmen_0_summoned`
+(Skavenslave Spears) and
+`land_units_onscreen_name_wh3_dlc25_nur_inf_nurglings_summoned` (Nurglings).
+This catalog is not imported; no retained localization record is fabricated.
+Summon unit identity and mechanics retain their casting-record provenance.
