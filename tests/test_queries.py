@@ -232,6 +232,25 @@ class QueryTests(unittest.TestCase):
         self.check(projected)
         self.assertEqual(projected['units'][0]['coverage']['ranged'], 'omitted')
 
+    def test_native_phase_parameters_are_visible_without_invented_units(self):
+        for key, field, value, text in (
+            ('wh_main_character_abilities_arcane_conduit', 'mana_regen_mod', 0.4, 'Mana regeneration modifier: 0.4'),
+            ('wh3_dlc24_unit_passive_solar_engine', 'fatigue_change_ratio', -0.0025, 'Fatigue change ratio: -0.0025'),
+        ):
+            mechanic = self.q.get_passive_detail(key)['mechanic']
+            self.assertIn(text, mechanic['summary'])
+            self.assertIn('units and engine interpretation unverified', mechanic['summary'])
+            self.assertNotIn('scalar modifier', mechanic['summary'])
+            self.assertNotIn('..', mechanic['summary'])
+            effect = next(e for e in mechanic['effects'] if e.get('native_kind') == 'phase_behavior')
+            self.assertEqual(effect['kind'], 'unresolved')
+            self.assertEqual(effect['native_parameters'][field], value)
+            self.assertEqual(mechanic['phases'][0]['lifecycle'][field], value)
+        mechanic = self.q.get_passive_detail('wh2_dlc09_unit_passive_unstable_mark_ii_sand')['mechanic']
+        self.assertIn('max amount: 1.3', mechanic['summary'])
+        self.assertIn('effective scaling and stacking unverified', mechanic['summary'])
+        self.assertNotIn('source path:', mechanic['summary'])
+
     def test_section_pagination_exhausts_inventory_once(self):
         for section, field in [('attributes', 'attributes'), ('abilities', 'abilities')]:
             seen = []

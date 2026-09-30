@@ -23,6 +23,15 @@ agent output. Stored `coverage_gaps` and generated query caveats remain availabl
 without copying diagnostic notes into a second serving file. Stable interpretation
 rules belong in this contract and issue #6's skill guidance.
 
+Native phase behavior with unmapped semantics is still `kind: unresolved`, but
+its summary names the available parameters and exact values (for example,
+`Mana regeneration modifier: 0.4` or `Fatigue change ratio: -0.0025`). These
+labels describe source fields; they do not establish percent units, per-second
+rates, recipient applicability or engine arithmetic. The corresponding native
+keys, values, phase links and evidence remain intact. Intensity summaries expose
+their settings with scaling/stacking qualification, excluding repeated source
+locator metadata from the prose. Generic implementation notes stay in diagnostics.
+
 ## Ordinary output
 
 A packet has one snapshot/baseline, one or more qualified `units`, shared trait
