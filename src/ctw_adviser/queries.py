@@ -9,7 +9,25 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.7.0'
+PACKET_VERSION = '1.8.0'
+
+EXPLAINED_PASSIVES = {
+    'wh2_dlc11_unit_passive_gaseous_demise':
+        'Melee engagement enables this one-use detonation. A buffer phase precedes a phase that damages the Corpse itself. '
+        'The ability also launches an expanding magical blast that can hit allies and enemies. '
+        'Self-damage is separate from blast damage. Exact launch timing and interaction with the low-health detonation route remain unverified.',
+    'wh2_dlc11_unit_passive_noxious_unstable_mark_ii':
+        'Low-health detonation route: a buffer phase precedes damage to the Corpse itself, and the ability uses the same expanding magical blast as Gaseous Demise. '
+        'The blast can hit allies and enemies. A shared blast definition does not establish whether both routes can fire; their interaction and exact threshold timing remain unverified.',
+    'wh_dlc06_quest_passive_squigs_go_boom':
+        'One-use detonation associated with melee engagement. The ability damages the Squig itself and launches a bombardment projectile carrying an explosion. '
+        'The projectile has zero direct damage; the magical explosion can also hit allies. '
+        'Self-damage and explosion damage are separate. Exact activation, interruption and self-destruction timing remain unverified.',
+    'wh2_main_unit_passive_the_rats_emerge': None,
+    'wh2_main_unit_passive_too_horrible_to_die': None,
+}
+
+
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
 CONDITION_TEXT = {
@@ -35,7 +53,7 @@ STAT_NAMES = {
 PROTECTION = ('armour', 'shield_block_chance', 'physical_resistance',
               'missile_resistance', 'spell_resistance', 'fire_resistance', 'ward_save')
 CASTING_FIELDS = (
-    'active_time', 'recharge_time', 'num_uses', 'effect_range', 'target_intercept_range',
+    'wind_up_time', 'active_time', 'recharge_time', 'num_uses', 'effect_range', 'target_intercept_range',
     'affect_self', 'always_affect_self', 'only_affect_target', 'num_effected_friendly_units',
     'num_effected_enemy_units', 'update_targets_every_frame', 'initial_recharge',
     'min_range', 'target_self', 'target_friends', 'target_enemies', 'target_ground',
@@ -345,7 +363,7 @@ class Queries:
         detail = self.get_detail('record:' + option['definition_record'], limit=limit, cursor=cursor)
         result = {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'mechanic': mechanic,
                 'sources': c.packet['sources'], 'provenance': c.packet['provenance'],
-                'detail_refs': c.packet['detail_refs'], 'diagnostic_count': len(c.detail_gaps), 'graph': detail}
+                'detail_refs': c.packet['detail_refs'], 'diagnostic_count': len(c.detail_gaps), 'graph': detail, 'payload_graph': c.packet['payload_graph']}
         if include_diagnostics:
             result['gaps'] = c.detail_gaps
         return result
@@ -647,6 +665,10 @@ class Packet:
             mechanic['effects'].append({'kind': 'unresolved', 'phase_ref': None, 'native_kind': 'passive_definition',
                                          'native_parameters': {}, 'reason': 'No mapped effects in the retained definition.', 'provenance_refs': classification})
             self.gap(gaps, 'effect_meaning_unknown', 'abilities', key + ': no mapped effect.', classification)
+        if key in EXPLAINED_PASSIVES:
+            self.passive_payloads(mechanic, gaps)
+            _, tooltip_refs = self.loc('unit_abilities_tooltip_text_' + key)
+            mechanic['provenance_refs'] += tooltip_refs
         mechanic['summary'] = self.summary(mechanic)
         return mechanic
 
@@ -761,6 +783,7 @@ class Packet:
             if prefix + text not in pieces:
                 pieces.append(prefix + text)
         result = ('Effect: ' if all(e['kind'] in ('summon', 'visual_indicator') for e in mechanic['effects']) else 'While active: ') + '; '.join(pieces) + '.'
+        result = self.explained_summary(mechanic) or result
         for category, label in (
             ('activates_when', 'Activation conditions'),
             ('recharges_when', 'Readiness/recharge conditions'),
@@ -782,6 +805,74 @@ class Packet:
             if settings:
                 result += ' Recharge timer settings: ' + '; '.join(settings) + '.'
         return result
+
+    def explained_summary(self, mechanic):
+        key = mechanic.get('key')
+        if key == 'wh2_main_unit_passive_the_rats_emerge':
+            spawn = next((e for e in mechanic['effects'] if e['kind'] == 'summon' and e['trigger'] == 'on_death'), None)
+            if spawn:
+                return ('Summons ' + (spawn['unit_name'] or spawn['unit_key']) +
+                        ' upon the host dying, at its position. This is a separate death-triggered summon from Too Horrible to Die; '
+                        'the two abilities do not establish a single heal-versus-summon coin flip. '
+                        'Exact spawn timing and summoned-unit lifetime remain unverified.')
+        if key == 'wh2_main_unit_passive_too_horrible_to_die':
+            f = next((e['failure_context'] for e in mechanic['effects'] if 'failure_context' in e), None)
+            if f and f['miscast_chance'] is not None:
+                return ('Low-health survival mechanic with a buffer phase followed by healing. '
+                        f'Failure chance: {f["miscast_chance"]:.0%} (interpreted from the casting definition). '
+                        'The failure branch uses an explosion to deliver a damaging contact effect; '
+                        f'the explosion itself has {f["explosion_base_damage"]:g} base and {f["explosion_ap_damage"]:g} armour-piercing direct damage. '
+                        'Failure timing, healing amount interpretation and exact contact recipients remain unverified; '
+                        'the death summon is a separate mechanic.')
+        return EXPLAINED_PASSIVES.get(key)
+
+    def passive_payloads(self, mechanic, gaps):
+        """Reuse the existing graph for the reviewed examples' calculation inputs."""
+        graph = self.packet['payload_graph']
+        allowed = {'native_vortices', 'native_bombardments', 'projectiles', 'explosions',
+                   'native_ability_phases', 'native_phase_stat_effects', 'native_phase_attribute_effects'}
+        roots = [e['node_ref'].split(':', 1)[1] for e in mechanic['effects'] if e['kind'] == 'payload_reference']
+        queue = [(rid, 0) for rid in roots]; visited = set()
+        def add(rid, table, row):
+            node_id = self.detail('record', rid)
+            if not any(n['id'] == node_id for n in graph['nodes']):
+                params = self.native(table, row)
+                params = {k: v for k, v in params.items() if not k.startswith('source_') and
+                          not any(t in k for t in ('audio', 'particle', 'camera', 'display', 'icon', 'video', 'composite_scene', 'vfx'))}
+                graph['nodes'].append({'id': node_id, 'kind': table,
+                    'key': compact(json.loads(self.q.one('record_provenance', 'id', rid)['native_key_json'])),
+                    'native_parameters': params, 'provenance_refs': self.refs(row)})
+            return node_id
+        while queue:
+            rid, depth = queue.pop(0)
+            if rid in visited:
+                continue
+            if len(visited) >= 64:
+                self.gap(gaps, 'payload_detail_required', 'abilities', mechanic['key'] + ': further payload records require detail expansion.', [self.evidence(rid)])
+                break
+            visited.add(rid)
+            table, row = self.q.record(rid)
+            if table not in allowed:
+                continue
+            parent = add(rid, table, row)
+            for edge in self.q.rows('relation_edges', 'source_record', rid, 'relation,target_key_json,edge_ordinal'):
+                target = edge['target_record']
+                if not target:
+                    self.gap(gaps, 'payload_dependency_' + edge['status'], 'abilities', edge['relation'] + ': ' + edge['target_key_json'], self.refs(row))
+                    continue
+                child_table, child = self.q.record(target)
+                if child_table not in allowed:
+                    continue
+                if depth >= 4:
+                    self.detail('record', target)
+                    self.gap(gaps, 'payload_detail_required', 'abilities', mechanic['key'] + ': further payload records require detail expansion.', self.refs(row))
+                    continue
+                child_id = add(target, child_table, child)
+                item = {'from': parent, 'to': child_id, 'relationship': edge['relation'],
+                        'order': edge['edge_ordinal'], 'provenance_refs': self.refs(row)}
+                if item not in graph['edges']:
+                    graph['edges'].append(item)
+                queue.append((target, depth + 1))
 
     def traits(self, kind, attack, row, component=None, normalized=False):
         if normalized:
