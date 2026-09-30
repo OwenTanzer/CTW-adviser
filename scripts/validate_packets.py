@@ -188,7 +188,7 @@ def source_assertions(packet,assertions,source_root):
         if pointer(packet,a['pointer'])!=value:raise ValueError('source mismatch: '+a['pointer'])
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ctw-root',type=Path,required=True);a=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ctw-root',type=Path,required=True);parser.add_argument('--generated-examples',action='store_true',help='also validate reproducible, ignored unit and pair packets');a=parser.parse_args()
     schema=json.loads((ROOT/'schema/evidence_packet.schema.json').read_text());check_schema(schema)
     from verify_sources import verify
     lock=json.loads((ROOT/'source_lock.json').read_text());contract=json.loads((ROOT/'schema/import_contract.json').read_text())
@@ -196,6 +196,7 @@ def main():
     if checked['status']!='passed':raise ValueError(checked['errors'])
     locked_paths={f['path'] for f in lock['files']}
     index=json.loads((ROOT/'fixtures/manifest.json').read_text())
+    if a.generated_examples:index['fixtures']+=json.loads((ROOT/'work/generated_examples/manifest.json').read_text())['fixtures']
     for f in index['fixtures']:
         packet=json.loads((ROOT/f['path']).read_text());validate(packet,schema,schema);packet_checks(packet)
         if f['kind']=='source_backed':

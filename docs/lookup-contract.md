@@ -139,11 +139,14 @@ and receive a gap.
 
 ## Fixtures and validation
 
-`fixtures/manifest.json` separates **source_backed** from **synthetic** examples.
-Source-backed cases cover Sea Guard with and without shields, Blue Horrors,
-Kroxigor, Reiksguard, Doom Diver Catapults, Bloodletters and Queen Bess, plus the
-three named pairs. They are source-backed projections with explicit limitations,
-not generated production retrieval results.
+`fixtures/manifest.json` lists a small reviewed set: Sea Guard, Blue Horrors,
+Kroxigor, Wargor (enabling qualification) and Queen Bess (explosion scope), plus
+structurally distinct synthetic cases. These packets and their assertion sidecars
+are contract examples, not database contents. The generator also rebuilds the
+shielded Sea Guard, Reiksguard, Doom Diver, Bloodletters and all three named pairs
+under ignored `work/generated_examples/`. Their manifest is validated with
+`--generated-examples`; neither repeated pair packets nor every test projection
+needs to be committed. Source data and generation rules remain pinned.
 
 Synthetic cases use conspicuously invented identities, a zero source commit and
 `SYNTHETIC-NOT-GAME-DATA` provenance. They exercise compound effects, recipient
@@ -157,6 +160,7 @@ python scripts/define_packet_schema.py
 python scripts/build_packet_fixtures.py --ctw-root ../CTW-data
 python scripts/build_synthetic_fixtures.py
 python scripts/validate_packets.py --ctw-root ../CTW-data
+python scripts/validate_packets.py --ctw-root ../CTW-data --generated-examples
 python -m unittest discover -s tests -v
 ```
 

@@ -14,12 +14,6 @@
       "purpose": "Selected source projection; coverage gaps remain explicit."
     },
     {
-      "path": "fixtures/source_backed/sea_guard_shields.json",
-      "kind": "source_backed",
-      "assertions": "fixtures/source_backed/sea_guard_shields.assertions.json",
-      "purpose": "Selected source projection; coverage gaps remain explicit."
-    },
-    {
       "path": "fixtures/source_backed/blue_horrors.json",
       "kind": "source_backed",
       "assertions": "fixtures/source_backed/blue_horrors.assertions.json",
@@ -32,46 +26,10 @@
       "purpose": "Selected source projection; coverage gaps remain explicit."
     },
     {
-      "path": "fixtures/source_backed/reiksguard.json",
-      "kind": "source_backed",
-      "assertions": "fixtures/source_backed/reiksguard.assertions.json",
-      "purpose": "Selected source projection; coverage gaps remain explicit."
-    },
-    {
-      "path": "fixtures/source_backed/doom_diver.json",
-      "kind": "source_backed",
-      "assertions": "fixtures/source_backed/doom_diver.assertions.json",
-      "purpose": "Selected source projection; coverage gaps remain explicit."
-    },
-    {
-      "path": "fixtures/source_backed/bloodletters.json",
-      "kind": "source_backed",
-      "assertions": "fixtures/source_backed/bloodletters.assertions.json",
-      "purpose": "Selected source projection; coverage gaps remain explicit."
-    },
-    {
       "path": "fixtures/source_backed/queen_bess.json",
       "kind": "source_backed",
       "assertions": "fixtures/source_backed/queen_bess.assertions.json",
       "purpose": "Selected source projection; coverage gaps remain explicit."
-    },
-    {
-      "path": "fixtures/source_backed/reiksguard_vs_doom_diver.json",
-      "kind": "source_backed",
-      "assertions": "fixtures/source_backed/reiksguard_vs_doom_diver.assertions.json",
-      "purpose": "Named pair uses the same packet schema and unchanged source profiles."
-    },
-    {
-      "path": "fixtures/source_backed/sea_guard_vs_blue_horrors.json",
-      "kind": "source_backed",
-      "assertions": "fixtures/source_backed/sea_guard_vs_blue_horrors.assertions.json",
-      "purpose": "Named pair uses the same packet schema and unchanged source profiles."
-    },
-    {
-      "path": "fixtures/source_backed/bloodletters_vs_kroxigor.json",
-      "kind": "source_backed",
-      "assertions": "fixtures/source_backed/bloodletters_vs_kroxigor.assertions.json",
-      "purpose": "Named pair uses the same packet schema and unchanged source profiles."
     },
     {
       "path": "fixtures/synthetic/compound_and_variants.json",

@@ -160,16 +160,19 @@ def main():
  if lock['source_commit']!='3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196':raise ValueError('fixture definitions require explicit review for a new source pin')
  checked=verify(args.ctw_root,lock,contract)
  if checked['status']!='passed':raise ValueError(checked['errors'])
- approved=json.loads((ROOT/'fixtures/design/approved-examples.json').read_text());entries=[];built={}
+ approved=json.loads((ROOT/'fixtures/design/approved-examples.json').read_text());entries=[];generated=[];built={}
+ curated={'sea_guard','blue_horrors','kroxigor','wargor','queen_bess'}
  for slug,race,key in CASES:
   packet,assertions=build(args.ctw_root,slug,race,key,approved)
   built[slug]=(packet,assertions)
-  path=f'fixtures/source_backed/{slug}.json';ap=f'fixtures/source_backed/{slug}.assertions.json';dump(ROOT/path,packet);dump(ROOT/ap,assertions)
-  entries.append({'path':path,'kind':'source_backed','assertions':ap,'purpose':'Selected source projection; coverage gaps remain explicit.'})
+  folder='fixtures/source_backed' if slug in curated else 'work/generated_examples'
+  path=f'{folder}/{slug}.json';ap=f'{folder}/{slug}.assertions.json';dump(ROOT/path,packet);dump(ROOT/ap,assertions)
+  (entries if slug in curated else generated).append({'path':path,'kind':'source_backed','assertions':ap,'purpose':'Selected source projection; coverage gaps remain explicit.'})
  for a,b in [('reiksguard','doom_diver'),('sea_guard','blue_horrors'),('bloodletters','kroxigor')]:
   packet,assertions=copy.deepcopy(built[a]);second,second_assertions=copy.deepcopy(built[b]);packet['units']+=second['units']
   for field in ['sources','provenance','detail_refs','trait_descriptions']:packet[field].update(second[field])
   for assertion in second_assertions:assertion['pointer']=assertion['pointer'].replace('/units/0/','/units/1/');assertions.append(assertion)
-  path=f'fixtures/source_backed/{a}_vs_{b}.json';ap=f'fixtures/source_backed/{a}_vs_{b}.assertions.json';dump(ROOT/path,packet);dump(ROOT/ap,assertions);entries.append({'path':path,'kind':'source_backed','assertions':ap,'purpose':'Named pair uses the same packet schema and unchanged source profiles.'})
+  path=f'work/generated_examples/{a}_vs_{b}.json';ap=f'work/generated_examples/{a}_vs_{b}.assertions.json';dump(ROOT/path,packet);dump(ROOT/ap,assertions);generated.append({'path':path,'kind':'source_backed','assertions':ap,'purpose':'Reproducible named pair; generated locally and not committed.'})
  dump(ROOT/'fixtures/manifest.json',{'schema_version':'1.0.0','fixtures':entries})
+ dump(ROOT/'work/generated_examples/manifest.json',{'schema_version':'1.0.0','fixtures':generated})
 if __name__=='__main__':main()
