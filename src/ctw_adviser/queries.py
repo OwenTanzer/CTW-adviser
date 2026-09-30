@@ -50,6 +50,22 @@ PHASE_LABELS = {
     'remove_magical': 'Remove magical attacks', 'execute_ratio': 'Execution ratio',
     'requested_stance': 'Requested stance',
 }
+PHASE_ACTIONS = {
+    'cant_move': 'Prevents movement', 'freeze_fatigue': 'Stops fatigue changes',
+    'imbue_magical': 'Enables magical attacks', 'freeze_recharge': 'Stops ability recharge',
+    'remove_magical': 'Removes magical attacks',
+}
+PHASE_QUALIFICATIONS = {
+    'fatigue_change_ratio': 'fatigue scale and update interval not verified',
+    'inspiration_aura_range_mod': 'range units not verified',
+    'ability_recharge_change': 'time units not verified',
+    'mana_regen_mod': 'regeneration unit scale and timing not verified',
+    'mana_max_depletion_mod': 'unit scale not verified',
+    'imbue_ignition': 'ignition encoding not verified',
+    'replenish_ammo': 'absolute amount versus ammunition fraction not verified',
+    'execute_ratio': 'execution threshold and application rule not verified',
+    'requested_stance': 'stance execution behavior not verified',
+}
 TRAIT_TEXT = {
     'magical': ('ui_unit_bullet_point_enums_tooltip_ward_physical',
                 'Magical attacks bypass physical resistance; scoped to this attack.'),
@@ -489,11 +505,11 @@ class Packet:
         if text is None:
             text, refs = self.loc('special_ability_invalid_usage_flags_description_' + key)
         if text is None:
-            text = 'Native ' + kind + ' condition: ' + key + '; engine meaning unresolved.'
+            text = kind.capitalize() + ' condition: ' + key + '; meaning not established.'
             self.gap(gaps, 'condition_meaning_unknown', 'abilities', key + ': no selected wording.', self.refs(row))
         if '{{' in text:
             self.gap(gaps, 'unresolved_localization', 'abilities', key + ': unresolved condition substitution.', refs)
-        return {'key': key, 'summary': 'Native ' + kind + ' flag ' + key + '. Source UI wording: ' + text,
+        return {'key': key, 'summary': kind.capitalize() + ' condition (' + key + '). Source UI wording: ' + text,
                 'provenance_refs': self.refs(row) + refs}
 
     def mechanic(self, link, option, gaps):
@@ -566,11 +582,13 @@ class Packet:
                             'operation': {'add': 'add', 'mult': 'multiply'}.get(row['how'], 'native'),
                             'native_operation': row['how'], 'value': row['value'], 'provenance_refs': self.refs(row)})
         for row in self.q.rows('native_phase_attribute_effects', 'phase', key, 'attribute,record_id'):
-            # positive/negative are preserved without assuming grant/removal.
+            # Attribute polarity controls application, not benefit/harm.
+            operation = {'positive': 'grant', 'negative': 'remove'}.get(row['attribute_type'], 'native')
             effects.append({'kind': 'attribute_effect', 'phase_ref': key, 'attribute_key': row['attribute'],
-                            'operation': 'native', 'recipient': None,
+                            'operation': operation, 'recipient': None,
                             'native_parameters': {'attribute_type': row['attribute_type']}, 'provenance_refs': self.refs(row)})
-            self.gap(gaps, 'attribute_operation', 'abilities', key + ': native attribute_type does not certify grant/removal semantics.', self.refs(row))
+            if operation == 'native':
+                self.gap(gaps, 'attribute_operation', 'abilities', key + ': attribute application is unknown for ' + str(row['attribute_type']) + '.', self.refs(row))
         if phase['damage_amount'] not in (0, None):
             effects.append({'kind': 'periodic_damage', 'phase_ref': key,
                             'native_parameters': {k: phase[k] for k in ('damage_amount', 'hp_change_frequency', 'max_damaged_entities')},
@@ -588,7 +606,7 @@ class Packet:
                  if v not in (0, None, False) and k not in ('effect_type', 'affects_allies', 'affects_enemies')}
         if other:
             effects.append({'kind': 'unresolved', 'phase_ref': key, 'native_kind': 'phase_behavior',
-                            'native_parameters': other, 'reason': 'Native phase parameters; units and engine interpretation unverified.', 'provenance_refs': refs})
+                            'native_parameters': other, 'reason': 'Phase settings retained; exact units or engine rules require further verification.', 'provenance_refs': refs})
             self.gap(gaps, 'phase_behavior_semantics', 'abilities', key + ': phase behavior needs interpretation.', refs)
         if not effects:
             effects.append({'kind': 'unresolved', 'phase_ref': key, 'native_kind': 'phase', 'native_parameters': {},
@@ -604,26 +622,39 @@ class Packet:
             prefix = (ph + ': ') if len({p['key'] for p in mechanic['phases']}) > 1 and ph else ''
             if kind == 'stat_modifier':
                 value = effect['value']; op = effect['operation']
-                text = (f'{effect["stat"]} ' + (f'{value:+g}' if value is not None else 'unknown')) if op == 'add' else f'{effect["stat"]} x{value:g}' if op == 'multiply' and value is not None else f'{effect["stat"]}: native {effect["native_operation"]} {value}'
+                text = (f'{effect["stat"]} ' + (f'{value:+g}' if value is not None else 'unknown')) if op == 'add' else f'{effect["stat"]} x{value:g}' if op == 'multiply' and value is not None else f'{effect["stat"]}: value {value}; operation {effect["native_operation"]} is not mapped'
             elif kind == 'periodic_damage':
                 n = effect['native_parameters']
-                text = f'periodic damage amount {n["damage_amount"]}, frequency {n["hp_change_frequency"]}, entity cap {n["max_damaged_entities"]} (native parameters)'
+                text = f'Periodic damage amount: {n["damage_amount"]}; interval setting: {n["hp_change_frequency"]}; maximum affected entities: {n["max_damaged_entities"]} (damage units and effective timing not verified)'
             elif kind == 'healing':
                 n = effect['native_parameters']
-                text = f'healing {n["heal_amount"]}, barrier healing {n["barrier_heal_amount"]}, frequency {n["hp_change_frequency"]}, resurrection {n["resurrect"]} (native parameters)'
+                text = f'Healing amount: {n["heal_amount"]}; barrier healing amount: {n["barrier_heal_amount"]}; interval setting: {n["hp_change_frequency"]}; resurrection: {"enabled" if n["resurrect"] is True else "disabled" if n["resurrect"] is False else "unknown"} (amount units, effective timing and healing caps not verified)'
             elif kind == 'attribute_effect':
-                text = f'attribute {effect["attribute_key"]}, native type {effect["native_parameters"]["attribute_type"]}'
+                name, refs = self.loc('unit_attributes_onscreen_name_' + effect['attribute_key'])
+                if not name:
+                    description, refs = self.loc('unit_attributes_bullet_text_' + effect['attribute_key'])
+                    name = description.split('||', 1)[0] if description else None
+                name = name if name and '{{' not in name else effect['attribute_key'].replace('_', ' ').title()
+                effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + refs))
+                verb = {'grant': 'Grants ', 'remove': 'Removes '}.get(effect['operation'])
+                text = verb + name if verb else name + ': application rule unknown (source token: ' + str(effect['native_parameters']['attribute_type']) + ')'
             elif kind == 'payload_reference':
                 text = 'linked ' + effect['relationship']
             elif effect.get('native_parameters'):
                 parameters = {k: v for k, v in effect['native_parameters'].items()
                               if k not in ('ability', 'source_path', 'source_line', 'source_patch')}
-                text = '; '.join(PHASE_LABELS.get(k, k.replace('_', ' ')) + ': ' + compact(v)
-                                 for k, v in parameters.items())
-                qualification = ('native intensity settings; effective scaling and stacking unverified'
-                                 if effect.get('native_kind') == 'intensity_settings'
-                                 else 'native values; units and engine interpretation unverified')
-                text += ' (' + qualification + ')'
+                pieces_for_effect = []
+                for k, v in parameters.items():
+                    if k in PHASE_ACTIONS and isinstance(v, bool):
+                        description = PHASE_ACTIONS[k] if v else PHASE_LABELS[k] + ': disabled'
+                    else:
+                        description = PHASE_LABELS.get(k, k.replace('_', ' ')) + ': ' + compact(v)
+                        if k in PHASE_QUALIFICATIONS:
+                            description += ' (' + PHASE_QUALIFICATIONS[k] + ')'
+                    pieces_for_effect.append(description)
+                text = '; '.join(pieces_for_effect)
+                if effect.get('native_kind') == 'intensity_settings':
+                    text += ' (effective scaling and stacking unverified)'
             else:
                 text = effect['reason']
             text = text.rstrip('.')
