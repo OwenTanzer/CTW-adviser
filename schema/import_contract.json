@@ -6567,7 +6567,7 @@
         "name": "explosion_is_magical",
         "type": "BOOLEAN",
         "nullable": true,
-        "output_group": "ranged.default_projection",
+        "output_group": "passives.attack_traits.explosion",
         "native_expression": "explosion ? bool(explosion.is_magical) : null",
         "units": "native; no engine conversion",
         "evidence": "scripts/validate-unit-dataset.mjs#booleans; scripts/build-unit-dataset.mjs#row"
@@ -6576,7 +6576,7 @@
         "name": "explosion_is_flaming",
         "type": "BOOLEAN",
         "nullable": true,
-        "output_group": "ranged.default_projection",
+        "output_group": "passives.attack_traits.explosion",
         "native_expression": "explosion ? (number(explosion.ignition_amount) ?? 0) > 0 : null",
         "units": "native; no engine conversion",
         "evidence": "scripts/validate-unit-dataset.mjs#booleans; scripts/build-unit-dataset.mjs#row"
