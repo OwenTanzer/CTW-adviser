@@ -1,0 +1,582 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "combined",
+  "snapshot": {
+    "commit": "0000000000000000000000000000000000000000",
+    "owners": {
+      "units": {
+        "patch": "9.0",
+        "build": "25507028",
+        "schema": 4
+      },
+      "abilities": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      }
+    },
+    "baseline": {
+      "game": "warhammer_3",
+      "unit_scale": "ultra",
+      "rank": 0,
+      "context": "unmodified custom battle"
+    }
+  },
+  "units": [
+    {
+      "identity": {
+        "unit_key": "synthetic_hybrid",
+        "subculture_key": "synthetic_roster",
+        "name": "SYNTHETIC hybrid \u2014 invented schema exercise",
+        "unit_type": "synthetic_monster"
+      },
+      "body": {
+        "entity_count": 160.0,
+        "hp_per_entity": 48.0,
+        "total_hp": 7680.0,
+        "barrier_health": 1400.0,
+        "size": "small",
+        "components": [
+          {
+            "id": "component:0",
+            "role": "man",
+            "count": 160.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 40.0,
+            "known_hp_total": 7680.0,
+            "size": "small",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "synthetic"
+            ]
+          },
+          {
+            "id": "component:secondary",
+            "role": "synthetic_crew",
+            "count": 4,
+            "hp_per_component": 10,
+            "bonus_hp_per_component": 0,
+            "known_hp_total": 40,
+            "size": "small",
+            "targetable": null,
+            "primary": false,
+            "provenance_refs": [
+              "synthetic"
+            ]
+          }
+        ]
+      },
+      "movement": {
+        "speed": 3.8,
+        "mass": 70.0
+      },
+      "leadership": 50.0,
+      "melee": {
+        "id": "melee:primary",
+        "weapon_key": "wh3_main_tze_blue_horror",
+        "attack": 20.0,
+        "defence": 22.0,
+        "base_damage": 21.0,
+        "ap_damage": 3.0,
+        "attack_interval": 4.0,
+        "charge_bonus": 10.0,
+        "max_splash_targets": 1.0,
+        "provenance_refs": [
+          "synthetic"
+        ],
+        "variants": []
+      },
+      "ranged": {
+        "status": "present",
+        "id": "ranged:primary",
+        "weapon_key": "wh3_main_tze_blue_horror_fire_bolt",
+        "projectile_key": "wh3_main_tze_blue_horror_fire_bolt",
+        "component_ref": null,
+        "slot": "primary",
+        "ammunition_pool": "primary",
+        "is_default": true,
+        "range": 90.0,
+        "ammunition": 4.0,
+        "reload_time": 8.0,
+        "base_damage": 13.0,
+        "ap_damage": 2.0,
+        "projectiles_per_shot": 1.0,
+        "shots_per_volley": 1.0,
+        "burst_size": 1.0,
+        "burst_shot_delay": 0.0,
+        "velocity": 35.0,
+        "accuracy": 10.0,
+        "spread": 0.0,
+        "marksmanship_bonus": 10.0,
+        "calibration_distance": 60.0,
+        "calibration_area": 2.0,
+        "minimum_range": 0.0,
+        "explosion": null,
+        "detail_ref": "projectile:wh3_main_tze_blue_horror_fire_bolt",
+        "provenance_refs": [
+          "synthetic"
+        ],
+        "variants": [
+          {
+            "id": "ranged:alternate",
+            "weapon_key": "wh3_main_tze_blue_horror_fire_bolt",
+            "projectile_key": "synthetic_alternate",
+            "component_ref": null,
+            "slot": "primary",
+            "ammunition_pool": "primary",
+            "is_default": false,
+            "range": 90.0,
+            "ammunition": 4.0,
+            "reload_time": 8.0,
+            "base_damage": 9,
+            "ap_damage": 2.0,
+            "projectiles_per_shot": 1.0,
+            "shots_per_volley": 1.0,
+            "burst_size": 1.0,
+            "burst_shot_delay": 0.0,
+            "velocity": 35.0,
+            "accuracy": 10.0,
+            "spread": 0.0,
+            "marksmanship_bonus": 10.0,
+            "calibration_distance": 60.0,
+            "calibration_area": 2.0,
+            "minimum_range": 0.0,
+            "explosion": null,
+            "detail_ref": "projectile:wh3_main_tze_blue_horror_fire_bolt",
+            "provenance_refs": [
+              "synthetic"
+            ]
+          }
+        ]
+      },
+      "passives": {
+        "protection": {
+          "armour": 5.0,
+          "shield_block_chance": 0.0,
+          "physical_resistance": 20.0,
+          "missile_resistance": 0.0,
+          "spell_resistance": 0.0,
+          "fire_resistance": 0.0,
+          "ward_save": 0.0
+        },
+        "attack_traits": {
+          "melee": {
+            "scope": {
+              "attack_ref": "melee:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 0.0,
+            "bonus_vs_large": 0.0,
+            "magical": true,
+            "flaming": true,
+            "provenance_refs": [
+              "synthetic"
+            ]
+          },
+          "ranged": {
+            "scope": {
+              "attack_ref": "ranged:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 0.0,
+            "bonus_vs_large": 0.0,
+            "magical": true,
+            "flaming": true,
+            "provenance_refs": [
+              "synthetic"
+            ]
+          },
+          "explosion": null,
+          "additional": [
+            {
+              "kind": "ranged",
+              "traits": {
+                "scope": {
+                  "attack_ref": "ranged:alternate",
+                  "component_ref": null
+                },
+                "bonus_vs_infantry": 0.0,
+                "bonus_vs_large": 0.0,
+                "magical": false,
+                "flaming": false,
+                "provenance_refs": [
+                  "synthetic"
+                ]
+              }
+            }
+          ]
+        },
+        "attributes": [
+          {
+            "key": "synthetic_attribute",
+            "name": "Synthetic attribute",
+            "summary": "Invented behavioral tag for schema validation.",
+            "provenance_refs": [
+              "synthetic"
+            ]
+          }
+        ],
+        "abilities": [
+          {
+            "key": "synthetic_compound",
+            "name": "Synthetic compound passive",
+            "culture_key": "*",
+            "summary": "Invented compound passive; effect variants and lifecycle remain separate.",
+            "native_parameters": {
+              "effect_range": 15
+            },
+            "conditions": {
+              "activates_when": [],
+              "deactivates_when": [
+                {
+                  "key": "synthetic_health_above_50",
+                  "summary": "Synthetic deactivation threshold; equality behavior unknown.",
+                  "provenance_refs": [
+                    "synthetic"
+                  ]
+                }
+              ],
+              "recipient_requirements": [],
+              "unresolved": []
+            },
+            "phases": [
+              {
+                "key": "synthetic_phase_a",
+                "order": 1,
+                "target_self": true,
+                "target_friends": false,
+                "target_enemies": false,
+                "duration": -1,
+                "lifecycle": {
+                  "native_intensity": "unknown_token"
+                },
+                "provenance_refs": [
+                  "synthetic"
+                ]
+              },
+              {
+                "key": "synthetic_phase_b",
+                "order": 2,
+                "target_self": false,
+                "target_friends": true,
+                "target_enemies": false,
+                "duration": 10,
+                "lifecycle": {
+                  "replacement": "unresolved"
+                },
+                "provenance_refs": [
+                  "synthetic"
+                ]
+              }
+            ],
+            "effects": [
+              {
+                "kind": "stat_modifier",
+                "phase_ref": "synthetic_phase_a",
+                "provenance_refs": [
+                  "synthetic"
+                ],
+                "stat": "melee_attack",
+                "operation": "add",
+                "native_operation": "add",
+                "value": 5
+              },
+              {
+                "kind": "stat_modifier",
+                "phase_ref": "synthetic_phase_a",
+                "provenance_refs": [
+                  "synthetic"
+                ],
+                "stat": "speed",
+                "operation": "multiply",
+                "native_operation": "mult",
+                "value": 1.1
+              },
+              {
+                "kind": "attribute_effect",
+                "phase_ref": "synthetic_phase_a",
+                "provenance_refs": [
+                  "synthetic"
+                ],
+                "attribute_key": "synthetic_stalk",
+                "operation": "grant",
+                "recipient": "phase recipients",
+                "native_parameters": {
+                  "native_grant": true
+                }
+              },
+              {
+                "kind": "periodic_damage",
+                "phase_ref": "synthetic_phase_a",
+                "provenance_refs": [
+                  "synthetic"
+                ],
+                "native_parameters": {
+                  "damage_amount": 3,
+                  "hp_change_frequency": 1,
+                  "max_damaged_entities": 2
+                }
+              },
+              {
+                "kind": "healing",
+                "phase_ref": "synthetic_phase_b",
+                "provenance_refs": [
+                  "synthetic"
+                ],
+                "native_parameters": {
+                  "heal_amount": 0.01,
+                  "barrier_heal_amount": 0,
+                  "hp_change_frequency": 2,
+                  "resurrect": true,
+                  "limits": {
+                    "native_cap": -1
+                  }
+                }
+              },
+              {
+                "kind": "payload_reference",
+                "phase_ref": "synthetic_phase_a",
+                "provenance_refs": [
+                  "synthetic"
+                ],
+                "node_ref": "payload:a",
+                "relationship": "imbues_attack"
+              },
+              {
+                "kind": "unresolved",
+                "phase_ref": "synthetic_phase_a",
+                "provenance_refs": [
+                  "synthetic"
+                ],
+                "native_kind": "synthetic_transformation",
+                "native_parameters": {
+                  "spawned_land_unit": "synthetic_land_key"
+                },
+                "reason": "Invented unknown effect; no numeric substitute."
+              }
+            ],
+            "provenance_refs": [
+              "synthetic"
+            ],
+            "detail_ref": "synthetic:compound"
+          }
+        ]
+      },
+      "cost": {
+        "multiplayer": 500.0,
+        "campaign_recruitment": 500.0,
+        "campaign_upkeep": 125.0
+      },
+      "activated_options": [
+        {
+          "key": "synthetic_button",
+          "name": "Synthetic deliberate option",
+          "classification": "activated_option",
+          "culture_key": "synthetic_culture",
+          "requires_effect_enabling": true,
+          "classification_evidence": [
+            "synthetic"
+          ],
+          "provenance_refs": [
+            "synthetic"
+          ],
+          "detail_ref": "synthetic:option"
+        },
+        {
+          "key": "synthetic_ambiguous",
+          "name": null,
+          "classification": "unresolved",
+          "culture_key": "*",
+          "requires_effect_enabling": null,
+          "classification_evidence": [
+            "synthetic"
+          ],
+          "provenance_refs": [
+            "synthetic"
+          ],
+          "detail_ref": "synthetic:ambiguous"
+        }
+      ],
+      "provenance_refs": [
+        "synthetic"
+      ],
+      "coverage": {
+        "melee": "present",
+        "ranged": "present",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 2,
+            "total": 2,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "unresolved",
+            "returned": 3,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 1,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "partial",
+            "returned": 1,
+            "total": 3,
+            "cursor": "synthetic:next-passives"
+          },
+          {
+            "name": "activated_options",
+            "state": "unresolved",
+            "returned": 2,
+            "total": null,
+            "cursor": null
+          }
+        ],
+        "gaps": [
+          {
+            "code": "synthetic",
+            "section": "weapons",
+            "summary": "Invented test case; no assertion about game behavior.",
+            "provenance_refs": [
+              "synthetic"
+            ]
+          },
+          {
+            "code": "synthetic",
+            "section": "abilities",
+            "summary": "Invented test case; no assertion about game behavior.",
+            "provenance_refs": [
+              "synthetic"
+            ]
+          },
+          {
+            "code": "synthetic",
+            "section": "activated_options",
+            "summary": "Invented test case; no assertion about game behavior.",
+            "provenance_refs": [
+              "synthetic"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "trait_descriptions": {
+    "magical": {
+      "summary": "Magical attacks bypass physical resistance; the tag applies only to the referenced attack.",
+      "provenance_refs": [
+        "synthetic"
+      ]
+    },
+    "flaming": {
+      "summary": "Flaming attacks interact with fire vulnerability and halve healing while the target is on fire.",
+      "provenance_refs": [
+        "synthetic"
+      ]
+    }
+  },
+  "sources": {
+    "synthetic": {
+      "path": "SYNTHETIC-NOT-GAME-DATA",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "owner": "units"
+    }
+  },
+  "provenance": {
+    "synthetic": {
+      "source_id": "synthetic",
+      "logical_record": 2,
+      "key": {
+        "kind": "invented"
+      },
+      "source_line": null,
+      "source_patch": null
+    }
+  },
+  "detail_refs": {
+    "projectile:wh3_main_tze_blue_horror_fire_bolt": {
+      "kind": "projectile",
+      "key": "wh3_main_tze_blue_horror_fire_bolt"
+    },
+    "passive:wh3_main_unit_passive_daemonic_instability_tzeentch": {
+      "kind": "passive",
+      "key": "wh3_main_unit_passive_daemonic_instability_tzeentch"
+    },
+    "passive:wh3_main_unit_passive_daemonic_instability_tzeentch_ii": {
+      "kind": "passive",
+      "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii"
+    },
+    "synthetic:compound": {
+      "kind": "passive",
+      "key": "synthetic_compound"
+    },
+    "synthetic:option": {
+      "kind": "option",
+      "key": "synthetic_option"
+    },
+    "synthetic:ambiguous": {
+      "kind": "option",
+      "key": "synthetic_ambiguous"
+    }
+  },
+  "payload_graph": {
+    "nodes": [
+      {
+        "id": "payload:a",
+        "kind": "synthetic_payload",
+        "key": "synthetic_a",
+        "native_parameters": {},
+        "provenance_refs": [
+          "synthetic"
+        ]
+      },
+      {
+        "id": "payload:b",
+        "kind": "synthetic_payload",
+        "key": "synthetic_b",
+        "native_parameters": {},
+        "provenance_refs": [
+          "synthetic"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "payload:a",
+        "to": "payload:b",
+        "relationship": "shrapnel",
+        "order": 1,
+        "provenance_refs": [
+          "synthetic"
+        ]
+      },
+      {
+        "from": "payload:a",
+        "to": "payload:b",
+        "relationship": "contact",
+        "order": 2,
+        "provenance_refs": [
+          "synthetic"
+        ]
+      },
+      {
+        "from": "payload:b",
+        "to": "payload:a",
+        "relationship": "cycle",
+        "order": null,
+        "provenance_refs": [
+          "synthetic"
+        ]
+      }
+    ]
+  }
+}

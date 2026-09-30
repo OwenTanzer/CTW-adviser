@@ -1,0 +1,425 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "combined",
+  "snapshot": {
+    "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+    "owners": {
+      "units": {
+        "patch": "9.0",
+        "build": "25507028",
+        "schema": 4
+      },
+      "abilities": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      }
+    },
+    "baseline": {
+      "game": "warhammer_3",
+      "unit_scale": "ultra",
+      "rank": 0,
+      "context": "unmodified custom battle"
+    }
+  },
+  "units": [
+    {
+      "identity": {
+        "unit_key": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "subculture_key": "wh2_main_sc_hef_high_elves",
+        "name": "Lothern Sea Guard (Shields)",
+        "unit_type": "infantry"
+      },
+      "body": {
+        "entity_count": 90.0,
+        "hp_per_entity": 68.0,
+        "total_hp": 6120.0,
+        "barrier_health": 0.0,
+        "size": "small",
+        "components": [
+          {
+            "id": "component:0",
+            "role": "man",
+            "count": 90.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 60.0,
+            "known_hp_total": 6120.0,
+            "size": "small",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "s_23de8daf4e75_1346"
+            ]
+          }
+        ]
+      },
+      "movement": {
+        "speed": 3.3,
+        "mass": 150.0
+      },
+      "leadership": 70.0,
+      "melee": {
+        "id": "melee:primary",
+        "weapon_key": "wh2_main_hef_spear_guard",
+        "attack": 22.0,
+        "defence": 40.0,
+        "base_damage": 20.0,
+        "ap_damage": 8.0,
+        "attack_interval": 4.2,
+        "charge_bonus": 4.0,
+        "max_splash_targets": 1.0,
+        "provenance_refs": [
+          "s_0150606dbf1a_160"
+        ],
+        "variants": []
+      },
+      "ranged": {
+        "status": "present",
+        "id": "ranged:primary",
+        "weapon_key": "wh2_main_hef_sea_guard_bow",
+        "projectile_key": "wh2_main_hef_sea_guard_arrow",
+        "component_ref": null,
+        "slot": "primary",
+        "ammunition_pool": "primary",
+        "is_default": true,
+        "range": 165.0,
+        "ammunition": 22.0,
+        "reload_time": 11.0,
+        "base_damage": 15.0,
+        "ap_damage": 4.0,
+        "projectiles_per_shot": 1.0,
+        "shots_per_volley": 1.0,
+        "burst_size": 1.0,
+        "burst_shot_delay": 0.0,
+        "velocity": 45.0,
+        "accuracy": 10.0,
+        "spread": 0.0,
+        "marksmanship_bonus": 10.0,
+        "calibration_distance": 120.0,
+        "calibration_area": 5.3,
+        "minimum_range": 0.0,
+        "explosion": null,
+        "detail_ref": "projectile:wh2_main_hef_sea_guard_arrow",
+        "provenance_refs": [
+          "s_0150606dbf1a_160",
+          "s_f4787b4b05a6_236",
+          "s_5e78e24b332a_1644"
+        ],
+        "variants": []
+      },
+      "passives": {
+        "protection": {
+          "armour": 40.0,
+          "shield_block_chance": 55.0,
+          "physical_resistance": 0.0,
+          "missile_resistance": 0.0,
+          "spell_resistance": 0.0,
+          "fire_resistance": 0.0,
+          "ward_save": 0.0
+        },
+        "attack_traits": {
+          "melee": {
+            "scope": {
+              "attack_ref": "melee:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 0.0,
+            "bonus_vs_large": 16.0,
+            "magical": false,
+            "flaming": false,
+            "provenance_refs": [
+              "s_0150606dbf1a_160"
+            ]
+          },
+          "ranged": {
+            "scope": {
+              "attack_ref": "ranged:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 0.0,
+            "bonus_vs_large": 0.0,
+            "magical": false,
+            "flaming": false,
+            "provenance_refs": [
+              "s_0150606dbf1a_160"
+            ]
+          },
+          "explosion": null,
+          "additional": []
+        },
+        "attributes": [
+          {
+            "key": "charge_defense_vs_large",
+            "name": null,
+            "summary": "Charge Defence vs. Large||When bracing, this unit negates the charge bonus of any large attacker.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_3860",
+              "s_15464982ee45_15"
+            ]
+          },
+          {
+            "key": "charge_reflection",
+            "name": null,
+            "summary": "Charge Reflection||When bracing, this unit causes additional damage when attacking charging enemies.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_3861",
+              "s_15464982ee45_16"
+            ]
+          },
+          {
+            "key": "hide_forest",
+            "name": null,
+            "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_3862",
+              "s_15464982ee45_39"
+            ]
+          }
+        ],
+        "abilities": []
+      },
+      "cost": {
+        "multiplayer": 750.0,
+        "campaign_recruitment": 750.0,
+        "campaign_upkeep": 188.0
+      },
+      "activated_options": [],
+      "provenance_refs": [
+        "s_0150606dbf1a_160"
+      ],
+      "coverage": {
+        "melee": "present",
+        "ranged": "present",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 1,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "unresolved",
+            "returned": 2,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 3,
+            "total": 3,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "unresolved",
+            "returned": 0,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "unresolved",
+            "returned": 0,
+            "total": null,
+            "cursor": null
+          }
+        ],
+        "gaps": [
+          {
+            "code": "fixture_projection",
+            "section": "weapons",
+            "summary": "Selected default attacks are shown; complete variant/payload closure is not demonstrated.",
+            "provenance_refs": [
+              "s_0150606dbf1a_160"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "abilities",
+            "summary": "Only reviewed example passives are expanded; exhaustive passive classification and lifecycle reconstruction remain outstanding.",
+            "provenance_refs": [
+              "s_0150606dbf1a_160"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "activated_options",
+            "summary": "Activated-option inventory is not demonstrated by this design projection.",
+            "provenance_refs": [
+              "s_0150606dbf1a_160"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "trait_descriptions": {
+    "bonus_vs_large": {
+      "summary": "Numeric bonus against large targets; distinct from the qualitative Anti-Large bullet.",
+      "provenance_refs": [
+        "s_0150606dbf1a_160",
+        "s_87676ff951da_85"
+      ]
+    }
+  },
+  "sources": {
+    "s_0150606dbf1a": {
+      "path": "data/unit_stats/normalized/high_elves__wh3__9.0__ultra.csv",
+      "sha256": "1fc4a726d3eed22429cabb3fbbf2b441b94d64df1f0411aea01aa044a439880c",
+      "owner": "units"
+    },
+    "s_23de8daf4e75": {
+      "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+      "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+      "owner": "units"
+    },
+    "s_f4787b4b05a6": {
+      "path": "data/unit_stats/lookups/projectiles__wh3__9.0.csv",
+      "sha256": "a59f4b20c373e54f8a4fc22c58064d0c0c6c74d94b59893a3b037705a698a62d",
+      "owner": "units"
+    },
+    "s_5e78e24b332a": {
+      "path": "data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv",
+      "sha256": "155423f063a8e97230a854109b00f12adcd39770e3a36e04c3c3daabe98bbe49",
+      "owner": "units"
+    },
+    "s_9d85f8e27f99": {
+      "path": "data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv",
+      "sha256": "9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac",
+      "owner": "units"
+    },
+    "s_15464982ee45": {
+      "path": "data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv",
+      "sha256": "40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab",
+      "owner": "units"
+    },
+    "s_87676ff951da": {
+      "path": "data/unit_stats/source_exports/text/db/unit_stat_localisations__.loc.tsv",
+      "sha256": "79cddda990a17e0b92af16b11f89cd95b6481c5ae99d88c8863aa7e230174c74",
+      "owner": "units"
+    }
+  },
+  "provenance": {
+    "s_0150606dbf1a_160": {
+      "source_id": "s_0150606dbf1a",
+      "logical_record": 160,
+      "key": {
+        "unit_key": "wh2_main_hef_inf_lothern_sea_guard_1"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_23de8daf4e75_1346": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 1346,
+      "key": {
+        "unit_key": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "component_role": "man",
+        "relationship_key": "",
+        "battle_entity_key": "wh2_main_hef_infantry_heavy_blood_dismembers"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_f4787b4b05a6_236": {
+      "source_id": "s_f4787b4b05a6",
+      "logical_record": 236,
+      "key": {
+        "projectile_key": "wh2_main_hef_sea_guard_arrow"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_5e78e24b332a_1644": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 1644,
+      "key": {
+        "unit_key": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "component_role": "unit",
+        "slot": "primary",
+        "projectile_key": "wh2_main_hef_sea_guard_arrow"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_3860": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 3860,
+      "key": {
+        "unit_key": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "attribute_key": "charge_defense_vs_large"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_15": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 15,
+      "key": {
+        "key": "unit_attributes_bullet_text_charge_defense_vs_large"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_3861": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 3861,
+      "key": {
+        "unit_key": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "attribute_key": "charge_reflection"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_16": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 16,
+      "key": {
+        "key": "unit_attributes_bullet_text_charge_reflection"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_3862": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 3862,
+      "key": {
+        "unit_key": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "attribute_key": "hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_39": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 39,
+      "key": {
+        "key": "unit_attributes_bullet_text_hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_87676ff951da_85": {
+      "source_id": "s_87676ff951da",
+      "logical_record": 85,
+      "key": {
+        "key": "unit_stat_localisations_tooltip_text_stat_bonus_vs_large"
+      },
+      "source_line": null,
+      "source_patch": null
+    }
+  },
+  "detail_refs": {
+    "projectile:wh2_main_hef_sea_guard_arrow": {
+      "kind": "projectile",
+      "key": "wh2_main_hef_sea_guard_arrow"
+    }
+  },
+  "payload_graph": {
+    "nodes": [],
+    "edges": []
+  }
+}

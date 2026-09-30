@@ -1,0 +1,905 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "combined",
+  "snapshot": {
+    "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+    "owners": {
+      "units": {
+        "patch": "9.0",
+        "build": "25507028",
+        "schema": 4
+      },
+      "abilities": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      }
+    },
+    "baseline": {
+      "game": "warhammer_3",
+      "unit_scale": "ultra",
+      "rank": 0,
+      "context": "unmodified custom battle"
+    }
+  },
+  "units": [
+    {
+      "identity": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "subculture_key": "wh2_main_sc_lzd_lizardmen",
+        "name": "Kroxigor",
+        "unit_type": "infantry"
+      },
+      "body": {
+        "entity_count": 16.0,
+        "hp_per_entity": 510.0,
+        "total_hp": 8160.0,
+        "barrier_health": 0.0,
+        "size": "large",
+        "components": [
+          {
+            "id": "component:0",
+            "role": "man",
+            "count": 16.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 502.0,
+            "known_hp_total": 8160.0,
+            "size": "large",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "s_23de8daf4e75_1644"
+            ]
+          }
+        ]
+      },
+      "movement": {
+        "speed": 4.6,
+        "mass": 1400.0
+      },
+      "leadership": 70.0,
+      "melee": {
+        "id": "melee:primary",
+        "weapon_key": "wh2_main_lzd_kroxigor",
+        "attack": 30.0,
+        "defence": 32.0,
+        "base_damage": 30.0,
+        "ap_damage": 70.0,
+        "attack_interval": 3.8,
+        "charge_bonus": 22.0,
+        "max_splash_targets": 4.0,
+        "provenance_refs": [
+          "s_ca1c9a7d1041_124"
+        ],
+        "variants": []
+      },
+      "ranged": null,
+      "passives": {
+        "protection": {
+          "armour": 100.0,
+          "shield_block_chance": 0.0,
+          "physical_resistance": 0.0,
+          "missile_resistance": 15.0,
+          "spell_resistance": 0.0,
+          "fire_resistance": 0.0,
+          "ward_save": 0.0
+        },
+        "attack_traits": {
+          "melee": {
+            "scope": {
+              "attack_ref": "melee:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 15.0,
+            "bonus_vs_large": 0.0,
+            "magical": false,
+            "flaming": false,
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          },
+          "ranged": null,
+          "explosion": null,
+          "additional": []
+        },
+        "attributes": [
+          {
+            "key": "causes_fear",
+            "name": null,
+            "summary": "Causes Fear||This unit frightens all enemy units, reducing their leadership when nearby. It is also immune to fear. Fear penalties do not stack.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_4711",
+              "s_15464982ee45_12"
+            ]
+          },
+          {
+            "key": "hide_forest",
+            "name": null,
+            "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_4712",
+              "s_15464982ee45_39"
+            ]
+          },
+          {
+            "key": "kroxigor",
+            "name": null,
+            "summary": "Kroxigor||A unit with the Kroxigor will gain the following bonuses if a unit with the Skink Attribute is nearby:  Increased Weapon Strength",
+            "provenance_refs": [
+              "s_9d85f8e27f99_4713",
+              "s_15464982ee45_48"
+            ]
+          }
+        ],
+        "abilities": [
+          {
+            "key": "wh2_main_unit_passive_primal_instincts",
+            "name": "Primal Instincts",
+            "culture_key": "*",
+            "summary": "While active: +5 melee attack, +5 percentage points physical resistance and charge bonus x1.15. Deactivates above 50% health.",
+            "conditions": {
+              "activates_when": [],
+              "deactivates_when": [
+                {
+                  "key": "health_above_50%",
+                  "summary": "Source deactivation condition: health_above_50%. Activation and equality behavior are not established.",
+                  "provenance_refs": [
+                    "s_32babbd7b0ea_146"
+                  ]
+                }
+              ],
+              "recipient_requirements": [],
+              "unresolved": []
+            },
+            "effects": [
+              {
+                "kind": "stat_modifier",
+                "stat": "charge_bonus",
+                "operation": "multiply",
+                "value": 1.15,
+                "phase_ref": "wh2_main_unit_passive_primal_instincts",
+                "native_operation": "mult",
+                "provenance_refs": [
+                  "s_5513bd8dbb85_786"
+                ]
+              },
+              {
+                "kind": "stat_modifier",
+                "stat": "melee_attack",
+                "operation": "add",
+                "value": 5.0,
+                "phase_ref": "wh2_main_unit_passive_primal_instincts",
+                "native_operation": "add",
+                "provenance_refs": [
+                  "s_5513bd8dbb85_787"
+                ]
+              },
+              {
+                "kind": "stat_modifier",
+                "stat": "physical_resistance",
+                "operation": "add",
+                "value": 5.0,
+                "phase_ref": "wh2_main_unit_passive_primal_instincts",
+                "native_operation": "add",
+                "provenance_refs": [
+                  "s_5513bd8dbb85_788"
+                ]
+              }
+            ],
+            "native_parameters": {
+              "effect_range": 0.0,
+              "target_intercept_range": 0.0,
+              "active_time": -1.0,
+              "recharge_time": 0.0,
+              "num_uses": -1.0
+            },
+            "phases": [
+              {
+                "key": "wh2_main_unit_passive_primal_instincts",
+                "order": 1,
+                "duration": -1.0,
+                "lifecycle": {},
+                "provenance_refs": [
+                  "s_c79a63825141_652",
+                  "s_d56bb4dc1aae_636"
+                ],
+                "target_self": true,
+                "target_friends": false,
+                "target_enemies": false
+              }
+            ],
+            "provenance_refs": [
+              "s_69a2a77f6deb_858",
+              "s_05412a0a8b98_857",
+              "s_cb3a51dedbb2_4572"
+            ],
+            "detail_ref": "passive:wh2_main_unit_passive_primal_instincts"
+          },
+          {
+            "key": "wh3_dlc24_unit_passive_predatory_fighter",
+            "name": "Predatory Fighter",
+            "culture_key": "*",
+            "summary": "While active: +5 melee attack and speed x1.25; condition concerns recently fought enemies routing.",
+            "conditions": {
+              "activates_when": [],
+              "deactivates_when": [
+                {
+                  "key": "no_recent_melee_combatant_routing",
+                  "summary": "Source deactivation condition: no_recent_melee_combatant_routing. Activation and equality behavior are not established.",
+                  "provenance_refs": [
+                    "s_32babbd7b0ea_241"
+                  ]
+                }
+              ],
+              "recipient_requirements": [],
+              "unresolved": []
+            },
+            "effects": [
+              {
+                "kind": "stat_modifier",
+                "stat": "speed",
+                "operation": "multiply",
+                "value": 1.25,
+                "phase_ref": "wh3_dlc24_unit_passive_predatory_fighter",
+                "native_operation": "mult",
+                "provenance_refs": [
+                  "s_5513bd8dbb85_1194"
+                ]
+              },
+              {
+                "kind": "stat_modifier",
+                "stat": "melee_attack",
+                "operation": "add",
+                "value": 5.0,
+                "phase_ref": "wh3_dlc24_unit_passive_predatory_fighter",
+                "native_operation": "add",
+                "provenance_refs": [
+                  "s_5513bd8dbb85_1195"
+                ]
+              }
+            ],
+            "native_parameters": {
+              "effect_range": 0.0,
+              "target_intercept_range": 20.0,
+              "active_time": 10.0,
+              "recharge_time": 60.0,
+              "num_uses": -1.0
+            },
+            "phases": [
+              {
+                "key": "wh3_dlc24_unit_passive_predatory_fighter",
+                "order": 1,
+                "duration": 10.0,
+                "lifecycle": {},
+                "provenance_refs": [
+                  "s_c79a63825141_1005",
+                  "s_d56bb4dc1aae_966"
+                ],
+                "target_self": true,
+                "target_friends": false,
+                "target_enemies": false
+              }
+            ],
+            "provenance_refs": [
+              "s_69a2a77f6deb_1224",
+              "s_05412a0a8b98_1221",
+              "s_cb3a51dedbb2_4573"
+            ],
+            "detail_ref": "passive:wh3_dlc24_unit_passive_predatory_fighter"
+          },
+          {
+            "key": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+            "name": "Spawn-Kin",
+            "culture_key": "*",
+            "summary": "While active: base and armour-piercing melee damage x1.10. Deactivates when no friendly Skink is in the relevant range.",
+            "conditions": {
+              "activates_when": [],
+              "deactivates_when": [
+                {
+                  "key": "no_skink_allies_in_intercept_range",
+                  "summary": "Source deactivation condition: no_skink_allies_in_intercept_range. Activation and equality behavior are not established.",
+                  "provenance_refs": [
+                    "s_32babbd7b0ea_244"
+                  ]
+                }
+              ],
+              "recipient_requirements": [],
+              "unresolved": []
+            },
+            "effects": [
+              {
+                "kind": "stat_modifier",
+                "stat": "melee_ap_damage",
+                "operation": "multiply",
+                "value": 1.1,
+                "phase_ref": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+                "native_operation": "mult",
+                "provenance_refs": [
+                  "s_5513bd8dbb85_1201"
+                ]
+              },
+              {
+                "kind": "stat_modifier",
+                "stat": "melee_base_damage",
+                "operation": "multiply",
+                "value": 1.1,
+                "phase_ref": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+                "native_operation": "mult",
+                "provenance_refs": [
+                  "s_5513bd8dbb85_1202"
+                ]
+              }
+            ],
+            "native_parameters": {
+              "effect_range": 0.0,
+              "target_intercept_range": 35.0,
+              "active_time": -1.0,
+              "recharge_time": -1.0,
+              "num_uses": -1.0
+            },
+            "phases": [
+              {
+                "key": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+                "order": 1,
+                "duration": -1.0,
+                "lifecycle": {},
+                "provenance_refs": [
+                  "s_c79a63825141_1009",
+                  "s_d56bb4dc1aae_970"
+                ],
+                "target_self": true,
+                "target_friends": false,
+                "target_enemies": false
+              }
+            ],
+            "provenance_refs": [
+              "s_69a2a77f6deb_1229",
+              "s_05412a0a8b98_1226",
+              "s_cb3a51dedbb2_4574"
+            ],
+            "detail_ref": "passive:wh3_dlc24_unit_passive_spawn_kin_kroxigors"
+          }
+        ]
+      },
+      "cost": {
+        "multiplayer": 1000.0,
+        "campaign_recruitment": 1000.0,
+        "campaign_upkeep": 250.0
+      },
+      "activated_options": [],
+      "provenance_refs": [
+        "s_ca1c9a7d1041_124"
+      ],
+      "coverage": {
+        "melee": "present",
+        "ranged": "known_none",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 1,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "unresolved",
+            "returned": 1,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 3,
+            "total": 3,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "unresolved",
+            "returned": 3,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "unresolved",
+            "returned": 0,
+            "total": null,
+            "cursor": null
+          }
+        ],
+        "gaps": [
+          {
+            "code": "fixture_projection",
+            "section": "weapons",
+            "summary": "Selected default attacks are shown; complete variant/payload closure is not demonstrated.",
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "abilities",
+            "summary": "Only reviewed example passives are expanded; exhaustive passive classification and lifecycle reconstruction remain outstanding.",
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "activated_options",
+            "summary": "Activated-option inventory is not demonstrated by this design projection.",
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          },
+          {
+            "code": "reviewed_source_gap",
+            "section": "abilities",
+            "summary": "Spawn-Kin numerical range requires further definition lookup.",
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          },
+          {
+            "code": "reviewed_source_gap",
+            "section": "abilities",
+            "summary": "Predatory Fighter activation/refresh window remains unverified; phase duration alone is not the complete lifecycle.",
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          },
+          {
+            "code": "reviewed_source_gap",
+            "section": "abilities",
+            "summary": "Threshold equality and full activation rules remain unverified.",
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          },
+          {
+            "code": "reviewed_source_gap",
+            "section": "abilities",
+            "summary": "Activated-option classification and full weapon/component closure are not demonstrated by this illustrative profile projection.",
+            "provenance_refs": [
+              "s_ca1c9a7d1041_124"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "trait_descriptions": {
+    "bonus_vs_infantry": {
+      "summary": "Numeric bonus against infantry-sized targets; distinct from the qualitative Anti-Infantry bullet.",
+      "provenance_refs": [
+        "s_ca1c9a7d1041_124",
+        "s_87676ff951da_84"
+      ]
+    }
+  },
+  "sources": {
+    "s_ca1c9a7d1041": {
+      "path": "data/unit_stats/normalized/lizardmen__wh3__9.0__ultra.csv",
+      "sha256": "b3a1f3ab8ff60d5ab36fe49ab62f8eb9aa57c88dffb7629817ec80be411d41c2",
+      "owner": "units"
+    },
+    "s_23de8daf4e75": {
+      "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+      "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+      "owner": "units"
+    },
+    "s_9d85f8e27f99": {
+      "path": "data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv",
+      "sha256": "9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac",
+      "owner": "units"
+    },
+    "s_15464982ee45": {
+      "path": "data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv",
+      "sha256": "40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab",
+      "owner": "units"
+    },
+    "s_69a2a77f6deb": {
+      "path": "data/unit_stats/abilities/tables/ability_definitions.csv",
+      "sha256": "8535065555857989be3fd6c10c9f04fdcb9fd7ad9d390d6c0dec7da246d5c318",
+      "owner": "abilities"
+    },
+    "s_05412a0a8b98": {
+      "path": "data/unit_stats/abilities/tables/ability_casting.csv",
+      "sha256": "9ec08ddc3ddb7bde9cacb4e50823940c97bcdedfad16f8901f7fe66edc80143d",
+      "owner": "abilities"
+    },
+    "s_cb3a51dedbb2": {
+      "path": "data/unit_stats/lookups/unit_abilities__wh3__9.0__ultra.csv",
+      "sha256": "9377e967b64ca76fa0a7aabcf49bf86fd8260a915f13bda1f947f4ed0626ec9c",
+      "owner": "units"
+    },
+    "s_c79a63825141": {
+      "path": "data/unit_stats/abilities/tables/ability_phase_links.csv",
+      "sha256": "73c101b5e00eb2656ba8906c210f02ea2d1acbaadc5a58260a1f1f2ed9529816",
+      "owner": "abilities"
+    },
+    "s_d56bb4dc1aae": {
+      "path": "data/unit_stats/abilities/tables/ability_phases.csv",
+      "sha256": "cc4a090f13abfb62745008de5b949174ffde1464b62dc0eb94e2e7284da25081",
+      "owner": "abilities"
+    },
+    "s_32babbd7b0ea": {
+      "path": "data/unit_stats/abilities/tables/special_ability_to_auto_deactivate_flags.csv",
+      "sha256": "89db18866a1c7b54c6cf0d7bca7682a3ec23b6fba6e271a391e875fbb2ad638e",
+      "owner": "abilities"
+    },
+    "s_5513bd8dbb85": {
+      "path": "data/unit_stats/abilities/tables/phase_stat_effects.csv",
+      "sha256": "1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f",
+      "owner": "abilities"
+    },
+    "s_87676ff951da": {
+      "path": "data/unit_stats/source_exports/text/db/unit_stat_localisations__.loc.tsv",
+      "sha256": "79cddda990a17e0b92af16b11f89cd95b6481c5ae99d88c8863aa7e230174c74",
+      "owner": "units"
+    }
+  },
+  "provenance": {
+    "s_ca1c9a7d1041_124": {
+      "source_id": "s_ca1c9a7d1041",
+      "logical_record": 124,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_23de8daf4e75_1644": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 1644,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "component_role": "man",
+        "relationship_key": "",
+        "battle_entity_key": "wh2_main_lzd_mon_kroxigor"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_4711": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 4711,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "attribute_key": "causes_fear"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_12": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 12,
+      "key": {
+        "key": "unit_attributes_bullet_text_causes_fear"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_4712": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 4712,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "attribute_key": "hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_39": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 39,
+      "key": {
+        "key": "unit_attributes_bullet_text_hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_4713": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 4713,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "attribute_key": "kroxigor"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_48": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 48,
+      "key": {
+        "key": "unit_attributes_bullet_text_kroxigor"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_69a2a77f6deb_858": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 858,
+      "key": {
+        "key": "wh2_main_unit_passive_primal_instincts"
+      },
+      "source_line": 859,
+      "source_patch": "9.0.1"
+    },
+    "s_05412a0a8b98_857": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 857,
+      "key": {
+        "key": "wh2_main_unit_passive_primal_instincts"
+      },
+      "source_line": 858,
+      "source_patch": "9.0.1"
+    },
+    "s_cb3a51dedbb2_4572": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 4572,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "ability_key": "wh2_main_unit_passive_primal_instincts",
+        "culture_key": "*"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_c79a63825141_652": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 652,
+      "key": {
+        "order": "1",
+        "special_ability": "wh2_main_unit_passive_primal_instincts",
+        "target_self": "true",
+        "target_friends": "false",
+        "target_enemies": "false"
+      },
+      "source_line": 653,
+      "source_patch": "9.0.1"
+    },
+    "s_d56bb4dc1aae_636": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 636,
+      "key": {
+        "id": "wh2_main_unit_passive_primal_instincts"
+      },
+      "source_line": 637,
+      "source_patch": "9.0.1"
+    },
+    "s_32babbd7b0ea_146": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 146,
+      "key": {
+        "special_ability": "wh2_main_unit_passive_primal_instincts",
+        "deactivate_flag": "health_above_50%"
+      },
+      "source_line": 147,
+      "source_patch": "9.0.1"
+    },
+    "s_5513bd8dbb85_786": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 786,
+      "key": {
+        "phase": "wh2_main_unit_passive_primal_instincts",
+        "stat": "stat_charge_bonus"
+      },
+      "source_line": 787,
+      "source_patch": "9.0.1"
+    },
+    "s_5513bd8dbb85_787": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 787,
+      "key": {
+        "phase": "wh2_main_unit_passive_primal_instincts",
+        "stat": "stat_melee_attack"
+      },
+      "source_line": 788,
+      "source_patch": "9.0.1"
+    },
+    "s_5513bd8dbb85_788": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 788,
+      "key": {
+        "phase": "wh2_main_unit_passive_primal_instincts",
+        "stat": "stat_resistance_physical"
+      },
+      "source_line": 789,
+      "source_patch": "9.0.1"
+    },
+    "s_69a2a77f6deb_1224": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 1224,
+      "key": {
+        "key": "wh3_dlc24_unit_passive_predatory_fighter"
+      },
+      "source_line": 1225,
+      "source_patch": "9.0.1"
+    },
+    "s_05412a0a8b98_1221": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 1221,
+      "key": {
+        "key": "wh3_dlc24_unit_passive_predatory_fighter"
+      },
+      "source_line": 1222,
+      "source_patch": "9.0.1"
+    },
+    "s_cb3a51dedbb2_4573": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 4573,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "ability_key": "wh3_dlc24_unit_passive_predatory_fighter",
+        "culture_key": "*"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_c79a63825141_1005": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 1005,
+      "key": {
+        "order": "1",
+        "special_ability": "wh3_dlc24_unit_passive_predatory_fighter",
+        "target_self": "true",
+        "target_friends": "false",
+        "target_enemies": "false"
+      },
+      "source_line": 1006,
+      "source_patch": "9.0.1"
+    },
+    "s_d56bb4dc1aae_966": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 966,
+      "key": {
+        "id": "wh3_dlc24_unit_passive_predatory_fighter"
+      },
+      "source_line": 967,
+      "source_patch": "9.0.1"
+    },
+    "s_32babbd7b0ea_241": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 241,
+      "key": {
+        "special_ability": "wh3_dlc24_unit_passive_predatory_fighter",
+        "deactivate_flag": "no_recent_melee_combatant_routing"
+      },
+      "source_line": 242,
+      "source_patch": "9.0.1"
+    },
+    "s_5513bd8dbb85_1194": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 1194,
+      "key": {
+        "phase": "wh3_dlc24_unit_passive_predatory_fighter",
+        "stat": "scalar_speed"
+      },
+      "source_line": 1195,
+      "source_patch": "9.0.1"
+    },
+    "s_5513bd8dbb85_1195": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 1195,
+      "key": {
+        "phase": "wh3_dlc24_unit_passive_predatory_fighter",
+        "stat": "stat_melee_attack"
+      },
+      "source_line": 1196,
+      "source_patch": "9.0.1"
+    },
+    "s_69a2a77f6deb_1229": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 1229,
+      "key": {
+        "key": "wh3_dlc24_unit_passive_spawn_kin_kroxigors"
+      },
+      "source_line": 1230,
+      "source_patch": "9.0.1"
+    },
+    "s_05412a0a8b98_1226": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 1226,
+      "key": {
+        "key": "wh3_dlc24_unit_passive_spawn_kin_kroxigors"
+      },
+      "source_line": 1227,
+      "source_patch": "9.0.1"
+    },
+    "s_cb3a51dedbb2_4574": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 4574,
+      "key": {
+        "unit_key": "wh2_main_lzd_mon_kroxigors",
+        "ability_key": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+        "culture_key": "*"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_c79a63825141_1009": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 1009,
+      "key": {
+        "order": "1",
+        "special_ability": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+        "target_self": "true",
+        "target_friends": "false",
+        "target_enemies": "false"
+      },
+      "source_line": 1010,
+      "source_patch": "9.0.1"
+    },
+    "s_d56bb4dc1aae_970": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 970,
+      "key": {
+        "id": "wh3_dlc24_unit_passive_spawn_kin_kroxigors"
+      },
+      "source_line": 971,
+      "source_patch": "9.0.1"
+    },
+    "s_32babbd7b0ea_244": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 244,
+      "key": {
+        "special_ability": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+        "deactivate_flag": "no_skink_allies_in_intercept_range"
+      },
+      "source_line": 245,
+      "source_patch": "9.0.1"
+    },
+    "s_5513bd8dbb85_1201": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 1201,
+      "key": {
+        "phase": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+        "stat": "stat_melee_damage_ap"
+      },
+      "source_line": 1202,
+      "source_patch": "9.0.1"
+    },
+    "s_5513bd8dbb85_1202": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 1202,
+      "key": {
+        "phase": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+        "stat": "stat_melee_damage_base"
+      },
+      "source_line": 1203,
+      "source_patch": "9.0.1"
+    },
+    "s_87676ff951da_84": {
+      "source_id": "s_87676ff951da",
+      "logical_record": 84,
+      "key": {
+        "key": "unit_stat_localisations_tooltip_text_stat_bonus_vs_infantry"
+      },
+      "source_line": null,
+      "source_patch": null
+    }
+  },
+  "detail_refs": {
+    "passive:wh2_main_unit_passive_primal_instincts": {
+      "kind": "passive",
+      "key": "wh2_main_unit_passive_primal_instincts"
+    },
+    "passive:wh3_dlc24_unit_passive_predatory_fighter": {
+      "kind": "passive",
+      "key": "wh3_dlc24_unit_passive_predatory_fighter"
+    },
+    "passive:wh3_dlc24_unit_passive_spawn_kin_kroxigors": {
+      "kind": "passive",
+      "key": "wh3_dlc24_unit_passive_spawn_kin_kroxigors"
+    }
+  },
+  "payload_graph": {
+    "nodes": [],
+    "edges": []
+  }
+}

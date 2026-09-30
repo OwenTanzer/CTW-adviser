@@ -1,0 +1,456 @@
+{
+  "Lothern Sea Guard": {
+    "identity": {
+      "unit_key": "wh2_main_hef_inf_lothern_sea_guard_0",
+      "subculture_key": "wh2_main_sc_hef_high_elves",
+      "name": "Lothern Sea Guard",
+      "unit_type": "infantry"
+    },
+    "body": {
+      "entity_count": 90,
+      "size": "small",
+      "hp_per_entity": 68,
+      "total_hp": 6120,
+      "barrier_health": 0
+    },
+    "movement": {
+      "speed": 3.6,
+      "mass": 100
+    },
+    "leadership": 70,
+    "melee": {
+      "weapon_key": "wh2_main_hef_spear_guard",
+      "attack": 22,
+      "defence": 32,
+      "base_damage": 20,
+      "ap_damage": 8,
+      "attack_interval": 4.2,
+      "charge_bonus": 4,
+      "max_splash_targets": 1
+    },
+    "ranged": {
+      "weapon_key": "wh2_main_hef_sea_guard_bow",
+      "projectile_key": "wh2_main_hef_sea_guard_arrow",
+      "range": 165,
+      "ammunition": 22,
+      "reload_time": 11,
+      "base_damage": 15,
+      "ap_damage": 4,
+      "projectiles_per_shot": 1,
+      "shots_per_volley": 1,
+      "burst_size": 1,
+      "burst_shot_delay": 0,
+      "velocity": 45,
+      "accuracy": 10,
+      "spread": 0,
+      "marksmanship_bonus": 10,
+      "calibration_distance": 120,
+      "calibration_area": 5.3,
+      "detail_ref": "projectile:wh2_main_hef_sea_guard_arrow"
+    },
+    "passives": {
+      "protection": {
+        "armour": 40,
+        "shield_block_chance": 0,
+        "physical_resistance": 0,
+        "missile_resistance": 0,
+        "spell_resistance": 0,
+        "fire_resistance": 0,
+        "ward_save": 0
+      },
+      "attack_traits": {
+        "melee": {
+          "bonus_vs_infantry": 0,
+          "bonus_vs_large": 16,
+          "magical": false,
+          "flaming": false
+        },
+        "ranged": {
+          "bonus_vs_infantry": 0,
+          "bonus_vs_large": 0,
+          "magical": false,
+          "flaming": false
+        }
+      },
+      "attributes": [
+        {
+          "key": "charge_defense_vs_large",
+          "name": "Charge Defence vs. Large",
+          "summary": "When braced, negates the charge bonus of large attackers."
+        },
+        {
+          "key": "charge_reflection",
+          "name": "Charge Reflection",
+          "summary": "When braced, causes additional damage when attacking charging enemies."
+        },
+        {
+          "key": "hide_forest",
+          "name": "Hide (forest)",
+          "summary": "Can hide in forests until enemy units approach too closely."
+        }
+      ],
+      "abilities": [
+        {
+          "key": "wh2_main_unit_passive_martial_prowess",
+          "name": "Martial Prowess",
+          "culture_key": "*",
+          "summary": "While active: +2 melee attack and +12 melee defence. Deactivates below 25% health.",
+          "conditions": {
+            "deactivates_when": [
+              "health_below_25%"
+            ]
+          },
+          "effects": [
+            {
+              "kind": "stat_modifier",
+              "stat": "melee_attack",
+              "operation": "add",
+              "value": 2
+            },
+            {
+              "kind": "stat_modifier",
+              "stat": "melee_defence",
+              "operation": "add",
+              "value": 12
+            }
+          ]
+        }
+      ]
+    },
+    "cost": {
+      "multiplayer": 650,
+      "campaign_recruitment": 650,
+      "campaign_upkeep": 163
+    },
+    "coverage": {
+      "gaps": [
+        "Full activation/refresh rules and exact threshold equality not established by deactivation flag alone.",
+        "Activated-option classification and full weapon/component closure are not demonstrated by this illustrative profile projection."
+      ]
+    },
+    "provenance": {
+      "profile": "data/unit_stats/normalized/high_elves__wh3__9.0__ultra.csv",
+      "passives": "Shared ability tables: phase_stat_effects, ability_phases, special_ability_to_auto_deactivate_flags; exact row locators required in production."
+    }
+  },
+  "Blue Horrors of Tzeentch": {
+    "identity": {
+      "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+      "subculture_key": "wh3_main_sc_tze_tzeentch",
+      "name": "Blue Horrors of Tzeentch",
+      "unit_type": "infantry"
+    },
+    "body": {
+      "entity_count": 160,
+      "size": "small",
+      "hp_per_entity": 48,
+      "total_hp": 7680,
+      "barrier_health": 1400
+    },
+    "movement": {
+      "speed": 3.8,
+      "mass": 70
+    },
+    "leadership": 50,
+    "melee": {
+      "weapon_key": "wh3_main_tze_blue_horror",
+      "attack": 20,
+      "defence": 22,
+      "base_damage": 21,
+      "ap_damage": 3,
+      "attack_interval": 4,
+      "charge_bonus": 10,
+      "max_splash_targets": 1
+    },
+    "ranged": {
+      "weapon_key": "wh3_main_tze_blue_horror_fire_bolt",
+      "projectile_key": "wh3_main_tze_blue_horror_fire_bolt",
+      "range": 90,
+      "ammunition": 4,
+      "reload_time": 8,
+      "base_damage": 13,
+      "ap_damage": 2,
+      "projectiles_per_shot": 1,
+      "shots_per_volley": 1,
+      "burst_size": 1,
+      "burst_shot_delay": 0,
+      "velocity": 35,
+      "accuracy": 10,
+      "spread": 0,
+      "marksmanship_bonus": 10,
+      "calibration_distance": 60,
+      "calibration_area": 2,
+      "detail_ref": "projectile:wh3_main_tze_blue_horror_fire_bolt"
+    },
+    "passives": {
+      "protection": {
+        "armour": 5,
+        "shield_block_chance": 0,
+        "physical_resistance": 20,
+        "missile_resistance": 0,
+        "spell_resistance": 0,
+        "fire_resistance": 0,
+        "ward_save": 0
+      },
+      "attack_traits": {
+        "melee": {
+          "bonus_vs_infantry": 0,
+          "bonus_vs_large": 0,
+          "magical": true,
+          "flaming": true
+        },
+        "ranged": {
+          "bonus_vs_infantry": 0,
+          "bonus_vs_large": 0,
+          "magical": true,
+          "flaming": true
+        }
+      },
+      "attributes": [
+        {
+          "key": "causes_fear",
+          "name": "Causes Fear",
+          "summary": "Reduces nearby enemy leadership and grants fear immunity. Fear penalties do not stack."
+        },
+        {
+          "key": "daemonic",
+          "name": "Daemonic",
+          "summary": "Cannot rout; suffers damage at low leadership. Also carries physical resistance and fear/terror immunity; numeric values and instability effects are represented separately."
+        },
+        {
+          "key": "hide_forest",
+          "name": "Hide (forest)",
+          "summary": "Can hide in forests until enemy units approach too closely."
+        }
+      ],
+      "abilities": [
+        {
+          "key": "wh3_main_unit_passive_daemonic_instability_tzeentch",
+          "name": "Daemonic Instability",
+          "culture_key": "*",
+          "summary": "Periodic self-damage associated with broken morale; deactivates when morale is higher than broken.",
+          "conditions": {
+            "deactivates_when": [
+              "morale_is_higher_than_broken"
+            ]
+          },
+          "effects": [
+            {
+              "kind": "periodic_damage",
+              "native_parameters": {
+                "damage_amount": 66,
+                "hp_change_frequency": 1,
+                "max_damaged_entities": 4
+              }
+            }
+          ]
+        },
+        {
+          "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii",
+          "name": "Daemonic Instability II",
+          "culture_key": "*",
+          "summary": "Stronger periodic self-damage phase associated with shattered morale; deactivates when morale is higher than shattered.",
+          "conditions": {
+            "deactivates_when": [
+              "morale_is_higher_than_shattered"
+            ]
+          },
+          "effects": [
+            {
+              "kind": "periodic_damage",
+              "native_parameters": {
+                "damage_amount": 133,
+                "hp_change_frequency": 1,
+                "max_damaged_entities": 12
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "cost": {
+      "multiplayer": 500,
+      "campaign_recruitment": 500,
+      "campaign_upkeep": 125
+    },
+    "coverage": {
+      "gaps": [
+        "Periodic damage native fields do not certify unit-wide damage per second or tick scheduling.",
+        "Replacement/overlap of instability phases remains unverified.",
+        "Activated-option classification and full weapon/component closure are not demonstrated by this illustrative profile projection."
+      ]
+    },
+    "provenance": {
+      "profile": "data/unit_stats/normalized/tzeentch__wh3__9.0__ultra.csv",
+      "passives": "Shared ability tables: phase_stat_effects, ability_phases, special_ability_to_auto_deactivate_flags; exact row locators required in production."
+    }
+  },
+  "Kroxigor": {
+    "identity": {
+      "unit_key": "wh2_main_lzd_mon_kroxigors",
+      "subculture_key": "wh2_main_sc_lzd_lizardmen",
+      "name": "Kroxigor",
+      "unit_type": "infantry"
+    },
+    "body": {
+      "entity_count": 16,
+      "size": "large",
+      "hp_per_entity": 510,
+      "total_hp": 8160,
+      "barrier_health": 0
+    },
+    "movement": {
+      "speed": 4.6,
+      "mass": 1400
+    },
+    "leadership": 70,
+    "melee": {
+      "weapon_key": "wh2_main_lzd_kroxigor",
+      "attack": 30,
+      "defence": 32,
+      "base_damage": 30,
+      "ap_damage": 70,
+      "attack_interval": 3.8,
+      "charge_bonus": 22,
+      "max_splash_targets": 4
+    },
+    "ranged": null,
+    "passives": {
+      "protection": {
+        "armour": 100,
+        "shield_block_chance": 0,
+        "physical_resistance": 0,
+        "missile_resistance": 15,
+        "spell_resistance": 0,
+        "fire_resistance": 0,
+        "ward_save": 0
+      },
+      "attack_traits": {
+        "melee": {
+          "bonus_vs_infantry": 15,
+          "bonus_vs_large": 0,
+          "magical": false,
+          "flaming": false
+        }
+      },
+      "attributes": [
+        {
+          "key": "causes_fear",
+          "name": "Causes Fear",
+          "summary": "Reduces nearby enemy leadership and grants fear immunity. Fear penalties do not stack."
+        },
+        {
+          "key": "hide_forest",
+          "name": "Hide (forest)",
+          "summary": "Can hide in forests until enemy units approach too closely."
+        },
+        {
+          "key": "kroxigor",
+          "name": "Kroxigor",
+          "summary": "Receives increased weapon strength near a unit with the Skink attribute; exact modifiers are represented by Spawn-Kin."
+        }
+      ],
+      "abilities": [
+        {
+          "key": "wh2_main_unit_passive_primal_instincts",
+          "name": "Primal Instincts",
+          "culture_key": "*",
+          "summary": "While active: +5 melee attack, +5 percentage points physical resistance and charge bonus x1.15. Deactivates above 50% health.",
+          "conditions": {
+            "deactivates_when": [
+              "health_above_50%"
+            ]
+          },
+          "effects": [
+            {
+              "kind": "stat_modifier",
+              "stat": "charge_bonus",
+              "operation": "multiply",
+              "value": 1.15
+            },
+            {
+              "kind": "stat_modifier",
+              "stat": "melee_attack",
+              "operation": "add",
+              "value": 5
+            },
+            {
+              "kind": "stat_modifier",
+              "stat": "physical_resistance",
+              "operation": "add",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "key": "wh3_dlc24_unit_passive_predatory_fighter",
+          "name": "Predatory Fighter",
+          "culture_key": "*",
+          "summary": "While active: +5 melee attack and speed x1.25; condition concerns recently fought enemies routing.",
+          "conditions": {
+            "deactivates_when": [
+              "no_recent_melee_combatant_routing"
+            ]
+          },
+          "phase_duration": 10,
+          "effects": [
+            {
+              "kind": "stat_modifier",
+              "stat": "speed",
+              "operation": "multiply",
+              "value": 1.25
+            },
+            {
+              "kind": "stat_modifier",
+              "stat": "melee_attack",
+              "operation": "add",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "key": "wh3_dlc24_unit_passive_spawn_kin_kroxigors",
+          "name": "Spawn-Kin",
+          "culture_key": "*",
+          "summary": "While active: base and armour-piercing melee damage x1.10. Deactivates when no friendly Skink is in the relevant range.",
+          "conditions": {
+            "deactivates_when": [
+              "no_skink_allies_in_intercept_range"
+            ]
+          },
+          "effects": [
+            {
+              "kind": "stat_modifier",
+              "stat": "melee_ap_damage",
+              "operation": "multiply",
+              "value": 1.1
+            },
+            {
+              "kind": "stat_modifier",
+              "stat": "melee_base_damage",
+              "operation": "multiply",
+              "value": 1.1
+            }
+          ]
+        }
+      ]
+    },
+    "cost": {
+      "multiplayer": 1000,
+      "campaign_recruitment": 1000,
+      "campaign_upkeep": 250
+    },
+    "coverage": {
+      "gaps": [
+        "Spawn-Kin numerical range requires further definition lookup.",
+        "Predatory Fighter activation/refresh window remains unverified; phase duration alone is not the complete lifecycle.",
+        "Threshold equality and full activation rules remain unverified.",
+        "Activated-option classification and full weapon/component closure are not demonstrated by this illustrative profile projection."
+      ]
+    },
+    "provenance": {
+      "profile": "data/unit_stats/normalized/lizardmen__wh3__9.0__ultra.csv",
+      "passives": "Shared ability tables: phase_stat_effects, ability_phases, special_ability_to_auto_deactivate_flags; exact row locators required in production."
+    }
+  }
+}
