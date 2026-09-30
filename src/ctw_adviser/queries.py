@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.6.0'
+PACKET_VERSION = '1.7.0'
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
 CONDITION_TEXT = {
@@ -596,6 +596,26 @@ class Packet:
                         mechanic['effects'].append({'kind': 'payload_reference', 'phase_ref': None,
                                                      'node_ref': self.detail('record', edge['target_record']),
                                                      'relationship': edge['relation'], 'provenance_refs': self.refs(source)})
+        if key == 'wh2_main_unit_passive_too_horrible_to_die' and casting and casting['miscast_explosion']:
+            explosion = self.q.one('explosions', 'explosion_key', casting['miscast_explosion'])
+            if explosion:
+                phase = self.q.one('native_ability_phases', 'id', explosion['contact_phase_effect']) if explosion['contact_phase_effect'] else None
+                for effect in mechanic['effects']:
+                    if effect['kind'] == 'payload_reference' and effect['node_ref'] == 'record:' + explosion['record_id']:
+                        effect['failure_context'] = {
+                            'miscast_chance': casting['miscast_chance'],
+                            'miscast_global_bonus': boolean(casting['miscast_global_bonus']),
+                            'explosion_base_damage': explosion['base_damage'],
+                            'explosion_ap_damage': explosion['ap_damage'],
+                            'explosion_radius': explosion['radius'],
+                            'explosion_affects_allies': boolean(explosion['affects_allies']),
+                            'contact_phase_key': explosion['contact_phase_effect'],
+                        }
+                        if phase:
+                            effect['failure_context'].update({
+                                'contact_' + k: v for k, v in self.native('native_ability_phases', phase,
+                                    ('damage_amount', 'hp_change_frequency', 'duration', 'max_damaged_entities', 'affects_allies', 'affects_enemies')).items()})
+                        effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + self.refs(casting, explosion, phase)))
         if casting and casting['spawned_unit']:
             unit_key = casting['spawned_unit']
             unit_name, unit_refs = self.loc('land_units_onscreen_name_' + unit_key)
@@ -710,6 +730,16 @@ class Packet:
                 text = effect['purpose']
             elif kind == 'payload_reference':
                 text = 'linked ' + effect['relationship']
+                if effect.get('failure_context'):
+                    f = effect['failure_context']
+                    chance = f['miscast_chance']
+                    text = (f'Failure chance: {chance:.0%} (interpreted from miscast_chance={chance:g})' if chance is not None else 'Failure chance unknown')
+                    text += f'; failure explosion direct damage: {f["explosion_base_damage"]} base / {f["explosion_ap_damage"]} armour-piercing'
+                    if 'contact_damage_amount' in f:
+                        text += f'; delivers a contact effect with damage amount {f["contact_damage_amount"]}, interval setting {f["contact_hp_change_frequency"]}, duration setting {f["contact_duration"]}, maximum affected entities {f["contact_max_damaged_entities"]}'
+                        text += '; contact effect affects allies: ' + str(f['contact_affects_allies']).lower() + ', enemies: ' + str(f['contact_affects_enemies']).lower()
+                    text += ' (failure scheduling, effective damage and exact recipients unverified; death summon is a separate mechanic)'
+
             elif effect.get('native_parameters'):
                 parameters = {k: v for k, v in effect['native_parameters'].items()
                               if k not in ('ability', 'source_path', 'source_line', 'source_patch')}

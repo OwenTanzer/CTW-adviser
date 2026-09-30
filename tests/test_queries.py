@@ -40,6 +40,24 @@ class QueryTests(unittest.TestCase):
         packet_checks(packet)
         return packet['units'][0]
 
+    def test_abomination_failure_branch_is_conditional_and_separate(self):
+        unit = self.check(self.q.get_unit_profile('wh2_main_skv_mon_hell_pit_abomination'))
+        abilities = {m['key']: m for m in unit['passives']['abilities']}
+        ability = abilities['wh2_main_unit_passive_too_horrible_to_die']
+        branches = [e for e in ability['effects'] if 'failure_context' in e]
+        self.assertEqual(len(branches), 1)
+        f = branches[0]['failure_context']
+        self.assertEqual(f['miscast_chance'], 0.5)
+        self.assertEqual(f['explosion_base_damage'] + f['explosion_ap_damage'], 0)
+        self.assertEqual(f['contact_damage_amount'], 6650)
+        self.assertFalse(f['contact_affects_enemies'])
+        self.assertIn('Failure chance: 50%', ability['summary'])
+        self.assertIn('death summon is a separate mechanic', ability['summary'])
+        self.assertFalse(any(e['kind'] == 'periodic_damage' for e in ability['effects']))
+        rats = abilities['wh2_main_unit_passive_the_rats_emerge']
+        self.assertFalse(any('failure_context' in e for e in rats['effects']))
+        self.assertTrue(any(e.get('trigger') == 'on_death' for e in rats['effects']))
+
     def test_exploding_unit_is_source_backed_visual_indicator(self):
         key = 'wh2_dlc15_unit_abilities_exploding_unit'
         detail = self.q.get_passive_detail(key, include_diagnostics=True)
