@@ -82,11 +82,12 @@ def unit_html(packet, args):
         if coverage['cursor']:
             content += ' · <a href="' + escape(link('/inspect', **dict(args, section=coverage['name'], cursor=coverage['cursor'], mode=packet['mode']))) + '">Continue this section</a>'
         content += '</p>'
-    content += ''.join('<p><b>' + escape(g['code']) + '</b>: ' + escape(g['summary']) + '</p>' for g in unit['coverage']['gaps']) + '</section>'
+    content += '<details><summary>Development coverage notes (' + str(unit['coverage']['diagnostic_count']) + ')</summary>'
+    content += ''.join('<p><b>' + escape(g['code']) + '</b>: ' + escape(g['summary']) + '</p>' for g in unit['coverage']['gaps']) + '</details></section>'
     content += '<section class="card"><h3>Provenance & detail</h3><p>Source commit ' + escape(packet['snapshot']['commit']) + ' · packet ' + escape(packet['schema_version']) + '</p>'
     content += '<details><summary>Source owners, locators and payload graph</summary>' + raw({k: packet[k] for k in ('snapshot', 'sources', 'provenance', 'payload_graph')}) + '</details>'
     content += '<details><summary>All detail links</summary><ul>' + ''.join('<li><a href="' + escape(link('/inspect/detail', ref=ref)) + '">' + escape(ref) + '</a></li>' for ref in packet['detail_refs']) + '</ul></details>'
-    content += '<p><a href="' + escape(link('/inspect', **dict(args, format='json'))) + '">Download the same JSON packet</a></p></section>'
+    content += '<p><a href="' + escape(link('/inspect', **dict(args, format='json'))) + '">Download compact JSON packet</a> · <a href="' + escape(link('/inspect', **dict(args, format='json', diagnostics='1'))) + '">JSON with development notes</a></p></section>'
     return content
 
 
@@ -104,7 +105,8 @@ async def inspect(request, datasette):
                 resolved = {'status': 'not_found'}
             if resolved['status'] == 'resolved':
                 packet = queries.get_unit_profile(resolved['resolved'], mode=args.get('mode', 'combined'),
-                                                  section=args.get('section'), cursor=args.get('cursor'), limit=int(args.get('limit', '32')))
+                                                  section=args.get('section'), cursor=args.get('cursor'), limit=int(args.get('limit', '32')),
+                                                  include_diagnostics=args.get('format') != 'json' or args.get('diagnostics') == '1')
                 if args.get('format') == 'json':
                     return Response.json(packet)
                 return Response.html(page(unit_html(packet, args), query))
