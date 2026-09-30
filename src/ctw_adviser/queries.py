@@ -140,8 +140,34 @@ class Queries:
     def resolved(self, value, subculture=None):
         # Re-resolve caller-supplied dictionaries, so identities cannot be forged.
         if isinstance(value, dict):
-            subculture = value.get('subculture_key')
-            value = value['unit_key']
+            key = value['unit_key']
+            base = self.resolve_unit(key)
+            if base['status'] != 'resolved':
+                raise ResolutionError(base)
+            profile_key = base['resolved']['profile_unit_key']
+            keys = value.get('source_unit_keys', [key])
+            if not isinstance(keys, list) or not keys or key not in keys or len(keys) != len(set(keys)):
+                raise ValueError('invalid resolved source identity set')
+            contexts = []
+            for candidate in keys:
+                alias = self.one('unit_aliases', 'unit_key', candidate)
+                if not alias or alias['profile_unit_key'] != profile_key:
+                    raise ValueError('resolved source identities do not share this profile')
+                contexts.extend(self.rows('unit_availability', 'unit_key', candidate))
+            selected_context = subculture if subculture is not None else value.get('subculture_key')
+            if selected_context is not None:
+                contexts = [row for row in contexts if row['subculture_key'] == selected_context]
+                if not contexts:
+                    raise ResolutionError({'status': 'not_found', 'query': key, 'candidates': [], 'resolved': None})
+            valid_keys = sorted({row['unit_key'] for row in contexts})
+            selected_key = key if key in valid_keys else valid_keys[0]
+            result = self.resolve_unit(selected_key, selected_context)['resolved']
+            # Discovery through equivalent keys can leave context unselected.
+            # Revalidation of the representative key must not narrow that scope.
+            result['subculture_key'] = selected_context
+            result['source_unit_keys'] = valid_keys
+            result['subcultures'] = sorted({row['subculture_key'] for row in contexts})
+            return result
         result = self.resolve_unit(value, subculture)
         if result['status'] != 'resolved':
             raise ResolutionError(result)

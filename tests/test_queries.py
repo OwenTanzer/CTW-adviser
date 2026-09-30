@@ -68,6 +68,24 @@ class QueryTests(unittest.TestCase):
             unit = self.check(self.q.get_unit_profile(result['unit_key'], subculture=context))
             self.assertEqual(unit['identity']['subculture_key'], context)
 
+    def test_resolved_shared_alias_discovery_keeps_context_and_continuation(self):
+        resolved = self.q.resolve_unit('River Trolls')['resolved']
+        self.assertIsNone(resolved['subculture_key'])
+        self.assertGreater(len(resolved['source_unit_keys']), 1)
+        direct = self.q.get_unit_profile('River Trolls', limit=1)
+        from_identity = self.q.get_unit_profile(resolved, limit=1)
+        self.assertEqual(direct, from_identity)
+        coverage = next(s for s in direct['units'][0]['coverage']['sections'] if s['name'] == 'attributes')
+        self.check(self.q.get_combat_relations(resolved, 'attributes', coverage['cursor'], limit=1))
+        for subculture in resolved['subcultures']:
+            scoped = self.q.get_unit_profile(resolved, subculture=subculture)
+            unit = self.check(scoped)
+            self.assertEqual(unit['identity']['subculture_key'], subculture)
+            self.assertTrue(self.q.rows('unit_availability', 'unit_key', unit['identity']['unit_key']))
+        forged = dict(resolved, source_unit_keys=resolved['source_unit_keys'] + ['wh3_main_tze_inf_blue_horrors_0'])
+        with self.assertRaises(ValueError):
+            self.q.get_unit_profile(forged)
+
     def test_fixture_core_values_and_effects_match_independent_source_examples(self):
         for name in ('sea_guard', 'blue_horrors', 'kroxigor', 'queen_bess', 'wargor'):
             fixture = json.loads((ROOT / f'fixtures/source_backed/{name}.json').read_text())['units'][0]

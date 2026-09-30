@@ -23,6 +23,7 @@ def main():
         query.add_argument('keys', nargs='+' if command in ('matchup', 'provenance') else 1)
         query.add_argument('--subculture')
         query.add_argument('--subculture-b')
+        query.add_argument('--culture', default='*', help='Source-qualified culture for passive detail')
         query.add_argument('--mode', choices=('combined', 'melee', 'missile'), default='combined')
         query.add_argument('--section', choices=('components', 'weapons', 'attributes', 'abilities', 'activated_options'))
         query.add_argument('--limit', type=int, default=32)
@@ -49,7 +50,7 @@ def main():
                 elif args.command in ('unit', 'relations'):
                     result = queries.get_unit_profile(key, **options)
                 elif args.command == 'passive':
-                    result = queries.get_passive_detail(key, limit=args.limit, cursor=args.cursor)
+                    result = queries.get_passive_detail(key, culture=args.culture, limit=args.limit, cursor=args.cursor)
                 elif args.command == 'detail':
                     result = queries.get_detail(key, limit=args.limit, cursor=args.cursor)
                 else:
