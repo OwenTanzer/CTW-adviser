@@ -74,6 +74,23 @@ def unit_html(packet, args):
         content += '<article><h3>' + escape(mechanic['name'] or mechanic['key']) + '</h3><p>' + escape(mechanic['summary']) + '</p>'
         content += '<small>Culture: ' + escape(mechanic['culture_key']) + ' · requires effect enabling: ' + escape(mechanic['requires_effect_enabling']) + '</small>'
         content += '<details><summary>Effects, conditions & recipient phases</summary>' + raw({k: mechanic[k] for k in ('effects', 'conditions', 'phases', 'native_parameters', 'classification_evidence')}) + '</details>'
+        roots = {e['node_ref'] for e in mechanic['effects'] if e['kind'] == 'payload_reference'}
+        reached = set(roots)
+        pending = list(roots)
+        while pending:
+            parent = pending.pop()
+            for edge in packet['payload_graph']['edges']:
+                if edge['from'] == parent and edge['to'] not in reached:
+                    reached.add(edge['to'])
+                    pending.append(edge['to'])
+        payloads = [n for n in packet['payload_graph']['nodes'] if n['id'] in reached]
+        if payloads:
+            content += '<details><summary>Linked damage parameters</summary>'
+            content += '<p>Separate payload definitions; these are not additional ordinary weapon attacks.</p>'
+            for node in payloads:
+                content += '<h4>' + escape(node['kind'].removeprefix('native_').replace('_', ' ')) + '</h4>'
+                content += table(node['native_parameters'])
+            content += '</details>'
         content += '<a href="' + escape(link('/inspect/detail', ref=mechanic['detail_ref'])) + '">Full source evidence</a></article>'
     content += '</section><section class="card"><h3>Activated options</h3><p>Qualified listings; access and activity are not established by the link.</p>' + raw(unit['activated_options']) + '</section>'
     content += '<section class="card"><h3>Coverage & known gaps</h3>' + table({'melee': unit['coverage']['melee'], 'ranged': unit['coverage']['ranged']})
