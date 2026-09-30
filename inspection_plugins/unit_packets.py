@@ -41,7 +41,7 @@ a{color:#155a79}h1{margin-bottom:4px}h2{font-size:1.35rem}h3{margin-bottom:6px}.
 input{width:min(65%,520px)}button{background:#172b3a;color:white;cursor:pointer}table{border-collapse:collapse;width:100%;margin:12px 0}th,td{padding:7px 10px;border-bottom:1px solid #e5e8e7;text-align:left;vertical-align:top}th{width:30%;font-weight:500}
 pre{font:13px/1.5 ui-monospace,monospace;overflow:auto;max-height:500px;background:#f1f4f4;padding:14px}summary{cursor:pointer}small,.muted{color:#52656e}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.grid .card{margin:0}
 </style><main><nav><a href="/inspect">Unit evidence</a> · <a href="/ctw/find_units?name=">Name search</a> · <a href="/ctw">All source tables</a> · <a href="https://github.com/OwenTanzer/CTW-adviser/pull/11">PR #11</a></nav>
-<h1>Unit evidence inspection</h1><p class="preview">Phase 3 preview · PR #11 is unmerged. Independent code review completed; ready for inspection.</p>
+<h1>Unit evidence inspection</h1><p class="preview">Phase 3 preview · PR #11 is unmerged. Latest passive refinements are available for inspection; earlier review does not cover subsequent changes.</p>
 <form action="/inspect"><input name="q" aria-label="Unit name or key" placeholder="Unit name or exact key" value="''' + escape(query) + '''"><button>Find unit</button></form>
 <p class="muted">Base profiles and supported mechanics from pinned CTW-data. Conditional effects remain separate; no combat outcome is calculated.</p>''' + content + '</main></html>'
 
