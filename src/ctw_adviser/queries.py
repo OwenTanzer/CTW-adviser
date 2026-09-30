@@ -37,6 +37,19 @@ PHASE_FIELDS = (
     'affects_allies', 'affects_enemies', 'replenish_ammo', 'spreading',
     'freeze_recharge', 'remove_magical', 'execute_ratio', 'requested_stance',
 )
+PHASE_LABELS = {
+    'cant_move': 'Cannot move', 'freeze_fatigue': 'Freeze fatigue',
+    'fatigue_change_ratio': 'Fatigue change ratio',
+    'inspiration_aura_range_mod': 'Inspiration aura range modifier',
+    'ability_recharge_change': 'Ability recharge change',
+    'mana_regen_mod': 'Mana regeneration modifier',
+    'mana_max_depletion_mod': 'Maximum mana depletion modifier',
+    'imbue_magical': 'Imbue magical attacks', 'imbue_ignition': 'Imbue ignition',
+    'imbue_contact': 'Imbue contact effect', 'replenish_ammo': 'Ammunition replenishment',
+    'spreading': 'Spreading reference', 'freeze_recharge': 'Freeze recharge',
+    'remove_magical': 'Remove magical attacks', 'execute_ratio': 'Execution ratio',
+    'requested_stance': 'Requested stance',
+}
 TRAIT_TEXT = {
     'magical': ('ui_unit_bullet_point_enums_tooltip_ward_physical',
                 'Magical attacks bypass physical resistance; scoped to this attack.'),
@@ -575,7 +588,7 @@ class Packet:
                  if v not in (0, None, False) and k not in ('effect_type', 'affects_allies', 'affects_enemies')}
         if other:
             effects.append({'kind': 'unresolved', 'phase_ref': key, 'native_kind': 'phase_behavior',
-                            'native_parameters': other, 'reason': 'Native phase behavior retained without converting it to a scalar modifier.', 'provenance_refs': refs})
+                            'native_parameters': other, 'reason': 'Native phase parameters; units and engine interpretation unverified.', 'provenance_refs': refs})
             self.gap(gaps, 'phase_behavior_semantics', 'abilities', key + ': phase behavior needs interpretation.', refs)
         if not effects:
             effects.append({'kind': 'unresolved', 'phase_ref': key, 'native_kind': 'phase', 'native_parameters': {},
@@ -602,8 +615,18 @@ class Packet:
                 text = f'attribute {effect["attribute_key"]}, native type {effect["native_parameters"]["attribute_type"]}'
             elif kind == 'payload_reference':
                 text = 'linked ' + effect['relationship']
+            elif effect.get('native_parameters'):
+                parameters = {k: v for k, v in effect['native_parameters'].items()
+                              if k not in ('ability', 'source_path', 'source_line', 'source_patch')}
+                text = '; '.join(PHASE_LABELS.get(k, k.replace('_', ' ')) + ': ' + compact(v)
+                                 for k, v in parameters.items())
+                qualification = ('native intensity settings; effective scaling and stacking unverified'
+                                 if effect.get('native_kind') == 'intensity_settings'
+                                 else 'native values; units and engine interpretation unverified')
+                text += ' (' + qualification + ')'
             else:
                 text = effect['reason']
+            text = text.rstrip('.')
             if prefix + text not in pieces:
                 pieces.append(prefix + text)
         result = 'While active: ' + '; '.join(pieces) + '.'
