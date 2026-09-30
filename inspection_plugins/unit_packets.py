@@ -61,7 +61,7 @@ def unit_html(packet, args):
             primary = {k: v for k, v in value.items() if k not in ('variants', 'provenance_refs', 'native_parameters')}
             content += table(primary)
             if value.get('native_parameters'):
-                content += '<details><summary>Native mechanical parameters</summary>' + table(value['native_parameters']) + '</details>'
+                content += '<details><summary>Source mechanical parameters</summary>' + table(value['native_parameters']) + '</details>'
             for variant in value.get('variants', []):
                 content += '<details><summary>Additional attack: ' + escape(variant.get('projectile_key') or variant.get('weapon_key')) + '</summary>' + raw(variant) + '</details>'
         content += '</section>'
@@ -74,7 +74,7 @@ def unit_html(packet, args):
         content += '<article><h3>' + escape(mechanic['name'] or mechanic['key']) + '</h3><p>' + escape(mechanic['summary']) + '</p>'
         content += '<small>Culture: ' + escape(mechanic['culture_key']) + ' · requires effect enabling: ' + escape(mechanic['requires_effect_enabling']) + '</small>'
         content += '<details><summary>Effects, conditions & recipient phases</summary>' + raw({k: mechanic[k] for k in ('effects', 'conditions', 'phases', 'native_parameters', 'classification_evidence')}) + '</details>'
-        content += '<a href="' + escape(link('/inspect/detail', ref=mechanic['detail_ref'])) + '">Full native evidence</a></article>'
+        content += '<a href="' + escape(link('/inspect/detail', ref=mechanic['detail_ref'])) + '">Full source evidence</a></article>'
     content += '</section><section class="card"><h3>Activated options</h3><p>Qualified listings; access and activity are not established by the link.</p>' + raw(unit['activated_options']) + '</section>'
     content += '<section class="card"><h3>Coverage & known gaps</h3>' + table({'melee': unit['coverage']['melee'], 'ranged': unit['coverage']['ranged']})
     for coverage in unit['coverage']['sections']:
@@ -131,7 +131,7 @@ async def detail(request, datasette):
             result = queries.get_detail(args.get('ref', ''), cursor=args.get('cursor'), limit=int(args.get('limit', '64')))
         if args.get('format') == 'json':
             return Response.json(result)
-        content = '<section class="card"><h2>Native evidence detail</h2>' + raw(result)
+        content = '<section class="card"><h2>Source evidence detail</h2>' + raw(result)
         if result.get('cursor'):
             content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=result['cursor'], limit=args.get('limit', '64'))) + '">Continue evidence graph</a>'
         return Response.html(page(content + '</section>'))
