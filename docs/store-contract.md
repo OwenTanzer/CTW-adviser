@@ -19,12 +19,15 @@ does not complete issue #2 or calculate combat results.
 `schema/store.sql` defines STRICT metadata, identity, provenance, classification,
 graph and coverage tables. Native evidence tables are generated from the existing
 locked column types and keys, with their mappings recorded in `dataset_tables`.
-Schema version 2 stores each base profile once in `unit_profiles`, keyed by
-`unit_key` within the pinned game/patch/scale snapshot. `faction_name` is a sorted,
+Schema version 3 stores each distinct base profile once in `unit_profiles`, keyed by
+a canonical `unit_key` within the pinned game/patch/scale snapshot. `faction_name` is a sorted,
 unique JSON array, including for single-faction units. `unit_availability` retains
 each original faction/subculture-qualified roster entry, its restrictions, counts,
 notes and provenance locator. Conflicting base fields for a shared unit key reject
-the build. The current source has 2,409 profiles and 3,181 availability records.
+the build. The current source has 2,379 profiles representing 2,409 original
+unit keys and 3,181 availability records. `unit_aliases` maps every original key
+to its canonical profile and retains its original `source_main_unit_key`.
+`unit_keys` is a sorted JSON array of all keys represented by a profile.
 `unit_roster_records` is a lossless view reconstructing every original normalized
 column and source record; roster entries in `dataset_tables` point to this view.
 `unit_identity` stores each main-unit key once, scoped to the snapshot. `unit_records`
@@ -41,6 +44,20 @@ upstream name and the reconstruction view returns that original name. Labels are
 presentation derived from pinned mount icons/identifiers, not certified localized
 names or combat facts. Missing identifiers produce an explicit unresolved label.
 Unit keys, combat statistics, mount links and availability remain unchanged.
+
+Roster-wide consolidation compares every profile field except source record ID,
+unit/main-unit keys and aggregated faction labels. It also requires exact equality
+of the distinct linked unit-relation records (components, weapon slots/payloads,
+qualified abilities, attributes, contacts and other supported unit relations),
+excluding only their source record ID and unit key. Mount relationships must also
+match. Missing and present evidence remain distinct. Recruitment/roster permissions
+are preserved separately per original key. Matching names or base stats alone do
+not establish equivalence. No upstream key or dependency edge is discarded.
+The pinned snapshot consolidates 29 groups, eliminating 30 repeated profiles.
+Canonical selection prefers the shared land-unit key, then shortest/lexical key.
+Original keys resolve through the indexed alias map; original names and keys
+reconstruct through `unit_roster_records`. Serving clients must resolve aliases
+before profile lookup and retain the selected source key for availability queries.
 
 Normalized relation tables retain their stems, e.g. `unit_components`,
 `unit_weapon_links`, `unit_attributes`, `projectiles` and `explosions`. Shared

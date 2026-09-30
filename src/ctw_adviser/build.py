@@ -237,9 +237,9 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
         try:
             db.executescript((ROOT / 'schema/store.sql').read_text(encoding='utf-8'))
             db.execute('BEGIN IMMEDIATE')
-            snapshot_id = lock['source_commit'] + ':' + lock['contract_sha256'] + ':store2'
+            snapshot_id = lock['source_commit'] + ':' + lock['contract_sha256'] + ':store3'
             db.execute('INSERT INTO snapshot VALUES(?,?,?,?,?,?,?)',
-                       (snapshot_id, 2, lock['source_commit'], lock['contract_sha256'],
+                       (snapshot_id, 3, lock['source_commit'], lock['contract_sha256'],
                         compact(contract['baseline']), compact(lock['owners']),
                         compact({'structural': 'validated selected records and dependency edges',
                                  'semantic': 'partial; raw conditions/effects retained without application',
@@ -349,7 +349,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
                             raise ValueError('unresolved required relation: ' + edge['name'])
                         db.execute('INSERT INTO coverage_gaps(record_id,kind,detail) VALUES(?,?,?)',
                                    (rid, 'unresolved_reference', edge['name'] + ':' + compact(values)))
-            normalize_roster(db, next(s for s in specs.values() if s['role'] == 'roster'))
+            normalize_roster(db, next(s for s in specs.values() if s['role'] == 'roster'), specs)
             import_payload_lineage(db, source_root)
             import_localization(db, source_root, lock, options)
             record_semantic_gaps(db)
@@ -466,7 +466,7 @@ AVAILABILITY_FIELDS = {
 }
 
 
-def normalize_roster(db, spec):
+def normalize_roster(db, spec, specs):
     """Split source roster records into shared profiles and qualified availability."""
     columns = spec['columns']
     profile_columns = [c for c in columns if c['name'] not in AVAILABILITY_FIELDS]
@@ -490,12 +490,17 @@ def normalize_roster(db, spec):
     db.execute("ALTER TABLE unit_profiles ADD COLUMN source_unit_name TEXT NOT NULL DEFAULT ''")
     db.execute('CREATE INDEX unit_profiles_source_unit_name_nocase ON unit_profiles(source_unit_name COLLATE NOCASE)')
     create_native_table(db, 'unit_availability', availability_columns, ['unit_key', 'faction_key', 'subculture_key'],
-                        constraints=['FOREIGN KEY(unit_key) REFERENCES unit_profiles(unit_key)'])
+                        constraints=['FOREIGN KEY(unit_key) REFERENCES unit_identity(unit_key)'])
     for key, (rid, values) in sorted(profiles.items()):
         names = ['record_id'] + [c['name'] for c in profile_columns] + ['faction_name', 'source_unit_name']
         db.execute(f'INSERT INTO unit_profiles ({",".join(map(quote,names))}) '
                    f'VALUES({",".join("?" for _ in names)})',
                    (rid, *values, compact(sorted(factions[key])), values[[c['name'] for c in profile_columns].index('unit_name')]))
+    db.execute('CREATE TABLE unit_aliases (unit_key TEXT PRIMARY KEY REFERENCES unit_identity(unit_key), '
+               'profile_unit_key TEXT NOT NULL REFERENCES unit_profiles(unit_key), '
+               'source_main_unit_key TEXT NOT NULL) STRICT')
+    db.execute('CREATE INDEX unit_aliases_profile ON unit_aliases(profile_unit_key,unit_key)')
+    db.execute('INSERT INTO unit_aliases SELECT unit_key,unit_key,source_main_unit_key FROM unit_profiles')
     names = ['record_id'] + [c['name'] for c in availability_columns]
     db.executemany(f'INSERT INTO unit_availability ({",".join(map(quote,names))}) '
                    f'VALUES({",".join("?" for _ in names)})',
@@ -504,11 +509,59 @@ def normalize_roster(db, spec):
     # without storing repeated combat statistics. dataset_tables points here.
     db.execute('DROP TABLE unit_roster_records')
     projection = ['a.record_id'] + [('p.source_unit_name AS unit_name' if c['name'] == 'unit_name' else
+                                  'k.source_main_unit_key AS source_main_unit_key' if c['name'] == 'source_main_unit_key' else
+                                  'a.unit_key' if c['name'] == 'unit_key' else
                                   f'{"a" if c["name"] in AVAILABILITY_FIELDS else "p"}.{quote(c["name"])}')
                                   for c in columns]
     db.execute('CREATE VIEW unit_roster_records AS SELECT ' + ','.join(projection) +
-               ' FROM unit_availability a JOIN unit_profiles p ON p.unit_key=a.unit_key')
+               ' FROM unit_availability a JOIN unit_aliases k ON k.unit_key=a.unit_key '
+               'JOIN unit_profiles p ON p.unit_key=k.profile_unit_key')
     qualify_mount_names(db)
+    consolidate_profiles(db, specs)
+
+
+def profile_equivalence_groups(db, specs):
+    """Exact profile/linked-evidence equality; availability stays source-qualified."""
+    ignored = {'record_id', 'unit_key', 'source_main_unit_key', 'faction_name', 'unit_keys'}
+    tables = sorted({table_name(s['path'], s['role']) for s in specs.values()
+                     if s['role'] == 'unit_relation' and any(c['name'] == 'unit_key' for c in s['columns'])
+                     and table_name(s['path'], s['role']) != 'unit_rosters'})
+    signatures = {table: defaultdict(set) for table in tables}
+    for table in tables:
+        columns = [r[1] for r in db.execute(f'PRAGMA table_info({quote(table)})')]
+        for row in db.execute(f'SELECT * FROM {quote(table)}'):
+            values = dict(zip(columns, row))
+            signatures[table][values['unit_key']].add(tuple(v for k, v in values.items() if k not in ('record_id', 'unit_key')))
+    mounts = defaultdict(set)
+    for base, mounted, icon in db.execute('SELECT base_unit_key,mounted_unit_key,icon_name FROM unit_mount_variants'):
+        mounts[base].add(('base', mounted, icon))
+        mounts[mounted].add(('mounted', base, icon))
+    columns = [r[1] for r in db.execute('PRAGMA table_info(unit_profiles)')]
+    groups = defaultdict(list)
+    for row in db.execute('SELECT * FROM unit_profiles ORDER BY unit_key'):
+        values = dict(zip(columns, row))
+        key = values['unit_key']
+        signature = (tuple(v for k, v in values.items() if k not in ignored),
+                     tuple(frozenset(signatures[t][key]) for t in tables), frozenset(mounts[key]))
+        groups[signature].append(values)
+    return list(groups.values())
+
+
+def consolidate_profiles(db, specs):
+    groups = profile_equivalence_groups(db, specs)
+    db.execute("ALTER TABLE unit_profiles ADD COLUMN unit_keys TEXT NOT NULL DEFAULT '[]' "
+               "CHECK(json_valid(unit_keys) AND json_type(unit_keys)='array')")
+    for group in groups:
+        canonical = min(group, key=lambda r: (r['unit_key'] != r['source_land_unit_key'], len(r['unit_key']), r['unit_key']))
+        keys = sorted(r['unit_key'] for r in group)
+        factions = sorted({name for r in group for name in json.loads(r['faction_name'])})
+        for key in keys:
+            db.execute('UPDATE unit_aliases SET profile_unit_key=? WHERE unit_key=?', (canonical['unit_key'], key))
+        db.execute('UPDATE unit_profiles SET faction_name=?,unit_keys=? WHERE unit_key=?',
+                   (compact(factions), compact(keys), canonical['unit_key']))
+        for key in keys:
+            if key != canonical['unit_key']:
+                db.execute('DELETE FROM unit_profiles WHERE unit_key=?', (key,))
 
 
 def mount_label(base_key, mounted_key, icon):
@@ -564,8 +617,11 @@ def validate_candidate(db, specs, records, selected):
         raise ValueError('roster reconciliation failure')
     expected_profiles = {r['unit_key'] for p, s in specs.items() if s['role'] == 'roster'
                          for _, r in records[p].values()}
-    if db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0] != len(expected_profiles):
+    if {r[0] for r in db.execute('SELECT unit_key FROM unit_aliases')} != expected_profiles:
         raise ValueError('profile reconciliation failure')
+    if {r[0] for r in db.execute('SELECT DISTINCT profile_unit_key FROM unit_aliases')} != {
+            r[0] for r in db.execute('SELECT unit_key FROM unit_profiles')}:
+        raise ValueError('orphaned canonical profile')
     for path, spec in specs.items():
         expected = sum(rid in selected for rid in records[path])
         actual = db.execute('SELECT count(*) FROM record_provenance WHERE source_file=?', (path,)).fetchone()[0]
@@ -586,6 +642,7 @@ def report_candidate(db):
         ('unit_key', 'SELECT record_id FROM unit_profiles WHERE unit_key=?', ('wh2_main_lzd_mon_kroxigors',)),
         ('unit_name', 'SELECT record_id FROM unit_profiles WHERE unit_name=? COLLATE NOCASE', ('Kroxigor',)),
         ('source_unit_name', 'SELECT record_id FROM unit_profiles WHERE source_unit_name=? COLLATE NOCASE', ('Teclis',)),
+        ('alias_key', 'SELECT p.record_id FROM unit_aliases a JOIN unit_profiles p ON p.unit_key=a.profile_unit_key WHERE a.unit_key=?', ('wh2_main_lzd_mon_kroxigors_nakai',)),
         ('relations', 'SELECT record_id FROM unit_records WHERE unit_key=?', ('wh2_main_lzd_mon_kroxigors',)),
         ('reverse_edge', 'SELECT source_record FROM relation_edges WHERE target_record=?', ('example',)),
     ]:
@@ -594,6 +651,8 @@ def report_candidate(db):
             raise ValueError('unindexed ordinary access: ' + label)
     return {'roster_rows': db.execute('SELECT count(*) FROM unit_availability').fetchone()[0],
             'unit_profiles': db.execute('SELECT count(*) FROM unit_profiles').fetchone()[0],
+            'source_unit_keys': db.execute('SELECT count(*) FROM unit_aliases').fetchone()[0],
+            'consolidated_aliases': db.execute('SELECT count(*) FROM unit_aliases WHERE unit_key!=profile_unit_key').fetchone()[0],
             'unit_identities': dict(db.execute('SELECT namespace,count(*) FROM unit_identity GROUP BY namespace')),
             'classifications': dict(db.execute('SELECT classification,count(*) FROM ability_option_metadata GROUP BY classification')),
             'retained_records': db.execute('SELECT count(*) FROM record_provenance').fetchone()[0],

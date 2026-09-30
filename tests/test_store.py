@@ -18,6 +18,19 @@ from ctw_adviser.store import convert, open_snapshot, quote
 
 
 class StoreContractTests(unittest.TestCase):
+    def test_equal_stats_with_different_abilities_do_not_consolidate(self):
+        from ctw_adviser.build import profile_equivalence_groups
+        with sqlite3.connect(':memory:') as db:
+            db.executescript('CREATE TABLE unit_profiles(record_id,unit_key,source_main_unit_key,faction_name,armour); '
+                             'CREATE TABLE unit_abilities(record_id,unit_key,ability_key,culture_key); '
+                             'CREATE TABLE unit_mount_variants(base_unit_key,mounted_unit_key,icon_name);')
+            db.executemany('INSERT INTO unit_profiles VALUES(?,?,?,?,?)', [('r1','a','a','["Faction"]',50), ('r2','b','b','["Faction"]',50)])
+            db.executemany('INSERT INTO unit_abilities VALUES(?,?,?,?)', [('a1','a','first','*'), ('b1','b','second','*')])
+            specs = {'abilities': {'path': 'unit_abilities__test.csv', 'role': 'unit_relation', 'columns': [{'name':'unit_key'}]}}
+            self.assertEqual(len(profile_equivalence_groups(db, specs)), 2)
+            db.execute("UPDATE unit_abilities SET ability_key='first'")
+            self.assertEqual(len(profile_equivalence_groups(db, specs)), 1)
+
     def test_missing_classification_is_unresolved(self):
         self.assertEqual(classification({}, None), 'unresolved')
         self.assertEqual(classification(None, {'passive': 'true'}), 'unresolved')
@@ -60,7 +73,9 @@ class PinnedStoreTests(unittest.TestCase):
 
     def test_complete_roster_and_shared_identity(self):
         self.assertEqual(self.report['roster_rows'], 3181)
-        self.assertEqual(self.report['unit_profiles'], 2409)
+        self.assertEqual(self.report['unit_profiles'], 2379)
+        self.assertEqual(self.report['source_unit_keys'], 2409)
+        self.assertEqual(self.report['consolidated_aliases'], 30)
         self.assertEqual(self.report['unit_identities']['roster'], 2409)
         self.assertEqual(self.report['integrity'], 'ok')
         self.assertFalse(self.report['foreign_key_errors'])
@@ -73,10 +88,22 @@ class PinnedStoreTests(unittest.TestCase):
                                           (key,)).fetchone()[0], 1)
             for unit_key, names in db.execute('SELECT unit_key,faction_name FROM unit_profiles'):
                 expected = sorted({r[0] for r in db.execute(
-                    'SELECT faction_name FROM unit_availability WHERE unit_key=?', (unit_key,))})
+                    'SELECT a.faction_name FROM unit_availability a JOIN unit_aliases k ON k.unit_key=a.unit_key '
+                    'WHERE k.profile_unit_key=?', (unit_key,))})
                 self.assertEqual(json.loads(names), expected)
             self.assertEqual(db.execute('SELECT count(*) FROM unit_identity WHERE unit_key=?',
                                        ('wh3_main_tze_inf_blue_horrors_0',)).fetchone()[0], 1)
+
+    def test_aliases_resolve_without_losing_source_identity(self):
+        with closing(open_snapshot(self.output)) as db:
+            for key, keys_json in db.execute('SELECT unit_key,unit_keys FROM unit_profiles'):
+                aliases = [r[0] for r in db.execute('SELECT unit_key FROM unit_aliases WHERE profile_unit_key=? ORDER BY unit_key', (key,))]
+                self.assertEqual(json.loads(keys_json), aliases)
+            for key in ('wh2_main_lzd_mon_kroxigors', 'wh2_dlc13_lzd_mon_sacred_kroxigors_0'):
+                mappings = db.execute('SELECT profile_unit_key FROM unit_aliases WHERE unit_key IN (?,?)', (key, key+'_nakai')).fetchall()
+                self.assertEqual([r[0] for r in mappings], [key, key])
+                self.assertEqual(db.execute('SELECT source_main_unit_key FROM unit_roster_records WHERE unit_key=?',
+                                            (key+'_nakai',)).fetchone()[0], key+'_nakai')
 
     def test_conflicting_base_profile_preserves_previous_artifact(self):
         from unittest.mock import patch

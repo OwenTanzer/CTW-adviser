@@ -31,7 +31,7 @@ validators, certify runtime mechanics, or establish complete passive payload clo
 ## Types, meaning and identity
 
 The pinned import contract describes original source roster identities, not
-the serving layout. Store schema 2 deduplicates base profiles by unit key and
+the serving layout. Store schema 3 deduplicates base profiles with a lossless alias map and
 retains source-qualified roster records through linked availability and a
 lossless reconstruction view; this does not change the source contract or lock.
 
