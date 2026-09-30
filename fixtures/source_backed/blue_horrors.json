@@ -1,0 +1,769 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "combined",
+  "snapshot": {
+    "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+    "owners": {
+      "units": {
+        "patch": "9.0",
+        "build": "25507028",
+        "schema": 4
+      },
+      "abilities": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      }
+    },
+    "baseline": {
+      "game": "warhammer_3",
+      "unit_scale": "ultra",
+      "rank": 0,
+      "context": "unmodified custom battle"
+    }
+  },
+  "units": [
+    {
+      "identity": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "subculture_key": "wh3_main_sc_tze_tzeentch",
+        "name": "Blue Horrors of Tzeentch",
+        "unit_type": "infantry"
+      },
+      "body": {
+        "entity_count": 160.0,
+        "hp_per_entity": 48.0,
+        "total_hp": 7680.0,
+        "barrier_health": 1400.0,
+        "size": "small",
+        "components": [
+          {
+            "id": "component:0",
+            "role": "man",
+            "count": 160.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 40.0,
+            "known_hp_total": 7680.0,
+            "size": "small",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "s_23de8daf4e75_499"
+            ]
+          }
+        ]
+      },
+      "movement": {
+        "speed": 3.8,
+        "mass": 70.0
+      },
+      "leadership": 50.0,
+      "melee": {
+        "id": "melee:primary",
+        "weapon_key": "wh3_main_tze_blue_horror",
+        "attack": 20.0,
+        "defence": 22.0,
+        "base_damage": 21.0,
+        "ap_damage": 3.0,
+        "attack_interval": 4.0,
+        "charge_bonus": 10.0,
+        "max_splash_targets": 1.0,
+        "provenance_refs": [
+          "s_fb7eeb488e5c_72"
+        ],
+        "variants": []
+      },
+      "ranged": {
+        "status": "present",
+        "id": "ranged:primary",
+        "weapon_key": "wh3_main_tze_blue_horror_fire_bolt",
+        "projectile_key": "wh3_main_tze_blue_horror_fire_bolt",
+        "component_ref": null,
+        "slot": "primary",
+        "ammunition_pool": "primary",
+        "is_default": true,
+        "range": 90.0,
+        "ammunition": 4.0,
+        "reload_time": 8.0,
+        "base_damage": 13.0,
+        "ap_damage": 2.0,
+        "projectiles_per_shot": 1.0,
+        "shots_per_volley": 1.0,
+        "burst_size": 1.0,
+        "burst_shot_delay": 0.0,
+        "velocity": 35.0,
+        "accuracy": 10.0,
+        "spread": 0.0,
+        "marksmanship_bonus": 10.0,
+        "calibration_distance": 60.0,
+        "calibration_area": 2.0,
+        "minimum_range": 0.0,
+        "explosion": null,
+        "detail_ref": "projectile:wh3_main_tze_blue_horror_fire_bolt",
+        "provenance_refs": [
+          "s_fb7eeb488e5c_72",
+          "s_f4787b4b05a6_580",
+          "s_5e78e24b332a_554"
+        ],
+        "variants": []
+      },
+      "passives": {
+        "protection": {
+          "armour": 5.0,
+          "shield_block_chance": 0.0,
+          "physical_resistance": 20.0,
+          "missile_resistance": 0.0,
+          "spell_resistance": 0.0,
+          "fire_resistance": 0.0,
+          "ward_save": 0.0
+        },
+        "attack_traits": {
+          "melee": {
+            "scope": {
+              "attack_ref": "melee:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 0.0,
+            "bonus_vs_large": 0.0,
+            "magical": true,
+            "flaming": true,
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          },
+          "ranged": {
+            "scope": {
+              "attack_ref": "ranged:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 0.0,
+            "bonus_vs_large": 0.0,
+            "magical": true,
+            "flaming": true,
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          },
+          "explosion": null,
+          "additional": []
+        },
+        "attributes": [
+          {
+            "key": "causes_fear",
+            "name": null,
+            "summary": "Causes Fear||This unit frightens all enemy units, reducing their leadership when nearby. It is also immune to fear. Fear penalties do not stack.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_1761",
+              "s_15464982ee45_12"
+            ]
+          },
+          {
+            "key": "daemonic",
+            "name": null,
+            "summary": "Daemonic||Daemonic units cannot be routed, but take damage when their {{tr:morale}} is low.  Daemonic units also have: Physical Resistance  Fear and Terror Immunity",
+            "provenance_refs": [
+              "s_9d85f8e27f99_1762",
+              "s_15464982ee45_19"
+            ]
+          },
+          {
+            "key": "hide_forest",
+            "name": null,
+            "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_1763",
+              "s_15464982ee45_39"
+            ]
+          }
+        ],
+        "abilities": [
+          {
+            "key": "wh3_main_unit_passive_daemonic_instability_tzeentch",
+            "name": "Daemonic Instability",
+            "culture_key": "*",
+            "summary": "Periodic self-damage associated with broken morale; deactivates when morale is higher than broken.",
+            "conditions": {
+              "activates_when": [],
+              "deactivates_when": [
+                {
+                  "key": "morale_is_higher_than_broken",
+                  "summary": "Source deactivation condition: morale_is_higher_than_broken. Activation and equality behavior are not established.",
+                  "provenance_refs": [
+                    "s_32babbd7b0ea_481"
+                  ]
+                }
+              ],
+              "recipient_requirements": [],
+              "unresolved": []
+            },
+            "effects": [
+              {
+                "kind": "periodic_damage",
+                "native_parameters": {
+                  "damage_amount": 66.0,
+                  "hp_change_frequency": 1.0,
+                  "max_damaged_entities": 4.0
+                },
+                "phase_ref": "wh3_main_unit_passive_daemonic_instability_tzeentch_1",
+                "provenance_refs": [
+                  "s_d56bb4dc1aae_1988"
+                ]
+              }
+            ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_2482",
+              "s_05412a0a8b98_2476"
+            ],
+            "native_parameters": {
+              "effect_range": 0.0,
+              "target_intercept_range": 0.0,
+              "active_time": -1.0,
+              "recharge_time": -1.0,
+              "num_uses": -1.0
+            },
+            "phases": [
+              {
+                "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_1",
+                "order": 1,
+                "duration": -1.0,
+                "lifecycle": {},
+                "provenance_refs": [
+                  "s_c79a63825141_2106",
+                  "s_d56bb4dc1aae_1988"
+                ],
+                "target_self": true,
+                "target_friends": false,
+                "target_enemies": false
+              }
+            ],
+            "provenance_refs": [
+              "s_69a2a77f6deb_2482",
+              "s_05412a0a8b98_2476",
+              "s_cb3a51dedbb2_1500"
+            ],
+            "detail_ref": "passive:wh3_main_unit_passive_daemonic_instability_tzeentch"
+          },
+          {
+            "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii",
+            "name": "Daemonic Instability II",
+            "culture_key": "*",
+            "summary": "Stronger periodic self-damage phase associated with shattered morale; deactivates when morale is higher than shattered.",
+            "conditions": {
+              "activates_when": [],
+              "deactivates_when": [
+                {
+                  "key": "morale_is_higher_than_shattered",
+                  "summary": "Source deactivation condition: morale_is_higher_than_shattered. Activation and equality behavior are not established.",
+                  "provenance_refs": [
+                    "s_32babbd7b0ea_480"
+                  ]
+                }
+              ],
+              "recipient_requirements": [],
+              "unresolved": []
+            },
+            "effects": [
+              {
+                "kind": "periodic_damage",
+                "native_parameters": {
+                  "damage_amount": 133.0,
+                  "hp_change_frequency": 1.0,
+                  "max_damaged_entities": 12.0
+                },
+                "phase_ref": "wh3_main_unit_passive_daemonic_instability_tzeentch_2",
+                "provenance_refs": [
+                  "s_d56bb4dc1aae_1989"
+                ]
+              }
+            ],
+            "requires_effect_enabling": false,
+            "classification_evidence": [
+              "s_69a2a77f6deb_2483",
+              "s_05412a0a8b98_2477"
+            ],
+            "native_parameters": {
+              "effect_range": 0.0,
+              "target_intercept_range": 0.0,
+              "active_time": -1.0,
+              "recharge_time": -1.0,
+              "num_uses": -1.0
+            },
+            "phases": [
+              {
+                "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_2",
+                "order": 1,
+                "duration": -1.0,
+                "lifecycle": {},
+                "provenance_refs": [
+                  "s_c79a63825141_2107",
+                  "s_d56bb4dc1aae_1989"
+                ],
+                "target_self": true,
+                "target_friends": false,
+                "target_enemies": false
+              }
+            ],
+            "provenance_refs": [
+              "s_69a2a77f6deb_2483",
+              "s_05412a0a8b98_2477",
+              "s_cb3a51dedbb2_1501"
+            ],
+            "detail_ref": "passive:wh3_main_unit_passive_daemonic_instability_tzeentch_ii"
+          }
+        ]
+      },
+      "cost": {
+        "multiplayer": 500.0,
+        "campaign_recruitment": 500.0,
+        "campaign_upkeep": 125.0
+      },
+      "activated_options": [],
+      "provenance_refs": [
+        "s_fb7eeb488e5c_72"
+      ],
+      "coverage": {
+        "melee": "present",
+        "ranged": "present",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 1,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "unresolved",
+            "returned": 2,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 3,
+            "total": 3,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "unresolved",
+            "returned": 2,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "unresolved",
+            "returned": 0,
+            "total": null,
+            "cursor": null
+          }
+        ],
+        "gaps": [
+          {
+            "code": "fixture_projection",
+            "section": "weapons",
+            "summary": "Selected default attacks are shown; complete variant/payload closure is not demonstrated.",
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "abilities",
+            "summary": "Only reviewed example passives are expanded; exhaustive passive classification and lifecycle reconstruction remain outstanding.",
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "activated_options",
+            "summary": "Activated-option inventory is not demonstrated by this design projection.",
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          },
+          {
+            "code": "unresolved_localization",
+            "section": "attributes",
+            "summary": "daemonic: localization contains unresolved substitutions.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_1762",
+              "s_15464982ee45_19"
+            ]
+          },
+          {
+            "code": "reviewed_source_gap",
+            "section": "abilities",
+            "summary": "Periodic damage native fields do not certify unit-wide damage per second or tick scheduling.",
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          },
+          {
+            "code": "reviewed_source_gap",
+            "section": "abilities",
+            "summary": "Replacement/overlap of instability phases remains unverified.",
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          },
+          {
+            "code": "reviewed_source_gap",
+            "section": "abilities",
+            "summary": "Activated-option classification and full weapon/component closure are not demonstrated by this illustrative profile projection.",
+            "provenance_refs": [
+              "s_fb7eeb488e5c_72"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "trait_descriptions": {
+    "magical": {
+      "summary": "Magical attacks bypass physical resistance; the tag applies only to the referenced attack.",
+      "provenance_refs": [
+        "s_fb7eeb488e5c_72",
+        "s_d53bb00c3d74_431"
+      ]
+    },
+    "flaming": {
+      "summary": "Flaming attacks interact with fire vulnerability and halve healing while the target is on fire.",
+      "provenance_refs": [
+        "s_fb7eeb488e5c_72",
+        "s_d53bb00c3d74_319"
+      ]
+    }
+  },
+  "sources": {
+    "s_fb7eeb488e5c": {
+      "path": "data/unit_stats/normalized/tzeentch__wh3__9.0__ultra.csv",
+      "sha256": "2ea0da7f1dfc751f18e80a0606344a37af262f0fb923bf1da470844727c681fc",
+      "owner": "units"
+    },
+    "s_23de8daf4e75": {
+      "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+      "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+      "owner": "units"
+    },
+    "s_f4787b4b05a6": {
+      "path": "data/unit_stats/lookups/projectiles__wh3__9.0.csv",
+      "sha256": "a59f4b20c373e54f8a4fc22c58064d0c0c6c74d94b59893a3b037705a698a62d",
+      "owner": "units"
+    },
+    "s_5e78e24b332a": {
+      "path": "data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv",
+      "sha256": "155423f063a8e97230a854109b00f12adcd39770e3a36e04c3c3daabe98bbe49",
+      "owner": "units"
+    },
+    "s_9d85f8e27f99": {
+      "path": "data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv",
+      "sha256": "9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac",
+      "owner": "units"
+    },
+    "s_15464982ee45": {
+      "path": "data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv",
+      "sha256": "40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab",
+      "owner": "units"
+    },
+    "s_69a2a77f6deb": {
+      "path": "data/unit_stats/abilities/tables/ability_definitions.csv",
+      "sha256": "8535065555857989be3fd6c10c9f04fdcb9fd7ad9d390d6c0dec7da246d5c318",
+      "owner": "abilities"
+    },
+    "s_05412a0a8b98": {
+      "path": "data/unit_stats/abilities/tables/ability_casting.csv",
+      "sha256": "9ec08ddc3ddb7bde9cacb4e50823940c97bcdedfad16f8901f7fe66edc80143d",
+      "owner": "abilities"
+    },
+    "s_cb3a51dedbb2": {
+      "path": "data/unit_stats/lookups/unit_abilities__wh3__9.0__ultra.csv",
+      "sha256": "9377e967b64ca76fa0a7aabcf49bf86fd8260a915f13bda1f947f4ed0626ec9c",
+      "owner": "units"
+    },
+    "s_c79a63825141": {
+      "path": "data/unit_stats/abilities/tables/ability_phase_links.csv",
+      "sha256": "73c101b5e00eb2656ba8906c210f02ea2d1acbaadc5a58260a1f1f2ed9529816",
+      "owner": "abilities"
+    },
+    "s_d56bb4dc1aae": {
+      "path": "data/unit_stats/abilities/tables/ability_phases.csv",
+      "sha256": "cc4a090f13abfb62745008de5b949174ffde1464b62dc0eb94e2e7284da25081",
+      "owner": "abilities"
+    },
+    "s_32babbd7b0ea": {
+      "path": "data/unit_stats/abilities/tables/special_ability_to_auto_deactivate_flags.csv",
+      "sha256": "89db18866a1c7b54c6cf0d7bca7682a3ec23b6fba6e271a391e875fbb2ad638e",
+      "owner": "abilities"
+    },
+    "s_d53bb00c3d74": {
+      "path": "data/unit_stats/source_exports/text/db/ui_unit_bullet_point_enums__.loc.tsv",
+      "sha256": "b48f34e77303db2ba9b62115a5d9ef0b51bfb56ab0ea74b4de8836f383028939",
+      "owner": "units"
+    }
+  },
+  "provenance": {
+    "s_fb7eeb488e5c_72": {
+      "source_id": "s_fb7eeb488e5c",
+      "logical_record": 72,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_23de8daf4e75_499": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 499,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "component_role": "man",
+        "relationship_key": "",
+        "battle_entity_key": "wh3_main_tze_inf_blue_horror_blood_dismembers"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_f4787b4b05a6_580": {
+      "source_id": "s_f4787b4b05a6",
+      "logical_record": 580,
+      "key": {
+        "projectile_key": "wh3_main_tze_blue_horror_fire_bolt"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_5e78e24b332a_554": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 554,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "component_role": "unit",
+        "slot": "primary",
+        "projectile_key": "wh3_main_tze_blue_horror_fire_bolt"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_1761": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 1761,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "attribute_key": "causes_fear"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_12": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 12,
+      "key": {
+        "key": "unit_attributes_bullet_text_causes_fear"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_1762": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 1762,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "attribute_key": "daemonic"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_19": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 19,
+      "key": {
+        "key": "unit_attributes_bullet_text_daemonic"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_1763": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 1763,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "attribute_key": "hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_39": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 39,
+      "key": {
+        "key": "unit_attributes_bullet_text_hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_69a2a77f6deb_2482": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 2482,
+      "key": {
+        "key": "wh3_main_unit_passive_daemonic_instability_tzeentch"
+      },
+      "source_line": 2483,
+      "source_patch": "9.0.1"
+    },
+    "s_05412a0a8b98_2476": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 2476,
+      "key": {
+        "key": "wh3_main_unit_passive_daemonic_instability_tzeentch"
+      },
+      "source_line": 2477,
+      "source_patch": "9.0.1"
+    },
+    "s_cb3a51dedbb2_1500": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 1500,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "ability_key": "wh3_main_unit_passive_daemonic_instability_tzeentch",
+        "culture_key": "*"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_c79a63825141_2106": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 2106,
+      "key": {
+        "order": "1",
+        "special_ability": "wh3_main_unit_passive_daemonic_instability_tzeentch",
+        "target_self": "true",
+        "target_friends": "false",
+        "target_enemies": "false"
+      },
+      "source_line": 2107,
+      "source_patch": "9.0.1"
+    },
+    "s_d56bb4dc1aae_1988": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 1988,
+      "key": {
+        "id": "wh3_main_unit_passive_daemonic_instability_tzeentch_1"
+      },
+      "source_line": 1989,
+      "source_patch": "9.0.1"
+    },
+    "s_32babbd7b0ea_481": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 481,
+      "key": {
+        "special_ability": "wh3_main_unit_passive_daemonic_instability_tzeentch",
+        "deactivate_flag": "morale_is_higher_than_broken"
+      },
+      "source_line": 482,
+      "source_patch": "9.0.1"
+    },
+    "s_69a2a77f6deb_2483": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 2483,
+      "key": {
+        "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii"
+      },
+      "source_line": 2484,
+      "source_patch": "9.0.1"
+    },
+    "s_05412a0a8b98_2477": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 2477,
+      "key": {
+        "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii"
+      },
+      "source_line": 2478,
+      "source_patch": "9.0.1"
+    },
+    "s_cb3a51dedbb2_1501": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 1501,
+      "key": {
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0",
+        "ability_key": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii",
+        "culture_key": "*"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_c79a63825141_2107": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 2107,
+      "key": {
+        "order": "1",
+        "special_ability": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii",
+        "target_self": "true",
+        "target_friends": "false",
+        "target_enemies": "false"
+      },
+      "source_line": 2108,
+      "source_patch": "9.0.1"
+    },
+    "s_d56bb4dc1aae_1989": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 1989,
+      "key": {
+        "id": "wh3_main_unit_passive_daemonic_instability_tzeentch_2"
+      },
+      "source_line": 1990,
+      "source_patch": "9.0.1"
+    },
+    "s_32babbd7b0ea_480": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 480,
+      "key": {
+        "special_ability": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii",
+        "deactivate_flag": "morale_is_higher_than_shattered"
+      },
+      "source_line": 481,
+      "source_patch": "9.0.1"
+    },
+    "s_d53bb00c3d74_431": {
+      "source_id": "s_d53bb00c3d74",
+      "logical_record": 431,
+      "key": {
+        "key": "ui_unit_bullet_point_enums_tooltip_ward_physical"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_d53bb00c3d74_319": {
+      "source_id": "s_d53bb00c3d74",
+      "logical_record": 319,
+      "key": {
+        "key": "ui_unit_bullet_point_enums_tooltip_flaming_attacks"
+      },
+      "source_line": null,
+      "source_patch": null
+    }
+  },
+  "detail_refs": {
+    "projectile:wh3_main_tze_blue_horror_fire_bolt": {
+      "kind": "projectile",
+      "key": "wh3_main_tze_blue_horror_fire_bolt"
+    },
+    "passive:wh3_main_unit_passive_daemonic_instability_tzeentch": {
+      "kind": "passive",
+      "key": "wh3_main_unit_passive_daemonic_instability_tzeentch"
+    },
+    "passive:wh3_main_unit_passive_daemonic_instability_tzeentch_ii": {
+      "kind": "passive",
+      "key": "wh3_main_unit_passive_daemonic_instability_tzeentch_ii"
+    }
+  },
+  "payload_graph": {
+    "nodes": [],
+    "edges": []
+  }
+}

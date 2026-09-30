@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0.0",
+  "fixtures": [
+    {
+      "path": "fixtures/source_backed/wargor.json",
+      "kind": "source_backed",
+      "assertions": "fixtures/source_backed/wargor.assertions.json",
+      "purpose": "Selected source projection; coverage gaps remain explicit."
+    },
+    {
+      "path": "fixtures/source_backed/sea_guard.json",
+      "kind": "source_backed",
+      "assertions": "fixtures/source_backed/sea_guard.assertions.json",
+      "purpose": "Selected source projection; coverage gaps remain explicit."
+    },
+    {
+      "path": "fixtures/source_backed/blue_horrors.json",
+      "kind": "source_backed",
+      "assertions": "fixtures/source_backed/blue_horrors.assertions.json",
+      "purpose": "Selected source projection; coverage gaps remain explicit."
+    },
+    {
+      "path": "fixtures/source_backed/kroxigor.json",
+      "kind": "source_backed",
+      "assertions": "fixtures/source_backed/kroxigor.assertions.json",
+      "purpose": "Selected source projection; coverage gaps remain explicit."
+    },
+    {
+      "path": "fixtures/source_backed/queen_bess.json",
+      "kind": "source_backed",
+      "assertions": "fixtures/source_backed/queen_bess.assertions.json",
+      "purpose": "Selected source projection; coverage gaps remain explicit."
+    },
+    {
+      "path": "fixtures/synthetic/compound_and_variants.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/complete_dummy.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/unresolved_ranged.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/melee_projection.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/passive_overflow.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    }
+  ]
+}

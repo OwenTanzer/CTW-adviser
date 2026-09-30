@@ -3,13 +3,15 @@
 General single-unit matchup adviser. CTW-data owns game facts; this repository
 owns rebuildable serving artifacts and, in later increments, matchup calculations.
 
-Current implementation: issue #2, step 1 — pinned source verification and import
-contract. No serving database, importer or combat evaluator exists yet.
+Current implementation: issue #2, Lock and validate — pinned source verification,
+import contract, versioned packet schema and source-backed/synthetic fixtures.
+No serving database, importer or combat evaluator exists yet.
 
 With Python 3.11+ and SQLite 3.37+:
 
 ```sh
 python scripts/verify_sources.py --ctw-root ../CTW-data
+python scripts/validate_packets.py --ctw-root ../CTW-data
 python -m unittest discover -s tests -v
 ```
 
@@ -19,4 +21,5 @@ and writes JSON to standard output. Exit status is nonzero on failure. It never
 changes CTW-data or an existing serving database.
 
 See [source contract](docs/source-contract.md) and
-[verification evidence](docs/step-1-verification.json).
+[verification evidence](docs/step-1-verification.json), then the
+[lookup contract](docs/lookup-contract.md) for packet semantics and fixture rebuilds.

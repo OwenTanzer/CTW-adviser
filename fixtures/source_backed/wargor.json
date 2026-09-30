@@ -1,0 +1,442 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "combined",
+  "snapshot": {
+    "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+    "owners": {
+      "units": {
+        "patch": "9.0",
+        "build": "25507028",
+        "schema": 4
+      },
+      "abilities": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      }
+    },
+    "baseline": {
+      "game": "warhammer_3",
+      "unit_scale": "ultra",
+      "rank": 0,
+      "context": "unmodified custom battle"
+    }
+  },
+  "units": [
+    {
+      "identity": {
+        "unit_key": "wh2_dlc17_bst_cha_wargor_0",
+        "subculture_key": "wh_dlc03_sc_bst_beastmen",
+        "name": "Wargor",
+        "unit_type": "character"
+      },
+      "body": {
+        "entity_count": 1.0,
+        "hp_per_entity": 4056.0,
+        "total_hp": 4056.0,
+        "barrier_health": 0.0,
+        "size": "small",
+        "components": [
+          {
+            "id": "component:0",
+            "role": "man",
+            "count": 1.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 4048.0,
+            "known_hp_total": 4056.0,
+            "size": "small",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "s_23de8daf4e75_18"
+            ]
+          }
+        ]
+      },
+      "movement": {
+        "speed": 3.8,
+        "mass": 800.0
+      },
+      "leadership": 65.0,
+      "melee": {
+        "id": "melee:primary",
+        "weapon_key": "wh2_dlc17_bst_wargor_mace",
+        "attack": 50.0,
+        "defence": 40.0,
+        "base_damage": 220.0,
+        "ap_damage": 180.0,
+        "attack_interval": 4.0,
+        "charge_bonus": 50.0,
+        "max_splash_targets": 4.0,
+        "provenance_refs": [
+          "s_b7f7d596cc89_11"
+        ],
+        "variants": []
+      },
+      "ranged": null,
+      "passives": {
+        "protection": {
+          "armour": 80.0,
+          "shield_block_chance": 55.0,
+          "physical_resistance": 0.0,
+          "missile_resistance": 15.0,
+          "spell_resistance": 0.0,
+          "fire_resistance": 0.0,
+          "ward_save": 0.0
+        },
+        "attack_traits": {
+          "melee": {
+            "scope": {
+              "attack_ref": "melee:primary",
+              "component_ref": null
+            },
+            "bonus_vs_infantry": 20.0,
+            "bonus_vs_large": 0.0,
+            "magical": false,
+            "flaming": false,
+            "provenance_refs": [
+              "s_b7f7d596cc89_11"
+            ]
+          },
+          "ranged": null,
+          "explosion": null,
+          "additional": []
+        },
+        "attributes": [
+          {
+            "key": "encourages",
+            "name": null,
+            "summary": "Encourage||This unit provides a leadership bonus to nearby allies. Units within range of both the Lord's aura and an encouraging unit will receive the larger of the two bonuses.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_37",
+              "s_15464982ee45_23"
+            ]
+          },
+          {
+            "key": "hide_forest",
+            "name": null,
+            "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_38",
+              "s_15464982ee45_39"
+            ]
+          },
+          {
+            "key": "ignore_trees",
+            "name": null,
+            "summary": "Woodsman||This unit can pass through trees.",
+            "provenance_refs": [
+              "s_9d85f8e27f99_39",
+              "s_15464982ee45_42"
+            ]
+          }
+        ],
+        "abilities": [
+          {
+            "key": "wh2_dlc17_hero_passive_will_of_the_dark_gods",
+            "name": null,
+            "culture_key": "*",
+            "requires_effect_enabling": true,
+            "classification_evidence": [
+              "s_69a2a77f6deb_602",
+              "s_05412a0a8b98_601"
+            ],
+            "summary": "Source classifies this linked mechanic as passive and requires effect enabling; access and effect behavior are not established by this fixture.",
+            "native_parameters": {},
+            "conditions": {
+              "activates_when": [],
+              "deactivates_when": [],
+              "recipient_requirements": [],
+              "unresolved": []
+            },
+            "phases": [],
+            "effects": [
+              {
+                "kind": "unresolved",
+                "phase_ref": null,
+                "native_kind": "passive_definition",
+                "native_parameters": {},
+                "reason": "Effect expansion is outside this qualification fixture.",
+                "provenance_refs": [
+                  "s_69a2a77f6deb_602",
+                  "s_05412a0a8b98_601"
+                ]
+              }
+            ],
+            "provenance_refs": [
+              "s_69a2a77f6deb_602",
+              "s_05412a0a8b98_601",
+              "s_cb3a51dedbb2_29"
+            ],
+            "detail_ref": "passive:wh2_dlc17_hero_passive_will_of_the_dark_gods"
+          }
+        ]
+      },
+      "cost": {
+        "multiplayer": 600.0,
+        "campaign_recruitment": 0.0,
+        "campaign_upkeep": 0.0
+      },
+      "activated_options": [],
+      "provenance_refs": [
+        "s_b7f7d596cc89_11"
+      ],
+      "coverage": {
+        "melee": "present",
+        "ranged": "known_none",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 1,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "unresolved",
+            "returned": 1,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 3,
+            "total": 3,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "unresolved",
+            "returned": 1,
+            "total": null,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "unresolved",
+            "returned": 0,
+            "total": null,
+            "cursor": null
+          }
+        ],
+        "gaps": [
+          {
+            "code": "fixture_projection",
+            "section": "weapons",
+            "summary": "Selected default attacks are shown; complete variant/payload closure is not demonstrated.",
+            "provenance_refs": [
+              "s_b7f7d596cc89_11"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "abilities",
+            "summary": "Only reviewed example passives are expanded; exhaustive passive classification and lifecycle reconstruction remain outstanding.",
+            "provenance_refs": [
+              "s_b7f7d596cc89_11"
+            ]
+          },
+          {
+            "code": "fixture_projection",
+            "section": "activated_options",
+            "summary": "Activated-option inventory is not demonstrated by this design projection.",
+            "provenance_refs": [
+              "s_b7f7d596cc89_11"
+            ]
+          },
+          {
+            "code": "qualification_projection",
+            "section": "abilities",
+            "summary": "Passive classification and enabling requirement are shown; effects and activation conditions remain unresolved in this fixture.",
+            "provenance_refs": [
+              "s_69a2a77f6deb_602",
+              "s_05412a0a8b98_601",
+              "s_cb3a51dedbb2_29"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "trait_descriptions": {
+    "bonus_vs_infantry": {
+      "summary": "Numeric bonus against infantry-sized targets; distinct from the qualitative Anti-Infantry bullet.",
+      "provenance_refs": [
+        "s_b7f7d596cc89_11",
+        "s_87676ff951da_84"
+      ]
+    }
+  },
+  "sources": {
+    "s_b7f7d596cc89": {
+      "path": "data/unit_stats/normalized/beastmen__wh3__9.0__ultra.csv",
+      "sha256": "981e1b3e0bfda6b72a18e81fcb67618c5cad4d3fa009e3579aae743c302cb709",
+      "owner": "units"
+    },
+    "s_23de8daf4e75": {
+      "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+      "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+      "owner": "units"
+    },
+    "s_9d85f8e27f99": {
+      "path": "data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv",
+      "sha256": "9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac",
+      "owner": "units"
+    },
+    "s_15464982ee45": {
+      "path": "data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv",
+      "sha256": "40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab",
+      "owner": "units"
+    },
+    "s_69a2a77f6deb": {
+      "path": "data/unit_stats/abilities/tables/ability_definitions.csv",
+      "sha256": "8535065555857989be3fd6c10c9f04fdcb9fd7ad9d390d6c0dec7da246d5c318",
+      "owner": "abilities"
+    },
+    "s_05412a0a8b98": {
+      "path": "data/unit_stats/abilities/tables/ability_casting.csv",
+      "sha256": "9ec08ddc3ddb7bde9cacb4e50823940c97bcdedfad16f8901f7fe66edc80143d",
+      "owner": "abilities"
+    },
+    "s_cb3a51dedbb2": {
+      "path": "data/unit_stats/lookups/unit_abilities__wh3__9.0__ultra.csv",
+      "sha256": "9377e967b64ca76fa0a7aabcf49bf86fd8260a915f13bda1f947f4ed0626ec9c",
+      "owner": "units"
+    },
+    "s_87676ff951da": {
+      "path": "data/unit_stats/source_exports/text/db/unit_stat_localisations__.loc.tsv",
+      "sha256": "79cddda990a17e0b92af16b11f89cd95b6481c5ae99d88c8863aa7e230174c74",
+      "owner": "units"
+    }
+  },
+  "provenance": {
+    "s_b7f7d596cc89_11": {
+      "source_id": "s_b7f7d596cc89",
+      "logical_record": 11,
+      "key": {
+        "unit_key": "wh2_dlc17_bst_cha_wargor_0"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_23de8daf4e75_18": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 18,
+      "key": {
+        "unit_key": "wh2_dlc17_bst_cha_wargor_0",
+        "component_role": "man",
+        "relationship_key": "",
+        "battle_entity_key": "wh_dlc03_bst_cha_gor_hero_blood_dismember"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_37": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 37,
+      "key": {
+        "unit_key": "wh2_dlc17_bst_cha_wargor_0",
+        "attribute_key": "encourages"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_23": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 23,
+      "key": {
+        "key": "unit_attributes_bullet_text_encourages"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_38": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 38,
+      "key": {
+        "unit_key": "wh2_dlc17_bst_cha_wargor_0",
+        "attribute_key": "hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_39": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 39,
+      "key": {
+        "key": "unit_attributes_bullet_text_hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_9d85f8e27f99_39": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 39,
+      "key": {
+        "unit_key": "wh2_dlc17_bst_cha_wargor_0",
+        "attribute_key": "ignore_trees"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_15464982ee45_42": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 42,
+      "key": {
+        "key": "unit_attributes_bullet_text_ignore_trees"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_69a2a77f6deb_602": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 602,
+      "key": {
+        "key": "wh2_dlc17_hero_passive_will_of_the_dark_gods"
+      },
+      "source_line": 603,
+      "source_patch": "9.0.1"
+    },
+    "s_05412a0a8b98_601": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 601,
+      "key": {
+        "key": "wh2_dlc17_hero_passive_will_of_the_dark_gods"
+      },
+      "source_line": 602,
+      "source_patch": "9.0.1"
+    },
+    "s_cb3a51dedbb2_29": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 29,
+      "key": {
+        "unit_key": "wh2_dlc17_bst_cha_wargor_0",
+        "ability_key": "wh2_dlc17_hero_passive_will_of_the_dark_gods",
+        "culture_key": "*"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_87676ff951da_84": {
+      "source_id": "s_87676ff951da",
+      "logical_record": 84,
+      "key": {
+        "key": "unit_stat_localisations_tooltip_text_stat_bonus_vs_infantry"
+      },
+      "source_line": null,
+      "source_patch": null
+    }
+  },
+  "detail_refs": {
+    "passive:wh2_dlc17_hero_passive_will_of_the_dark_gods": {
+      "kind": "passive",
+      "key": "wh2_dlc17_hero_passive_will_of_the_dark_gods"
+    }
+  },
+  "payload_graph": {
+    "nodes": [],
+    "edges": []
+  }
+}

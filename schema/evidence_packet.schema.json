@@ -1,0 +1,2408 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ctw-adviser:evidence-packet:1.0.0",
+  "title": "CTW adviser evidence packet v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "mode": {
+      "enum": [
+        "combined",
+        "melee",
+        "missile"
+      ]
+    },
+    "snapshot": {
+      "$ref": "#/$defs/snapshot"
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/unit"
+      },
+      "minItems": 1
+    },
+    "trait_descriptions": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/description"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "detail_refs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "kind",
+          "key"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "payload_graph": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          },
+          "minItems": 0
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/edge"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "nodes",
+        "edges"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "mode",
+    "snapshot",
+    "units",
+    "trait_descriptions",
+    "sources",
+    "provenance",
+    "detail_refs",
+    "payload_graph"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "gap": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "code",
+        "section",
+        "summary",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "section": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "enum": [
+            "components",
+            "weapons",
+            "attributes",
+            "abilities",
+            "activated_options"
+          ]
+        },
+        "state": {
+          "enum": [
+            "complete",
+            "partial",
+            "omitted",
+            "unresolved"
+          ]
+        },
+        "returned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "state",
+        "returned",
+        "total",
+        "cursor"
+      ],
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "melee": {
+          "enum": [
+            "present",
+            "known_none",
+            "unresolved",
+            "omitted"
+          ]
+        },
+        "ranged": {
+          "enum": [
+            "present",
+            "known_none",
+            "unresolved",
+            "omitted"
+          ]
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/section"
+          },
+          "minItems": 5
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "melee",
+        "ranged",
+        "sections",
+        "gaps"
+      ],
+      "additionalProperties": false
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "unit_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subculture_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "unit_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "traits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "unit_key",
+        "subculture_key",
+        "name",
+        "unit_type"
+      ],
+      "additionalProperties": false
+    },
+    "component": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "hp_per_component": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bonus_hp_per_component": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "known_hp_total": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "targetable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "primary": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "count",
+        "hp_per_component",
+        "bonus_hp_per_component",
+        "known_hp_total",
+        "size",
+        "targetable",
+        "primary",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "body": {
+      "type": "object",
+      "properties": {
+        "entity_count": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "hp_per_entity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "total_hp": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "barrier_health": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "entity_count",
+        "hp_per_entity",
+        "total_hp",
+        "barrier_health",
+        "size",
+        "components"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "attack_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        }
+      },
+      "required": [
+        "attack_ref",
+        "component_ref"
+      ],
+      "additionalProperties": false
+    },
+    "traits": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "bonus_vs_infantry": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bonus_vs_large": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "flaming": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "scope",
+        "bonus_vs_infantry",
+        "bonus_vs_large",
+        "magical",
+        "flaming",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "extra_traits": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "melee",
+            "ranged",
+            "explosion"
+          ]
+        },
+        "traits": {
+          "$ref": "#/$defs/traits"
+        }
+      },
+      "required": [
+        "kind",
+        "traits"
+      ],
+      "additionalProperties": false
+    },
+    "melee_attack": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weapon_key": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "attack": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "defence": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "base_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ap_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "attack_interval": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "charge_bonus": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max_splash_targets": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "weapon_key",
+        "attack",
+        "defence",
+        "base_damage",
+        "ap_damage",
+        "attack_interval",
+        "charge_bonus",
+        "max_splash_targets",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "explosion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ap_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "radius": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "base_damage",
+        "ap_damage",
+        "radius",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "ranged_attack": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weapon_key": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "projectile_key": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "component_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "slot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ammunition_pool": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "is_default": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "minimum_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ammunition": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "reload_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "base_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ap_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "projectiles_per_shot": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "shots_per_volley": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "burst_size": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "burst_shot_delay": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "velocity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "accuracy": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spread": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "marksmanship_bonus": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "calibration_distance": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "calibration_area": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "explosion": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/explosion"
+            }
+          ]
+        },
+        "detail_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "weapon_key",
+        "projectile_key",
+        "component_ref",
+        "slot",
+        "ammunition_pool",
+        "is_default",
+        "range",
+        "minimum_range",
+        "ammunition",
+        "reload_time",
+        "base_damage",
+        "ap_damage",
+        "projectiles_per_shot",
+        "shots_per_volley",
+        "burst_size",
+        "burst_shot_delay",
+        "velocity",
+        "accuracy",
+        "spread",
+        "marksmanship_bonus",
+        "calibration_distance",
+        "calibration_area",
+        "explosion",
+        "detail_ref",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "melee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weapon_key": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "attack": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "defence": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "base_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ap_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "attack_interval": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "charge_bonus": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max_splash_targets": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/melee_attack"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "id",
+        "weapon_key",
+        "attack",
+        "defence",
+        "base_damage",
+        "ap_damage",
+        "attack_interval",
+        "charge_bonus",
+        "max_splash_targets",
+        "provenance_refs",
+        "variants"
+      ],
+      "additionalProperties": false
+    },
+    "ranged_present": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "const": "present"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weapon_key": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "projectile_key": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "component_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "slot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ammunition_pool": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "is_default": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "minimum_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ammunition": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "reload_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "base_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ap_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "projectiles_per_shot": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "shots_per_volley": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "burst_size": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "burst_shot_delay": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "velocity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "accuracy": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spread": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "marksmanship_bonus": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "calibration_distance": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "calibration_area": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "explosion": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/explosion"
+            }
+          ]
+        },
+        "detail_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ranged_attack"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "status",
+        "id",
+        "weapon_key",
+        "projectile_key",
+        "component_ref",
+        "slot",
+        "ammunition_pool",
+        "is_default",
+        "range",
+        "minimum_range",
+        "ammunition",
+        "reload_time",
+        "base_damage",
+        "ap_damage",
+        "projectiles_per_shot",
+        "shots_per_volley",
+        "burst_size",
+        "burst_shot_delay",
+        "velocity",
+        "accuracy",
+        "spread",
+        "marksmanship_bonus",
+        "calibration_distance",
+        "calibration_area",
+        "explosion",
+        "detail_ref",
+        "provenance_refs",
+        "variants"
+      ],
+      "additionalProperties": false
+    },
+    "ranged": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/ranged_present"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "unresolved",
+                "omitted"
+              ]
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "key",
+        "summary",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "conditions": {
+      "type": "object",
+      "properties": {
+        "activates_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "minItems": 0
+        },
+        "deactivates_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "minItems": 0
+        },
+        "recipient_requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "minItems": 0
+        },
+        "unresolved": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "activates_when",
+        "deactivates_when",
+        "recipient_requirements",
+        "unresolved"
+      ],
+      "additionalProperties": false
+    },
+    "phase": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "target_self": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "target_friends": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "target_enemies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "duration": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "key",
+        "order",
+        "target_self",
+        "target_friends",
+        "target_enemies",
+        "duration",
+        "lifecycle",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "effect_stat_modifier": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "stat_modifier"
+        },
+        "phase_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "stat": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "enum": [
+            "add",
+            "multiply",
+            "native"
+          ]
+        },
+        "native_operation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "phase_ref",
+        "provenance_refs",
+        "stat",
+        "operation",
+        "native_operation",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "effect_attribute_effect": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "attribute_effect"
+        },
+        "phase_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "attribute_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "enum": [
+            "grant",
+            "remove",
+            "native"
+          ]
+        },
+        "recipient": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "phase_ref",
+        "provenance_refs",
+        "attribute_key",
+        "operation",
+        "recipient",
+        "native_parameters"
+      ],
+      "additionalProperties": false
+    },
+    "effect_periodic_damage": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "periodic_damage"
+        },
+        "phase_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "properties": {
+            "damage_amount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "hp_change_frequency": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "max_damaged_entities": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "damage_amount",
+            "hp_change_frequency",
+            "max_damaged_entities"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kind",
+        "phase_ref",
+        "provenance_refs",
+        "native_parameters"
+      ],
+      "additionalProperties": false
+    },
+    "effect_healing": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "healing"
+        },
+        "phase_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "properties": {
+            "heal_amount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "barrier_heal_amount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "hp_change_frequency": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "resurrect": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "limits": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          },
+          "required": [
+            "heal_amount",
+            "barrier_heal_amount",
+            "hp_change_frequency",
+            "resurrect",
+            "limits"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kind",
+        "phase_ref",
+        "provenance_refs",
+        "native_parameters"
+      ],
+      "additionalProperties": false
+    },
+    "effect_payload_reference": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "payload_reference"
+        },
+        "phase_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "node_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationship": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "phase_ref",
+        "provenance_refs",
+        "node_ref",
+        "relationship"
+      ],
+      "additionalProperties": false
+    },
+    "effect_unresolved": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "unresolved"
+        },
+        "phase_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "native_kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "phase_ref",
+        "provenance_refs",
+        "native_kind",
+        "native_parameters",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "effect": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/effect_stat_modifier"
+        },
+        {
+          "$ref": "#/$defs/effect_attribute_effect"
+        },
+        {
+          "$ref": "#/$defs/effect_periodic_damage"
+        },
+        {
+          "$ref": "#/$defs/effect_healing"
+        },
+        {
+          "$ref": "#/$defs/effect_payload_reference"
+        },
+        {
+          "$ref": "#/$defs/effect_unresolved"
+        }
+      ]
+    },
+    "mechanic": {
+      "type": "object",
+      "properties": {
+        "requires_effect_enabling": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "classification_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "culture_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "conditions": {
+          "$ref": "#/$defs/conditions"
+        },
+        "phases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/phase"
+          },
+          "minItems": 0
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "detail_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "requires_effect_enabling",
+        "classification_evidence",
+        "key",
+        "name",
+        "culture_key",
+        "summary",
+        "native_parameters",
+        "conditions",
+        "phases",
+        "effects",
+        "provenance_refs",
+        "detail_ref"
+      ],
+      "additionalProperties": false
+    },
+    "attribute": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "summary",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "option": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "classification": {
+          "enum": [
+            "activated_option",
+            "unresolved"
+          ]
+        },
+        "culture_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requires_effect_enabling": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "classification_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "detail_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "classification",
+        "culture_key",
+        "requires_effect_enabling",
+        "classification_evidence",
+        "provenance_refs",
+        "detail_ref"
+      ],
+      "additionalProperties": false
+    },
+    "passives": {
+      "type": "object",
+      "properties": {
+        "protection": {
+          "type": "object",
+          "properties": {
+            "armour": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "shield_block_chance": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "physical_resistance": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "missile_resistance": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "spell_resistance": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "fire_resistance": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "ward_save": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "armour",
+            "shield_block_chance",
+            "physical_resistance",
+            "missile_resistance",
+            "spell_resistance",
+            "fire_resistance",
+            "ward_save"
+          ],
+          "additionalProperties": false
+        },
+        "attack_traits": {
+          "type": "object",
+          "properties": {
+            "melee": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/traits"
+                }
+              ]
+            },
+            "ranged": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/traits"
+                }
+              ]
+            },
+            "explosion": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/traits"
+                }
+              ]
+            },
+            "additional": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/extra_traits"
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "melee",
+            "ranged",
+            "explosion",
+            "additional"
+          ],
+          "additionalProperties": false
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attribute"
+          },
+          "minItems": 0
+        },
+        "abilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mechanic"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "protection",
+        "attack_traits",
+        "attributes",
+        "abilities"
+      ],
+      "additionalProperties": false
+    },
+    "unit": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "body": {
+          "$ref": "#/$defs/body"
+        },
+        "movement": {
+          "type": "object",
+          "properties": {
+            "speed": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "mass": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "speed",
+            "mass"
+          ],
+          "additionalProperties": false
+        },
+        "leadership": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "melee": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/melee"
+            }
+          ]
+        },
+        "ranged": {
+          "$ref": "#/$defs/ranged"
+        },
+        "passives": {
+          "$ref": "#/$defs/passives"
+        },
+        "cost": {
+          "type": "object",
+          "properties": {
+            "multiplayer": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "campaign_recruitment": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "campaign_upkeep": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "multiplayer",
+            "campaign_recruitment",
+            "campaign_upkeep"
+          ],
+          "additionalProperties": false
+        },
+        "activated_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/option"
+          },
+          "minItems": 0
+        },
+        "coverage": {
+          "$ref": "#/$defs/coverage"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "identity",
+        "body",
+        "movement",
+        "leadership",
+        "melee",
+        "ranged",
+        "passives",
+        "cost",
+        "activated_options",
+        "coverage",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "owner"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "logical_record": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "key": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "source_patch": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        }
+      },
+      "required": [
+        "source_id",
+        "logical_record",
+        "key",
+        "source_line",
+        "source_patch"
+      ],
+      "additionalProperties": false
+    },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "patch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "build": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "patch",
+        "build",
+        "schema"
+      ],
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "properties": {
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "owners": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/owner"
+          }
+        },
+        "baseline": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "const": "warhammer_3"
+            },
+            "unit_scale": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rank": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "context": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "game",
+            "unit_scale",
+            "rank",
+            "context"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "commit",
+        "owners",
+        "baseline"
+      ],
+      "additionalProperties": false
+    },
+    "description": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "summary",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "edge": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationship": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "relationship",
+        "order",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
