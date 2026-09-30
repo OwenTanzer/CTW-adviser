@@ -17,7 +17,7 @@ def main():
     build.add_argument('--output', type=Path, required=True)
     inspect = commands.add_parser('inspect')
     inspect.add_argument('snapshot', type=Path)
-    for command in ('resolve', 'unit', 'matchup', 'relations', 'passive', 'detail', 'provenance'):
+    for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance'):
         query = commands.add_parser(command)
         query.add_argument('--db', type=Path, required=True)
         query.add_argument('keys', nargs='+' if command in ('matchup', 'provenance') else 1)
@@ -28,6 +28,7 @@ def main():
         query.add_argument('--section', choices=('components', 'weapons', 'attributes', 'abilities', 'activated_options'))
         query.add_argument('--limit', type=int, default=32)
         query.add_argument('--cursor')
+        query.add_argument('--include-diagnostics', action='store_true', help='Include development coverage notes for inspection')
         query.add_argument('--scenario', help='JSON object echoed as caller context; never applied')
     args = parser.parse_args()
     try:
@@ -40,7 +41,8 @@ def main():
                 key = args.keys[0]
                 options = dict(mode=args.mode, subculture=args.subculture, section=args.section,
                                cursor=args.cursor, limit=args.limit,
-                               scenario=json.loads(args.scenario) if args.scenario else None)
+                               scenario=json.loads(args.scenario) if args.scenario else None,
+                               include_diagnostics=args.include_diagnostics)
                 if args.command == 'resolve':
                     result = queries.resolve_unit(key, args.subculture)
                 elif args.command == 'matchup':
@@ -49,8 +51,11 @@ def main():
                     result = queries.get_matchup_evidence(*args.keys, subculture_b=args.subculture_b, **options)
                 elif args.command in ('unit', 'relations'):
                     result = queries.get_unit_profile(key, **options)
+                elif args.command == 'coverage':
+                    result = queries.get_coverage_notes(key, **options)
                 elif args.command == 'passive':
-                    result = queries.get_passive_detail(key, culture=args.culture, limit=args.limit, cursor=args.cursor)
+                    result = queries.get_passive_detail(key, culture=args.culture, limit=args.limit, cursor=args.cursor,
+                                                        include_diagnostics=args.include_diagnostics)
                 elif args.command == 'detail':
                     result = queries.get_detail(key, limit=args.limit, cursor=args.cursor)
                 else:

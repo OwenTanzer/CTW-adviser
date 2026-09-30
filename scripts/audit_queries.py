@@ -83,7 +83,7 @@ def main():
                                 ('phase_effects', 'SELECT * FROM native_phase_stat_effects WHERE phase=?', 'wh2_main_unit_passive_martial_prowess')]:
             plans[label] = [r[3] for r in q.db.execute('EXPLAIN QUERY PLAN ' + sql, (key,))]
         report = {'status': 'passed' if not errors else 'failed', 'source_commit': q.snapshot['source_commit'],
-                  'packet_version': '1.2.0', 'runtime': {'python': platform.python_version(), 'sqlite': sqlite3.sqlite_version,
+                  'packet_version': packet['schema_version'], 'runtime': {'python': platform.python_version(), 'sqlite': sqlite3.sqlite_version,
                                                        'os': platform.platform(), 'machine': platform.machine(), 'processor': platform.processor()},
                   'checked_unit_keys': unit_count, 'checked_source_locators': len(checked), 'errors': errors,
                   'partial_sections': partials, 'startup_seconds': startup,

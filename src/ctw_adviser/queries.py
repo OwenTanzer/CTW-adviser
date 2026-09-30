@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.2.0'
+PACKET_VERSION = '1.3.0'
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
 STAT_NAMES = {
@@ -181,7 +181,7 @@ class Queries:
 
     def get_matchup_evidence(self, unit_a, unit_b=None, mode='combined', scenario=None,
                             *, subculture=None, subculture_b=None, section=None,
-                            cursor=None, limit=32):
+                            cursor=None, limit=32, include_diagnostics=False):
         if mode not in MODES or (section is not None and section not in SECTIONS):
             raise ValueError('unsupported mode or section')
         if type(limit) is not int or not 1 <= limit <= 256:
@@ -208,8 +208,28 @@ class Queries:
                 section = decoded['section']
                 offsets[section] = decoded['offset']
             packet['units'].append(context.unit(unit, mode, section, offsets, limit))
+        for unit in packet['units']:
+            coverage = unit['coverage']
+            coverage['diagnostic_count'] = len(coverage['gaps'])
+            if not include_diagnostics:
+                del coverage['gaps']
         context.prune()
         return packet
+
+    def get_coverage_notes(self, unit_a, unit_b=None, **kwargs):
+        """Explicit inspection of development caveats, separate from combat facts."""
+        kwargs.pop('include_diagnostics', None)
+        packet = self.get_matchup_evidence(unit_a, unit_b, include_diagnostics=True, **kwargs)
+        units = [{'identity': u['identity'], 'coverage': u['coverage']} for u in packet['units']]
+        refs = sorted({ref for u in units for gap in u['coverage']['gaps'] for ref in gap['provenance_refs']})
+        evidence = {'sources': {}, 'provenance': {}}
+        for offset in range(0, len(refs), 256):
+            chunk = self.get_provenance(refs[offset:offset + 256])
+            for field in evidence:
+                evidence[field].update(chunk[field])
+        return {'schema_version': PACKET_VERSION, 'snapshot': packet['snapshot'],
+                'mode': packet['mode'], 'units': units,
+                'sources': evidence['sources'], 'provenance': evidence['provenance']}
 
     def cursor(self, unit, mode, section, offset, limit):
         data = {'snapshot': self.snapshot['id'], 'version': PACKET_VERSION,
@@ -269,7 +289,7 @@ class Queries:
                 'records': records, 'sources': c.packet['sources'],
                 'provenance': c.packet['provenance']}
 
-    def get_passive_detail(self, key, *, culture='*', limit=128, cursor=None):
+    def get_passive_detail(self, key, *, culture='*', limit=128, cursor=None, include_diagnostics=False):
         option = self.one('ability_option_metadata', 'ability_key', key)
         if not option or option['classification'] != 'core_passive':
             raise ValueError('passive detail requires a classified core passive')
@@ -280,9 +300,12 @@ class Queries:
         c = Packet(self)
         mechanic = c.mechanic(links[0], option, c.detail_gaps)
         detail = self.get_detail('record:' + option['definition_record'], limit=limit, cursor=cursor)
-        return {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'mechanic': mechanic,
+        result = {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'mechanic': mechanic,
                 'sources': c.packet['sources'], 'provenance': c.packet['provenance'],
-                'detail_refs': c.packet['detail_refs'], 'gaps': c.detail_gaps, 'graph': detail}
+                'detail_refs': c.packet['detail_refs'], 'diagnostic_count': len(c.detail_gaps), 'graph': detail}
+        if include_diagnostics:
+            result['gaps'] = c.detail_gaps
+        return result
 
     def get_detail(self, ref, *, limit=128, cursor=None):
         """Cycle-safe bounded graph with explicit continuation and every edge."""
