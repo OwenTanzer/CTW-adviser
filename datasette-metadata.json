@@ -8,13 +8,16 @@
       "title": "CTW snapshot",
       "tables": {
         "unit_profiles": {
-          "description": "2,409 distinct unit profiles. faction_name is a list; faction-specific restrictions and original source locators are linked in unit_availability (3,181 records).",
+          "description": "2,379 distinct profiles representing 2,409 original unit keys. unit_keys lists equivalent keys; unit_aliases resolves each original key. faction_name is a list; restrictions and source locators remain in unit_availability (3,181 records).",
           "label_column": "unit_name",
           "facets": ["tactical_category", {"array": "faction_name"}]
         },
         "unit_availability": {
           "description": "Original faction/subculture-qualified availability, restrictions, notes and provenance. Shared inclusion does not transfer recruitment permissions.",
           "facets": ["faction_name", "roster_scope"]
+        },
+        "unit_aliases": {
+          "description": "All 2,409 original unit keys mapped to canonical profiles. Key-only consolidation requires identical profile fields and linked combat evidence; availability and provenance remain keyed to the original identity."
         },
         "unit_roster_records": {"description": "Lossless reconstruction of the 3,181 original source roster records; repeated combat statistics are stored once in unit_profiles."},
         "coverage_gaps": {"description": "Known limits in the retained native definitions; these are not inferred combat effects."},
@@ -24,7 +27,7 @@
         "find_units": {
           "title": "Find units by name",
           "description": "Enter part of a unit name, such as Kroxigor. An empty name shows the roster.",
-          "sql": "select unit_name, unit_key, faction_name, tactical_category, entity_count, total_hp, armour, melee_attack, melee_defence, weapon_base_damage, weapon_ap_damage, speed, multiplayer_cost from unit_profiles where unit_name like '%' || :name || '%' order by unit_name, unit_key"
+          "sql": "select unit_name, unit_keys, faction_name, tactical_category, entity_count, total_hp, armour, melee_attack, melee_defence, weapon_base_damage, weapon_ap_damage, speed, multiplayer_cost from unit_profiles where unit_name like '%' || :name || '%' order by unit_name, unit_key"
         }
       }
     }
