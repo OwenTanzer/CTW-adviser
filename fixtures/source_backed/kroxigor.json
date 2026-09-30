@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "mode": "combined",
   "snapshot": {
     "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
@@ -28,7 +28,10 @@
         "unit_key": "wh2_main_lzd_mon_kroxigors",
         "subculture_key": "wh2_main_sc_lzd_lizardmen",
         "name": "Kroxigor",
-        "unit_type": "infantry"
+        "unit_type": "infantry",
+        "faction_name": [
+          "Lizardmen"
+        ]
       },
       "body": {
         "entity_count": 16.0,
@@ -562,6 +565,7 @@
       "source_id": "s_ca1c9a7d1041",
       "logical_record": 124,
       "key": {
+        "subculture_key": "wh2_main_sc_lzd_lizardmen",
         "unit_key": "wh2_main_lzd_mon_kroxigors"
       },
       "source_line": null,

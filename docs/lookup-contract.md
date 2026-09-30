@@ -1,4 +1,4 @@
-# Evidence packet contract 1.0.0
+# Evidence packet contract 1.1.0
 
 This completes the packet-design portion of issue #2's Lock and validate work.
 The authoritative schema is `schema/evidence_packet.schema.json`. The functions
@@ -115,6 +115,19 @@ Native scalar parameters can include opaque tokens. External/unresolved targets
 must be represented explicitly, with a qualified node/detail entry and gap.
 
 ## Field mappings and evidence
+
+Packet version 1.1.0 requires `identity.faction_name` as a sorted, unique array
+of roster labels, including for a single-faction unit. These labels describe
+shared inclusion; they do not transfer availability restrictions. A resolved
+`subculture_key` is the selected lookup context, not ownership of the shared
+base profile. The store retains each context and its evidence in
+`unit_availability`; profiles and list-valued labels are deduplicated.
+Store schema 3 maps every original key through `unit_aliases` to a shared profile.
+Resolve the supplied key before profile retrieval; retain the supplied identity
+when querying availability and evidence. `unit_keys` lists all represented keys.
+Only exact profile and linked-combat-evidence matches consolidate; mount and
+mechanical variants remain distinct. Selected source identity and permissions
+must never be inferred from the canonical profile's representative key.
 
 `identity.unit_type` maps to canonical `tactical_category`. Costs map as follows:
 `multiplayer` ← `multiplayer_cost`, `campaign_recruitment` ← `campaign_recruit_cost`,

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "mode": "combined",
   "snapshot": {
     "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
@@ -28,7 +28,12 @@
         "unit_key": "wh3_main_tze_inf_blue_horrors_0",
         "subculture_key": "wh3_main_sc_tze_tzeentch",
         "name": "Blue Horrors of Tzeentch",
-        "unit_type": "infantry"
+        "unit_type": "infantry",
+        "faction_name": [
+          "Daemons of Chaos",
+          "Tzeentch",
+          "Warriors of Chaos"
+        ]
       },
       "body": {
         "entity_count": 160.0,
@@ -446,6 +451,16 @@
       "sha256": "2ea0da7f1dfc751f18e80a0606344a37af262f0fb923bf1da470844727c681fc",
       "owner": "units"
     },
+    "s_fcd50555b5a8": {
+      "path": "data/unit_stats/normalized/daemons_of_chaos__wh3__9.0__ultra.csv",
+      "sha256": "f93ba331d00accaff6ed2524a6ba9867aa5b130085c0c83e1ec2539d2ce17afd",
+      "owner": "units"
+    },
+    "s_8b07b0425e11": {
+      "path": "data/unit_stats/normalized/warriors_of_chaos__wh3__9.0__ultra.csv",
+      "sha256": "7d310ce12c2014e3dd1320678a8e51527bf77c04e928f69db7dd7ebe98b214ac",
+      "owner": "units"
+    },
     "s_23de8daf4e75": {
       "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
       "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
@@ -512,6 +527,27 @@
       "source_id": "s_fb7eeb488e5c",
       "logical_record": 72,
       "key": {
+        "subculture_key": "wh3_main_sc_tze_tzeentch",
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_fcd50555b5a8_183": {
+      "source_id": "s_fcd50555b5a8",
+      "logical_record": 183,
+      "key": {
+        "subculture_key": "wh3_main_sc_dae_daemons",
+        "unit_key": "wh3_main_tze_inf_blue_horrors_0"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_8b07b0425e11_282": {
+      "source_id": "s_8b07b0425e11",
+      "logical_record": 282,
+      "key": {
+        "subculture_key": "wh_main_sc_chs_chaos",
         "unit_key": "wh3_main_tze_inf_blue_horrors_0"
       },
       "source_line": null,

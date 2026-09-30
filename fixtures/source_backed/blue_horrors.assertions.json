@@ -24,6 +24,24 @@
     "conversion": "text"
   },
   {
+    "pointer": "/units/0/identity/faction_name/0",
+    "evidence_ref": "s_fcd50555b5a8_183",
+    "column": "faction_name",
+    "conversion": "text"
+  },
+  {
+    "pointer": "/units/0/identity/faction_name/1",
+    "evidence_ref": "s_fb7eeb488e5c_72",
+    "column": "faction_name",
+    "conversion": "text"
+  },
+  {
+    "pointer": "/units/0/identity/faction_name/2",
+    "evidence_ref": "s_8b07b0425e11_282",
+    "column": "faction_name",
+    "conversion": "text"
+  },
+  {
     "pointer": "/units/0/body/entity_count",
     "evidence_ref": "s_fb7eeb488e5c_72",
     "column": "entity_count",

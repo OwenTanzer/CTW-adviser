@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "mode": "combined",
   "snapshot": {
     "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
@@ -28,7 +28,11 @@
         "unit_key": "wh2_dlc11_cst_art_queen_bess",
         "subculture_key": "wh2_dlc11_sc_cst_vampire_coast",
         "name": "Queen Bess",
-        "unit_type": "artillery"
+        "unit_type": "artillery",
+        "faction_name": [
+          "Undead Legions",
+          "Vampire Coast"
+        ]
       },
       "body": {
         "entity_count": 1.0,
@@ -323,6 +327,11 @@
       "sha256": "1bb1c65b46209aba5604e20f991d1f0e4876dffcdf4bd30c58e4f9879add657c",
       "owner": "units"
     },
+    "s_8c245bd0b3f0": {
+      "path": "data/unit_stats/normalized/undead_legions__wh3__9.0__ultra.csv",
+      "sha256": "9ca9eb03fe1ec2acc3fb61658c607003a02f9f42443c9d4b922b8a340d58142a",
+      "owner": "units"
+    },
     "s_23de8daf4e75": {
       "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
       "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
@@ -364,6 +373,17 @@
       "source_id": "s_c37bf93887b5",
       "logical_record": 4,
       "key": {
+        "subculture_key": "wh2_dlc11_sc_cst_vampire_coast",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null
+    },
+    "s_8c245bd0b3f0_53": {
+      "source_id": "s_8c245bd0b3f0",
+      "logical_record": 53,
+      "key": {
+        "subculture_key": "wh3_dlc29_sc_nag_undead_legions",
         "unit_key": "wh2_dlc11_cst_art_queen_bess"
       },
       "source_line": null,
