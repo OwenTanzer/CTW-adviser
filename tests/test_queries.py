@@ -156,6 +156,53 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(sorted(n['damage'] for n in pulses), [0, 50])
         self.assertTrue(all(n['detonation_force'] == 350 for n in pulses))
 
+    def test_death_gate_blasts_keep_contact_debuffs_and_self_damage_separate(self):
+        for key, damage, ap in [('wh2_dlc13_unit_passive_kaboom', 10, 8),
+                                ('wh3_dlc26_unit_abilities_blow_apart', 10, 20)]:
+            with self.subTest(key=key):
+                detail = self.q.get_passive_detail(key)
+                m = detail['mechanic']; nodes = detail['payload_graph']['nodes']
+                self.assertEqual(m['conditions']['activates_when'][0]['key'], 'on_death')
+                self.assertIn('reviewed interpretation', m['conditions']['activates_when'][0]['summary'])
+                vortex = next(n['native_parameters'] for n in nodes if n['kind'] == 'native_vortices')
+                self.assertEqual((vortex['damage'], vortex['damage_ap']), (damage, ap))
+                self.assertTrue(vortex['affects_allies'])
+                modifiers = {n['native_parameters']['stat']: n['native_parameters']['value'] for n in nodes if n['kind'] == 'native_phase_stat_effects'}
+                self.assertEqual(modifiers['stat_morale'], -8)
+                if key.endswith('blow_apart'):
+                    self.assertEqual(modifiers['scalar_speed'], 0.85)
+                    self.assertTrue(m['phases'][0]['target_self'])
+                    self.assertEqual(next(e for e in m['effects'] if e['kind'] == 'periodic_damage')['native_parameters']['damage_amount'], 26600)
+                else:
+                    self.assertFalse(any(e['kind'] == 'periodic_damage' for e in m['effects']))
+                self.check(self.q.get_unit_profile(self.q.rows('unit_abilities', 'ability_key', key)[0]['unit_key']))
+
+    def test_summons_preserve_host_versus_enemy_conditions_and_placement_uncertainty(self):
+        cases = [('wh3_dlc29_lord_passive_arch_necromancer', 'Wight King', 1, 'unit_is_not_commander_class'),
+                 ('wh3_dlc29_lord_passive_liche_ascendant', 'Zombies', 2, 'unit_is_commander_class'),
+                 ('wh_dlc05_lord_abilities_spirit_essence_of_chaos', 'Chaos Spawn', 1, 'unit_is_commander_class')]
+        for key, name, uses, excluded_class in cases:
+            with self.subTest(key=key):
+                m = self.q.get_passive_detail(key)['mechanic']
+                summon = next(e for e in m['effects'] if e['kind'] == 'summon')
+                self.assertEqual((summon['unit_name'], summon['num_uses']), (name, uses))
+                self.assertEqual(summon['trigger'], 'unresolved')
+                self.assertIn('whether summoning requires a kill', m['summary'])
+                self.assertNotIn('at the host position', m['summary'])
+                self.assertIn('caster-versus-target', summon['trigger_basis'])
+                self.assertEqual(m['conditions']['deactivates_when'], [])
+                self.assertIn(excluded_class, [c['key'] for c in m['conditions']['invalid_targets']])
+                self.assertTrue(m['phases'][0]['target_enemies'])
+                self.assertFalse(m['phases'][0]['target_self'])
+                self.check(self.q.get_unit_profile(self.q.rows('unit_abilities', 'ability_key', key)[0]['unit_key'], limit=128))
+        key = 'wh2_dlc11_unit_passive_abandon_ship'
+        m = self.q.get_passive_detail(key)['mechanic']
+        self.assertTrue(m['phases'][0]['target_self'])
+        self.assertEqual(m['conditions']['deactivates_when'][0]['key'], 'health_above_50%')
+        self.assertIn('50% host health', m['summary'])
+        self.assertNotEqual(next(e for e in m['effects'] if e['kind'] == 'summon')['trigger'], 'on_death')
+        self.check(self.q.get_unit_profile(self.q.rows('unit_abilities', 'ability_key', key)[0]['unit_key']))
+
     def test_exploding_unit_is_source_backed_visual_indicator(self):
         key = 'wh2_dlc15_unit_abilities_exploding_unit'
         detail = self.q.get_passive_detail(key, include_diagnostics=True)
