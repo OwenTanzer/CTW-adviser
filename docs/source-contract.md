@@ -106,5 +106,6 @@ upstream fingerprints. Recompute the contract fingerprint using sorted-key compa
 UTF-8 JSON. Commit the contract, lock and fresh verification evidence together.
 Do not refresh expected hashes just to make a failed check pass.
 
-The packet schema, example fixtures, importer, SQLite store and query interface
-are later steps. Issue #2 stays open.
+The packet schema and fixtures, importer, SQLite store and query interface are
+implemented in the subsequent phases described by the lookup/store contracts.
+Issue #2 stays open through its remaining packaging and integration checks.

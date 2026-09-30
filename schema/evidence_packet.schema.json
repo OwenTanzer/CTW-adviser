@@ -1,11 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ctw-adviser:evidence-packet:1.1.0",
-  "title": "CTW adviser evidence packet v1.1",
+  "$id": "urn:ctw-adviser:evidence-packet:1.2.0",
+  "title": "CTW adviser evidence packet v1.2 (accepts v1.1 fixtures)",
   "type": "object",
   "properties": {
     "schema_version": {
-      "const": "1.1.0"
+      "enum": [
+        "1.1.0",
+        "1.2.0"
+      ]
     },
     "mode": {
       "enum": [
@@ -86,6 +89,9 @@
         "edges"
       ],
       "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object"
     }
   },
   "required": [
@@ -174,6 +180,10 @@
               "minLength": 1
             }
           ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
         }
       },
       "required": [
@@ -235,8 +245,15 @@
           "minLength": 1
         },
         "subculture_key": {
-          "type": "string",
-          "minLength": 1
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
         },
         "faction_name": {
           "type": "array",
@@ -268,6 +285,18 @@
             "minLength": 1
           },
           "minItems": 0
+        },
+        "profile_unit_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit_keys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
         }
       },
       "required": [
@@ -577,6 +606,36 @@
             "minLength": 1
           },
           "minItems": 1
+        },
+        "component_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "slot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
         }
       },
       "required": [
@@ -819,6 +878,17 @@
             "minLength": 1
           },
           "minItems": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
         }
       },
       "required": [
@@ -918,6 +988,36 @@
             "minLength": 1
           },
           "minItems": 1
+        },
+        "component_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "slot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
         },
         "variants": {
           "type": "array",
@@ -1123,6 +1223,17 @@
             "minLength": 1
           },
           "minItems": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
         },
         "variants": {
           "type": "array",
@@ -2226,6 +2337,25 @@
               "minLength": 1
             }
           ]
+        },
+        "source_path": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "lineage_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
         }
       },
       "required": [
@@ -2299,6 +2429,13 @@
             "context"
           ],
           "additionalProperties": false
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       },
       "required": [

@@ -65,6 +65,7 @@ def packet_checks(p):
     evidence=p['provenance'];details=p['detail_refs']
     for e in evidence.values():
         if e['source_id'] not in p['sources']:raise ValueError('dangling source')
+        if any(r not in evidence for r in e.get('lineage_refs',[])):raise ValueError('dangling lineage')
     for s in p['sources'].values():
         if s['owner'] not in p['snapshot']['owners']:raise ValueError('dangling owner')
     def walk(x):
@@ -93,8 +94,9 @@ def packet_checks(p):
         if sorted(names)!=sorted(['components','weapons','attributes','abilities','activated_options']):raise ValueError('section coverage must be unique and exhaustive')
         for s in sections:
             if s['total'] is not None and s['returned']>s['total']:raise ValueError('invalid coverage counts')
-            if s['state']=='complete' and (s['total']!=s['returned'] or s['cursor'] is not None):raise ValueError('false complete section')
-            if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned'])):raise ValueError('partial section needs overflow/cursor')
+            offset=s.get('offset',0)
+            if s['state']=='complete' and (s['total']!=s['returned']+offset or s['cursor'] is not None):raise ValueError('false complete section')
+            if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned']+offset)):raise ValueError('partial section needs overflow/cursor')
             if s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in u['coverage']['gaps']):raise ValueError('unqualified unresolved/omitted section')
         if status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in u['coverage']['gaps']):raise ValueError('missing ranged gap')
         attacks={};components={c['id'] for c in u['body']['components']}
@@ -103,8 +105,8 @@ def packet_checks(p):
             if a['id'] in attacks:raise ValueError('duplicate attack id')
             attacks[a['id']]={'kind':kind,'component':component}
         if u['melee']:
-            add(u['melee'],'melee')
-            for a in u['melee']['variants']:add(a,'melee')
+            add(u['melee'],'melee',u['melee'].get('component_ref'))
+            for a in u['melee']['variants']:add(a,'melee',a.get('component_ref'))
         if ranged and status=='present':
             for a in [ranged,*ranged['variants']]:
                 add(a,'ranged',a['component_ref'])
