@@ -29,6 +29,8 @@ def main():
         query.add_argument('--limit', type=int, default=32)
         query.add_argument('--cursor')
         query.add_argument('--include-diagnostics', action='store_true', help='Include development coverage notes for inspection')
+        if command == 'passive':
+            query.add_argument('--include-documentation', action='store_true', help='Include the optional reviewed explanation source-documentation link')
         query.add_argument('--scenario', help='JSON object echoed as caller context; never applied')
     args = parser.parse_args()
     try:
@@ -55,7 +57,8 @@ def main():
                     result = queries.get_coverage_notes(key, **options)
                 elif args.command == 'passive':
                     result = queries.get_passive_detail(key, culture=args.culture, limit=args.limit, cursor=args.cursor,
-                                                        include_diagnostics=args.include_diagnostics)
+                                                        include_diagnostics=args.include_diagnostics,
+                                                        include_documentation=args.include_documentation)
                 elif args.command == 'detail':
                     result = queries.get_detail(key, limit=args.limit, cursor=args.cursor)
                 else:

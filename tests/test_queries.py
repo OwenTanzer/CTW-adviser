@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 sys.path.insert(0, str(ROOT / 'scripts'))
 from ctw_adviser.build import build_snapshot
-from ctw_adviser.queries import Queries, ResolutionError
+from ctw_adviser.queries import Queries, ResolutionError, RESEARCHED_PASSIVES
 from validate_packets import validate, packet_checks
 
 SOURCE = Path(os.environ.get('CTW_DATA_ROOT', ROOT.parent / 'CTW-data'))
@@ -39,6 +39,48 @@ class QueryTests(unittest.TestCase):
         validate(packet, self.schema, self.schema)
         packet_checks(packet)
         return packet['units'][0]
+
+    def test_researched_passives_keep_values_recipients_and_optional_documentation(self):
+        self.assertEqual(len(RESEARCHED_PASSIVES), 24)
+        for key in RESEARCHED_PASSIVES:
+            with self.subTest(key=key):
+                detail = self.q.get_passive_detail(key)
+                self.assertNotIn('explanation_documentation', detail)
+                documented = self.q.get_passive_detail(key, include_documentation=True)
+                self.assertIn('explanation_documentation', documented)
+                self.assertEqual(detail['mechanic'], documented['mechanic'])
+                link = self.q.rows('unit_abilities', 'ability_key', key)[0]
+                packet = self.q.get_unit_profile(link['unit_key'], section='abilities', limit=256)
+                self.check(packet)
+        lucky = self.q.get_passive_detail('wh3_dlc23_hero_passive_lucky_git')['mechanic']
+        heal = next(e for e in lucky['effects'] if e['kind'] == 'healing')
+        self.assertEqual(heal['native_parameters']['heal_amount'], 0.006)
+        self.assertEqual(heal['native_parameters']['hp_change_frequency'], 1.5)
+        feast = self.q.get_passive_detail('wh3_dlc25_lord_passive_feast_of_the_maggot_lord')['mechanic']
+        self.assertEqual([p['target_self'] for p in feast['phases']], [True, False])
+        self.assertEqual([p['target_enemies'] for p in feast['phases']], [False, True])
+        self.assertEqual(feast['conditions']['activates_when'][0]['key'], 'tamurkhan_death')
+        mirror = self.q.get_passive_detail('wh3_twa08_unit_passive_redirecting_aura')['mechanic']
+        self.assertEqual(mirror['native_parameters']['effect_range'], 55)
+        self.assertTrue(mirror['phases'][0]['target_enemies'])
+        self.assertFalse(mirror['phases'][0]['target_self'])
+
+    def test_researched_damage_payloads_preserve_shared_definitions(self):
+        detail = self.q.get_passive_detail('wh2_dlc15_unit_passive_rubble_and_ruin_tier_1_bombardment')
+        link = self.q.rows('unit_abilities', 'ability_key', detail['mechanic']['key'])[0]
+        packet = self.q.get_unit_profile(link['unit_key'], section='abilities', limit=256)
+        self.check(packet)
+        tiers = [m for m in packet['units'][0]['passives']['abilities']
+                 if 'rubble_and_ruin_tier_' in m['key'] and m['key'].endswith('_bombardment')]
+        self.assertEqual(len(tiers), 3)
+        roots = [next(e['node_ref'] for e in m['effects'] if e['kind'] == 'payload_reference') for m in tiers]
+        self.assertEqual(len(set(roots)), 1)
+        self.assertEqual(sum(n['id'] == roots[0] for n in packet['payload_graph']['nodes']), 1)
+        self.assertEqual({m['conditions']['deactivates_when'][0]['key'] for m in tiers},
+                         {'health_above_75%', 'health_above_50%', 'health_above_25%'})
+        for key in ('wh3_dlc29_passive_spell_lightning_strike', 'wh2_main_faction_abilities_murderous_prowess_indicator'):
+            self.assertNotIn(key, RESEARCHED_PASSIVES)
+            self.assertNotIn('explanation_documentation', self.q.get_passive_detail(key, include_documentation=True))
 
     def test_reviewed_explanations_keep_calculation_payloads_separate(self):
         corpse_packet = self.q.get_unit_profile('wh2_dlc11_cst_mon_bloated_corpse_0')

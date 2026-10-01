@@ -11,7 +11,7 @@ from markupsafe import Markup
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
-from ctw_adviser.queries import Queries, ResolutionError
+from ctw_adviser.queries import Queries, ResolutionError, RESEARCHED_PASSIVES, PASSIVE_RESEARCH_DOCUMENTATION
 
 
 def escape(value):
@@ -74,6 +74,11 @@ def unit_html(packet, args):
         content += '<article><h3>' + escape(mechanic['name'] or mechanic['key']) + '</h3><p>' + escape(mechanic['summary']) + '</p>'
         content += '<small>Culture: ' + escape(mechanic['culture_key']) + ' · requires effect enabling: ' + escape(mechanic['requires_effect_enabling']) + '</small>'
         content += '<details><summary>Effects, conditions & recipient phases</summary>' + raw({k: mechanic[k] for k in ('effects', 'conditions', 'phases', 'native_parameters', 'classification_evidence')}) + '</details>'
+        if mechanic['key'] in RESEARCHED_PASSIVES:
+            content += ('<details><summary>Supporting source documentation</summary>'
+                        '<p>Reviewed explanations combine pinned game records with separately attributed external corroboration. '
+                        'Numerical values retain their pinned patch scope.</p><p><a href="' + escape(PASSIVE_RESEARCH_DOCUMENTATION) +
+                        '">Read the source notes and remaining uncertainties for this pass</a></p></details>')
         roots = {e['node_ref'] for e in mechanic['effects'] if e['kind'] == 'payload_reference'}
         reached = set(roots)
         pending = list(roots)

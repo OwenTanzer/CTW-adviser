@@ -10,6 +10,7 @@ from pathlib import Path
 from .store import open_snapshot, quote
 
 PACKET_VERSION = '1.8.0'
+PASSIVE_RESEARCH_DOCUMENTATION = 'https://github.com/OwenTanzer/CTW-adviser/blob/issue-2-query-packets/docs/lookup-contract.md#focused-passive-research'
 
 # Reviewed families share payload handling, not necessarily phase sequences.
 SURVIVAL_PASSIVES = {
@@ -28,7 +29,113 @@ DEATH_PAYLOAD_PASSIVES = {
     'wh3_dlc29_unit_passive_curse_of_the_fallen': 'the Khemric Titan',
     'wh3_dlc29_unit_passive_pestilent_perfection': 'the Pusbags',
 }
+# Individually reviewed interpretations; supporting sources and their limits are
+# optional documentation in docs/lookup-contract.md#focused-passive-research.
+# Neither Lightning Strike nor Murderous Prowess Indicator is included.
+RESEARCHED_PASSIVES = {
+    'wh2_dlc16_lord_passive_conjoined_destiny':
+        'Low-health healing for the Sisters of Twilight, disabled above 20% health. '
+        'A 30-second preparation phase precedes a self-healing phase with amount setting 0.25, interval setting 1 and duration setting 1.1. '
+        'The published ability description identifies this as a 25% heal. Countdown interruption, repeatability, exact threshold equality and effective healing caps remain unverified.',
+    'wh3_dlc23_hero_passive_lucky_git':
+        'One-use low-health healing for Gorduz Backstabber, disabled above 25% health. '
+        'Prepares for 5 seconds, then heals himself during a 30-second phase. Healing amount setting 0.006 and interval setting 1.5 are retained separately; '
+        'the published 0.60% healing-rate description does not establish tick arithmetic or total healing. Exact threshold equality and interruption behavior remain unverified.',
+    'wh3_dlc26_character_passive_bloodborn':
+        'One-use low-health healing for Skarr Bloodwrath, disabled above 25% health. '
+        'A 1-second buffer precedes a 1-second self-healing phase with amount setting 0.2 and interval setting 1. '
+        'This is healing of the living host, with resurrection disabled. Exact threshold equality, effective healing amount and caps remain unverified.',
+    'wh3_cp1_unit_passive_implacable_spirit':
+        'After 25 seconds stationary, the Gate Master gains missile range x1.4, armour-piercing missile damage x1.25 and +15 percentage points missile resistance. '
+        'These effects target the Gate Master himself, not nearby allies. Movement disables the ability; requires effect enabling. '
+        'The additional climbing/equipment/platform restriction is retained below; its exact combination rule remains unverified.',
+    'wh3_dlc23_unit_passive_dig_in':
+        'After 25 seconds stationary, the host gains missile range x1.4, +15 percentage points missile resistance and Expert Charge Defence. '
+        'These are self-targeted benefits; movement disables the ability. '
+        'The additional climbing/equipment/platform restriction is retained below; its exact combination rule remains unverified.',
+    'wh3_dlc25_unit_passive_blackpowder_discipline':
+        'After 10 seconds stationary, the host gains +40 accuracy and +10 reload skill until movement disables the ability. '
+        'Reload skill is a stat bonus, not a 10% reduction in reload time. '
+        'The additional climbing/equipment/platform restriction is retained below; its exact combination rule remains unverified.',
+    'wh3_dlc25_lord_passive_feast_of_the_maggot_lord':
+        'One-use last chance at death for Tamurkhan, requiring an enemy lord or hero within the 30-metre interception range. '
+        'His self-targeted phase grants Cannot Die and healing (amount setting 0.03, interval setting 1, duration 7); '
+        'a separate enemy-targeted phase deals damage (amount 424, interval setting 1, duration 7, maximum one affected entity). '
+        'This is a survival response, not an unconditional death explosion. Exact target priority, phase overlap and success requirements remain unverified.',
+    'wh3_dlc25_unit_passive_unbinding_spirit_of_grungni':
+        'The Spirit of Grungni provides support for 150 seconds, then enters a 5-second disengagement phase and leaves the battlefield to resupply. '
+        'The removal phase damages the airship itself (amount 16000, interval setting 1); it does not damage nearby enemies. '
+        'This describes the base summoned-airship ability; campaign upgrades and exact removal scheduling are not evaluated.',
+    'wh3_dlc27_unit_passive_burrowing_instinct':
+        'When the Dread Maw breaks, it shatters and leaves the battle rather than rallying. '
+        'The self-targeted leadership penalty is -100 and the behavior requests battlefield departure. '
+        'The internal stance named rebirth belongs to this departure sequence, not resurrection. Exact departure timing remains unverified.',
+    'wh3_twa08_unit_passive_redirecting_aura':
+        'Enemy missile units within 55 metres of the Green Guardian have their projectiles redirected toward the firing unit. '
+        'Eligibility concerns nearby enemy shooters, not merely projectiles aimed at the Guardian. '
+        'Projectile exceptions, close-range behavior and reflected hit counts remain unverified; no flat damage-reflection percentage is established.',
+    'wh2_dlc12_unit_passive_thunderous_one':
+        'The Thunderous One automatically releases lightning bombardments associated with melee combat. '
+        'It has 10 uses and recharges while engaged in melee. Bombardment, projectile and explosion parameters are separate from ordinary melee damage. '
+        'Exact strike placement, interrupted recharge and hit counts remain unverified.',
+    'wh2_dlc15_lord_passive_mistwalkers_barrage':
+        'Eltharion automatically releases a bombardment associated with melee combat; recharge progresses while engaged in melee. '
+        'Requires effect enabling. Projectile and explosion parameters are retained separately from his ordinary attacks. '
+        'Exact strike placement, interrupted recharge and hit counts remain unverified.',
+    'wh2_dlc16_unit_passive_warp_discharge':
+        'Morskittar\'s Hellion releases a damaging magical vortex associated with melee combat; recharge progresses while engaged in melee. '
+        'The vortex is a separate damage payload, not a modifier to each melee hit. Exact launch scheduling and hit counts remain unverified.',
+    'wh2_dlc17_unit_passive_searing_bile_blood':
+        'The Vorbergland Broodmother releases a damaging bile vortex associated with melee combat; recharge progresses while engaged in melee. '
+        'The linked vortex supplies the armour-piercing damage parameters. The records do not establish retaliation on every incoming hit; exact launch scheduling and hit counts remain unverified.',
+    'wh2_dlc17_unit_passive_spurting_bile_blood':
+        'The Jabberslythe releases a damaging bile vortex associated with melee combat; recharge progresses while engaged in melee. '
+        'The records do not establish retaliation on every incoming hit. Vortex damage is separate from ordinary melee damage; exact launch scheduling and hit counts remain unverified.',
+    'wh3_dlc24_unit_passive_tides_of_transformation':
+        'The Mutalith Vortex Beast releases the linked transformation vortex, with recharge progressing while engaged in melee. '
+        'Its 32-second self-targeted phase has no numerical modifier; the damaging effect belongs to the separate vortex payload. '
+        'Exact launch timing, phase-to-vortex synchronization and hit counts remain unverified.',
+    'wh3_dlc26_unit_passive_hellraiser':
+        'The Hellforged Bellowers release the linked damaging vortex in melee; recharge progresses in melee and the ability deactivates outside melee. '
+        'Its 6-second self-targeted phase has no numerical modifier; outward damage belongs to the separate vortex payload. '
+        'Exact launch scheduling and hit counts remain unverified.',
+    'wh2_dlc15_unit_passive_giant_explodin_spores':
+        'Logey Bogey\'s Spore Splodaz release explosive spores on entering melee; the published description associates this with the charge. '
+        'Spores recharge outside melee, with initial recharge 0 and subsequent recharge 60. '
+        'The bombardment and its explosion are separate from normal attacks; no self-destruction effect is established. '
+        'Exact charge-versus-contact timing, interrupted recharge and hit counts remain unverified.',
+    **{f'wh2_dlc15_unit_passive_rubble_and_ruin_tier_{tier}_bombardment':
+        f'One-use debris bombardment for this Rubble & Ruin tier, disabled above {health}% host health. '
+        'The three health tiers are separate event routes using one shared bombardment definition. '
+        'Keep the shared projectile/explosion parameters once without collapsing the three triggers. '
+        'Exact threshold equality, skipped-threshold scheduling and hit counts remain unverified.'
+        for tier, health in ((1, 75), (2, 50), (3, 25))},
+    'wh3_main_daemon_body_passive_foreboding_ignition':
+        'One-use low-health release of an expanding damaging vortex, disabled above 10% host health. '
+        'Requires effect enabling. This is a low-health response, not an established death trigger. '
+        'Vortex parameters remain separate from ordinary attacks; exact threshold equality, release timing and hit counts remain unverified.',
+    'wh3_main_lord_passive_wrath_of_khorne':
+        'Punishes enemy spellcasting within the 100-metre interception range with a separate damaging vortex; recharge setting 15. '
+        'Requires effect enabling. The target restriction checks for an ability winding up; spellcasting is the reviewed interpretation of the published description. '
+        'The treatment of non-spell abilities, simultaneous casters, target priority and exact firing timing remain unverified. This does not establish spell cancellation.',
+    'wh_dlc06_lord_passive_locus_of_power':
+        'Causes a damaging miscast-like explosion when an enemy casts within the 100-metre interception range of the Anvil of Doom; recharge setting 6. '
+        'Damage is supplied by the linked vortex rather than added to ordinary attacks. The target restriction checks for an ability winding up. '
+        'The treatment of non-spell abilities, simultaneous casters, target priority and exact firing timing remain unverified. This does not establish spell cancellation.',
+}
+
+EXPLAINED_PHASE_ROLES = {
+    'wh2_dlc16_lord_passive_conjoined_destiny_countdown': '30-second preparation before self-healing; countdown interruption and repeatability remain unverified.',
+    'wh3_dlc23_hero_passive_lucky_git_i': '5-second preparation before the 30-second self-healing phase; interruption behavior remains unverified.',
+    'wh3_cp1_unit_passive_implacable_spirit_i': '25-second stationary preparation before self-targeted missile benefits.',
+    'wh3_dlc23_unit_passive_dig_in_i': '25-second stationary preparation before self-targeted defensive and range benefits.',
+    'wh3_dlc25_unit_passive_blackpowder_discipline_i': '10-second stationary preparation before accuracy and reload-skill benefits.',
+    'wh3_dlc25_unit_passive_unbinding_spirit_of_grungni': '150-second support period before the self-targeted disengagement/removal phase.',
+    'wh3_twa08_unit_passive_redirecting_aura': 'Enemy-targeted projectile redirection phase; the missile-mirror behavior supplies the effect rather than a numerical modifier. Projectile exceptions remain unverified.',
+}
+
 EXPLAINED_PASSIVES = {
+    **RESEARCHED_PASSIVES,
     'wh2_dlc13_unit_passive_kaboom':
         'One-use death blast for the Steam Tank variant carrying Kaboom!, interpreted from the unit-alive exclusion and explosion definition. '
         'The expanding flaming blast can hit allies and enemies; its contact effect reduces enemy leadership by 8, with duration setting 10. '
@@ -396,7 +503,8 @@ class Queries:
                 'records': records, 'sources': c.packet['sources'],
                 'provenance': c.packet['provenance']}
 
-    def get_passive_detail(self, key, *, culture='*', limit=128, cursor=None, include_diagnostics=False):
+    def get_passive_detail(self, key, *, culture='*', limit=128, cursor=None, include_diagnostics=False,
+                           include_documentation=False):
         option = self.one('ability_option_metadata', 'ability_key', key)
         if not option or option['classification'] != 'core_passive':
             raise ValueError('passive detail requires a classified core passive')
@@ -412,6 +520,11 @@ class Queries:
                 'detail_refs': c.packet['detail_refs'], 'diagnostic_count': len(c.detail_gaps), 'graph': detail, 'payload_graph': c.packet['payload_graph']}
         if include_diagnostics:
             result['gaps'] = c.detail_gaps
+        if include_documentation and key in RESEARCHED_PASSIVES:
+            result['explanation_documentation'] = {
+                'url': PASSIVE_RESEARCH_DOCUMENTATION,
+                'basis': 'Reviewed interpretation of pinned source records with separately attributed external corroboration; numerical records retain their pinned patch scope.',
+            }
         return result
 
     def get_detail(self, ref, *, limit=128, cursor=None):
@@ -752,6 +865,25 @@ class Packet:
             for effect in mechanic['effects']:
                 if effect.get('native_kind') == 'phase' and effect['phase_ref'] == 'wh2_main_unit_passive_rebirth_buffer':
                     effect['reason'] = 'Buffer phase before the healing phase; duration setting 1, with no numerical modifier. Exact transition timing unverified.'
+                if key in RESEARCHED_PASSIVES and effect.get('native_kind') == 'phase':
+                    role = EXPLAINED_PHASE_ROLES.get(effect['phase_ref'])
+                    if role:
+                        effect['reason'] = role
+                    elif casting and (casting['vortex'] or casting['bombardment']):
+                        effect['reason'] = 'Ability phase with no numerical modifier; damage comes from the separately linked vortex or bombardment. Exact phase-to-payload timing remains unverified.'
+                if key == 'wh3_dlc27_unit_passive_burrowing_instinct' and effect.get('native_kind') == 'phase_behavior':
+                    effect['reason'] = 'The rebirth stance is used with battlefield departure when the Dread Maw breaks, not resurrection; exact transition timing remains unverified.'
+            if key == 'wh3_dlc25_lord_passive_feast_of_the_maggot_lord' and casting:
+                for behavior in self.q.rows('native_special_ability_behaviour_groups_to_types', 'group', casting['behaviour']):
+                    if behavior['behaviour'] == 'tamurkhan_death':
+                        mechanic['conditions']['activates_when'].append({
+                            'key': 'tamurkhan_death',
+                            'summary': 'Tamurkhan reaches death with an eligible nearby enemy character (reviewed death-response behavior; exact execution timing unverified)',
+                            'provenance_refs': self.refs(casting, behavior)})
+            if key in ('wh3_main_lord_passive_wrath_of_khorne', 'wh_dlc06_lord_passive_locus_of_power'):
+                for condition in mechanic['conditions']['invalid_targets']:
+                    if condition['key'] == 'other_abilities_none_on_wind_up':
+                        condition['summary'] = 'the target has no ability winding up (which non-spell abilities qualify remains unverified)'
             self.passive_payloads(mechanic, gaps)
             _, tooltip_refs = self.loc('unit_abilities_tooltip_text_' + key)
             mechanic['provenance_refs'] += tooltip_refs
