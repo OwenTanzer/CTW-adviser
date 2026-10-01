@@ -3,9 +3,10 @@
 General single-unit matchup adviser. CTW-data owns game facts; this repository
 owns rebuildable serving artifacts and, in later increments, matchup calculations.
 
-Current implementation: issue #2, phases 1–2 — pinned contracts and fixtures,
-plus an offline STRICT SQLite snapshot builder with indexed relations and
-provenance. The query/packet interface and combat evaluator are later work.
+Current implementation: issue #2, phases 1–3 — pinned contracts and fixtures,
+an offline STRICT SQLite snapshot builder, and indexed JSON evidence retrieval
+with unit resolution, inline passive explanations, projections and continuation.
+The combat evaluator is later work.
 Each base unit appears once, with list-valued faction names and linked,
 source-qualified availability records.
 
@@ -16,6 +17,10 @@ python scripts/verify_sources.py --ctw-root ../CTW-data
 python scripts/validate_packets.py --ctw-root ../CTW-data
 python scripts/build_snapshot.py build --ctw-root ../CTW-data --output work/units.sqlite
 python scripts/build_snapshot.py inspect work/units.sqlite
+python scripts/query_snapshot.py resolve --db work/units.sqlite Teclis
+python scripts/query_snapshot.py unit --db work/units.sqlite "Lothern Sea Guard"
+python scripts/query_snapshot.py matchup --db work/units.sqlite "Lothern Sea Guard" "Blue Horrors of Tzeentch"
+python scripts/audit_queries.py --db work/units.sqlite --ctw-root ../CTW-data
 python -m unittest discover -s tests -v
 ```
 
@@ -29,3 +34,10 @@ See [source contract](docs/source-contract.md) and
 [lookup contract](docs/lookup-contract.md) for packet semantics and fixture rebuilds.
 See the [store contract](docs/store-contract.md) for build boundaries, source
 accounting, dependency selection and atomic installation.
+
+Query commands require only the built SQLite file. Ambiguous names return
+candidates; source aliases and availability remain distinct. Python callers use
+`Queries` from `ctw_adviser.queries` as a context manager. See the lookup contract
+for sections, modes, continuation, detail/provenance commands and interpretation
+boundaries. The public Datasette inspection deployment follows reviewed merges;
+it is separate from the offline query library and future client adapters.

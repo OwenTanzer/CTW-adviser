@@ -13,7 +13,7 @@ import re
 
 ROOT=Path(__file__).resolve().parents[1]
 ANNOTATIONS={'$schema','$id','title','description','$defs'}
-KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf'}
+KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf','allOf','if','then','else'}
 
 def check_schema(s):
     if not isinstance(s,dict):raise ValueError('only object schemas supported')
@@ -21,9 +21,9 @@ def check_schema(s):
     if unsupported:raise ValueError('unsupported schema keywords: '+str(unsupported))
     for key in ('properties','$defs'):
         for child in s.get(key,{}).values():check_schema(child)
-    for key in ('oneOf','anyOf'):
+    for key in ('oneOf','anyOf','allOf'):
         for child in s.get(key,[]):check_schema(child)
-    for key in ('items','additionalProperties'):
+    for key in ('items','additionalProperties','if','then','else'):
         if isinstance(s.get(key),dict):check_schema(s[key])
 
 def validate(value,s,root,path='$'):
@@ -31,6 +31,16 @@ def validate(value,s,root,path='$'):
         prefix='#/$defs/'
         if not s['$ref'].startswith(prefix):raise ValueError('external schema references unsupported')
         return validate(value,root['$defs'][s['$ref'][len(prefix):]],root,path)
+    for branch in s.get('allOf', []):
+        validate(value, branch, root, path)
+    if 'if' in s:
+        try:
+            validate(value, s['if'], root, path)
+            branch = 'then'
+        except ValueError:
+            branch = 'else'
+        if branch in s:
+            validate(value, s[branch], root, path)
     for keyword in ('oneOf','anyOf'):
         if keyword in s:
             matched=0
@@ -65,6 +75,7 @@ def packet_checks(p):
     evidence=p['provenance'];details=p['detail_refs']
     for e in evidence.values():
         if e['source_id'] not in p['sources']:raise ValueError('dangling source')
+        if any(r not in evidence for r in e.get('lineage_refs',[])):raise ValueError('dangling lineage')
     for s in p['sources'].values():
         if s['owner'] not in p['snapshot']['owners']:raise ValueError('dangling owner')
     def walk(x):
@@ -86,25 +97,29 @@ def packet_checks(p):
         if names!=sorted(set(names)):raise ValueError('faction_name must be sorted and unique')
         ranged=u['ranged'];status=u['coverage']['ranged']
         melee_status=u['coverage']['melee']
+        gaps=u['coverage'].get('gaps')
+        if gaps is None and (p['schema_version'] not in ('1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0') or 'diagnostic_count' not in u['coverage']):raise ValueError('missing diagnostic coverage')
+        if gaps is not None and 'diagnostic_count' in u['coverage'] and u['coverage']['diagnostic_count']!=len(gaps):raise ValueError('diagnostic count mismatch')
         if (u['melee'] is None)==(melee_status=='present'):raise ValueError('melee absence/status contradiction')
-        if melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in u['coverage']['gaps']):raise ValueError('missing melee gap')
+        if gaps is not None and melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in gaps):raise ValueError('missing melee gap')
         if (ranged is None and status!='known_none') or (ranged is not None and ranged['status']!=status):raise ValueError('ranged absence/status contradiction')
         sections=u['coverage']['sections'];names=[s['name'] for s in sections]
         if sorted(names)!=sorted(['components','weapons','attributes','abilities','activated_options']):raise ValueError('section coverage must be unique and exhaustive')
         for s in sections:
             if s['total'] is not None and s['returned']>s['total']:raise ValueError('invalid coverage counts')
-            if s['state']=='complete' and (s['total']!=s['returned'] or s['cursor'] is not None):raise ValueError('false complete section')
-            if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned'])):raise ValueError('partial section needs overflow/cursor')
-            if s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in u['coverage']['gaps']):raise ValueError('unqualified unresolved/omitted section')
-        if status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in u['coverage']['gaps']):raise ValueError('missing ranged gap')
+            offset=s.get('offset',0)
+            if s['state']=='complete' and (s['total']!=s['returned']+offset or s['cursor'] is not None):raise ValueError('false complete section')
+            if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned']+offset)):raise ValueError('partial section needs overflow/cursor')
+            if gaps is not None and s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in gaps):raise ValueError('unqualified unresolved/omitted section')
+        if gaps is not None and status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in gaps):raise ValueError('missing ranged gap')
         attacks={};components={c['id'] for c in u['body']['components']}
         if len(components)!=len(u['body']['components']):raise ValueError('duplicate component id')
         def add(a,kind,component=None):
             if a['id'] in attacks:raise ValueError('duplicate attack id')
             attacks[a['id']]={'kind':kind,'component':component}
         if u['melee']:
-            add(u['melee'],'melee')
-            for a in u['melee']['variants']:add(a,'melee')
+            add(u['melee'],'melee',u['melee'].get('component_ref'))
+            for a in u['melee']['variants']:add(a,'melee',a.get('component_ref'))
         if ranged and status=='present':
             for a in [ranged,*ranged['variants']]:
                 add(a,'ranged',a['component_ref'])
