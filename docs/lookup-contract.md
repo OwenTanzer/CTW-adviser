@@ -607,3 +607,42 @@ Consolidation occurs before pagination so counts and continuations describe the
 served mechanic inventory. Packet 1.8.1 invalidates prior cursors; the schema still
 accepts earlier fixtures. No stored source classification or source pin changes.
 Lightning Strike is the remaining boundary case in this focused queue.
+
+### Lightning Strike: automatic bombardment
+
+The subsequent Lightning Strike pass completes representation of the remaining
+case, using the same explanation plus calculation-payload approach. The original
+24-case research group now has this additional source-traced entry. Packet 1.8.1,
+source pin and import scope remain unchanged. No runtime-completeness claim is made.
+
+`wh3_dlc29_passive_spell_lightning_strike` is linked to the Celestial Hurricanum.
+The pinned casting record explicitly targets enemies, excludes self/friendly/ground
+selection, and has target interception range 40, initial recharge 0, recharge 10,
+active time 4, shared recharge 5 and use-count sentinel -1. There are no linked
+phase or condition rows. This does not mean unconditional firing, unlimited
+realized attacks, or exactly one strike every ten seconds. Target priority,
+behavior without a target and shared-recharge interactions are not established.
+The autoresolver target count 3 is not a live-battle target-count guarantee.
+
+Its bombardment `wh3_dlc29_passive_spell_heavens_lightning_strike` launches from
+`above_target`, with one projectile, spread radius 1, start time 0.1 and arrival
+window 0.1. Randomized launch is enabled; deterministic launch cadence is false.
+The projectile carries 0 base / 18 armour-piercing magical damage, plus a separately
+linked explosion with 0 base / 18 armour-piercing magical damage and radius 8.
+Both permit friendly damage. These remain two payload records, not a guaranteed
+36 damage per victim or extra ordinary weapon damage. Projectile effective range
+30 is not substituted for ability interception range 40. Projectile central-target
+preference is retained but does not establish selection among competing units.
+
+The exact source chain is casting -> bombardment -> projectile -> explosion;
+the existing bounded graph now exposes all three payload nodes in ordinary lookup.
+Full evidence and optional source documentation remain separately accessible.
+Evidence comes from the pinned casting/bombardment tables, projectile/explosion
+lookups and selected tooltip. No new internet-derived claim is introduced.
+
+The source also contains a distinct activated/bound Lightning Strike
+(`wh3_dlc29_unit_abilities_lightning_strike`, range 300, two uses, recharge 42).
+It is not this passive, and its payload is not imported as part of this pass.
+Murderous Prowess Indicator is already consolidated as described above. The focused
+queue is therefore represented, with specific unresolved runtime details retained;
+human review and the wider issue #2 completion checks remain pending.

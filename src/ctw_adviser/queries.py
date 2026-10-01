@@ -34,8 +34,15 @@ DEATH_PAYLOAD_PASSIVES = {
 }
 # Individually reviewed interpretations; supporting sources and their limits are
 # optional documentation in docs/lookup-contract.md#focused-passive-research.
-# Neither Lightning Strike nor Murderous Prowess Indicator is included.
+# Murderous Prowess Indicator is consolidated separately at the unit boundary.
 RESEARCHED_PASSIVES = {
+    'wh3_dlc29_passive_spell_lightning_strike':
+        'The Celestial Hurricanum automatically targets enemies within a 40-metre interception range and launches a lightning bombardment from above the selected target. '
+        'Each bombardment specifies one projectile, with spread radius setting 1. The magical projectile deals 0 base and 18 armour-piercing damage; '
+        'its separate magical explosion deals 0 base and 18 armour-piercing damage with radius 8. Both can damage allies. '
+        'Initial recharge is 0, recharge setting 10 seconds, active time 4 seconds and shared-recharge setting 5 seconds; these do not establish an exact repeating attack interval. '
+        'Target priority, behavior without an eligible target, shared-recharge interactions and actual hit counts remain unverified. '
+        'Damage parameters are separate from ordinary weapon attacks and from the separately activated Lightning Strike ability.',
     'wh2_dlc16_lord_passive_conjoined_destiny':
         'Low-health healing for the Sisters of Twilight, disabled above 20% health. '
         'A 30-second preparation phase precedes a self-healing phase with amount setting 0.25, interval setting 1 and duration setting 1.1. '

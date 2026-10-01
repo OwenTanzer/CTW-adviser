@@ -79,7 +79,7 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(self.q.get_passive_detail(MURDEROUS_INDICATOR)['mechanic']['key'], MURDEROUS_INDICATOR)
 
     def test_researched_passives_keep_values_recipients_and_optional_documentation(self):
-        self.assertEqual(len(RESEARCHED_PASSIVES), 24)
+        self.assertEqual(len(RESEARCHED_PASSIVES), 25)
         for key in RESEARCHED_PASSIVES:
             with self.subTest(key=key):
                 detail = self.q.get_passive_detail(key)
@@ -116,9 +116,36 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(sum(n['id'] == roots[0] for n in packet['payload_graph']['nodes']), 1)
         self.assertEqual({m['conditions']['deactivates_when'][0]['key'] for m in tiers},
                          {'health_above_75%', 'health_above_50%', 'health_above_25%'})
-        for key in ('wh3_dlc29_passive_spell_lightning_strike', 'wh2_main_faction_abilities_murderous_prowess_indicator'):
+        for key in ('wh2_main_faction_abilities_murderous_prowess_indicator',):
             self.assertNotIn(key, RESEARCHED_PASSIVES)
             self.assertNotIn('explanation_documentation', self.q.get_passive_detail(key, include_documentation=True))
+
+    def test_lightning_strike_targeting_and_damage_stay_separate(self):
+        key = 'wh3_dlc29_passive_spell_lightning_strike'
+        detail = self.q.get_passive_detail(key)
+        m = detail['mechanic']; c = m['native_parameters']
+        self.assertTrue(c['target_enemies'])
+        self.assertFalse(c['target_ground'])
+        self.assertFalse(c['target_self'])
+        self.assertEqual((c['target_intercept_range'], c['recharge_time'], c['active_time'], c['shared_recharge_time']), (40, 10, 4, 5))
+        self.assertTrue(all(not conditions for conditions in m['conditions'].values()))
+        nodes = {n['kind']: n for n in detail['payload_graph']['nodes']}
+        self.assertEqual(set(nodes), {'native_bombardments', 'projectiles', 'explosions'})
+        bombardment = nodes['native_bombardments']['native_parameters']
+        self.assertEqual((bombardment['launch_source'], bombardment['num_projectiles'], bombardment['radius_spread']), ('above_target', 1, 1))
+        for kind in ('projectiles', 'explosions'):
+            params = nodes[kind]['native_parameters']
+            self.assertEqual((params['base_damage'], params['ap_damage']), (0, 18))
+            self.assertTrue(params['is_magical'])
+        self.assertTrue(nodes['projectiles']['native_parameters']['can_damage_allies'])
+        self.assertTrue(nodes['explosions']['native_parameters']['affects_allies'])
+        self.assertEqual(nodes['explosions']['native_parameters']['radius'], 8)
+        edges = detail['payload_graph']['edges']
+        self.assertTrue(any(e['from'] == nodes['projectiles']['id'] and e['to'] == nodes['explosions']['id'] for e in edges))
+        packet = self.q.get_unit_profile('wh3_dlc29_emp_veh_celestial_hurricanum_0', limit=256)
+        self.check(packet)
+        self.assertIn('actual hit counts remain unverified', m['summary'])
+        self.assertNotIn('explanation_documentation', detail)
 
     def test_reviewed_explanations_keep_calculation_payloads_separate(self):
         corpse_packet = self.q.get_unit_profile('wh2_dlc11_cst_mon_bloated_corpse_0')
