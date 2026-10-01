@@ -109,6 +109,41 @@ class QueryTests(unittest.TestCase):
             self.assertIn('unverified', summon['trigger_basis'])
             self.assertFalse(detail['mechanic']['conditions']['activates_when'])
 
+    def test_payload_mechanical_fields_cannot_disappear(self):
+        import copy
+        node_schema = self.schema['$defs']['current_node']
+        expected = {ref['$ref'].rsplit('node_', 1)[-1] for ref in node_schema['oneOf']}
+        examples = {}
+        for row in self.q.db.execute('SELECT unit_key FROM unit_aliases ORDER BY unit_key'):
+            packet = self.q.get_unit_profile(row[0], limit=256)
+            for node in packet['payload_graph']['nodes']:
+                examples.setdefault(node['kind'], node)
+            if set(examples) == expected:
+                break
+        self.assertEqual(set(examples), expected)
+        for kind, node in examples.items():
+            validate(node, node_schema, self.schema)
+            if kind == 'attack_payload':
+                self.assertEqual(node['native_parameters'], {})
+                continue
+            fields = self.schema['$defs']['parameters_' + kind]['required']
+            self.assertTrue(fields, kind)
+            for field in fields:
+                with self.subTest(kind=kind, field=field):
+                    missing = copy.deepcopy(node)
+                    del missing['native_parameters'][field]
+                    with self.assertRaises(ValueError):
+                        validate(missing, node_schema, self.schema)
+                    unknown = copy.deepcopy(node)
+                    unknown['native_parameters'][field] = None
+                    validate(unknown, node_schema, self.schema)
+            empty = copy.deepcopy(node)
+            empty['native_parameters'] = {}
+            with self.assertRaises(ValueError):
+                validate(empty, node_schema, self.schema)
+        self.assertIn('can_damage_allies', self.schema['$defs']['parameters_projectiles']['required'])
+        self.assertIn('is_magical', self.schema['$defs']['parameters_explosions']['required'])
+
     @classmethod
     def tearDownClass(cls):
         cls.q.close()
