@@ -124,6 +124,7 @@ Effect kinds are closed and versioned:
 | `periodic_damage` | Native damage amount, cadence and entity limit; no invented unit-wide rate. |
 | `healing` | Healing, barrier healing, resurrection, cadence and native limits remain distinct. |
 | `payload_reference` | Exact typed node/detail reference and relationship. |
+| `phase_behavior` | Explained non-scalar behavior with retained parameters and phase recipients; remaining opaque settings are separate unresolved effects. |
 | `phase_role` | Reviewed non-numerical phase purpose, source parameters and references; timing uncertainty stays explicit. |
 | `unresolved` | Native kind/parameters and a truthful explanation of missing semantics. |
 
@@ -661,3 +662,31 @@ Generic engine-validation limits apply throughout: numerical damage parameters d
 not guarantee hit counts; threshold predicates do not settle equality behavior.
 Record-specific uncertainties about target selection, interrupted recharge, phase
 interactions, healing amounts or kill requirements remain beside the relevant facts.
+
+
+### Consistency repairs (packet 1.10.0)
+
+Current packets (1.9.0 and 1.10.0) require every condition role, the diagnostic
+count, and the consolidated profile identities. Earlier fixture versions retain
+their earlier requirements; their compatibility does not waive current fields.
+
+Calculation graph nodes are validated by their table kind against types generated
+from the pinned import contract. Known numeric and boolean parameters cannot be
+strings, booleans cannot substitute for numbers, and essential damage/phase fields
+must be present even when null. Text passthrough extensions remain text and negative
+sentinels remain unchanged. Attack-scope nodes retain their empty parameter object.
+This validates representation, not engine units or effective damage.
+
+Supported magical-attack and contact-imbue settings use `phase_behavior`, with
+their existing phase references, recipients, parameters and contact dependencies.
+Opaque settings in the same phase remain separate `unresolved` effects; for
+example, Balefire's magical attacks do not settle its ignition setting. The Dread
+Maw's reviewed departure stance is also a known behavior, with transition timing
+still qualified. No behavior is applied to base stats.
+
+Summon `trigger: low_health` records the reviewed host-health basis for Necrofex
+Abandon Ship and hidden Split Up. Their original deactivation predicates and
+timing qualifications remain: this label does not turn an exclusion into a
+guaranteed activation threshold. Death summons retain `on_death`; the three
+target-dependent summons retain `unresolved` where the execution/kill requirement
+is not established. No new trigger enum is inferred from arbitrary flags.

@@ -51,6 +51,64 @@ class QueryTests(unittest.TestCase):
             self.assertNotIn('Keep the shared', summary)
             self.assertIn('same damage parameters', summary)
 
+
+    def test_current_contract_rejects_payload_types_and_missing_conditions(self):
+        import copy
+        packet = self.q.get_unit_profile('wh3_dlc29_emp_veh_celestial_hurricanum_0', limit=256)
+        self.check(packet)
+        for version in ('1.9.0', '1.10.0'):
+            for field, bad in (('ap_damage', 'eighteen'), ('ap_damage', True),
+                               ('can_damage_allies', 'true'), ('can_damage_allies', 1)):
+                mutated = copy.deepcopy(packet)
+                mutated['schema_version'] = version
+                node = next(n for n in mutated['payload_graph']['nodes'] if n['kind'] == 'projectiles')
+                node['native_parameters'][field] = bad
+                with self.subTest(version=version, field=field, bad=bad), self.assertRaises(ValueError):
+                    self.check(mutated)
+            for role in ('recharges_when', 'unavailable_when', 'invalid_targets'):
+                mutated = copy.deepcopy(packet)
+                mutated['schema_version'] = version
+                del mutated['units'][0]['passives']['abilities'][0]['conditions'][role]
+                with self.subTest(version=version, role=role), self.assertRaises(ValueError):
+                    self.check(mutated)
+        mutated = copy.deepcopy(packet)
+        node = next(n for n in mutated['payload_graph']['nodes'] if n['kind'] == 'projectiles')
+        del node['native_parameters']['ap_damage']
+        with self.assertRaises(ValueError):
+            self.check(mutated)
+        # Pinned opaque extension tokens stay text, and unknown/sentinel numbers survive.
+        node['native_parameters']['ap_damage'] = None
+        node['native_parameters']['expiry_range'] = -1
+        self.assertEqual(node['native_parameters']['prefer_central_targets'], 'true')
+        self.check(mutated)
+
+    def test_known_behavior_and_low_health_triggers_are_not_unknown(self):
+        for key, field in (
+            ('wh3_dlc23_unit_passive_hellbound', 'imbue_magical'),
+            ('wh2_dlc09_character_passive_blessing_of_asaph', 'imbue_contact'),
+            ('wh3_dlc27_unit_passive_burrowing_instinct', 'requested_stance'),
+        ):
+            detail = self.q.get_passive_detail(key, include_diagnostics=True)
+            effects = detail['mechanic']['effects']
+            self.assertTrue(any(e['kind'] == 'phase_behavior' and
+                                field in e['native_parameters'] for e in effects))
+            self.assertFalse(any(e['kind'] == 'unresolved' and
+                                 field in e.get('native_parameters', {}) for e in effects))
+            self.assertFalse(any(g['code'] == 'phase_behavior_semantics' for g in detail['gaps']))
+        # Do not certify the unknown setting merely because another field is explained.
+        mixed = self.q.get_passive_detail('wh_dlc04_unit_passive_balefire', include_diagnostics=True)
+        self.assertTrue(any(e['kind'] == 'phase_behavior' and e['native_parameters'] == {'imbue_magical': True}
+                            for e in mixed['mechanic']['effects']))
+        self.assertTrue(any(e['kind'] == 'unresolved' and e['native_parameters'] == {'imbue_ignition': 10}
+                            for e in mixed['mechanic']['effects']))
+        self.assertTrue(any(g['code'] == 'phase_behavior_semantics' for g in mixed['gaps']))
+        for key in ('wh2_dlc11_unit_passive_abandon_ship', 'wh3_dlc27_unit_passive_split_up_hidden'):
+            detail = self.q.get_passive_detail(key)
+            summon = next(e for e in detail['mechanic']['effects'] if e['kind'] == 'summon')
+            self.assertEqual(summon['trigger'], 'low_health')
+            self.assertIn('unverified', summon['trigger_basis'])
+            self.assertFalse(detail['mechanic']['conditions']['activates_when'])
+
     @classmethod
     def tearDownClass(cls):
         cls.q.close()

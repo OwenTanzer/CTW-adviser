@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ctw-adviser:evidence-packet:1.9.0",
-  "title": "CTW adviser evidence packet v1.9.0 (accepts earlier fixtures)",
+  "$id": "urn:ctw-adviser:evidence-packet:1.10.0",
+  "title": "CTW adviser evidence packet v1.10.0 (accepts earlier fixtures)",
   "type": "object",
   "properties": {
     "schema_version": {
@@ -15,7 +15,8 @@
         "1.7.0",
         "1.8.0",
         "1.8.1",
-        "1.9.0"
+        "1.9.0",
+        "1.10.0"
       ]
     },
     "mode": {
@@ -1784,6 +1785,7 @@
         "trigger": {
           "enum": [
             "on_death",
+            "low_health",
             "unresolved"
           ]
         },
@@ -1831,6 +1833,94 @@
         "spawn_type",
         "num_uses",
         "native_parameters"
+      ],
+      "additionalProperties": false
+    },
+    "effect_phase_behavior": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "phase_behavior"
+        },
+        "phase_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "native_kind": {
+          "const": "phase_behavior"
+        },
+        "native_parameters": {
+          "type": "object",
+          "properties": {
+            "imbue_magical": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "imbue_contact": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "requested_stance": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "anyOf": [
+            {
+              "required": [
+                "imbue_magical"
+              ]
+            },
+            {
+              "required": [
+                "imbue_contact"
+              ]
+            },
+            {
+              "required": [
+                "requested_stance"
+              ]
+            }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "phase_ref",
+        "provenance_refs",
+        "native_kind",
+        "native_parameters",
+        "reason"
       ],
       "additionalProperties": false
     },
@@ -2052,6 +2142,9 @@
         },
         {
           "$ref": "#/$defs/effect_summon"
+        },
+        {
+          "$ref": "#/$defs/effect_phase_behavior"
         },
         {
           "$ref": "#/$defs/effect_phase_role"
@@ -2787,6 +2880,2112 @@
         "provenance_refs"
       ],
       "additionalProperties": false
+    },
+    "parameters_native_projectile_homing_params": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lookahead_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max_target_angle_delta": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "start_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "steering_coefficient": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "node_native_projectile_homing_params": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_projectile_homing_params"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_projectile_homing_params"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_projectile_penetration_junctions": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "entity_size_cap": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_penetration": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "node_native_projectile_penetration_junctions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_projectile_penetration_junctions"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_projectile_penetration_junctions"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_projectile_shrapnels": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectile": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "amount": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "launch_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sector_angle": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "node_native_projectile_shrapnels": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_projectile_shrapnels"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_projectile_shrapnels"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_projectiles_scaling_damages": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_damage_multiplier": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max_health_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "min_damage_multiplier": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "min_health_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "node_native_projectiles_scaling_damages": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_projectiles_scaling_damages"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_projectiles_scaling_damages"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_special_ability_contact_phase_groups": {
+      "type": "object",
+      "properties": {
+        "contact_phase_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contact_phase_group_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "node_native_special_ability_contact_phase_groups": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_special_ability_contact_phase_groups"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_special_ability_contact_phase_groups"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_special_ability_spreadings": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phase": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "spread_radius": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "node_native_special_ability_spreadings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_special_ability_spreadings"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_special_ability_spreadings"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_projectiles": {
+      "type": "object",
+      "properties": {
+        "game": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectile_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shot_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectile_number": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "effective_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "minimum_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "muzzle_velocity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "marksmanship_bonus": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spread": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "base_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ap_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "base_reload_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "calibration_distance": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "calibration_area": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bonus_vs_infantry": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bonus_vs_large": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "burst_size": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "burst_shot_delay": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "shots_per_volley": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "collision_radius": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mass": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "gravity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ignition_amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "is_magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_target_airborne": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_damage_allies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_damage_buildings": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "building_damage_multiplier": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "projectile_penetration": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "penetration_entity_size_cap": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_penetration": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "expiry_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "expire_on_impact": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_bounce": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_roll": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "homing_params": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scaling_damage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contact_stat_effect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "explosion_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shrapnel_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_spell": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "spin_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trajectory_sight": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_elevation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "high_air_resistance": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectile_display": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "overhead_stat_effect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectile_audio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shockwave_radius": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "first_person_params": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fixed_elevation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_beam_launch_burst": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trail_always_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fired_by_mount": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lock_on_multiple_fire_pos": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prefer_central_targets": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "can_damage_vehicles": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vegetation_ignore_time": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "missile_mirror_start_time": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "spawned_vortex": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectile_shot_type_display": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "base_damage",
+        "ap_damage",
+        "is_magical"
+      ],
+      "additionalProperties": false
+    },
+    "node_projectiles": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "projectiles"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_projectiles"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_explosions": {
+      "type": "object",
+      "properties": {
+        "game": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "explosion_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detonator_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detonation_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "radius": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "duration": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "speed": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "base_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ap_damage": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "force": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ignition_amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "is_magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "affects_allies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "contact_phase_effect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shrapnel_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_spell": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "explosion_particle_effect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fuse_distance_from_target": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "explosion_particle_effect_on_ground": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "explosion_audio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "camera_shake": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fuse_fixed_time": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "base_damage",
+        "ap_damage",
+        "radius",
+        "affects_allies"
+      ],
+      "additionalProperties": false
+    },
+    "node_explosions": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "explosions"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_explosions"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_vortices": {
+      "type": "object",
+      "properties": {
+        "vortex_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "change_max_angle": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "contact_effect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "damage": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "damage_ap": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "duration": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "expansion_speed": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "goal_radius": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "infinite_height": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "move_change_freq": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "movement_speed": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "start_radius": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ignition_amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "is_magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "composite_scene": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "detonation_force": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "launch_source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "building_collision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "launch_vfx": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "height_off_ground": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "delay": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "num_vortexes": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "composite_scene_blood": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "affects_allies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "launch_source_offset": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "composite_scene_group": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "delay_between_vortexes": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "is_spell": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "shape": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start_height": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "goal_height": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "affects_enemies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "follow_target": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "subsequent_vortex": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "subsequent_vortex_delay": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "damage",
+        "damage_ap",
+        "duration",
+        "affects_allies",
+        "affects_enemies"
+      ],
+      "additionalProperties": false
+    },
+    "node_native_vortices": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_vortices"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_vortices"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_bombardments": {
+      "type": "object",
+      "properties": {
+        "bombardment_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "arrival_window": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "num_projectiles": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "projectile_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "radius_spread": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "start_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "launch_source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "launch_vfx": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "launch_height": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "audio_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "launch_height_underground": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "randomise_launch": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "deterministic_launch_cadence": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "num_projectiles",
+        "projectile_type",
+        "arrival_window"
+      ],
+      "additionalProperties": false
+    },
+    "node_native_bombardments": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_bombardments"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_bombardments"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_ability_phases": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "effect_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requested_stance": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cant_move": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "freeze_fatigue": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fatigue_change_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "inspiration_aura_range_mod": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ability_recharge_change": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "hp_change_frequency": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "damage_amount": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_damaged_entities": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "resurrect": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "mana_regen_mod": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mana_max_depletion_mod": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "imbue_magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "imbue_ignition": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "imbue_contact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phase_display": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phase_audio": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_hidden_in_ui": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "affects_allies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "affects_enemies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "replenish_ammo": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "composite_scene_group": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "spreading": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "freeze_recharge": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "heal_amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "barrier_heal_amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "remove_magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "execute_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "duration",
+        "damage_amount",
+        "hp_change_frequency",
+        "heal_amount",
+        "resurrect"
+      ],
+      "additionalProperties": false
+    },
+    "node_native_ability_phases": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_ability_phases"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_ability_phases"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_phase_stat_effects": {
+      "type": "object",
+      "properties": {
+        "phase": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stat": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "how": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "stat",
+        "value",
+        "how"
+      ],
+      "additionalProperties": false
+    },
+    "node_native_phase_stat_effects": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_phase_stat_effects"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_phase_stat_effects"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_native_phase_attribute_effects": {
+      "type": "object",
+      "properties": {
+        "attribute": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phase": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attribute_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_line": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_patch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "attribute",
+        "attribute_type"
+      ],
+      "additionalProperties": false
+    },
+    "node_native_phase_attribute_effects": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "native_phase_attribute_effects"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "$ref": "#/$defs/parameters_native_phase_attribute_effects"
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "node_attack_payload": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "attack_payload"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": false
+        },
+        "provenance_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "key",
+        "native_parameters",
+        "provenance_refs"
+      ],
+      "additionalProperties": false
+    },
+    "current_node": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/node_native_projectile_homing_params"
+        },
+        {
+          "$ref": "#/$defs/node_native_projectile_penetration_junctions"
+        },
+        {
+          "$ref": "#/$defs/node_native_projectile_shrapnels"
+        },
+        {
+          "$ref": "#/$defs/node_native_projectiles_scaling_damages"
+        },
+        {
+          "$ref": "#/$defs/node_native_special_ability_contact_phase_groups"
+        },
+        {
+          "$ref": "#/$defs/node_native_special_ability_spreadings"
+        },
+        {
+          "$ref": "#/$defs/node_projectiles"
+        },
+        {
+          "$ref": "#/$defs/node_explosions"
+        },
+        {
+          "$ref": "#/$defs/node_native_vortices"
+        },
+        {
+          "$ref": "#/$defs/node_native_bombardments"
+        },
+        {
+          "$ref": "#/$defs/node_native_ability_phases"
+        },
+        {
+          "$ref": "#/$defs/node_native_phase_stat_effects"
+        },
+        {
+          "$ref": "#/$defs/node_native_phase_attribute_effects"
+        },
+        {
+          "$ref": "#/$defs/node_attack_payload"
+        }
+      ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "1.9.0",
+              "1.10.0"
+            ]
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "properties": {
+          "units": {
+            "items": {
+              "properties": {
+                "identity": {
+                  "required": [
+                    "profile_unit_key",
+                    "unit_keys"
+                  ]
+                },
+                "coverage": {
+                  "required": [
+                    "diagnostic_count"
+                  ]
+                },
+                "passives": {
+                  "properties": {
+                    "abilities": {
+                      "items": {
+                        "properties": {
+                          "conditions": {
+                            "required": [
+                              "activates_when",
+                              "deactivates_when",
+                              "recipient_requirements",
+                              "recharges_when",
+                              "unavailable_when",
+                              "invalid_targets",
+                              "unresolved"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "payload_graph": {
+            "properties": {
+              "nodes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/current_node"
+                },
+                "minItems": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.9.0'
+PACKET_VERSION = '1.10.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -858,9 +858,11 @@ class Packet:
                     ('spawn_is_transformation', 'spawn_is_decoy', 'spawn_shares_health_and_fatigue')),
                 'provenance_refs': list(dict.fromkeys(spawn_refs))})
             if key == 'wh3_dlc27_unit_passive_split_up_hidden':
+                mechanic['effects'][-1]['trigger'] = 'low_health'
                 mechanic['effects'][-1]['trigger_basis'] = (
                     'Low-health summon route, disabled above 25% health. Exact threshold equality and event scheduling unverified; not the death-blast route.')
             if key == 'wh2_dlc11_unit_passive_abandon_ship':
+                mechanic['effects'][-1]['trigger'] = 'low_health'
                 mechanic['effects'][-1]['trigger_basis'] = 'Host low-health summon, disabled above 50% host health; exact threshold equality and scheduling unverified.'
             if key in TARGET_SUMMON_PASSIVES:
                 mechanic['effects'][-1]['trigger_basis'] = (
@@ -893,6 +895,11 @@ class Packet:
                         gap['code'] == 'phase_effect_unknown' and gap['summary'] == phase_ref + ': no mapped numerical effect.')]
                 if key == 'wh3_dlc27_unit_passive_burrowing_instinct' and effect.get('native_kind') == 'phase_behavior':
                     effect['reason'] = 'The rebirth stance is used with battlefield departure when the Dread Maw breaks, not resurrection; exact transition timing remains unverified.'
+                    if set(effect['native_parameters']) == {'requested_stance'}:
+                        effect['kind'] = 'phase_behavior'
+                        gaps[:] = [gap for gap in gaps if not (
+                            gap['code'] == 'phase_behavior_semantics' and
+                            gap['summary'] == effect['phase_ref'] + ': phase behavior needs interpretation.')]
             if key == 'wh3_dlc25_lord_passive_feast_of_the_maggot_lord' and casting:
                 for behavior in self.q.rows('native_special_ability_behaviour_groups_to_types', 'group', casting['behaviour']):
                     if behavior['behaviour'] == 'tamurkhan_death':
@@ -940,6 +947,16 @@ class Packet:
                                 'node_ref': self.detail('record', edge['target_record']), 'relationship': edge['relation'], 'provenance_refs': refs})
         other = {k: v for k, v in self.native('native_ability_phases', phase, PHASE_FIELDS).items()
                  if v not in (0, None, False) and k not in ('effect_type', 'affects_allies', 'affects_enemies')}
+        # Classify supported behavior independently of any remaining opaque settings.
+        explained = {k: other.pop(k) for k in ('imbue_magical', 'imbue_contact') if k in other}
+        if explained:
+            meanings = []
+            if 'imbue_magical' in explained:
+                meanings.append('Enables magical attacks while this phase is active.')
+            if 'imbue_contact' in explained:
+                meanings.append('Attacks apply the linked contact effect ' + explained['imbue_contact'] + ' while this phase is active.')
+            effects.append({'kind': 'phase_behavior', 'phase_ref': key, 'native_kind': 'phase_behavior',
+                            'native_parameters': explained, 'reason': ' '.join(meanings), 'provenance_refs': refs})
         if other:
             effects.append({'kind': 'unresolved', 'phase_ref': key, 'native_kind': 'phase_behavior',
                             'native_parameters': other, 'reason': 'Phase settings retained; exact units or engine rules require further verification.', 'provenance_refs': refs})
@@ -982,7 +999,7 @@ class Packet:
                 text = verb + name if verb else name + ': application rule unknown (source token: ' + str(effect['native_parameters']['attribute_type']) + ')'
             elif kind == 'summon':
                 text = 'Summons ' + (effect['unit_name'] or effect['unit_key'])
-                text += ' upon the host dying' if effect['trigger'] == 'on_death' else ' (activation event unresolved)'
+                text += {'on_death': ' upon the host dying', 'low_health': ' at low host health'}.get(effect['trigger'], ' (activation event unresolved)')
                 text += ' at the host position' if effect['spawn_type'] == 'unit_position' else '; spawn placement: ' + str(effect['spawn_type'])
                 if effect['num_uses'] is not None and effect['num_uses'] >= 0:
                     text += f'; uses: {effect["num_uses"]:g}'
