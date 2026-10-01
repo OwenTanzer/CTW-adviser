@@ -698,3 +698,9 @@ must be present; null remains an explicit unknown, and negative sentinels retain
 their values. Presentation, lineage and intentionally omitted contact identity
 fields remain optional. The synthetic attack-scope node still has empty
 parameters. This is a validation repair within 1.10.0; emitted data is unchanged.
+
+Forgefire's ordinary explanation is “While enabled, reduces enemy armour by 15
+within 35 metres.” Its enabling flag is retained as an availability qualification,
+not presented as a missing battle trigger. Acquisition details are deferred to
+live testing; empty condition arrays are not replaced with speculative conditions.
+The wording draws its value, range and recipients from the retained records.

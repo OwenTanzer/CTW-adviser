@@ -1063,6 +1063,17 @@ class Packet:
 
     def explained_summary(self, mechanic):
         key = mechanic.get('key')
+        if key == 'wh_main_hero_passive_forgefire':
+            for effect in mechanic['effects']:
+                if (effect['kind'] == 'stat_modifier' and effect['stat'] == 'stat_armour'
+                        and effect['operation'] == 'add' and effect['value'] is not None
+                        and effect['value'] < 0):
+                    phases = [p for p in mechanic['phases'] if p['key'] == effect['phase_ref']]
+                    radius = mechanic['native_parameters'].get('effect_range')
+                    if (phases and radius is not None and all(
+                            p['target_enemies'] and not p['target_self'] and not p['target_friends']
+                            for p in phases)):
+                        return f'While enabled, reduces enemy armour by {-effect["value"]:g} within {radius:g} metres.'
         if key in TARGET_SUMMON_PASSIVES:
             spawn = next(e for e in mechanic['effects'] if e['kind'] == 'summon')
             damage = next(e for e in mechanic['effects'] if e['kind'] == 'periodic_damage')
