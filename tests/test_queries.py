@@ -31,6 +31,26 @@ class QueryTests(unittest.TestCase):
         cls.q = Queries(cls.output)
         cls.schema = json.loads((ROOT / 'schema/evidence_packet.schema.json').read_text())
 
+    def test_reviewed_roles_and_opt_in_source_graph(self):
+        key = 'wh3_dlc23_unit_passive_dig_in'
+        detail = self.q.get_passive_detail(key, include_diagnostics=True)
+        roles = [e for e in detail['mechanic']['effects'] if e['kind'] == 'phase_role']
+        self.assertTrue(any(e['phase_ref'].endswith('_i') for e in roles))
+        self.assertFalse(any(g['code'] == 'phase_effect_unknown' and
+                             g['summary'].startswith(roles[0]['phase_ref'] + ':') for g in detail['gaps']))
+        self.assertNotIn('graph', detail)
+        expanded = self.q.get_passive_detail(key, include_graph=True, limit=1)
+        self.assertIn('graph', expanded)
+        self.assertEqual(detail['mechanic'], expanded['mechanic'])
+        self.assertEqual(detail['payload_graph'], expanded['payload_graph'])
+        with self.assertRaisesRegex(ValueError, 'include_graph'):
+            self.q.get_passive_detail(key, cursor='unused')
+        for tier in (1, 2, 3):
+            summary = self.q.get_passive_detail(
+                f'wh2_dlc15_unit_passive_rubble_and_ruin_tier_{tier}_bombardment')['mechanic']['summary']
+            self.assertNotIn('Keep the shared', summary)
+            self.assertIn('same damage parameters', summary)
+
     @classmethod
     def tearDownClass(cls):
         cls.q.close()
@@ -144,7 +164,8 @@ class QueryTests(unittest.TestCase):
         self.assertTrue(any(e['from'] == nodes['projectiles']['id'] and e['to'] == nodes['explosions']['id'] for e in edges))
         packet = self.q.get_unit_profile('wh3_dlc29_emp_veh_celestial_hurricanum_0', limit=256)
         self.check(packet)
-        self.assertIn('actual hit counts remain unverified', m['summary'])
+        self.assertIn('shared-recharge interactions remain unverified', m['summary'])
+        self.assertNotIn('actual hit counts remain unverified', m['summary'])
         self.assertNotIn('explanation_documentation', detail)
 
     def test_reviewed_explanations_keep_calculation_payloads_separate(self):

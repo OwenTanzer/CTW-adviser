@@ -124,6 +124,7 @@ Effect kinds are closed and versioned:
 | `periodic_damage` | Native damage amount, cadence and entity limit; no invented unit-wide rate. |
 | `healing` | Healing, barrier healing, resurrection, cadence and native limits remain distinct. |
 | `payload_reference` | Exact typed node/detail reference and relationship. |
+| `phase_role` | Reviewed non-numerical phase purpose, source parameters and references; timing uncertainty stays explicit. |
 | `unresolved` | Native kind/parameters and a truthful explanation of missing semantics. |
 
 Each effect points to its phase where known. Definitions are not automatically
@@ -229,7 +230,7 @@ table/type registry, not unit records, and does not rehash the database.
 | `get_unit_profile(resolved_id, ...)` | One assembled evidence packet with base facts and linked combat sections. |
 | `get_combat_relations(resolved_id, section=None, cursor=None, ...)` | The same packet contract, optionally projecting or continuing one section. |
 | `get_matchup_evidence(unit_a, unit_b=None, mode="combined", scenario=None, ...)` | One or two units through the same general retrieval path. |
-| `get_passive_detail(key, culture="*", limit=128, cursor=None)` | Inline mechanic plus bounded native graph/lineage details; the supplied culture does not establish unit access. |
+| `get_passive_detail(key, culture="*", limit=128, cursor=None)` | Inline mechanic and calculation payloads; raw graph/lineage only with `include_graph=True` (`--include-graph`); the supplied culture does not establish unit access. |
 | `get_detail(ref, limit=128, cursor=None)` | Native record graph, exact-key availability/permissions, or deferred option metadata. |
 | `get_provenance(record_ids)` | Exact source locators, physical source path/line/patch, and payload lineage. |
 
@@ -444,7 +445,7 @@ a hidden persistent banner visual effect indicating that a unit explodes.
 The mapping requires that supporting tooltip and includes its provenance.
 It is not a damage event or numerical modifier; attack/projectile/explosion
 evidence remains separately represented. Its empty phase therefore does not
-produce a phase_effect_unknown warning. No other empty phase is reclassified.
+produce a phase_effect_unknown warning. Other empty phases remain unresolved unless their role has been individually reviewed (see packet 1.9.0 below).
 
 ## Too Horrible to Die failure branch
 
@@ -473,7 +474,7 @@ vortices and contact phases keep their original mechanical parameters and record
 identity. Shared definitions appear once; separate ability references remain.
 Expansion is bounded to four edges/64 visited records per mechanic, with explicit
 detail-required diagnostics at a boundary. Passive detail exposes the same compact
-payload_graph alongside its existing full source graph. Ordinary source documentation
+payload_graph; its full source graph is available with `include_graph=True`. Ordinary source documentation
 remains optional. Retained parameters support downstream calculations but do not
 certify per-target hit counts, damage totals or engine scheduling. Payload damage
 is never copied into ordinary melee or ranged weapon statistics.
@@ -573,10 +574,10 @@ several of these behaviors (healing timer, melee bombardment/vortex, instant
 shatter, projectile redirection and Locus miscast). They were inspected as research
 evidence but are not newly imported tables or fabricated stored provenance rows.
 
-No packet schema change is needed: summaries, existing condition objects, phase
-reasons and bounded calculation payloads carry the explanations. Empty preparation
-phases retain their unresolved effect kind and timing qualifications; improved
-explanations do not certify engine execution. Existing diagnostics stay separately
+Packet 1.9.0 uses `phase_role` for reviewed empty preparation or payload-associated
+phases, with a plain-language reason and retained source references. Those phases
+no longer generate `phase_effect_unknown`; genuinely unknown phases still do.
+A known phase role does not certify exact engine timing. Existing diagnostics stay separately
 retrievable. Default unit and passive results contain no research-document prose.
 For an explicit documentation link, use:
 
@@ -646,3 +647,17 @@ It is not this passive, and its payload is not imported as part of this pass.
 Murderous Prowess Indicator is already consolidated as described above. The focused
 queue is therefore represented, with specific unresolved runtime details retained;
 human review and the wider issue #2 completion checks remain pending.
+
+### Review repairs (packet 1.9.0)
+
+Passive detail defaults to the mechanic and bounded calculation payloads. Raw source
+graph expansion is opt-in with `include_graph=True` or `--include-graph`; graph
+limits and cursors apply to that expansion. A cursor without graph opt-in is rejected.
+Source documentation and diagnostics remain independently opt-in.
+
+Shared payload definitions are stored once while preserving distinct trigger routes.
+This is a consumer convention, not an instruction repeated in ability summaries.
+Generic engine-validation limits apply throughout: numerical damage parameters do
+not guarantee hit counts; threshold predicates do not settle equality behavior.
+Record-specific uncertainties about target selection, interrupted recharge, phase
+interactions, healing amounts or kill requirements remain beside the relevant facts.
