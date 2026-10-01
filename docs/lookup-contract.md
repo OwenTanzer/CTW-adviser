@@ -1,9 +1,9 @@
-# Evidence packet contract 1.8.0
+# Evidence packet contract 1.10.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.8.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.10.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -690,3 +690,11 @@ timing qualifications remain: this label does not turn an exclusion into a
 guaranteed activation threshold. Death summons retain `on_death`; the three
 target-dependent summons retain `unresolved` where the execution/kill requirement
 is not established. No new trigger enum is inferred from arbitrary flags.
+
+The follow-up adversarial review tightened required payload fields across all
+13 source-backed graph kinds, including homing, penetration, shrapnel, scaling,
+spreading and contact groups. Every field in their common mechanical projection
+must be present; null remains an explicit unknown, and negative sentinels retain
+their values. Presentation, lineage and intentionally omitted contact identity
+fields remain optional. The synthetic attack-scope node still has empty
+parameters. This is a validation repair within 1.10.0; emitted data is unchanged.

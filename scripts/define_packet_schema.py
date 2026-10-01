@@ -71,30 +71,42 @@ schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-
  'trait_descriptions':mapping(ref('description')),'sources':mapping(ref('source')),'provenance':mapping(ref('evidence')),'detail_refs':mapping(obj({'kind':S,'key':S})),
  'payload_graph':obj({'nodes':arr(ref('node')),'edges':arr(ref('edge'))}),'scenario':{'type':'object'}},['schema_version','mode','snapshot','units','trait_descriptions','sources','provenance','detail_refs','payload_graph']),'$defs':defs}
 
-# Source-backed output types. Projections may omit nonessential source columns;
-# raw extension tokens remain TEXT, never inferred from their apparent values.
+# Source-backed output types and complete mechanical projections. Presentation
+# and lineage stay optional; raw extension tokens remain TEXT.
 contract=json.loads((ROOT/'schema/import_contract.json').read_text())
 payload_tables={
- 'native_projectile_homing_params': ('data/unit_stats/abilities/tables/projectile_homing_params.csv', ()),
- 'native_projectile_penetration_junctions': ('data/unit_stats/abilities/tables/projectile_penetration_junctions.csv', ()),
- 'native_projectile_shrapnels': ('data/unit_stats/abilities/tables/projectile_shrapnels.csv', ()),
- 'native_projectiles_scaling_damages': ('data/unit_stats/abilities/tables/projectiles_scaling_damages.csv', ()),
- 'native_special_ability_contact_phase_groups': ('data/unit_stats/abilities/tables/special_ability_contact_phase_groups.csv', ()),
- 'native_special_ability_spreadings': ('data/unit_stats/abilities/tables/special_ability_spreadings.csv', ()),
- 'projectiles': ('data/unit_stats/lookups/projectiles__wh3__9.0.csv', ('base_damage','ap_damage','is_magical')),
- 'explosions': ('data/unit_stats/lookups/explosions__wh3__9.0.csv', ('base_damage','ap_damage','radius','affects_allies')),
- 'native_vortices': ('data/unit_stats/abilities/tables/vortices.csv', ('damage','damage_ap','duration','affects_allies','affects_enemies')),
- 'native_bombardments': ('data/unit_stats/abilities/tables/bombardments.csv', ('num_projectiles','projectile_type','arrival_window')),
- 'native_ability_phases': ('data/unit_stats/abilities/tables/ability_phases.csv', ('duration','damage_amount','hp_change_frequency','heal_amount','resurrect')),
- 'native_phase_stat_effects': ('data/unit_stats/abilities/tables/phase_stat_effects.csv', ('stat','value','how')),
- 'native_phase_attribute_effects': ('data/unit_stats/abilities/tables/phase_attribute_effects.csv', ('attribute','attribute_type')),
+ 'native_projectile_homing_params': 'data/unit_stats/abilities/tables/projectile_homing_params.csv',
+ 'native_projectile_penetration_junctions': 'data/unit_stats/abilities/tables/projectile_penetration_junctions.csv',
+ 'native_projectile_shrapnels': 'data/unit_stats/abilities/tables/projectile_shrapnels.csv',
+ 'native_projectiles_scaling_damages': 'data/unit_stats/abilities/tables/projectiles_scaling_damages.csv',
+ 'native_special_ability_contact_phase_groups': 'data/unit_stats/abilities/tables/special_ability_contact_phase_groups.csv',
+ 'native_special_ability_spreadings': 'data/unit_stats/abilities/tables/special_ability_spreadings.csv',
+ 'projectiles': 'data/unit_stats/lookups/projectiles__wh3__9.0.csv',
+ 'explosions': 'data/unit_stats/lookups/explosions__wh3__9.0.csv',
+ 'native_vortices': 'data/unit_stats/abilities/tables/vortices.csv',
+ 'native_bombardments': 'data/unit_stats/abilities/tables/bombardments.csv',
+ 'native_ability_phases': 'data/unit_stats/abilities/tables/ability_phases.csv',
+ 'native_phase_stat_effects': 'data/unit_stats/abilities/tables/phase_stat_effects.csv',
+ 'native_phase_attribute_effects': 'data/unit_stats/abilities/tables/phase_attribute_effects.csv',
 }
 source_types={'TEXT':'string','REAL':'number','INTEGER':'integer','BOOLEAN':'boolean'}
-for kind,(path,required) in payload_tables.items():
+# Both graph emitters omit presentation/lineage. Contact phases and their effect
+# rows additionally omit identity fields already supplied by the graph node.
+optional_projection_fields={
+ 'native_ability_phases': {'id', 'is_hidden_in_ui'},
+ 'native_phase_stat_effects': {'phase'},
+ 'native_phase_attribute_effects': {'phase'},
+}
+presentation_tokens=('audio','particle','camera','display','icon','video','composite_scene','vfx')
+for kind,path in payload_tables.items():
  dataset=next(d for d in contract['datasets'] if d['path']==path)
  columns=dataset['columns']
  properties={c['name']:{'type':[source_types[c['type']], 'null']} for c in columns}
- defs['parameters_'+kind]=obj(properties,list(required))
+ required=[c['name'] for c in columns
+           if not c['name'].startswith('source_')
+           and not any(token in c['name'] for token in presentation_tokens)
+           and c['name'] not in optional_projection_fields.get(kind,set())]
+ defs['parameters_'+kind]=obj(properties,required)
  defs['node_'+kind]=obj({**defs['node']['properties'],'kind':const(kind),
                          'native_parameters':ref('parameters_'+kind)})
 defs['node_attack_payload']=obj({**defs['node']['properties'], 'kind':const('attack_payload'), 'native_parameters':obj({})})

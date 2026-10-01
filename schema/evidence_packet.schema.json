@@ -2933,7 +2933,13 @@
           ]
         }
       },
-      "required": [],
+      "required": [
+        "key",
+        "lookahead_time",
+        "max_target_angle_delta",
+        "start_time",
+        "steering_coefficient"
+      ],
       "additionalProperties": false
     },
     "node_native_projectile_homing_params": {
@@ -3017,7 +3023,12 @@
           ]
         }
       },
-      "required": [],
+      "required": [
+        "key",
+        "description",
+        "entity_size_cap",
+        "max_penetration"
+      ],
       "additionalProperties": false
     },
     "node_native_projectile_penetration_junctions": {
@@ -3107,7 +3118,13 @@
           ]
         }
       },
-      "required": [],
+      "required": [
+        "key",
+        "projectile",
+        "amount",
+        "launch_type",
+        "sector_angle"
+      ],
       "additionalProperties": false
     },
     "node_native_projectile_shrapnels": {
@@ -3197,7 +3214,13 @@
           ]
         }
       },
-      "required": [],
+      "required": [
+        "key",
+        "max_damage_multiplier",
+        "max_health_ratio",
+        "min_damage_multiplier",
+        "min_health_ratio"
+      ],
       "additionalProperties": false
     },
     "node_native_projectiles_scaling_damages": {
@@ -3269,7 +3292,10 @@
           ]
         }
       },
-      "required": [],
+      "required": [
+        "contact_phase_id",
+        "contact_phase_group_id"
+      ],
       "additionalProperties": false
     },
     "node_native_special_ability_contact_phase_groups": {
@@ -3347,7 +3373,11 @@
           ]
         }
       },
-      "required": [],
+      "required": [
+        "key",
+        "phase",
+        "spread_radius"
+      ],
       "additionalProperties": false
     },
     "node_native_special_ability_spreadings": {
@@ -3768,9 +3798,66 @@
         }
       },
       "required": [
+        "game",
+        "patch",
+        "projectile_key",
+        "category",
+        "shot_type",
+        "projectile_number",
+        "effective_range",
+        "minimum_range",
+        "muzzle_velocity",
+        "marksmanship_bonus",
+        "spread",
         "base_damage",
         "ap_damage",
-        "is_magical"
+        "base_reload_time",
+        "calibration_distance",
+        "calibration_area",
+        "bonus_vs_infantry",
+        "bonus_vs_large",
+        "burst_size",
+        "burst_shot_delay",
+        "shots_per_volley",
+        "collision_radius",
+        "mass",
+        "gravity",
+        "ignition_amount",
+        "is_magical",
+        "can_target_airborne",
+        "can_damage_allies",
+        "can_damage_buildings",
+        "building_damage_multiplier",
+        "projectile_penetration",
+        "penetration_entity_size_cap",
+        "max_penetration",
+        "expiry_range",
+        "expire_on_impact",
+        "can_bounce",
+        "can_roll",
+        "homing_params",
+        "scaling_damage",
+        "contact_stat_effect",
+        "explosion_key",
+        "shrapnel_key",
+        "is_spell",
+        "spin_type",
+        "trajectory_sight",
+        "max_elevation",
+        "high_air_resistance",
+        "overhead_stat_effect",
+        "shockwave_radius",
+        "first_person_params",
+        "fixed_elevation",
+        "is_beam_launch_burst",
+        "trail_always_on",
+        "fired_by_mount",
+        "lock_on_multiple_fire_pos",
+        "prefer_central_targets",
+        "can_damage_vehicles",
+        "vegetation_ignore_time",
+        "missile_mirror_start_time",
+        "spawned_vortex"
       ],
       "additionalProperties": false
     },
@@ -3952,10 +4039,25 @@
         }
       },
       "required": [
+        "game",
+        "patch",
+        "explosion_key",
+        "detonator_type",
+        "detonation_type",
+        "radius",
+        "duration",
+        "speed",
         "base_damage",
         "ap_damage",
-        "radius",
-        "affects_allies"
+        "force",
+        "ignition_amount",
+        "is_magical",
+        "affects_allies",
+        "contact_phase_effect",
+        "shrapnel_key",
+        "is_spell",
+        "fuse_distance_from_target",
+        "fuse_fixed_time"
       ],
       "additionalProperties": false
     },
@@ -4227,11 +4329,37 @@
         }
       },
       "required": [
+        "vortex_key",
+        "change_max_angle",
+        "contact_effect",
         "damage",
         "damage_ap",
         "duration",
+        "expansion_speed",
+        "goal_radius",
+        "infinite_height",
+        "move_change_freq",
+        "movement_speed",
+        "start_radius",
+        "ignition_amount",
+        "is_magical",
+        "detonation_force",
+        "launch_source",
+        "building_collision",
+        "height_off_ground",
+        "delay",
+        "num_vortexes",
         "affects_allies",
-        "affects_enemies"
+        "launch_source_offset",
+        "delay_between_vortexes",
+        "is_spell",
+        "shape",
+        "start_height",
+        "goal_height",
+        "affects_enemies",
+        "follow_target",
+        "subsequent_vortex",
+        "subsequent_vortex_delay"
       ],
       "additionalProperties": false
     },
@@ -4371,9 +4499,17 @@
         }
       },
       "required": [
+        "bombardment_key",
+        "arrival_window",
         "num_projectiles",
         "projectile_type",
-        "arrival_window"
+        "radius_spread",
+        "start_time",
+        "launch_source",
+        "launch_height",
+        "launch_height_underground",
+        "randomise_launch",
+        "deterministic_launch_cadence"
       ],
       "additionalProperties": false
     },
@@ -4622,10 +4758,31 @@
       },
       "required": [
         "duration",
-        "damage_amount",
+        "effect_type",
+        "requested_stance",
+        "cant_move",
+        "freeze_fatigue",
+        "fatigue_change_ratio",
+        "inspiration_aura_range_mod",
+        "ability_recharge_change",
         "hp_change_frequency",
+        "damage_amount",
+        "max_damaged_entities",
+        "resurrect",
+        "mana_regen_mod",
+        "mana_max_depletion_mod",
+        "imbue_magical",
+        "imbue_ignition",
+        "imbue_contact",
+        "affects_allies",
+        "affects_enemies",
+        "replenish_ammo",
+        "spreading",
+        "freeze_recharge",
         "heal_amount",
-        "resurrect"
+        "barrier_heal_amount",
+        "remove_magical",
+        "execute_ratio"
       ],
       "additionalProperties": false
     },
