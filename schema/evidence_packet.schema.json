@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ctw-adviser:evidence-packet:1.8.0",
-  "title": "CTW adviser evidence packet v1.8 (accepts earlier fixtures)",
+  "$id": "urn:ctw-adviser:evidence-packet:1.8.1",
+  "title": "CTW adviser evidence packet v1.8.1 (accepts earlier fixtures)",
   "type": "object",
   "properties": {
     "schema_version": {
@@ -13,7 +13,8 @@
         "1.5.0",
         "1.6.0",
         "1.7.0",
-        "1.8.0"
+        "1.8.0",
+        "1.8.1"
       ]
     },
     "mode": {

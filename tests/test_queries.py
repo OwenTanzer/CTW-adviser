@@ -9,12 +9,13 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 sys.path.insert(0, str(ROOT / 'scripts'))
 from ctw_adviser.build import build_snapshot
-from ctw_adviser.queries import Queries, ResolutionError, RESEARCHED_PASSIVES
+from ctw_adviser.queries import Queries, ResolutionError, RESEARCHED_PASSIVES, MURDEROUS_INDICATOR, MURDEROUS_BUFFS
 from validate_packets import validate, packet_checks
 
 SOURCE = Path(os.environ.get('CTW_DATA_ROOT', ROOT.parent / 'CTW-data'))
@@ -39,6 +40,43 @@ class QueryTests(unittest.TestCase):
         validate(packet, self.schema, self.schema)
         packet_checks(packet)
         return packet['units'][0]
+
+    def test_murderous_indicator_consolidation_is_lossless_and_qualified(self):
+        links = self.q.rows('unit_abilities', 'ability_key', MURDEROUS_INDICATOR)
+        self.assertEqual(len(links), 115)
+        for link in links:
+            packet = self.q.get_unit_profile(link['unit_key'], section='abilities', limit=256)
+            unit = self.check(packet)
+            abilities = unit['passives']['abilities']
+            self.assertNotIn(MURDEROUS_INDICATOR, {m['key'] for m in abilities})
+            matched = [m for m in abilities if m['key'] in MURDEROUS_BUFFS and m['culture_key'] == link['culture_key']]
+            self.assertEqual(len(matched), 1)
+            self.assertIn(link['record_id'], matched[0]['provenance_refs'])
+            original = self.q.get_passive_detail(matched[0]['key'])['mechanic']
+            for field in ('effects', 'conditions', 'phases', 'native_parameters', 'summary'):
+                self.assertEqual(matched[0][field], original[field])
+            coverage = next(c for c in unit['coverage']['sections'] if c['name'] == 'abilities')
+            self.assertEqual(coverage['total'], len(abilities))
+        key = links[0]['unit_key']
+        paged = []
+        cursor = None
+        while True:
+            packet = self.q.get_unit_profile(key, section='abilities', limit=1, cursor=cursor)
+            paged += [m['key'] for m in self.check(packet)['passives']['abilities']]
+            cursor = next(c for c in packet['units'][0]['coverage']['sections'] if c['name'] == 'abilities')['cursor']
+            if not cursor:
+                break
+        self.assertNotIn(MURDEROUS_INDICATOR, paged)
+        self.assertEqual(len(paged), len(set(paged)))
+        # If a future source has no equally qualified counterpart, retain it.
+        rows = self.q.rows
+        def without_buff(table, field, value, order='record_id'):
+            result = rows(table, field, value, order)
+            return [r for r in result if r['ability_key'] not in MURDEROUS_BUFFS] if table == 'unit_abilities' and field == 'unit_key' else result
+        with patch.object(self.q, 'rows', side_effect=without_buff):
+            packet = self.q.get_unit_profile(key, section='abilities', limit=256)
+            self.assertIn(MURDEROUS_INDICATOR, {m['key'] for m in self.check(packet)['passives']['abilities']})
+        self.assertEqual(self.q.get_passive_detail(MURDEROUS_INDICATOR)['mechanic']['key'], MURDEROUS_INDICATOR)
 
     def test_researched_passives_keep_values_recipients_and_optional_documentation(self):
         self.assertEqual(len(RESEARCHED_PASSIVES), 24)

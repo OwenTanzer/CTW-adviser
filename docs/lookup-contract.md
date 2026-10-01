@@ -588,3 +588,22 @@ The optional `explanation_documentation` object links here and distinguishes the
 reviewed interpretation from pinned source facts. The inspection site exposes the
 same documentation through a collapsed panel. The two excluded records receive
 neither a revised explanation nor that documentation attachment.
+
+### Murderous Prowess indicator consolidation
+
+The subsequent presentation pass (packet 1.8.1) consolidates the indicator into
+the actual Murderous Prowess or Murderous Mastery entry for ordinary unit queries.
+All 115 pinned indicator links have exactly one same-unit, same-culture counterpart:
+101 Prowess and 14 Mastery. No unit eligibility is supplied only by the indicator.
+Consolidation requires matching effect-enabling qualification and a unique
+counterpart; an unmatched or ambiguous indicator stays visible.
+
+The actual buff retains its original explanation, modifiers, duration, conditions
+and source identity. Indicator provenance is attached to that entry, and its source
+definition remains a detail link. Its pre-activation state is not copied onto the
+buff as a deactivation condition. No second benefit or unresolved combat effect is
+presented. All source records and explicit passive-detail retrieval remain intact.
+Consolidation occurs before pagination so counts and continuations describe the
+served mechanic inventory. Packet 1.8.1 invalidates prior cursors; the schema still
+accepts earlier fixtures. No stored source classification or source pin changes.
+Lightning Strike is the remaining boundary case in this focused queue.
