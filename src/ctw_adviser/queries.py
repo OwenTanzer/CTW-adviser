@@ -9,7 +9,10 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.8.0'
+PACKET_VERSION = '1.8.1'
+MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
+MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
+                   'wh2_main_faction_abilities_murderous_mastery'}
 PASSIVE_RESEARCH_DOCUMENTATION = 'https://github.com/OwenTanzer/CTW-adviser/blob/issue-2-query-packets/docs/lookup-contract.md#focused-passive-research'
 
 # Reviewed families share payload handling, not necessarily phase sequences.
@@ -1392,8 +1395,26 @@ class Packet:
         classified = [(row, q.one('ability_option_metadata', 'ability_key', row['ability_key'])) for row in ability_links]
         passives = [(r, o) for r, o in classified if o and o['classification'] == 'core_passive']
         options = [(r, o) for r, o in classified if not o or o['classification'] != 'core_passive']
+        # Consolidate only a redundant, equally qualified indicator. Filtering
+        # precedes pagination; never hide a standalone or ambiguous unit link.
+        consolidated = {}
+        for indicator, indicator_option in passives:
+            if indicator['ability_key'] != MURDEROUS_INDICATOR:
+                continue
+            matches = [(r, o) for r, o in passives if r['ability_key'] in MURDEROUS_BUFFS
+                       and r['culture_key'] == indicator['culture_key']
+                       and o['requires_effect_enabling'] == indicator_option['requires_effect_enabling']]
+            if len(matches) == 1:
+                consolidated[matches[0][0]['record_id']] = (indicator, indicator_option)
+        hidden = {r['record_id'] for r, _ in consolidated.values()}
+        passives = [(r, o) for r, o in passives if r['record_id'] not in hidden]
         for row, option in page('abilities', passives, section in (None, 'abilities')):
-            unit['passives']['abilities'].append(self.mechanic(row, option, gaps))
+            mechanic = self.mechanic(row, option, gaps)
+            if row['record_id'] in consolidated:
+                indicator, indicator_option = consolidated[row['record_id']]
+                mechanic['provenance_refs'] += self.refs(indicator)
+                self.detail('record', indicator_option['definition_record'])
+            unit['passives']['abilities'].append(mechanic)
         for row, option in page('activated_options', options, section in (None, 'activated_options')):
             name, refs = self.loc('unit_abilities_onscreen_name_' + row['ability_key'])
             refs = self.refs(row) + refs
