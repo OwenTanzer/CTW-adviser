@@ -530,3 +530,61 @@ invented. Their unit-position spawn setting does not establish caster-versus-tar
 placement, a required kill, summon timing or lifetime. The existing trigger_basis
 and summary describe these specific unknowns; trigger remains unresolved. Summoned
 unit labels follow the same pinned-localization convention as earlier passes.
+
+## Focused passive research
+
+This pass covers the 24 entries in `RESEARCHED_PASSIVES` in `queries.py`.
+Lightning Strike (`wh3_dlc29_passive_spell_lightning_strike`) and Murderous
+Prowess Indicator (`wh2_main_faction_abilities_murderous_prowess_indicator`)
+are deliberately unchanged. Their target-selection and indicator-state questions
+remain outside this increment. This is explanation enrichment, not a claim that
+all 24 engine implementations have been reconstructed.
+
+The summaries are reviewed interpretations. Numerical values, recipient edges,
+condition roles, sentinel values and payloads come from the existing pinned
+CTW-data commit, with base 9.0 / shared 9.0.1 scope unchanged. External sources
+corroborate the meaning of those records; they neither overwrite numerical values
+nor establish compatibility with every patch. Research was consulted on
+2026-10-01 UTC (2026-09-30 Pacific). Wiki pages are unversioned secondary sources;
+CA release articles are historical descriptions, not current-value authorities.
+
+| Cases | Source basis and supported interpretation |
+| --- | --- |
+| Conjoined Destiny | Pinned countdown/heal phase order and above-20% deactivation; [ability reference](https://totalwarwarhammer.fandom.com/wiki/Conjoined_Destiny) corroborates 30-second preparation and the advertised 25% heal. Keep source duration 1.1, not the reference's rounded 1 second. Repeatability, resets and caps remain unverified. |
+| Lucky Git | Pinned one-use, above-25%, 5-second preparation and 30-second healing records; [ability reference](https://totalwarwarhammer.fandom.com/wiki/Lucky_Git) corroborates that sequence. Its advertised 0.60% rate does not resolve the pinned 1.5 interval setting; do not calculate a total heal from the tooltip. |
+| Bloodborn | Pinned one-use, above-25%, shared 1-second buffer and self-heal records, with resurrection false. [Ability reference](https://totalwarwarhammer.fandom.com/wiki/Bloodborn) corroborates a healing ability. Effective healing arithmetic remains qualified. |
+| Implacable Spirit | Pinned 25-second first phase, self-recipient links, movement restriction and modifiers; [CA Update 8.0](https://community.creative-assembly.com/total-war/total-war-warhammer/blogs/98) explicitly identifies stationary preparation. Wall Veteran is a separate allied-buff interaction, not a reason to relabel these self-effects as an aura. |
+| Dig in! | Pinned 25-second preparation, movement restriction, self-recipient links, range/resistance modifiers and charge-defence grant; selected unit tooltip describes digging into position. Only this exact base ability is reviewed; upgraded variants are not silently included. |
+| Blackpowder Discipline | Pinned 10-second preparation, self-effects and movement restriction; [CA's Elspeth introduction](https://community.creative-assembly.com/total-war/total-war-warhammer/blogs/14) corroborates stationary accuracy/reload benefits. The +10 stat_reloading is reload skill, not a percentage reduction in reload time. |
+| Feast of the Maggot Lord | Pinned tamurkhan_death behavior, nearby-commander restriction and separate self-healing/protection versus enemy-damage phases; [CA's Tamurkhan introduction](https://community.creative-assembly.com/total-war/total-war-warhammer/blogs/13) explicitly describes a death-triggered last chance and second wind. Do not infer target priority, phase overlap or a universal execution-health threshold. |
+| Disengage! | Pinned summon_unbinding behavior, 150-second support phase and 5-second self-damage phase; selected tooltip and [ability reference](https://totalwarwarhammer.fandom.com/wiki/Disengage%21) identify departure to resupply. Self-damage is removal machinery, not outward damage; campaign upgrade behavior is not evaluated. |
+| Survival Instinct | Pinned broken-morale restriction, teleport_leave_battle behavior, -100 leadership and rebirth stance; [Dread Maw reference](https://totalwarwarhammer.fandom.com/wiki/Dread_Maw) explicitly says it does not return after fleeing. Interpret the stance in that context, not as resurrection. |
+| Redirecting Aura | Pinned missile_mirror behavior, enemy-recipient phase, non-missile exclusion and effect_range 55; [ability reference](https://totalwarwarhammer.fandom.com/wiki/Redirecting_Aura) corroborates nearby-shooter redirection. Projectile exceptions and close-range behavior remain unresolved. |
+| Judgement of the Uxmac; Mistwalkers' Barrage | Pinned melee recharge, casting timers and bombardment links; [Judgement reference](https://totalwarwarhammer.fandom.com/wiki/Judgement_of_the_Uxmac) and [Barrage reference](https://totalwarwarhammer.fandom.com/wiki/Mistwalkers%27_Barrage) corroborate melee-associated strikes. Payload values remain pinned, not copied from older balance discussions. |
+| Warp Discharge; Searing/Spurting Bile-Blood | Pinned melee recharge and vortex links; [Warp Discharge](https://totalwarwarhammer.fandom.com/wiki/Warp_Discharge), [Searing Bile-Blood](https://totalwarwarhammer.fandom.com/wiki/Searing_Bile-Blood) and [Spurting Bile-Blood](https://totalwarwarhammer.fandom.com/wiki/Spurting_Bile-Blood) corroborate the damage mechanisms. No per-incoming-hit retaliation is established. |
+| Tides of Transformation; Hellraiser | Pinned melee recharge, separate vortex links and non-numerical self-phases; Hellraiser also has an outside-melee deactivation. Source records support the explanation; external listings add no proof of exact scheduling or phase/vortex synchronization. |
+| Giant Explodin' Spores | Pinned outside-melee recharge and outside-melee deactivation describe recharge and release separately; [historical WH2 unit description](https://www.honga.net/totalwar/warhammer2/unit.php?f=wh_main_grn_greenskins_mp_custom_battles_only&l=en&u=wh2_dlc15_grn_veh_snotling_pump_wagon_ror_0&v=warhammer2) describes charge explosions and regrowth out of combat. Charge-versus-contact timing is qualified; no self-destruction is inferred. |
+| Rubble & Ruin I–III bombardment records | Pinned one-use, above-75/50/25% exclusions and shared bombardment. Three event routes survive deduplication of one payload definition. Exact equality and skipped-threshold scheduling remain unknown. |
+| Foreboding Ignition | Pinned one-use, above-10% exclusion, effect-enabling qualification and expanding vortex link. Describe a low-health release, not a death event. No external runtime guarantee is added. |
+| Wrath of Khorne; Locus of Power | Pinned enemy-targeting, 100-metre interception range, winding-up target restriction and separate vortex damage; [Wrath reference](https://totalwarwarhammer.fandom.com/wiki/Wrath_of_Khorne) and [Locus reference](https://totalwarwarhammer.fandom.com/wiki/Locus_of_Power) support spellcasting retaliation. Whether non-spell abilities qualify, simultaneous-caster arbitration and exact timing remain unknown. Damage does not imply spell cancellation. |
+
+Additional UI-effect junctions in the pinned upstream source independently label
+several of these behaviors (healing timer, melee bombardment/vortex, instant
+shatter, projectile redirection and Locus miscast). They were inspected as research
+evidence but are not newly imported tables or fabricated stored provenance rows.
+
+No packet schema change is needed: summaries, existing condition objects, phase
+reasons and bounded calculation payloads carry the explanations. Empty preparation
+phases retain their unresolved effect kind and timing qualifications; improved
+explanations do not certify engine execution. Existing diagnostics stay separately
+retrievable. Default unit and passive results contain no research-document prose.
+For an explicit documentation link, use:
+
+```sh
+python scripts/query_snapshot.py passive --db work/units.sqlite --include-documentation wh3_twa08_unit_passive_redirecting_aura
+```
+
+The optional `explanation_documentation` object links here and distinguishes the
+reviewed interpretation from pinned source facts. The inspection site exposes the
+same documentation through a collapsed panel. The two excluded records receive
+neither a revised explanation nor that documentation attachment.
