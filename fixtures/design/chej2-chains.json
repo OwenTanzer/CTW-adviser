@@ -1,0 +1,148 @@
+[
+  {
+    "units": [
+      "wh2_dlc12_lzd_mon_ancient_salamander_0_blessed"
+    ],
+    "chain": [
+      "wh2_dlc12_lzd_salamander_flame_large_blessed",
+      "giant_salamander_blessed",
+      "wh2_dlc12_lzd_salamander_flame_blessed_shrapnel",
+      "wh2_dlc12_lzd_salamander_flame_blessed"
+    ],
+    "expected_text": "25 base / 2 AP; radius 4"
+  },
+  {
+    "units": [
+      "wh2_dlc14_skv_inf_poison_wind_mortar_ror_0"
+    ],
+    "chain": [
+      "wh2_dlc14_skv_poison_wind_mortar_globe_ror",
+      "wh2_dlc14_skv_poison_wind_mortar_ror_shrapnel",
+      "wh2_dlc14_skv_poison_wind_mortar_globe_ror_shrapnel",
+      "wh2_dlc14_skv_poison_wind_mortar_ror_shrapnel"
+    ],
+    "expected_text": "9 base / 33 AP; radius 4"
+  },
+  {
+    "units": [
+      "wh2_dlc14_skv_inf_poison_wind_mortar_ror_0"
+    ],
+    "chain": [
+      "wh2_dlc14_skv_poison_wind_mortar_globe_ror_alt",
+      "wh2_dlc14_skv_poison_wind_mortar_ror_shrapnel_alt",
+      "wh2_dlc14_skv_poison_wind_mortar_globe_ror_shrapnel_alt",
+      "wh2_dlc14_skv_poison_wind_mortar_ror_shrapnel_alt"
+    ],
+    "expected_text": "9 base / 33 AP; radius 4"
+  },
+  {
+    "units": [
+      "wh3_main_cth_art_grand_cannon_0"
+    ],
+    "chain": [
+      "wh3_cp1_cth_grand_cannon_shrapnel_shot_shrapnel",
+      "grand_cannon_shrapenel_shot_shrapnel",
+      "wh3_cp1_cth_grand_cannon_shrapnel_shot_shrapnel_projectiles",
+      "wh3_cp1_cth_grand_cannon_shrapnel_shot_shrapnel_projectile"
+    ],
+    "expected_text": "1 base / 1 AP; radius 1"
+  },
+  {
+    "units": [
+      "wh3_dlc23_chd_veh_deathshrieker_rocket_launcher"
+    ],
+    "chain": [
+      "wh3_dlc23_chd_deathshrieker_rocket_stage_1",
+      "deathshrieker_rocket",
+      "wh3_dlc23_chd_deathshrieker_rocket_stage_2_shrapnel",
+      "wh3_dlc23_chd_deathshrieker_rocket_stage_2"
+    ],
+    "expected_text": "25 base / 55 AP; radius 5"
+  },
+  {
+    "units": [
+      "wh3_dlc25_dwf_art_grudge_thrower_grudge_reward"
+    ],
+    "chain": [
+      "wh3_dlc25_dwf_grudge_stone_shrapnel_stage_1",
+      "grudge_thrower_shrapnel",
+      "wh3_dlc25_dwf_grudge_stone_shrapnel_stage_2",
+      "wh3_dlc25_dwf_grudge_thrower_explosion_shrapnel_stage_2"
+    ],
+    "expected_text": "15 base / 25 AP; radius 4"
+  },
+  {
+    "units": [
+      "wh_main_dwf_art_flame_cannon",
+      "wh_main_dwf_art_flame_cannon_grudge_reward"
+    ],
+    "chain": [
+      "wh3_dlc25_flame_cannon_flame_shrapnel_stage_1",
+      "flame_cannon_shrapnel",
+      "wh3_dlc25_flame_cannon_flame_shrapnel_stage_2",
+      "wh3_dlc25_dwf_flamecannon_explosion_shrapnel_stage_2"
+    ],
+    "expected_text": "5 base / 2 AP; radius 5"
+  },
+  {
+    "units": [
+      "wh3_dlc25_nur_cha_infernal_castellan_chieftain"
+    ],
+    "chain": [
+      "wh3_dlc25_nur_esar_doombolt_bullet",
+      "wh3_dlc25_nur_esar_doombolt_shrapnel",
+      "wh3_dlc25_nur_esar_doombolt_bullet_shrapnel",
+      "wh3_dlc25_nur_esar_doombolt_bullet_shrapnel"
+    ],
+    "expected_text": "46 base / 100 AP; radius 4"
+  },
+  {
+    "units": [
+      "wh3_dlc25_dwf_veh_thunderbarge",
+      "wh3_dlc25_dwf_veh_thunderbarge_grungni"
+    ],
+    "chain": [
+      "wh3_dlc25_unit_abilities_thunderbarge_fire_bomb",
+      "wh3_dlc25_unit_abilities_thunderbarge_fire_bomb_shrapnel",
+      "wh3_dlc25_unit_abilities_thunderbarge_fire_bomb_shrapnel",
+      "wh3_dlc25_unit_abilities_thunderbarge_fire_bomb_stage_2"
+    ],
+    "expected_text": "30 base / 15 AP; radius 5"
+  },
+  {
+    "units": [
+      "wh3_dlc25_nur_cav_plague_drones_1_ror"
+    ],
+    "chain": [
+      "wh3_nur_plague_drones_deaths_head_ror",
+      "wh3_nur_plague_drones_deaths_head_ror_cluster",
+      "wh3_nur_plague_drones_deaths_head_ror_cluster",
+      "wh3_dlc25_nur_plague_drones_deaths_head_cluster_explosion_ror"
+    ],
+    "expected_text": "3 base / 7 AP; radius 3"
+  },
+  {
+    "units": [
+      "wh_dlc04_emp_art_sunmaker_0"
+    ],
+    "chain": [
+      "wh_dlc04_emp_sunmaker_rocket_fuse",
+      "sunmaker_shrapnel",
+      "wh_dlc04_emp_sunmaker_rocket_shrapnel",
+      "wh2_dlc14_emp_rocket_explosion_sunmaker"
+    ],
+    "expected_text": "22 base / 51 AP; radius 6"
+  },
+  {
+    "units": [
+      "wh_main_emp_art_helstorm_rocket_battery"
+    ],
+    "chain": [
+      "wh_main_emp_rocket_battery_fuse",
+      "emp_rocket_shrapnel",
+      "wh_main_emp_rocket_battery_shrapnel",
+      "wh_main_emp_rocket_explosion"
+    ],
+    "expected_text": "22 base / 51 AP; radius 6"
+  }
+]

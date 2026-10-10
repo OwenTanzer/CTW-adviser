@@ -13,7 +13,7 @@ def dump(path,value):path.parent.mkdir(parents=True,exist_ok=True);path.write_te
 
 class Example:
  def __init__(self,root):
-  self.root=root;self.cache={};self.assertions=[];self.packet={'schema_version':'1.1.0','mode':'combined','snapshot':{'commit':'3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196','owners':{'units':{'patch':'9.0','build':'25507028','schema':4},'abilities':{'patch':'9.0.1','build':'25546563','schema':1}},'baseline':{'game':'warhammer_3','unit_scale':'ultra','rank':0,'context':'unmodified custom battle'}},'units':[],'trait_descriptions':{},'sources':{},'provenance':{},'detail_refs':{},'payload_graph':{'nodes':[],'edges':[]}}
+  self.root=root;self.cache={};self.assertions=[];self.packet={'schema_version':'1.1.0','mode':'combined','snapshot':{'commit':'595e22764b22e748afdbafafcb0a6258973e2451','owners':{'units':{'patch':'9.0','build':'25507028','schema':4},'abilities':{'patch':'9.0.1','build':'25546563','schema':1}},'baseline':{'game':'warhammer_3','unit_scale':'ultra','rank':0,'context':'unmodified custom battle'}},'units':[],'trait_descriptions':{},'sources':{},'provenance':{},'detail_refs':{},'payload_graph':{'nodes':[],'edges':[]}}
  def records(self,path):
   if path not in self.cache:
    with (self.root/path).open(encoding='utf-8',newline='') as f:self.cache[path]=list(enumerate(csv.DictReader(f,delimiter='\t' if path.endswith('.tsv') else ','),2))
@@ -168,7 +168,7 @@ def main():
  parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ctw-root',type=Path,required=True);args=parser.parse_args()
  from verify_sources import verify
  lock=json.loads((ROOT/'source_lock.json').read_text());contract=json.loads((ROOT/'schema/import_contract.json').read_text())
- if lock['source_commit']!='3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196':raise ValueError('fixture definitions require explicit review for a new source pin')
+ if lock['source_commit']!='595e22764b22e748afdbafafcb0a6258973e2451':raise ValueError('fixture definitions require explicit review for a new source pin')
  checked=verify(args.ctw_root,lock,contract)
  if checked['status']!='passed':raise ValueError(checked['errors'])
  approved=json.loads((ROOT/'fixtures/design/approved-examples.json').read_text());entries=[];generated=[];built={}
@@ -184,6 +184,7 @@ def main():
   for field in ['sources','provenance','detail_refs','trait_descriptions']:packet[field].update(second[field])
   for assertion in second_assertions:assertion['pointer']=assertion['pointer'].replace('/units/0/','/units/1/');assertions.append(assertion)
   path=f'work/generated_examples/{a}_vs_{b}.json';ap=f'work/generated_examples/{a}_vs_{b}.assertions.json';dump(ROOT/path,packet);dump(ROOT/ap,assertions);generated.append({'path':path,'kind':'source_backed','assertions':ap,'purpose':'Reproducible named pair; generated locally and not committed.'})
- dump(ROOT/'fixtures/manifest.json',{'schema_version':'1.1.0','fixtures':entries})
+ synthetic=[entry for entry in json.loads((ROOT/'fixtures/manifest.json').read_text())['fixtures'] if entry['kind']=='synthetic']
+ dump(ROOT/'fixtures/manifest.json',{'schema_version':'1.1.0','fixtures':entries+synthetic})
  dump(ROOT/'work/generated_examples/manifest.json',{'schema_version':'1.1.0','fixtures':generated})
 if __name__=='__main__':main()

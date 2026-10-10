@@ -2,7 +2,7 @@
   "schema_version": "1.1.0",
   "mode": "combined",
   "snapshot": {
-    "commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+    "commit": "595e22764b22e748afdbafafcb0a6258973e2451",
     "owners": {
       "units": {
         "patch": "9.0",
@@ -473,7 +473,7 @@
     },
     "s_5e78e24b332a": {
       "path": "data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv",
-      "sha256": "155423f063a8e97230a854109b00f12adcd39770e3a36e04c3c3daabe98bbe49",
+      "sha256": "8f1f18d37042a216284924094820ce57d26bd67212225cb9ac3921f6c4e8c7ae",
       "owner": "units"
     },
     "s_9d85f8e27f99": {

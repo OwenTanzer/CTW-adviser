@@ -1,9 +1,9 @@
 {
   "lock_version": 1,
   "source_repository": "https://github.com/OwenTanzer/CTW-data",
-  "source_commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
-  "source_tree": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
-  "contract_sha256": "076e734f1bbf3c984c41238c1f14fa409396e8e442effa5db7a8d219442e40fe",
+  "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+  "source_tree": "a682a56f25daca27ff08a9b4a506b4dbf0c42778",
+  "contract_sha256": "81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16",
   "owners": {
     "units": {
       "schema": 4,
@@ -35,15 +35,15 @@
   "files": [
     {
       "path": "AGENTS.md",
-      "bytes": 7917,
-      "sha256": "c7b3c6d24471454bb0f6bf7e8c68c5986dcdf8cb464e6d1e2d16ccfb5edc59eb",
-      "git_blob_sha": "ea723902d2b4434db7d5f9bf21c10bf03e28c92a"
+      "bytes": 9071,
+      "sha256": "0ece3003fe74d9bd31e1ef66e8329663460d34a69ed53cbef7d52a374e9cde28",
+      "git_blob_sha": "f4248fdc99432cc9695bbdf148ab92be80cf928a"
     },
     {
       "path": "context_catalog.json",
-      "bytes": 10624,
-      "sha256": "7526828e8317d6893a1254ff4aff15172a37835fa85cb65ae8e7292d4ae94727",
-      "git_blob_sha": "46a69e0faccfa94293c7c2e64e786b2dc84989fa"
+      "bytes": 14907,
+      "sha256": "e04ef0b37aa7ad3a5d1f5608ad32eafd5385c3725719354629af5975afcadf2b",
+      "git_blob_sha": "62e759e5d5ca596bb75d0d1b07ea08d8ad2ac0af"
     },
     {
       "path": "data/effect_semantics/README.md",
@@ -121,9 +121,9 @@
     },
     {
       "path": "data/unit_stats/README.md",
-      "bytes": 14925,
-      "sha256": "05402e34c25ab447fe346410a6ea527b61a3a458978798d39e8ed39270d0face",
-      "git_blob_sha": "0d72a5c3b93843f5eab6a8a0dd0462f5999b052f"
+      "bytes": 15523,
+      "sha256": "c944b272b0ea42324dcba8ad50971319670d611b1989b68bba13669ffd228c72",
+      "git_blob_sha": "a7107ce4b38970c7871fb813f575b068ca023197"
     },
     {
       "path": "data/unit_stats/abilities/README.md",
@@ -675,14 +675,14 @@
     {
       "path": "data/unit_stats/audit_report.json",
       "bytes": 3261,
-      "sha256": "a9a085e1eda8254626f171ae07b39ded6d5c79b6a87dd5da15cbee14fc5bb224",
-      "git_blob_sha": "7b9d20aac36c2d8dd0301186ea34f0e2d1289a47"
+      "sha256": "3d71f175298200a7214ed5875cd7aaa2e0b9aee934898269bbb6b9d884bef168",
+      "git_blob_sha": "6e69cb5f7cf0c7397176874cbd3c77d1f7024d12"
     },
     {
       "path": "data/unit_stats/dataset_manifest.json",
-      "bytes": 1422,
-      "sha256": "0edf55c436155b0e05b597295886d36a0f9772170773a3281070d305ddd65e0d",
-      "git_blob_sha": "dc656413d958874d9c19937aa9f4483c9c638ce5"
+      "bytes": 1579,
+      "sha256": "32118ace837771e6321aa5e968fb0ae3cc22352579150af5fde07c2f0452ca51",
+      "git_blob_sha": "4b3c51db1d3953cffef2f979892ffcb2584c5f03"
     },
     {
       "path": "data/unit_stats/lookups/data_quality_flags__wh3__9.0__ultra.csv",
@@ -740,9 +740,9 @@
     },
     {
       "path": "data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv",
-      "bytes": 509127,
-      "sha256": "155423f063a8e97230a854109b00f12adcd39770e3a36e04c3c3daabe98bbe49",
-      "git_blob_sha": "223c0ce0aaca1030af59d0b63cd31aefdaf205dc"
+      "bytes": 508873,
+      "sha256": "8f1f18d37042a216284924094820ce57d26bd67212225cb9ac3921f6c4e8c7ae",
+      "git_blob_sha": "e0e160bde406a09bc6f6cac459a44a63f234581e"
     },
     {
       "path": "data/unit_stats/normalized/beastmen__wh3__9.0__ultra.csv",
@@ -824,15 +824,15 @@
     },
     {
       "path": "data/unit_stats/normalized/norsca__wh3__9.0__ultra.csv",
-      "bytes": 85526,
-      "sha256": "dfa61d4520a35eaad0842ccd577d8f06c0cf42691b56ad65864cf05caea93b5e",
-      "git_blob_sha": "38473daeae8262fc824961816f6895c32cf902d6"
+      "bytes": 85528,
+      "sha256": "332e294adfadcca550a696dc40ad7f37bab5709b503d80a283a6586a067dc58a",
+      "git_blob_sha": "5646e5d776a33d76cf622f8cecace0de1575a44d"
     },
     {
       "path": "data/unit_stats/normalized/nurgle__wh3__9.0__ultra.csv",
-      "bytes": 102041,
-      "sha256": "cfa46bdf1d54781c6806f34456bb4cc9f432f954f2510ae95a5727b7e0bf723b",
-      "git_blob_sha": "612e366bf85eed6bed89331a438a7d765daf5ff7"
+      "bytes": 102043,
+      "sha256": "b23cf5533a034a9d75eb87dc6bff0f9a8ab2db6ac3efb6e844693cd399f87cda",
+      "git_blob_sha": "f5797d4af8e703c7dd0fb0d6f27071771fd9bf23"
     },
     {
       "path": "data/unit_stats/normalized/ogre_kingdoms__wh3__9.0__ultra.csv",
@@ -842,9 +842,9 @@
     },
     {
       "path": "data/unit_stats/normalized/skaven__wh3__9.0__ultra.csv",
-      "bytes": 83615,
-      "sha256": "7cf3f734eb257f62e05187cbdf4667016644f5db2eeb0215be287106bdbe03d7",
-      "git_blob_sha": "a4c9be2cec797366bb91c0b8b754361e8665b05c"
+      "bytes": 83619,
+      "sha256": "3f4f074fd72e73df949d4c1ea6d5df2253c4afb4f437a8c77028f80493a08c26",
+      "git_blob_sha": "e89b5a0bd20059a783b53b574334aad4ce248091"
     },
     {
       "path": "data/unit_stats/normalized/slaanesh__wh3__9.0__ultra.csv",
@@ -1241,9 +1241,9 @@
     },
     {
       "path": "scripts/build-unit-dataset.mjs",
-      "bytes": 42297,
-      "sha256": "fcbc7b071469bf58073bb6b92c31126a8b7d17b9c8dc0c4725cbbabf37cdf46e",
-      "git_blob_sha": "268bbe4efffecf2aaabe33fc557ef1852d715b5d"
+      "bytes": 42332,
+      "sha256": "91fcda0e3b54895bbd8e1cb9da152f6319459a099de2f2af80b59aee22cd36b1",
+      "git_blob_sha": "7b66ccd6affee0f05b9306fccc6df83010cc229b"
     },
     {
       "path": "scripts/magic_pipeline.py",
@@ -1253,15 +1253,75 @@
     },
     {
       "path": "scripts/validate-unit-dataset.mjs",
-      "bytes": 28202,
-      "sha256": "a87b6821faac64e3b6c03b4cb9a82175cd49ea5fa54a6cf4dd7699782dcfa4e0",
-      "git_blob_sha": "1cb22bafa153e09e74b4b07ddb50e6030e230fe8"
+      "bytes": 28977,
+      "sha256": "abb12497325c5ace206f087a03d955270baee3e4e03afceeb1aec9df83cdb37e",
+      "git_blob_sha": "7355291f645802c8b5b2b217c9c6d4d9fe249a24"
     },
     {
       "path": "scripts/validation-text.mjs",
       "bytes": 876,
       "sha256": "f4c39c3db973785f55de07f6b29a6347b06b3c7157c8bdbce75d6817cb2a7a3a",
       "git_blob_sha": "1a33d9541f5baee87c4130ad7934dbb0c31a7799"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "bytes": 1677120,
+      "sha256": "deca81795dd1af2a894406423779e4730e322d365ffd41150e34271d82410a38",
+      "git_blob_sha": "37c0f7b9be640ad17619a770c9eb1cb2de0b3acf"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "bytes": 590081,
+      "sha256": "831966e3ab48dd3660d2dcf232a8742d92643368433f90ddd7eec8017c83f42b",
+      "git_blob_sha": "4be49f4cdcc2790d89c604188b58de45c7e58afd"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/unit_missile_weapon_junctions_tables/data__.tsv",
+      "bytes": 31016,
+      "sha256": "517b82e54bef24dc3a0e587fac4f0a29ba36f7496f30c0f3ab13cb414c74ff4c",
+      "git_blob_sha": "cb5a12b981dcc6902e173f831f966ed518756bf5"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/battle_entity_stats_tables/data__.tsv",
+      "bytes": 7862,
+      "sha256": "2c365778320a0ddb7a5a33a52568532824505c4136806624554f1e6ae8aa8eaa",
+      "git_blob_sha": "e61e2bfd866704d8913206a6858dea5114752c91"
+    },
+    {
+      "path": "scripts/unit-ammunition.mjs",
+      "bytes": 621,
+      "sha256": "9b10e97505bb028243db870d879f6133dc54c0ca36a567d0086d9308bb189608",
+      "git_blob_sha": "a5dae87acc5d124f6dcefe9f7182e0518d67e9ef"
+    },
+    {
+      "path": "scripts/ammunition_compatibility_migration.json",
+      "bytes": 176928,
+      "sha256": "e90b6ab6c5604cdc5dd0135bf8fc8b697c1b2a33fcf156813c561015e746ec80",
+      "git_blob_sha": "25743f48018bd0888c514b3ff2849e9a11276181"
+    },
+    {
+      "path": "scripts/magic_payload_baseline.json",
+      "bytes": 293287,
+      "sha256": "1b4632f7f3ee98a002e475616da1317b6581c21a15168b6ff140a9be6f0b11a4",
+      "git_blob_sha": "c49ba2b647c590b87bf5a328df0c5118c086b908"
+    },
+    {
+      "path": "scripts/magic_audit.py",
+      "bytes": 8579,
+      "sha256": "abfc6a9e966f127939f812cd856e34721dd40c963ab7a78b5604444eec7ee937",
+      "git_blob_sha": "20605461d5a0fbc1023434b366de4d0bf3fed782"
+    },
+    {
+      "path": "data/magic/output_manifest.json",
+      "bytes": 180532,
+      "sha256": "0ea131d9462ee05ef55db14617c137c26fe903dddf690f3dd59c354262c0953a",
+      "git_blob_sha": "ff52c89ac285b4bb19b3bc62cfd884481cf9eca2"
+    },
+    {
+      "path": "data/magic/payload_baseline_comparison.json",
+      "bytes": 1548,
+      "sha256": "dc78b008e170e50c9ceff020c6a8cc2976d6ec5b3db4d673a537ff16b32f047e",
+      "git_blob_sha": "38c0704358ef91c7b257d8dfd552e7a7e88e9d92"
     }
   ]
 }

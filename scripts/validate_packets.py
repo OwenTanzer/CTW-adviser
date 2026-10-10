@@ -13,7 +13,8 @@ import re
 
 ROOT=Path(__file__).resolve().parents[1]
 ANNOTATIONS={'$schema','$id','title','description','$defs'}
-KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf'}
+KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf','allOf','if','then','else'}
+CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0'}
 
 def check_schema(s):
     if not isinstance(s,dict):raise ValueError('only object schemas supported')
@@ -21,9 +22,9 @@ def check_schema(s):
     if unsupported:raise ValueError('unsupported schema keywords: '+str(unsupported))
     for key in ('properties','$defs'):
         for child in s.get(key,{}).values():check_schema(child)
-    for key in ('oneOf','anyOf'):
+    for key in ('oneOf','anyOf','allOf'):
         for child in s.get(key,[]):check_schema(child)
-    for key in ('items','additionalProperties'):
+    for key in ('items','additionalProperties','if','then','else'):
         if isinstance(s.get(key),dict):check_schema(s[key])
 
 def validate(value,s,root,path='$'):
@@ -31,6 +32,16 @@ def validate(value,s,root,path='$'):
         prefix='#/$defs/'
         if not s['$ref'].startswith(prefix):raise ValueError('external schema references unsupported')
         return validate(value,root['$defs'][s['$ref'][len(prefix):]],root,path)
+    for branch in s.get('allOf', []):
+        validate(value, branch, root, path)
+    if 'if' in s:
+        try:
+            validate(value, s['if'], root, path)
+            branch = 'then'
+        except ValueError:
+            branch = 'else'
+        if branch in s:
+            validate(value, s[branch], root, path)
     for keyword in ('oneOf','anyOf'):
         if keyword in s:
             matched=0
@@ -61,10 +72,36 @@ def validate(value,s,root,path='$'):
         if 'pattern' in s and re.search(s['pattern'],value) is None:raise ValueError(path+': pattern mismatch')
     if typ in ('integer','number') and 'minimum' in s and value<s['minimum']:raise ValueError(path+': below minimum')
 
-def packet_checks(p):
+def packet_checks(p, provenance_resolver=None):
+    if p.get('provenance_mode') == 'deferred':
+        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0') or p['sources'] or p['provenance']:
+            raise ValueError('invalid deferred evidence envelope')
+        if provenance_resolver is None:
+            raise ValueError('deferred evidence requires a snapshot-bound provenance resolver')
+        requested=set()
+        def collect(x):
+            if isinstance(x,dict):
+                for k,v in x.items():
+                    if k in ('provenance_refs','classification_evidence'):requested.update(v)
+                    else:collect(v)
+            elif isinstance(x,list):
+                for v in x:collect(v)
+        collect(p)
+        sources={}; provenance={}; ids=sorted(requested)
+        for start in range(0,len(ids),256):
+            chunk=provenance_resolver(ids[start:start+256])
+            if any(chunk['snapshot'].get(k)!=p['snapshot'].get(k) for k in ('commit','owners','baseline')):
+                raise ValueError('provenance belongs to a different snapshot')
+            for target,field in ((sources,'sources'),(provenance,'provenance')):
+                for key,value in chunk[field].items():
+                    if key in target and target[key]!=value:raise ValueError('conflicting evidence expansion')
+                    target[key]=value
+        if not requested <= provenance.keys():raise ValueError('unresolved deferred evidence')
+        p={**p,'sources':sources,'provenance':provenance}
     evidence=p['provenance'];details=p['detail_refs']
     for e in evidence.values():
         if e['source_id'] not in p['sources']:raise ValueError('dangling source')
+        if any(r not in evidence for r in e.get('lineage_refs',[])):raise ValueError('dangling lineage')
     for s in p['sources'].values():
         if s['owner'] not in p['snapshot']['owners']:raise ValueError('dangling owner')
     def walk(x):
@@ -86,25 +123,73 @@ def packet_checks(p):
         if names!=sorted(set(names)):raise ValueError('faction_name must be sorted and unique')
         ranged=u['ranged'];status=u['coverage']['ranged']
         melee_status=u['coverage']['melee']
+        gaps=u['coverage'].get('gaps')
+        if gaps is None and (p['schema_version'] not in CURRENT_VERSIONS | {'1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0'} or 'diagnostic_count' not in u['coverage']):raise ValueError('missing diagnostic coverage')
+        if gaps is not None and 'diagnostic_count' in u['coverage'] and u['coverage']['diagnostic_count']!=len(gaps):raise ValueError('diagnostic count mismatch')
         if (u['melee'] is None)==(melee_status=='present'):raise ValueError('melee absence/status contradiction')
-        if melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in u['coverage']['gaps']):raise ValueError('missing melee gap')
+        if gaps is not None and melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in gaps):raise ValueError('missing melee gap')
         if (ranged is None and status!='known_none') or (ranged is not None and ranged['status']!=status):raise ValueError('ranged absence/status contradiction')
         sections=u['coverage']['sections'];names=[s['name'] for s in sections]
         if sorted(names)!=sorted(['components','weapons','attributes','abilities','activated_options']):raise ValueError('section coverage must be unique and exhaustive')
         for s in sections:
             if s['total'] is not None and s['returned']>s['total']:raise ValueError('invalid coverage counts')
-            if s['state']=='complete' and (s['total']!=s['returned'] or s['cursor'] is not None):raise ValueError('false complete section')
-            if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned'])):raise ValueError('partial section needs overflow/cursor')
-            if s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in u['coverage']['gaps']):raise ValueError('unqualified unresolved/omitted section')
-        if status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in u['coverage']['gaps']):raise ValueError('missing ranged gap')
+            offset=s.get('offset',0)
+            if s['state']=='complete' and (s['total']!=s['returned']+offset or s['cursor'] is not None):raise ValueError('false complete section')
+            if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned']+offset)):raise ValueError('partial section needs overflow/cursor')
+            if gaps is not None and s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in gaps):raise ValueError('unqualified unresolved/omitted section')
+        if gaps is not None and status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in gaps):raise ValueError('missing ranged gap')
+        if p['schema_version'] in ('1.16.0','1.17.0','1.18.0','1.19.0'):
+            body=u['body'];movement=u['movement']
+            if movement['speed']!=movement['ground_speed']:
+                raise ValueError('movement speed differs from primary-body run speed')
+            if movement['primary_body_key']!=body['firing_arc']['primary_body_key']:
+                raise ValueError('movement and firing-arc body identities differ')
+            rule=body['health_aggregation']['rule']
+            for component in body['components']:
+                # A returned primary body contributes its known total. Native
+                # artillery additionally counts separate crew; other secondary
+                # component totals are descriptive, not another health pool.
+                included=component['primary'] is True or (rule=='primary_and_separate_crew' and component['role']=='crew_or_rider')
+                if component['primary'] is not None:
+                    expected=component['known_hp_total'] if included else 0
+                    if component['health_contribution']!=expected:
+                        raise ValueError('component health contribution conflicts with aggregation rule')
+            component_section=next(s for s in sections if s['name']=='components')
+            contributions=[c['health_contribution'] for c in body['components']]
+            if (component_section['state']=='complete' and component_section.get('offset',0)==0
+                    and body['total_hp'] is not None
+                    and all(value is not None for value in contributions)
+                    and sum(contributions)!=body['total_hp']):
+                raise ValueError('component health contributions do not reconcile to unit total')
+            if ranged and status=='present':
+                for attack in [ranged,*ranged['variants']]:
+                    if attack['reload']['projectile_base_interval']!=attack['reload_time']:
+                        raise ValueError('projectile base reload alias mismatch')
+                    supply=attack['ammunition_supply'];native=supply['native_weapon_pool']
+                    disagreement=native is not None and native!=attack['ammunition_pool']
+                    expected_status=('source_disagreement' if disagreement else
+                                     'sources_agree' if native is not None else 'unresolved')
+                    expected_pool=None if disagreement else native
+                    if supply['assignment_status']!=expected_status or supply['effective_pool']!=expected_pool:
+                        raise ValueError('ammunition supply status conflicts with retained pools')
+                    if p['schema_version'] in ('1.17.0','1.18.0','1.19.0'):
+                        capacity=supply['native_'+expected_pool+'_capacity'] if expected_pool else None
+                        unlimited=(supply['infinite_secondary'] if expected_pool=='secondary' else False) if expected_pool else None
+                        if supply['capacity']!=capacity or supply['unlimited'] is not unlimited:
+                            raise ValueError('ammunition capacity or unlimited scope mismatch')
+                        if expected_pool and attack['ammunition']!=capacity:
+                            raise ValueError('normalized ammunition differs from selected native capacity')
+                    if disagreement and not supply['qualification']:
+                        raise ValueError('ammunition pool disagreement lacks qualification')
         attacks={};components={c['id'] for c in u['body']['components']}
         if len(components)!=len(u['body']['components']):raise ValueError('duplicate component id')
         def add(a,kind,component=None):
             if a['id'] in attacks:raise ValueError('duplicate attack id')
+            if component is not None and component not in components:raise ValueError('unknown component')
             attacks[a['id']]={'kind':kind,'component':component}
         if u['melee']:
-            add(u['melee'],'melee')
-            for a in u['melee']['variants']:add(a,'melee')
+            add(u['melee'],'melee',u['melee'].get('component_ref'))
+            for a in u['melee']['variants']:add(a,'melee',a.get('component_ref'))
         if ranged and status=='present':
             for a in [ranged,*ranged['variants']]:
                 add(a,'ranged',a['component_ref'])
@@ -129,9 +214,38 @@ def packet_checks(p):
             phases={x['key'] for x in m['phases']}
             for e in m['effects']:
                 if e['phase_ref'] is not None and e['phase_ref'] not in phases:raise ValueError('unknown effect phase')
+                # Validate source-qualified attachment, not just membership in
+                # the ability's phase list. Ability-level payloads remain legal.
+                phase_sources={'data/unit_stats/abilities/tables/ability_phases.csv':'id',
+                               'data/unit_stats/abilities/tables/phase_stat_effects.csv':'phase',
+                               'data/unit_stats/abilities/tables/phase_attribute_effects.csv':'phase'}
+                if p['schema_version'] in CURRENT_VERSIONS:
+                    attached={evidence[r]['key'].get(phase_sources[p['sources'][evidence[r]['source_id']]['path']])
+                              for r in e['provenance_refs'] if p['sources'][evidence[r]['source_id']]['path'] in phase_sources}
+                    attached &= phases
+                    if attached and e['phase_ref'] not in attached:raise ValueError('effect conflicts with source phase attachment')
                 if e['kind']=='stat_modifier' and e['operation']!='native' and e['native_operation']!={'add':'add','multiply':'mult'}[e['operation']]:raise ValueError('operation mapping mismatch')
         actual={'components':len(u['body']['components']),'weapons':sum(v['kind']!='explosion' for v in attacks.values()),'attributes':len(u['passives']['attributes']),'abilities':len(u['passives']['abilities']),'activated_options':len(u['activated_options'])}
         if any(s['returned']!=actual[s['name']] for s in sections):raise ValueError('returned count differs from packet')
+    comparison=p.get('comparison')
+    if comparison is not None:
+        if (p['schema_version']!='1.19.0' or len(p['units'])!=2 or p['mode']!='combined' or
+                comparison['unit_names']!=[u['identity']['name'] or u['identity']['unit_key'] for u in p['units']] or
+                [d['dimension'] for d in comparison['dimensions']]!=
+                ['range','ammunition','attack_types','material_conditions']):
+            raise ValueError('comparison does not match the ordered unit pair')
+        supply_refs=set()
+        for u in p['units']:
+            ranged=u['ranged']
+            if ranged and ranged['status']=='present':
+                for attack in [ranged,*ranged['variants']]:
+                    supply_refs.update(attack['provenance_refs'])
+                    supply_refs.update(attack['ammunition_supply']['provenance_refs'])
+            else:
+                supply_refs.update(u['provenance_refs'])
+        cited=comparison['dimensions'][1]['provenance_refs']
+        if len(cited)!=len(set(cited)) or set(cited)!=supply_refs:
+            raise ValueError('ammunition comparison lacks scoped supply evidence')
     graph=p['payload_graph'];nodes={n['id'] for n in graph['nodes']}
     if len(nodes)!=len(graph['nodes']):raise ValueError('duplicate graph node')
     if any(e['from'] not in nodes or e['to'] not in nodes for e in graph['edges']):raise ValueError('dangling graph edge')

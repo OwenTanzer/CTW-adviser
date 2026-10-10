@@ -14,10 +14,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from ctw_adviser.build import (build_snapshot, classification, compact, load_records,
                               select_records, table_name, ROOT as BUILD_ROOT)
-from ctw_adviser.store import convert, open_snapshot, quote
+from ctw_adviser.store import SUPPORTED_CONTRACT_SHA256, convert, open_snapshot, quote
 
 
 class StoreContractTests(unittest.TestCase):
+    def test_reader_contract_matches_source_lock(self):
+        lock = json.loads((ROOT / 'source_lock.json').read_text())
+        self.assertEqual(SUPPORTED_CONTRACT_SHA256, lock['contract_sha256'])
+
     def test_equal_stats_with_different_abilities_do_not_consolidate(self):
         from ctw_adviser.build import profile_equivalence_groups
         with sqlite3.connect(':memory:') as db:
@@ -70,6 +74,20 @@ class PinnedStoreTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.temp.cleanup()
+
+    def test_incompatible_contract_fails_at_open(self):
+        older = self.directory / 'different-contract.sqlite'
+        with sqlite3.connect(self.output) as source, sqlite3.connect(older) as target:
+            source.backup(target)
+            target.execute("UPDATE snapshot SET contract_sha256=?", ('0' * 64,))
+        with self.assertRaisesRegex(ValueError, 'rebuild from pinned sources'):
+            open_snapshot(older)
+        obsolete = self.directory / 'obsolete-schema.sqlite'
+        with sqlite3.connect(obsolete) as db:
+            db.execute('CREATE TABLE snapshot(schema_version INTEGER)')
+            db.execute('INSERT INTO snapshot VALUES(2)')
+        with self.assertRaisesRegex(ValueError, 'rebuild from pinned sources'):
+            open_snapshot(obsolete)
 
     def test_complete_roster_and_shared_identity(self):
         self.assertEqual(self.report['roster_rows'], 3181)

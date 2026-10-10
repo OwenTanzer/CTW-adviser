@@ -6,6 +6,11 @@ from contextlib import closing
 from pathlib import Path
 import sqlite3
 
+# Store schema 3 spans more than one import contract. Query packet 1.16 needs
+# the native unit supplements selected by contract 2; an older schema-3 store
+# cannot satisfy those lookups even when it uses the same CTW-data source pin.
+SUPPORTED_CONTRACT_SHA256 = '81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16'
+
 
 def quote(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
@@ -41,7 +46,7 @@ def create_native_table(db, name, columns, keys, *, constraints=()):
     # source-identity uniqueness even for native blank key components.
     present = {c['name'] for c in columns}
     for key in dict.fromkeys([*keys, 'unit_key', 'base_unit_key', 'mounted_unit_key',
-                              'unit_name', 'special_ability', 'phase']):
+                              'unit_name', 'special_ability', 'phase', 'unit']):
         if key in present:
             suffix = '_nocase' if key == 'unit_name' else ''
             collate = ' COLLATE NOCASE' if key == 'unit_name' else ''
@@ -51,11 +56,18 @@ def create_native_table(db, name, columns, keys, *, constraints=()):
 
 def open_snapshot(path: Path) -> sqlite3.Connection:
     db = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)
-    db.execute('PRAGMA foreign_keys=ON')
-    db.execute('PRAGMA query_only=ON')
-    if db.execute('SELECT schema_version FROM snapshot').fetchone() != (3,):
+    try:
+        db.execute('PRAGMA foreign_keys=ON')
+        db.execute('PRAGMA query_only=ON')
+        if db.execute('SELECT schema_version FROM snapshot').fetchone() != (3,):
+            raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
+        if db.execute('SELECT contract_sha256 FROM snapshot').fetchone() != (SUPPORTED_CONTRACT_SHA256,):
+            raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
+    except (sqlite3.Error, ValueError) as exc:
         db.close()
-        raise ValueError('unsupported snapshot schema')
+        if isinstance(exc, sqlite3.Error):
+            raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources') from exc
+        raise
     db.row_factory = sqlite3.Row
     return db
 

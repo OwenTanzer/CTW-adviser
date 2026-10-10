@@ -1,6 +1,6 @@
 # Pinned source contract — issue #2, step 1
 
-The source is CTW-data commit `3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196`.
+The source is CTW-data commit `595e22764b22e748afdbafafcb0a6258973e2451`.
 `source_lock.json` pins every selected input by SHA-256 and byte count, also
 recording its Git blob identity. `schema/import_contract.json` supplies explicit
 headers, types, keys, expected counts, field mappings, owner gates and joins.
@@ -106,5 +106,32 @@ upstream fingerprints. Recompute the contract fingerprint using sorted-key compa
 UTF-8 JSON. Commit the contract, lock and fresh verification evidence together.
 Do not refresh expected hashes just to make a failed check pass.
 
-The packet schema, example fixtures, importer, SQLite store and query interface
-are later steps. Issue #2 stays open.
+The packet schema and fixtures, importer, SQLite store and query interface are
+implemented in the subsequent phases described by the lookup/store contracts.
+Issue #2 stays open through its remaining packaging and integration checks.
+
+## Contract 2: unit mechanics supplements
+
+The reviewed scope extension for Chej's findings retains four existing native
+exports at the unchanged pin. See [field mappings and selection rules](chej-findings.md).
+Raw field coverage supplements normalized facts without overriding source
+ammunition disagreements. The lock fingerprints the expanded contract and files;
+existing snapshots must be rebuilt before serving packet 1.16.
+
+## Reviewed ammunition migration (10 October 2026)
+
+The current pin is `595e22764b22e748afdbafafcb0a6258973e2451` (CTW-data PR #42).
+Native missile-weapon pool selection replaces the upstream attachment-role
+heuristic. The 255 changed link rows, six default ammo values, new builder helper,
+metadata hashes and compatibility gate are reviewed in [the acceptance record](chej-findings-2.md).
+No raw combat source values or import columns change. The separate combat target
+class is an adviser interpretation; the historical normalized is_large field is
+retained without being promoted into combat eligibility.
+
+## Compatibility follow-through
+
+The third-review pin additionally locks the exact ammunition migration, unchanged
+historical payload baseline, reconciliation validator, magic output manifest and
+baseline comparison. These five authority artifacts expand verification only;
+no imported table or raw combat value changes. See [Chej findings 3](chej-findings-3.md)
+for upstream continuous-integration evidence and downstream acceptance.

@@ -1,0 +1,404 @@
+{
+  "special_ability_to_auto_deactivate_flags.csv": [
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc09_lore_passive_the_restless_dead",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "17",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc09_weapon_passive_the_liche_staff",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "20",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc11_item_passive_the_bordeleaux_flabellum",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "34",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc11_lore_passive_kiss_of_the_deep",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "36",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc12_item_passive_plaque_of_sotek",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "42",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc12_lord_passive_adrenaline_rush",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "43",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc12_lord_passive_secondwind_serum",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "44",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc14_lore_passive_toxic_rain",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "57",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc16_item_passive_fang_of_taalroth",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "103",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc16_lore_passive_ancients_protection",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "107",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_dlc16_lore_passive_wrath_of_the_wood",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "108",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_main_lore_passive_musk_of_fear",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "137",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_main_lore_passive_plague_rash",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "138",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_main_lore_passive_shield_of_saphery",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "139",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh2_main_lore_passive_spiteful_conjuration",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "140",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_cp1_character_passive_kamau_magic",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "157",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_cp1_character_passive_kamau_offence",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "158",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_cp1_character_passive_kamau_protect",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "159",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc20_character_passive_soul_feeder",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "177",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc20_item_passive_vessel_of_chaos",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "180",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc23_lore_passive_killing_fire",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "193",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc24_lore_passive_fate_of_interlopers",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "222",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc25_item_passive_armour_of_tarnus",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "261",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc27_character_passive_dangerous_practice",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "310",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc27_item_passive_stone_of_shyish",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "326",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc27_lore_passive_obscuring_mists",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "330",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc27_weapon_passive_the_viperous_staff",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "349",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc29_hero_passive_daemon_flies",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "356",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc29_item_abilities_warp_amulet",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "365",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_dlc29_lore_passive_raise_the_dead",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "376",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_item_passive_crystal_cloak",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "428",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_item_passive_jade_amulet",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "433",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lord_passive_prismatic_plurality",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "451",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_blissful_rapture",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "456",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_bloodgruel",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "457",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_children_of_nurgle",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "458",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_fires_of_change",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "459",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_freezing_winds",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "460",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_frost_shield",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "461",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_power_of_yin",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "462",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_lore_passive_strength_of_yang",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "463",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh3_main_weapon_passive_wand_of_whimsey",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "491",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_dlc03_lore_passive_bestial_surge",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "505",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_dlc03_lore_passive_wild_heart",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "506",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_dlc05_lore_passive_life_bloom",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "517",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_dlc05_lore_passive_smoke_and_mirrors",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "518",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_dlc06_weapon_passive_bonewood_staff",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "527",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_dlc08_quest_abilities_soul_binding",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "535",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_exorcism",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "551",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_kindleflame",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "552",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_life_leeching",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "553",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_metalshifting",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "554",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_power_of_da_waaagh",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "555",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_roiling_skies",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "556",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_sneaky_stealin",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "557",
+      "source_patch": "9.0.1"
+    },
+    {
+      "deactivate_flag": "other_abilities_just_activated_after_wind_up",
+      "special_ability": "wh_main_lore_passive_the_curse_of_undeath",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv",
+      "source_line": "559",
+      "source_patch": "9.0.1"
+    }
+  ],
+  "special_ability_invalid_usage_flags.csv": [
+    {
+      "flag_key": "other_abilities_just_activated_after_wind_up",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_invalid_usage_flags_tables/data__.tsv",
+      "source_line": "143",
+      "source_patch": "9.0.1"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
-  "contract_version": 1,
-  "source_commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
+  "contract_version": 2,
+  "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
   "baseline": {
     "game": "warhammer_3",
     "patch": "9.0",
@@ -5261,6 +5261,1054 @@
           "units": "native"
         }
       ]
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "role": "unit_native_supplement",
+      "delimiter": "\t",
+      "rpfm_metadata": true,
+      "keys": [
+        "key"
+      ],
+      "expected_rows": 2679,
+      "columns": [
+        {
+          "name": "key",
+          "type": "TEXT",
+          "nullable": false,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "accuracy",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "armour",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "campaign_action_points",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "charge_bonus",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "class",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "historical_description_text",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "man_animation",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "man_entity",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "melee_attack",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "melee_defence",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "morale",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "bonus_hit_points",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "mount",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "num_mounts",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "primary_melee_weapon",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "primary_missile_weapon",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "rank_depth",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "shield",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "short_description_text",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "spacing",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "training_level",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "articulated_record",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "engine",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "is_male",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "visibility_spotting_range_min",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "visibility_spotting_range_max",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "attribute_group",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "spot_dist_tree",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "spot_dist_scrub",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "reload",
+          "type": "INTEGER",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "selection_vo",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "selected_vo_secondary",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "selected_vo_tertiary",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "hiding_scalar",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "ground_stat_effect_group",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "secondary_ammo",
+          "type": "INTEGER",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "primary_ammo",
+          "type": "INTEGER",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "damage_mod_flame",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "damage_mod_magic",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "num_engines",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "damage_mod_physical",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "damage_mod_missile",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "damage_mod_all",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "ai_usage_group",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "can_skirmish",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "can_brace",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "mounted_draughts",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "sync_locomotion",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "capture_tier",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "key_building_capture_tier",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "score_capture_tier",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "harmony_amplification_type",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "first_person",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "ar_unit_category",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "healing_power",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "spell_mastery",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "infinite_secondary_ammo",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "default_guard_mode",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        }
+      ]
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "role": "unit_native_supplement",
+      "delimiter": "\t",
+      "rpfm_metadata": true,
+      "keys": [
+        "key"
+      ],
+      "expected_rows": 1339,
+      "columns": [
+        {
+          "name": "key",
+          "type": "TEXT",
+          "nullable": false,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "type",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "walk_speed",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "run_speed",
+          "type": "REAL",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "acceleration",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "deceleration",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "charge_speed",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "charge_distance_commence_run",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "charge_distance_adopt_charge_pose",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "charge_distance_pick_target",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "radius",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "shape",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "radii_ratio",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "mass",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "height",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "fire_arc_close",
+          "type": "REAL",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "turn_speed",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "hit_points",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "allow_turn_to_move_anim",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "allow_static_turn_anim",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "min_turning_speed",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "fly_speed",
+          "type": "REAL",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "flying_charge_speed",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "size",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "strafe_speed",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "gradient_strategy",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "audio_entity_type",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "combat_reaction_radius",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "entity_effects",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "hit_reactions_ignore_chance",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "knock_interrupts_ignore_chance",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "soft_collision_offset_z",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "can_climb_ladder_and_stair_pipes",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "projectile_intersection_radius_ratio",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "projectile_penetration_speed_change",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "projectile_penetration_resistance",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "aura_vfx",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "porthole_camera",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "min_tracking_ratio",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "max_tracking_ratio",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "vfx_filter_id",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "can_cast_projectile",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "porthole_composite_scene",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "has_blood",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "can_dismember",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "combat_camera_shake",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "dismember_head_alive_hp_ratio",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "dismember_arms_alive_hp_ratio",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "jump_attack_chance",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "locomotion_constants",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "enable_engine_crew_turn_in_movement_direction",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "dealt_collision_knocked_flying_threshold_multiplier",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "dealt_collision_knocked_down_threshold_multiplier",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "dealt_collision_knocked_back_threshold_multiplier",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "anim_lod_distance_multiplier",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "size_for_animation_lod",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "leaves_collision_when_dies",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "stop_before_turn",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        }
+      ]
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/unit_missile_weapon_junctions_tables/data__.tsv",
+      "role": "unit_native_supplement",
+      "delimiter": "\t",
+      "rpfm_metadata": true,
+      "keys": [
+        "id"
+      ],
+      "expected_rows": 333,
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "missile_weapon",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "unit",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "battle_entity_stats_override",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        }
+      ]
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/battle_entity_stats_tables/data__.tsv",
+      "role": "unit_native_supplement",
+      "delimiter": "\t",
+      "rpfm_metadata": true,
+      "keys": [
+        "key"
+      ],
+      "expected_rows": 100,
+      "columns": [
+        {
+          "name": "key",
+          "type": "TEXT",
+          "nullable": false,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "primary_melee_weapon",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        },
+        {
+          "name": "primary_missile_weapon",
+          "type": "TEXT",
+          "nullable": true,
+          "evidence": "Pinned native export; docs/chej-findings.md explicit supplement mapping",
+          "units": "native",
+          "storage_note": "Unprojected fields retain exact source text."
+        }
+      ]
     }
   ],
   "joins": [
@@ -5801,6 +6849,630 @@
       "target": "data/effect_semantics/tables/modifiable_unit_stats.csv",
       "target_columns": [
         "stat_key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/beastmen__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/beastmen__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/beastmen__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/beastmen__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/bretonnia__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/bretonnia__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/bretonnia__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/bretonnia__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/chaos_dwarfs__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/chaos_dwarfs__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/chaos_dwarfs__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/chaos_dwarfs__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/daemons_of_chaos__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/daemons_of_chaos__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/daemons_of_chaos__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/daemons_of_chaos__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/dark_elves__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/dark_elves__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/dark_elves__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/dark_elves__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/dwarfs__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/dwarfs__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/dwarfs__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/dwarfs__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/empire__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/empire__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/empire__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/empire__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/grand_cathay__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/grand_cathay__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/grand_cathay__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/grand_cathay__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/greenskins__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/greenskins__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/greenskins__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/greenskins__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/high_elves__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/high_elves__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/high_elves__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/high_elves__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/khorne__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/khorne__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/khorne__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/khorne__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/kislev__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/kislev__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/kislev__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/kislev__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/lizardmen__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/lizardmen__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/lizardmen__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/lizardmen__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/norsca__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/norsca__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/norsca__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/norsca__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/nurgle__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/nurgle__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/nurgle__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/nurgle__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/ogre_kingdoms__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/ogre_kingdoms__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/ogre_kingdoms__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/ogre_kingdoms__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/skaven__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/skaven__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/skaven__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/skaven__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/slaanesh__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/slaanesh__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/slaanesh__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/slaanesh__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/tomb_kings__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/tomb_kings__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/tomb_kings__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/tomb_kings__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/tzeentch__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/tzeentch__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/tzeentch__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/tzeentch__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/vampire_coast__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/vampire_coast__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/vampire_coast__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/vampire_coast__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/vampire_counts__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/vampire_counts__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/vampire_counts__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/vampire_counts__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/warriors_of_chaos__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/warriors_of_chaos__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/warriors_of_chaos__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/warriors_of_chaos__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/wood_elves__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/wood_elves__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/wood_elves__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/wood_elves__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/undead_legions__wh3__9.0__ultra.csv.source_land_unit_key",
+      "source": "data/unit_stats/normalized/undead_legions__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_land_unit_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/normalized/undead_legions__wh3__9.0__ultra.csv.source_battle_entity_key",
+      "source": "data/unit_stats/normalized/undead_legions__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "source_battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv.battle_entity_key",
+      "source": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+      "source_columns": [
+        "battle_entity_key"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "target_columns": [
+        "key"
+      ],
+      "unresolved_policy": "record_gap"
+    },
+    {
+      "name": "chej data/unit_stats/source_exports/db/unit_missile_weapon_junctions_tables/data__.tsv.battle_entity_stats_override",
+      "source": "data/unit_stats/source_exports/db/unit_missile_weapon_junctions_tables/data__.tsv",
+      "source_columns": [
+        "battle_entity_stats_override"
+      ],
+      "target": "data/unit_stats/source_exports/db/battle_entity_stats_tables/data__.tsv",
+      "target_columns": [
+        "key"
       ],
       "unresolved_policy": "record_gap"
     }
