@@ -3,6 +3,7 @@ import copy
 import json
 import os
 from pathlib import Path
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -11,6 +12,7 @@ sys.path[:0]=[str(ROOT/'src'),str(ROOT/'scripts')]
 from ctw_adviser.build import build_snapshot
 from ctw_adviser.queries import Queries
 from validate_packets import validate, packet_checks
+from audit_chej_findings import audit, acceptance_errors
 SOURCE=Path(os.environ.get('CTW_DATA_ROOT',ROOT.parent/'CTW-data'))
 
 @unittest.skipUnless((SOURCE/'data/unit_stats/dataset_manifest.json').exists(),'pinned source required')
@@ -23,7 +25,8 @@ class ChejFindings(unittest.TestCase):
  @classmethod
  def tearDownClass(cls):cls.q.close();cls.temp.cleanup()
  def packet(self,key,**kwargs):
-  p=self.q.get_unit_profile(key,limit=256,**kwargs)
+  kwargs.setdefault('limit',256)
+  p=self.q.get_unit_profile(key,**kwargs)
   validate(p,self.schema,self.schema);packet_checks(p,provenance_resolver=self.q.get_provenance)
   return p
  def unit(self,key):return self.packet(key)['units'][0]
@@ -78,3 +81,34 @@ class ChejFindings(unittest.TestCase):
   with self.assertRaises(ValueError):validate(damaged,self.schema,self.schema)
   expanded=self.packet('wh2_dlc11_cst_art_queen_bess',include_provenance=True)
   self.assertEqual(p['units'],expanded['units']);self.assertEqual(p['sources'],{})
+ def test_relationship_contradictions_rejected(self):
+  for key,change in [
+   ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['movement'].__setitem__('speed',999)),
+   ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['body']['firing_arc'].__setitem__('primary_body_key','wrong')),
+   ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['ranged']['reload'].__setitem__('projectile_base_interval',999)),
+   ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['ranged']['ammunition_supply'].__setitem__('effective_pool',None)),
+   ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['ranged']['variants'][0]['ammunition_supply'].__setitem__('assignment_status','sources_agree')),
+   ('wh2_dlc11_cst_art_queen_bess',lambda u:u['body']['components'][0].__setitem__('health_contribution',1)),
+   ('wh2_dlc11_cst_art_queen_bess',lambda u:u['body']['health_aggregation'].__setitem__('rule','primary_body_only')),
+  ]:
+   with self.subTest(key=key,change=change):
+    damaged=copy.deepcopy(self.packet(key));change(damaged['units'][0])
+    validate(damaged,self.schema,self.schema)
+    with self.assertRaises(ValueError):packet_checks(damaged,self.q.get_provenance)
+ def test_audit_fails_missing_native_movement(self):
+  damaged=Path(self.temp.name)/'missing-speed.sqlite'
+  with sqlite3.connect(damaged) as out:self.q.db.backup(out)
+  with sqlite3.connect(damaged) as db:
+   db.execute("UPDATE battle_entities SET run_speed=NULL WHERE key=(SELECT source_battle_entity_key FROM unit_profiles WHERE unit_key='wh2_main_hef_inf_lothern_sea_guard_0')")
+  result=audit(damaged)
+  self.assertIn('missing_movement',acceptance_errors(result))
+  self.assertTrue(result['missing_movement'])
+ def test_final_component_page_does_not_claim_whole_unit_health(self):
+  key='wh2_dlc11_cst_art_queen_bess'
+  first=self.packet(key,section='components',limit=1)
+  section=next(s for s in first['units'][0]['coverage']['sections'] if s['name']=='components')
+  self.assertEqual(section['state'],'partial')
+  last=self.packet(key,section='components',limit=1,cursor=section['cursor'])
+  section=next(s for s in last['units'][0]['coverage']['sections'] if s['name']=='components')
+  self.assertEqual((section['state'],section['offset'],section['returned']),('complete',1,1))
+  self.assertNotEqual(last['units'][0]['body']['components'][0]['health_contribution'],last['units'][0]['body']['total_hp'])

@@ -138,6 +138,42 @@ def packet_checks(p, provenance_resolver=None):
             if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned']+offset)):raise ValueError('partial section needs overflow/cursor')
             if gaps is not None and s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in gaps):raise ValueError('unqualified unresolved/omitted section')
         if gaps is not None and status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in gaps):raise ValueError('missing ranged gap')
+        if p['schema_version']=='1.16.0':
+            body=u['body'];movement=u['movement']
+            if movement['speed']!=movement['ground_speed']:
+                raise ValueError('movement speed differs from primary-body run speed')
+            if movement['primary_body_key']!=body['firing_arc']['primary_body_key']:
+                raise ValueError('movement and firing-arc body identities differ')
+            rule=body['health_aggregation']['rule']
+            for component in body['components']:
+                # A returned primary body contributes its known total. Native
+                # artillery additionally counts separate crew; other secondary
+                # component totals are descriptive, not another health pool.
+                included=component['primary'] is True or (rule=='primary_and_separate_crew' and component['role']=='crew_or_rider')
+                if component['primary'] is not None:
+                    expected=component['known_hp_total'] if included else 0
+                    if component['health_contribution']!=expected:
+                        raise ValueError('component health contribution conflicts with aggregation rule')
+            component_section=next(s for s in sections if s['name']=='components')
+            contributions=[c['health_contribution'] for c in body['components']]
+            if (component_section['state']=='complete' and component_section.get('offset',0)==0
+                    and body['total_hp'] is not None
+                    and all(value is not None for value in contributions)
+                    and sum(contributions)!=body['total_hp']):
+                raise ValueError('component health contributions do not reconcile to unit total')
+            if ranged and status=='present':
+                for attack in [ranged,*ranged['variants']]:
+                    if attack['reload']['projectile_base_interval']!=attack['reload_time']:
+                        raise ValueError('projectile base reload alias mismatch')
+                    supply=attack['ammunition_supply'];native=supply['native_weapon_pool']
+                    disagreement=native is not None and native!=attack['ammunition_pool']
+                    expected_status=('source_disagreement' if disagreement else
+                                     'sources_agree' if native is not None else 'unresolved')
+                    expected_pool=None if disagreement else native
+                    if supply['assignment_status']!=expected_status or supply['effective_pool']!=expected_pool:
+                        raise ValueError('ammunition supply status conflicts with retained pools')
+                    if disagreement and not supply['qualification']:
+                        raise ValueError('ammunition pool disagreement lacks qualification')
         attacks={};components={c['id'] for c in u['body']['components']}
         if len(components)!=len(u['body']['components']):raise ValueError('duplicate component id')
         def add(a,kind,component=None):

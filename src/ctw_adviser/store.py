@@ -6,6 +6,11 @@ from contextlib import closing
 from pathlib import Path
 import sqlite3
 
+# Store schema 3 spans more than one import contract. Query packet 1.16 needs
+# the native unit supplements selected by contract 2; an older schema-3 store
+# cannot satisfy those lookups even when it uses the same CTW-data source pin.
+SUPPORTED_CONTRACT_SHA256 = 'fd689183d941d88f021e5a750fd9eaa78ba14c35e93481001d251582d8823802'
+
 
 def quote(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
@@ -51,11 +56,18 @@ def create_native_table(db, name, columns, keys, *, constraints=()):
 
 def open_snapshot(path: Path) -> sqlite3.Connection:
     db = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)
-    db.execute('PRAGMA foreign_keys=ON')
-    db.execute('PRAGMA query_only=ON')
-    if db.execute('SELECT schema_version FROM snapshot').fetchone() != (3,):
+    try:
+        db.execute('PRAGMA foreign_keys=ON')
+        db.execute('PRAGMA query_only=ON')
+        if db.execute('SELECT schema_version FROM snapshot').fetchone() != (3,):
+            raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
+        if db.execute('SELECT contract_sha256 FROM snapshot').fetchone() != (SUPPORTED_CONTRACT_SHA256,):
+            raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
+    except (sqlite3.Error, ValueError) as exc:
         db.close()
-        raise ValueError('unsupported snapshot schema')
+        if isinstance(exc, sqlite3.Error):
+            raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources') from exc
+        raise
     db.row_factory = sqlite3.Row
     return db
 

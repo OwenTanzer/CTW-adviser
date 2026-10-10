@@ -5,6 +5,7 @@ baseline. Writes only a reproducible report under ignored work/ by default.
 """
 import argparse
 from collections import defaultdict
+import copy
 import json
 from pathlib import Path
 import re
@@ -52,6 +53,27 @@ def mechanic_facts(mechanic):
 
 def size(packet):
     return len(json.dumps(packet, separators=(',', ':'), ensure_ascii=False).encode())
+
+
+def before_chej_unit_shape(unit):
+    """Compare Alpha 4 fields while retaining all of their mechanical values."""
+    unit = copy.deepcopy(unit)
+    unit['body'].pop('firing_arc', None)
+    unit['body'].pop('health_aggregation', None)
+    for component in unit['body']['components']:
+        component.pop('health_contribution', None)
+    for field in ('ground_speed', 'flight_speed', 'speed_basis', 'primary_body_key',
+                  'provenance_refs'):
+        unit['movement'].pop(field, None)
+    ranged = unit['ranged']
+    if ranged:
+        for attack in [ranged, *ranged['variants']]:
+            for field in ('firing_policy', 'reload', 'ammunition_supply', 'entity_stat_overrides'):
+                attack.pop(field, None)
+            if attack.get('explosion'):
+                attack['explosion'].pop('native_parameters', None)
+                attack['explosion'].pop('detail_ref', None)
+    return unit
 
 
 def main():
@@ -103,8 +125,9 @@ def main():
             validate(compact, schema, schema); packet_checks(compact, after.get_provenance)
             for field in ('units', 'payload_graph', 'detail_refs', 'trait_descriptions'):
                 require(b[field] == compact[field], key + ': compact/expanded ' + field)
+            comparable = before_chej_unit_shape(b['units'][0])
             for field in ('identity', 'body', 'movement', 'leadership', 'melee', 'ranged', 'cost', 'activated_options'):
-                require(a['units'][0][field] == b['units'][0][field], key + ': changed ' + field)
+                require(a['units'][0][field] == comparable[field], key + ': changed ' + field)
             require(a['payload_graph'] == b['payload_graph'], key + ': changed unit payload')
             contexts += 1
         require(contexts == 3181, 'roster context drift')
