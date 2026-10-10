@@ -6,7 +6,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from ctw_adviser.queries import PACKET_VERSION
-VERSIONS=['1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0']
+VERSIONS=['1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0']
 VERSIONS=VERSIONS[:VERSIONS.index(PACKET_VERSION)+1]
 S={'type':'string','minLength':1}; N={'type':['number','null']}; B={'type':['boolean','null']}
 def enum(*values):return {'enum':list(values)}
@@ -89,10 +89,13 @@ defs['snapshot']=obj({'commit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'own
 defs['description']=obj({'summary':S,'provenance_refs':refs})
 defs['node']=obj({'id':S,'kind':S,'key':S,'native_parameters':native,'provenance_refs':refs})
 defs['edge']=obj({'from':S,'to':S,'relationship':S,'order':{'type':['integer','null']},'provenance_refs':refs})
+defs['comparison_dimension']=obj({'dimension':enum('range','ammunition','attack_types','material_conditions'),
+ 'unit_a':S,'unit_b':S,'difference':S,'provenance_refs':refs},['dimension','unit_a','unit_b','provenance_refs'])
+defs['comparison']=obj({'unit_names':arr(S,2),'dimensions':arr(ref('comparison_dimension'),4)})
 schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-adviser:evidence-packet:'+PACKET_VERSION,'title':'CTW adviser evidence packet v'+PACKET_VERSION+' (accepts earlier fixtures)',
  **obj({'schema_version':enum(*VERSIONS),'mode':enum('combined','melee','missile'),'snapshot':ref('snapshot'),'units':arr(ref('unit'),1),
  'trait_descriptions':mapping(ref('description')),'sources':mapping(ref('source')),'provenance':mapping(ref('evidence')),'detail_refs':mapping(obj({'kind':S,'key':S})),
- 'payload_graph':obj({'nodes':arr(ref('node')),'edges':arr(ref('edge'))}),'scenario':{'type':'object'}},['schema_version','mode','snapshot','units','trait_descriptions','sources','provenance','detail_refs','payload_graph']),'$defs':defs}
+ 'payload_graph':obj({'nodes':arr(ref('node')),'edges':arr(ref('edge'))}),'scenario':{'type':'object'},'comparison':ref('comparison')},['schema_version','mode','snapshot','units','trait_descriptions','sources','provenance','detail_refs','payload_graph']),'$defs':defs}
 
 # Source-backed output types and complete mechanical projections. Presentation
 # and lineage stay optional; raw extension tokens remain TEXT.
@@ -182,14 +185,14 @@ schema['allOf'].append({
 })
 schema['properties']['provenance_mode']=enum('deferred','expanded')
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum(*[v for v in VERSIONS if v in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0')])},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum(*[v for v in VERSIONS if v in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0')])},'required':['schema_version']},
  'then':{'required':['provenance_mode']}
 })
 
 new_attack={'required':['firing_policy','reload','ammunition_supply','entity_stat_overrides'],
  'properties':{'explosion':{'anyOf':[{'type':'null'},{'required':['native_parameters','detail_ref'],'properties':{'native_parameters':ref('parameters_explosions')}}]}}}
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum('1.16.0','1.17.0','1.18.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum('1.16.0','1.17.0','1.18.0','1.19.0')},'required':['schema_version']},
  'then':{'properties':{'units':{'items':{'properties':{
   'movement':{'required':['ground_speed','flight_speed','speed_basis','primary_body_key','provenance_refs']},
   'body':{'required':['firing_arc','health_aggregation'],'properties':{'components':{'items':{'required':['health_contribution']}}}},
@@ -201,7 +204,7 @@ schema['allOf'].append({
 defs['ranged_attack']['properties']['ammunition_supply']['properties'].update(capacity=N, unlimited=B)
 supply_required={'properties':{'ammunition_supply':{'required':['capacity','unlimited']}}}
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum('1.17.0','1.18.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum('1.17.0','1.18.0','1.19.0')},'required':['schema_version']},
  'then':{'properties':{'units':{'items':{'properties':{'ranged':{
   'if':{'type':'object','properties':{'status':const('present')},'required':['status']},
   'then':{'properties':{**supply_required['properties'],'variants':{'items':supply_required}}}
@@ -220,7 +223,7 @@ for kind,fields in [('melee',['building_damage_multiplier']),('ranged',['traject
 def current_attack(kind):
  return {'required':['parameter_explanations'],'properties':{'native_parameters':{'required':(['building_damage_multiplier'] if kind=='melee' else ['building_damage_multiplier','trajectory_sight','fixed_elevation','max_elevation'])}}}
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':const('1.18.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum('1.18.0','1.19.0')},'required':['schema_version']},
  'then':{'properties':{'units':{'items':{'properties':{
   'body':{'required':['target_classification']},
   'passives':{'properties':{'abilities':{'items':{'required':['spreadings']}}}},

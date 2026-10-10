@@ -1,9 +1,9 @@
-# Evidence packet contract 1.18.0
+# Evidence packet contract 1.19.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.18.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.19.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -36,6 +36,13 @@ A packet has one snapshot/baseline, one or more qualified `units`, shared trait
 descriptions, inline evidence IDs and optional expanded provenance/graph details.
 Single-unit and two-unit requests use the same schema. No winner, calculated
 damage, interpreted trigger satisfaction or modified baseline belongs here.
+Complete combined two-unit requests add an optional `comparison` that aligns
+returned range, ammunition capacity, attack types and passive conditions by
+unit name, with source references. It describes the records already returned in
+`units`; it does not select a winner, apply conditional effects, or infer DPS.
+Projected or mode-restricted pair requests omit this comparison. A partial
+ability page is marked partial in its condition text, and a missing ranged
+record remains distinct from a known absence.
 
 Default unit/matchup/passive responses declare `provenance_mode: deferred` and
 leave `sources`/`provenance` empty. Pass `include_provenance=True` (CLI

@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.18.0'
+PACKET_VERSION = '1.19.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -471,6 +471,8 @@ class Queries:
                 section = decoded['section']
                 offsets[section] = decoded['offset']
             packet['units'].append(context.unit(unit, mode, section, offsets, limit))
+        if len(units) == 2 and mode == 'combined' and section is None:
+            packet['comparison'] = context.comparison()
         for unit in packet['units']:
             coverage = unit['coverage']
             coverage['diagnostic_count'] = len(coverage['gaps'])
@@ -705,8 +707,9 @@ class Packet:
             raise ValueError('missing provenance: ' + rid)
         path = p['source_file']
         sid = 's_' + hashlib.sha256(path.encode()).hexdigest()[:12]
-        source = self.q.one('source_files', 'path', path)
-        self.packet['sources'][sid] = {'path': path, 'sha256': source['sha256'], 'owner': source['owner']}
+        if sid not in self.packet['sources']:
+            source = self.q.one('source_files', 'path', path)
+            self.packet['sources'][sid] = {'path': path, 'sha256': source['sha256'], 'owner': source['owner']}
         self.packet['provenance'][rid] = {'source_id': sid, 'logical_record': p['logical_record'],
                                          'key': {k: '' if v is None else str(v) for k, v in json.loads(p['native_key_json']).items()},
                                          'source_line': p['source_line'], 'source_patch': p['source_patch'],
@@ -1033,8 +1036,10 @@ class Packet:
                     [ref for effect in effects for ref in effect['provenance_refs']]))})
         replacement = self.supersession_summary(mechanic, definition, gaps)
         mechanic['summary'] = self.summary(mechanic, replacement)
-        if any((mechanic['native_parameters'].get(f) or 0) > 0 for f in ('num_effected_friendly_units', 'num_effected_enemy_units')):
+        if (mechanic['native_parameters'].get('num_effected_friendly_units') or 0) > 0:
             mechanic['summary'] += ' Recipient limits do not establish target choice or whether the bearer consumes a friendly slot.'
+        elif (mechanic['native_parameters'].get('num_effected_enemy_units') or 0) > 0:
+            mechanic['summary'] += ' The enemy recipient limit does not establish which eligible target is chosen.'
         for spread in mechanic['spreadings']:
             radius = str(spread['radius']) if spread['radius'] is not None else 'unknown'
             mechanic['summary'] += (' Spreading links to phase ' + spread['phase_key'] +
@@ -1614,6 +1619,67 @@ class Packet:
                                 graph['edges'].append(item)
                 self.stored_gaps(target, 'weapons', gaps)
 
+    def explain_child_payload(self, attack):
+        """Summarize a source-linked shrapnel chain without inferring hit arithmetic."""
+        explosion = attack.get('explosion')
+        graph = self.packet['payload_graph']
+        nodes = {n['id']: n for n in graph['nodes']}
+        children = {}
+        for edge in graph['edges']:
+            children.setdefault(edge['from'], []).append(edge['to'])
+        roots = []
+        if explosion:
+            radius = explosion['radius']
+            roots.append(('attack_payload:' + explosion['id'],
+                          f'Root explosion {explosion["base_damage"]:g} base/{explosion["ap_damage"]:g} armour-piercing damage, '
+                          f'radius {radius:g} {"metre" if radius == 1 else "metres"}'))
+        roots.append(('attack_payload:' + attack['id'], 'Root projectile'))
+        parts = []
+        refs = []
+        visited_shrapnel = set()
+        for root, root_text in roots:
+            for shrapnel_id in children.get(root, []):
+                if shrapnel_id in visited_shrapnel:
+                    continue
+                shrapnel = nodes.get(shrapnel_id)
+                if not shrapnel or shrapnel['kind'] != 'native_projectile_shrapnels':
+                    continue
+                amount = shrapnel['native_parameters'].get('amount')
+                if amount is None:
+                    continue
+                for projectile_id in children.get(shrapnel_id, []):
+                    projectile = nodes.get(projectile_id)
+                    if not projectile or projectile['kind'] != 'projectiles':
+                        continue
+                    descendants = [nodes[i] for i in children.get(projectile_id, []) if i in nodes]
+                    blasts = [n for n in descendants if n['kind'] == 'explosions']
+                    vortices = [n for n in descendants if n['kind'] == 'native_vortices']
+                    if not blasts and not vortices:
+                        continue
+                    pieces = [f'{amount:g} child {"projectile" if amount == 1 else "projectiles"}']
+                    for blast in blasts:
+                        p = blast['native_parameters']
+                        if all(p.get(k) is not None for k in ('base_damage', 'ap_damage', 'radius')):
+                            pieces.append(f'child explosion {p["base_damage"]:g} base/{p["ap_damage"]:g} armour-piercing damage, '
+                                          f'radius {p["radius"]:g} {"metre" if p["radius"] == 1 else "metres"}')
+                            refs += blast['provenance_refs']
+                    for vortex in vortices:
+                        p = vortex['native_parameters']
+                        if all(p.get(k) is not None for k in ('damage', 'damage_ap', 'duration', 'start_radius', 'goal_radius')):
+                            radius = (f'radius {p["start_radius"]:g} metres' if p['start_radius'] == p['goal_radius']
+                                      else f'start radius {p["start_radius"]:g} metres, goal radius {p["goal_radius"]:g} metres')
+                            pieces.append(f'linked vortex {p["damage"]:g} base/{p["damage_ap"]:g} armour-piercing damage, {radius}, duration {p["duration"]:g} seconds')
+                            refs += vortex['provenance_refs']
+                    if len(pieces) > 1:
+                        parts.append(root_text + ' links to ' + '; '.join(pieces) + '.')
+                        refs += shrapnel['provenance_refs'] + projectile['provenance_refs']
+                        visited_shrapnel.add(shrapnel_id)
+        if parts:
+            attack['parameter_explanations']['payload_chain'] = (
+                ' '.join(parts) + ' These are separate source payload settings; child hits per target and total damage are not established.')
+            attack['provenance_refs'] = list(dict.fromkeys(attack['provenance_refs'] +
+                                                          (explosion['provenance_refs'] if explosion else []) + refs))
+
     def unit(self, resolved, mode, section, offsets, limit):
         q = self.q; key = resolved['unit_key']
         profile = q.one('unit_profiles', 'unit_key', resolved['profile_unit_key'])
@@ -1742,6 +1808,7 @@ class Packet:
                     'building_damage_multiplier': 'Native projectile building-damage multiplier; does not override can_damage_buildings=false. Combined siege damage is not calculated.'}
                 ranged.append(a)
                 self.weapon_payload(p, a['id'], gaps)
+                self.explain_child_payload(a)
                 self.attach_traits(attack_traits, 'ranged', self.traits('ranged', a, p, component))
                 self.stored_gaps(p['record_id'], 'weapons', gaps)
             self.stored_gaps(w['record_id'], 'weapons', gaps)
@@ -1824,6 +1891,97 @@ class Packet:
         else:
             traits['additional'].append({'kind': kind, 'traits': value})
 
+    def comparison(self):
+        """Align already-returned facts for a complete, combined pair lookup."""
+        first, second = self.packet['units']
+        units = (first, second)
+        names = [u['identity']['name'] or u['identity']['unit_key'] for u in units]
+        dimensions = []
+
+        def attacks(unit, kind):
+            value = unit[kind]
+            return [value, *value['variants']] if value and value.get('variants') is not None else []
+
+        def ranged_values(unit, field, unit_label):
+            value = unit['ranged']
+            if value is None:
+                return 'No ranged attack in the source profile.', unit['provenance_refs']
+            if value['status'] != 'present':
+                return 'Ranged attacks not returned in this page.', unit['provenance_refs']
+            rows = attacks(unit, 'ranged')
+            def describe(row):
+                name = row['slot'] + (' alternate projectile' if not row['is_default'] else '')
+                if row[field] is None:
+                    return name + ': unknown'
+                if field == 'range':
+                    return f'{name}: {row[field]:g} {unit_label}'
+                supply = row['ammunition_supply']
+                pool = f'{supply["effective_pool"]} pool' if supply['effective_pool'] else 'pool unresolved'
+                unlimited = '; unlimited secondary supply flag' if supply['unlimited'] else ''
+                return f'{name}: capacity {row[field]:g} ({pool}{unlimited})'
+            text = '; '.join(describe(row) for row in rows)
+            if next(s for s in unit['coverage']['sections'] if s['name'] == 'weapons')['state'] != 'complete':
+                text += '; weapon page is partial'
+            return text, [ref for row in rows for ref in row['provenance_refs']]
+
+        for dimension, field, label in (('range', 'range', 'metres'), ('ammunition', 'ammunition', 'ammunition units')):
+            values = [ranged_values(unit, field, label) for unit in units]
+            entry = {'dimension': dimension, 'unit_a': values[0][0], 'unit_b': values[1][0],
+                     'provenance_refs': list(dict.fromkeys(values[0][1] + values[1][1]))}
+            if all(unit['ranged'] and unit['ranged']['status'] == 'present' and
+                   unit['ranged'][field] is not None and
+                   (field != 'ammunition' or not unit['ranged']['ammunition_supply']['unlimited']) for unit in units):
+                delta = first['ranged'][field] - second['ranged'][field]
+                entry['difference'] = (f'Primary ranged attacks differ by {abs(delta):g} {label}; '
+                                       f'{names[0] if delta > 0 else names[1]} has the higher value.'
+                                       if delta else 'Primary ranged attacks have the same value.')
+            dimensions.append(entry)
+
+        def attack_types(unit):
+            traits = unit['passives']['attack_traits']
+            scoped = [t for t in (traits['melee'], traits['ranged'], traits['explosion']) if t]
+            scoped += [item['traits'] for item in traits['additional']]
+            by_ref = {t['scope']['attack_ref']: t for t in scoped}
+            parts = []; refs = []
+            for kind in ('melee', 'ranged'):
+                for row in attacks(unit, kind):
+                    labels = []
+                    t = by_ref.get(row['id'])
+                    if t:
+                        labels += [flag for flag in ('magical', 'flaming') if t[flag]]
+                        labels += [f'+{t[field]:g} vs {target}' for field, target in
+                                   (('bonus_vs_infantry', 'infantry'), ('bonus_vs_large', 'large')) if t[field]]
+                        refs += t['provenance_refs']
+                    parts.append(f'{row["slot"]}{" alternate projectile" if kind == "ranged" and not row["is_default"] else ""} {kind}' +
+                                 (f' ({", ".join(labels)})' if labels else ''))
+                    refs += row['provenance_refs']
+            if next(s for s in unit['coverage']['sections'] if s['name'] == 'weapons')['state'] != 'complete':
+                parts.append('Weapon page is partial; further attack types may be available')
+            return '; '.join(parts) or 'Attack records not returned.', refs or unit['provenance_refs']
+
+        values = [attack_types(unit) for unit in units]
+        dimensions.append({'dimension': 'attack_types', 'unit_a': values[0][0], 'unit_b': values[1][0],
+                           'provenance_refs': list(dict.fromkeys(values[0][1] + values[1][1]))})
+
+        def conditions(unit):
+            parts = []; refs = []
+            for ability in unit['passives']['abilities']:
+                for role, items in ability['conditions'].items():
+                    if role == 'unresolved':
+                        continue
+                    for item in items:
+                        parts.append(f'{ability["name"] or "Unnamed passive"}: {role.replace("_", " ")} {item["summary"]}')
+                        refs += item['provenance_refs'] + ability['provenance_refs']
+            abilities = next(s for s in unit['coverage']['sections'] if s['name'] == 'abilities')
+            if abilities['state'] != 'complete':
+                parts.append('Passive ability page is partial; further conditions may be available.')
+            return '; '.join(parts) or 'No conditions in returned passive abilities.', refs or unit['provenance_refs']
+
+        values = [conditions(unit) for unit in units]
+        dimensions.append({'dimension': 'material_conditions', 'unit_a': values[0][0], 'unit_b': values[1][0],
+                           'provenance_refs': list(dict.fromkeys(values[0][1] + values[1][1]))})
+        return {'unit_names': names, 'dimensions': dimensions}
+
     def prune(self):
         # Evidence collected during intermediate assembly is kept only if used.
         used = set()
@@ -1838,6 +1996,7 @@ class Packet:
                 for item in value:
                     walk(item)
         walk(self.packet['units']); walk(self.packet['trait_descriptions']); walk(self.packet['payload_graph'])
+        walk(self.packet.get('comparison', {}))
         pending = list(used)
         while pending:
             for rid in self.packet['provenance'][pending.pop()].get('lineage_refs', []):

@@ -645,6 +645,122 @@ class QueryTests(unittest.TestCase):
                      ('wh_main_dwf_inf_ironbreakers', 'wh_main_vmp_mon_varghulf')]:
             self.check(self.q.get_matchup_evidence(a, b))
 
+    def test_fire_bomb_child_payload_is_explained_without_hit_arithmetic(self):
+        key = 'wh3_dlc25_dwf_veh_thunderbarge'
+        packet = self.q.get_unit_profile(key)
+        unit = self.check(packet)
+        attack = next(a for a in [unit['ranged']] + unit['ranged']['variants']
+                      if a['projectile_key'] == 'wh3_dlc25_unit_abilities_thunderbarge_fire_bomb')
+        summary = attack['parameter_explanations']['payload_chain']
+        source_shrapnel = self.q.one('native_projectile_shrapnels', 'key',
+                                     'wh3_dlc25_unit_abilities_thunderbarge_fire_bomb_shrapnel')
+        source_child = self.q.one('explosions', 'explosion_key',
+                                  'wh3_dlc25_unit_abilities_thunderbarge_fire_bomb_stage_2')
+        source_vortex = self.q.one('native_vortices', 'vortex_key',
+                                   'wh3_dlc25_unit_abilities_thunderbarge_fire_bomb')
+        self.assertEqual(source_shrapnel['amount'], 4)
+        self.assertEqual((source_child['base_damage'], source_child['ap_damage'], source_child['radius']),
+                         (30, 15, 5))
+        self.assertEqual((source_vortex['damage'], source_vortex['damage_ap'],
+                          source_vortex['start_radius'], source_vortex['goal_radius'], source_vortex['duration']),
+                         (0, 8, 8, 8, 6))
+        for phrase in ('Root explosion 0 base/0 armour-piercing damage, radius 1 metre',
+                       '4 child projectiles', 'child explosion 30 base/15 armour-piercing damage, radius 5 metres',
+                       'linked vortex 0 base/8 armour-piercing damage, radius 8 metres, duration 6 seconds',
+                       'child hits per target and total damage are not established'):
+            self.assertIn(phrase, summary)
+        for row in (source_shrapnel, source_child, source_vortex):
+            self.assertIn(row['record_id'], attack['provenance_refs'])
+        expanded = self.q.get_unit_profile(key, include_provenance=True)
+        self.assertEqual(packet['units'], expanded['units'])
+        ushabti = self.check(self.q.get_unit_profile('wh2_dlc09_tmb_mon_ushabti_ror'))
+        self.assertNotIn('payload_chain', ushabti['ranged']['parameter_explanations'])
+
+    def test_all_retained_child_explosion_chains_have_direct_scoped_explanations(self):
+        cases = json.loads((ROOT / 'fixtures/design/chej2-chains.json').read_text())
+        instances = 0
+        for case in cases:
+            child = self.q.one('explosions', 'explosion_key', case['chain'][3])
+            for key in case['units']:
+                packet = self.q.get_unit_profile(key)
+                unit = self.check(packet)
+                attack = next(a for a in [unit['ranged']] + unit['ranged']['variants']
+                              if a['projectile_key'] == case['chain'][0])
+                text = attack['parameter_explanations']['payload_chain']
+                self.assertIn(f'child explosion {child["base_damage"]:g} base/{child["ap_damage"]:g} armour-piercing damage', text)
+                self.assertIn(f'radius {child["radius"]:g} ', text)
+                self.assertIn(child['record_id'], attack['provenance_refs'])
+                self.assertNotIn('guaranteed', text)
+                instances += 1
+        self.assertEqual(instances, 14)
+
+    def test_enemy_recipient_limit_does_not_claim_friendly_slot_uncertainty(self):
+        dominate = self.q.get_passive_detail('wh3_dlc29_hero_passive_dominate')['mechanic']
+        self.assertEqual(dominate['native_parameters']['num_effected_enemy_units'], 1)
+        self.assertEqual(dominate['native_parameters']['num_effected_friendly_units'], 0)
+        self.assertIn('enemy recipient limit', dominate['summary'])
+        self.assertNotIn('friendly slot', dominate['summary'])
+        pack = self.q.get_passive_detail('wh2_dlc16_hero_passive_running_with_the_pack')['mechanic']
+        self.assertGreater(pack['native_parameters']['num_effected_friendly_units'], 0)
+        self.assertIn('whether the bearer consumes a friendly slot', pack['summary'])
+        for key in (dominate['key'], pack['key']):
+            link = self.q.rows('unit_abilities', 'ability_key', key)[0]
+            packet = self.q.get_unit_profile(link['unit_key'], section='abilities', limit=256)
+            summary = next(a['summary'] for a in packet['units'][0]['passives']['abilities'] if a['key'] == key)
+            self.assertEqual(summary, self.q.get_passive_detail(key)['mechanic']['summary'])
+
+    def test_pair_comparison_aligns_source_facts_without_changing_profiles(self):
+        import copy
+        a, b = 'Lothern Sea Guard', 'Blue Horrors of Tzeentch'
+        packet = self.q.get_matchup_evidence(a, b)
+        self.check(packet)
+        self.assertEqual(packet['schema_version'], '1.19.0')
+        self.assertEqual(packet['comparison']['unit_names'], [a, b])
+        dimensions = {d['dimension']: d for d in packet['comparison']['dimensions']}
+        self.assertEqual(set(dimensions), {'range', 'ammunition', 'attack_types', 'material_conditions'})
+        self.assertIn('165 metres', dimensions['range']['unit_a'])
+        self.assertIn('90 metres', dimensions['range']['unit_b'])
+        self.assertIn('75 metres', dimensions['range']['difference'])
+        self.assertIn('capacity 22', dimensions['ammunition']['unit_a'])
+        self.assertIn('capacity 4', dimensions['ammunition']['unit_b'])
+        self.assertIn('magical, flaming', dimensions['attack_types']['unit_b'])
+        self.assertIn('Martial Prowess: deactivates when health below 25%',
+                      dimensions['material_conditions']['unit_a'])
+        self.assertIn('Daemonic Instability', dimensions['material_conditions']['unit_b'])
+        self.assertEqual(packet['units'], [self.q.get_unit_profile(a)['units'][0],
+                                           self.q.get_unit_profile(b)['units'][0]])
+        swapped = self.q.get_matchup_evidence(b, a)
+        self.check(swapped)
+        for dimension in dimensions:
+            inverse = next(d for d in swapped['comparison']['dimensions'] if d['dimension'] == dimension)
+            self.assertEqual(dimensions[dimension]['unit_a'], inverse['unit_b'])
+            self.assertEqual(dimensions[dimension]['unit_b'], inverse['unit_a'])
+        expanded = self.q.get_matchup_evidence(a, b, include_provenance=True)
+        self.assertEqual(packet['comparison'], expanded['comparison'])
+        for dimension in dimensions.values():
+            resolved = self.q.get_provenance(dimension['provenance_refs'])
+            self.assertLessEqual(set(dimension['provenance_refs']), set(resolved['provenance']))
+        mutated = copy.deepcopy(packet)
+        mutated['comparison']['unit_names'].reverse()
+        with self.assertRaisesRegex(ValueError, 'comparison does not match'):
+            packet_checks(mutated, provenance_resolver=self.q.get_provenance)
+        self.assertNotIn('comparison', self.q.get_matchup_evidence(a, b, section='weapons'))
+        limited = self.q.get_matchup_evidence(a, b, limit=1)
+        self.check(limited)
+        limited_dimensions = {d['dimension']: d for d in limited['comparison']['dimensions']}
+        self.assertNotIn('difference', limited_dimensions['range'])
+        self.assertIn('not returned in this page', limited_dimensions['range']['unit_a'])
+        self.assertIn('Weapon page is partial', limited_dimensions['attack_types']['unit_a'])
+        self.assertIn('Passive ability page is partial', limited_dimensions['material_conditions']['unit_b'])
+
+    def test_source_file_evidence_is_looked_up_once_per_packet(self):
+        with patch.object(self.q, 'one', wraps=self.q.one) as lookup:
+            packet = self.q.get_unit_profile('wh3_main_dae_cha_daemon_prince_0', include_provenance=True)
+        self.check(packet)
+        paths = [call.args[2] for call in lookup.call_args_list if call.args[0] == 'source_files']
+        self.assertEqual(len(paths), len(set(paths)))
+        self.assertGreater(len(paths), 0)
+
     def test_components_barrier_and_known_none(self):
         unit = self.check(self.q.get_unit_profile('wh_main_grn_art_doom_diver_catapult'))
         self.assertEqual(sorted(c['count'] for c in unit['body']['components']), [4, 40])
