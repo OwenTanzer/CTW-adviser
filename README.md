@@ -21,6 +21,7 @@ python scripts/query_snapshot.py resolve --db work/units.sqlite Teclis
 python scripts/query_snapshot.py unit --db work/units.sqlite "Lothern Sea Guard"
 python scripts/query_snapshot.py matchup --db work/units.sqlite "Lothern Sea Guard" "Blue Horrors of Tzeentch"
 python scripts/audit_queries.py --db work/units.sqlite --ctw-root ../CTW-data
+python scripts/audit_alpha4_recovery.py --db work/units.sqlite
 python -m unittest discover -s tests -v
 ```
 
@@ -41,3 +42,9 @@ candidates; source aliases and availability remain distinct. Python callers use
 for sections, modes, continuation, detail/provenance commands and interpretation
 boundaries. The public Datasette inspection deployment follows reviewed merges;
 it is separate from the offline query library and future client adapters.
+
+Packet 1.15.0 includes the reconstructed Alpha 4 repairs. Default packets keep
+inline evidence IDs and defer source/provenance dictionaries; use
+`--include-provenance` to expand them or the `provenance` command to resolve IDs.
+The recovery audit checks both views across all roster contexts against the
+published pre-repair baseline; its review-key inventory is checked in.

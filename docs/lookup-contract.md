@@ -887,3 +887,61 @@ have typed shared-unit and native-value preservation regressions. Signed synthet
 cases check spending ammunition and increasing cooldowns without inventing game
 abilities. The suite contains 12 reconstructed test methods beyond the published
 85, not recovered byte-identical historical test files.
+
+### Recovery verification and traceability
+
+| Recorded local-only commit | Reconstructed commit | Coverage |
+| --- | --- | --- |
+| `3ffc012` | `16371d0` | Complete mechanical projections, types, references and healing-phase attachment |
+| `b6473c0` | `49b8f15` | Recipients, aura ranges, durations, stat labels and contact effects |
+| `95045d4` | `19095f3` | Mixed-recipient groups, staged progression, recharge and fatigue |
+| `882375b` | `7008d3b` | Compact default context, optional validated provenance, qualification cleanup |
+| `0ca456b` | `d96d1ec` | Shared healing/intensity/ignition/execution explanations and material uncertainties |
+| `101e72d` | `bad6529` | Signed ammunition/cooldown/power-recharge/reserve conversions |
+
+Fresh recovery verification (10 October 2026, code through `bad6529`):
+
+- 97 tests pass, including 12 reconstructed regressions beyond the published 85.
+- 134 locked files / 72 datasets verify; all 10 registered fixtures pass.
+- Full expanded-evidence audit passes 2,409 unit keys and 32,811 source locators.
+- The baseline comparison passes all 503 ability/culture combinations and 3,181
+  roster contexts. Both compact and expanded packets validate, with every deferred
+  evidence reference resolved against the same snapshot. Native mechanical facts,
+  ordinary attack/body/movement/cost fields and calculation payloads are unchanged.
+- All 193 aura and 175 qualification inventory keys are rechecked. The exact key
+  lists are retained in `fixtures/design/alpha4-review-inventory.json`; they are
+  review metadata, not a new game-data import.
+- 492 of 499 summaries differ from the published baseline. No raw `stat_` labels
+  or obsolete shared healing/resource unit disclaimers remain. 96 summaries retain
+  `unverified`/`not verified`, versus the historical repair record's 88; wording
+  counts are not a claim of byte-identical recovery or a target to drive to zero.
+- Lothern Sea Guard: 23,322 baseline bytes → 11,670 default bytes (23,170 expanded),
+  measured as compact UTF-8 JSON. Expanded-audit performance sizes are not default
+  response sizes.
+- Schema regeneration is byte-identical; source lock, import contract and CTW-data
+  are unchanged. No deployment, merge, independent re-review or full engine
+  reconstruction is claimed. Later quantity/source-coverage review candidates
+  remain outside these six repairs.
+
+Reproduce from the pinned source checkout:
+
+```sh
+python scripts/verify_sources.py --ctw-root ../CTW-data
+python scripts/validate_packets.py --ctw-root ../CTW-data
+python scripts/build_snapshot.py build --ctw-root ../CTW-data --output work/units.sqlite
+python -m unittest discover -s tests -v
+python scripts/audit_queries.py --db work/units.sqlite --ctw-root ../CTW-data
+python scripts/audit_alpha4_recovery.py --db work/units.sqlite
+python scripts/define_packet_schema.py
+git diff --exit-code -- schema/evidence_packet.schema.json
+```
+
+The recovery audit requires Git history containing `804206d7` and writes its
+report under ignored `work/`; its code and inventory are committed so evidence
+can be regenerated after the working directory is removed.
+
+Publication uses the connected GitHub integration because this workspace has no
+Git push credential. Each of the six published commit trees exactly matches its
+tested local reconstruction; commit metadata/IDs differ. Commit messages retain
+the local reconstruction ID and original missing-batch ID. The table above uses
+the actual GitHub commit IDs, not local-only references.

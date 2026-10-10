@@ -1,4 +1,4 @@
-"""Reproduce roster-wide retrieval, source-locator and performance evidence."""
+"""Reproduce expanded-provenance retrieval, source-locator and performance evidence."""
 import argparse
 import csv
 import json
