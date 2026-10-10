@@ -206,6 +206,7 @@ CONDITION_TEXT = {
     'manning_equipment': 'manning equipment', 'no_spells_active': 'no spells active',
     'climbing_manning_eq_on_platform': 'climbing/equipment/platform state (combination rule not established)',
     'unit_is_not_pre_murderous_prowess': 'not in the pre-Murderous-Prowess state (state definition not established)',
+    'no_enemies_in_intercept_range_large': 'no large enemies in intercept range',
 }
 STAT_NAMES = {
     'stat_melee_attack': 'melee_attack', 'stat_melee_defence': 'melee_defence',
@@ -278,6 +279,12 @@ STATIONARY_STAGED_PASSIVES = {'wh3_dlc24_character_passive_bulwark_of_the_gate',
 MELEE_STAGED_PASSIVES = {'wh3_dlc27_unit_passive_murderous_euphoria', 'wh3_dlc27_unit_passive_murderous_euphoria_druchii',
     'wh3_main_daemon_arms_passive_for_the_slaughter', 'wh3_main_daemon_arms_passive_for_the_slaughter_upgraded'}
 INTENSITY_STAGED_PASSIVES = {'wh2_dlc10_lord_passive_blood_frenzy', 'wh_dlc08_unit_passive_berserk', 'wh3_dlc29_unit_passive_drakenhof_banner'}
+REVIEWED_SUPERSESSION_PASSIVES = {
+    'wh2_dlc15_unit_passive_grim_discipline',
+    'wh2_main_character_passive_grand_arcane_conduit',
+    'wh3_main_daemon_arms_passive_for_the_slaughter_upgraded',
+    'wh3_main_daemon_arms_passive_unending_feast_upgraded',
+}
 INTENSITY_DRIVERS = {
     'all_wom_spent': 'Winds of Magic spent by all casters',
     'allies_in_range': 'allies in range',
@@ -746,7 +753,7 @@ class Packet:
             self.gap(gaps, 'unresolved_localization', 'attributes', key + ': unresolved text substitution.', refs)
         return {'key': key, 'name': name, 'summary': text, 'provenance_refs': refs}
 
-    def condition(self, row, key, kind, gaps):
+    def condition(self, row, key, kind, gaps, casting=None):
         text, refs = self.loc('special_ability_invalid_usage_flags_alt_description_' + key)
         if text is None:
             text, refs = self.loc('special_ability_invalid_usage_flags_description_' + key)
@@ -774,10 +781,48 @@ class Packet:
             self.gap(gaps, 'condition_meaning_unknown', 'abilities', key + ': no selected wording.', self.refs(row))
         elif meaning is None:
             meaning = key.replace('_', ' ')
+        # This is a detection/interception setting, separate from effect_range.
+        # Only annotate an encoded intercept predicate when a positive distance
+        # is retained; zero, blank and native negative sentinels are not radii.
+        intercept = casting['target_intercept_range'] if casting else None
+        if 'intercept_range' in key and intercept is not None and intercept > 0:
+            meaning = meaning.replace('intercept range', f'{intercept:g}-metre interception range')
+            refs += self.refs(casting)
         if key in ('climbing_manning_eq_on_platform', 'unit_is_not_pre_murderous_prowess'):
             self.gap(gaps, 'condition_predicate_detail', 'abilities', key + ': exact state/composition needs verification.', self.refs(row))
         return {'key': key, 'summary': meaning,
                 'provenance_refs': self.refs(row) + refs}
+
+    def supersession_summary(self, mechanic, definition, gaps):
+        # Other native sets include self-links and different ability scopes;
+        # only these four passive relationships have been reviewed for prose.
+        if mechanic['key'] not in REVIEWED_SUPERSESSION_PASSIVES:
+            return ''
+        set_key = definition['superseded_abilities_set'] if definition else None
+        if not set_key:
+            return ''
+        elements = self.q.rows('native_unit_ability_superseded_abilities_set_elements',
+                               'set_key', set_key, 'superseded_ability_key,record_id')
+        if not elements:
+            return ''
+        names = []
+        refs = self.refs(definition, *elements)
+        for element in elements:
+            replaced = element['superseded_ability_key']
+            name, name_refs = self.loc('unit_abilities_onscreen_name_' + replaced)
+            refs += name_refs
+            if name is None:
+                name = replaced
+                self.gap(gaps, 'superseded_name_missing', 'abilities',
+                         replaced + ': replacement name not retained.', self.refs(element))
+            names.append(name)
+        mechanic['provenance_refs'] = list(dict.fromkeys(mechanic['provenance_refs'] + refs))
+        result = ('Source-defined replacement: this ability supersedes ' + ' and '.join(names)
+                  + ' when applicable.')
+        if mechanic['requires_effect_enabling']:
+            result += ' This ability requires effect enabling.'
+        return result + (' The packet does not identify the selected configuration or support '
+                         'adding the superseded bonuses.')
 
     def mechanic(self, link, option, gaps):
         key = link['ability_key']
@@ -799,7 +844,7 @@ class Packet:
             ('native_special_ability_to_invalid_target_flags', 'invalid_target', 'invalid_targets', 'invalid target'),
             ('native_special_ability_to_recharge_contexts', 'recharge_context', 'recharges_when', 'recharge')):
             for row in self.q.rows(table, 'special_ability', key):
-                mechanic['conditions'][category].append(self.condition(row, row[field], wording, gaps))
+                mechanic['conditions'][category].append(self.condition(row, row[field], wording, gaps, casting))
         if mechanic['conditions']['recharges_when']:
             self.gap(gaps, 'recharge_activation_boundary', 'abilities', key + ': recharge predicates and timer settings do not certify threshold equality, interrupted progress, reactivation or removal of an existing phase.', refs[:3])
         if mechanic['conditions']['deactivates_when']:
@@ -986,7 +1031,8 @@ class Packet:
                 'phase_detail_ref': self.detail('record', linked['record_id']),
                 'provenance_refs': list(dict.fromkeys(self.refs(spreading, linked) +
                     [ref for effect in effects for ref in effect['provenance_refs']]))})
-        mechanic['summary'] = self.summary(mechanic)
+        replacement = self.supersession_summary(mechanic, definition, gaps)
+        mechanic['summary'] = self.summary(mechanic, replacement)
         if any((mechanic['native_parameters'].get(f) or 0) > 0 for f in ('num_effected_friendly_units', 'num_effected_enemy_units')):
             mechanic['summary'] += ' Recipient limits do not establish target choice or whether the bearer consumes a friendly slot.'
         for spread in mechanic['spreadings']:
@@ -1184,8 +1230,8 @@ class Packet:
             text += '; ordinary deactivation reset is not established'
         return text
 
-    def summary(self, mechanic):
-        """Deterministic templates use only emitted structured evidence."""
+    def summary(self, mechanic, replacement=''):
+        """Deterministic templates use retained, referenced source evidence."""
         pieces = {}
         for effect in mechanic['effects']:
             kind = effect['kind']; ph = effect['phase_ref']
@@ -1222,6 +1268,8 @@ class Packet:
             elif kind == 'visual_indicator':
                 text = effect['purpose']
             elif kind == 'payload_reference':
+                if replacement and effect['relationship'] == 'unit_abilities_tables.superseded_abilities_set':
+                    continue
                 if effect['relationship'] == 'special_ability_phases_tables.spreading' and any(s['origin_phase'] == ph for s in mechanic.get('spreadings', [])):
                     continue
                 if effect['relationship'] == 'special_ability_phases_tables.imbue_contact':
@@ -1309,6 +1357,8 @@ class Packet:
             if key in STATIONARY_STAGED_PASSIVES | MELEE_STAGED_PASSIVES:
                 result += ' Phase durations describe uninterrupted progression; interruption and restart timing are not established.'
         result = self.explained_summary(mechanic) or result
+        if replacement:
+            result += ' ' + replacement
         for category, label in (
             ('activates_when', 'Activation conditions'),
             ('recharges_when', 'Readiness/recharge conditions'),

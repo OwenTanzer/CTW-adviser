@@ -665,6 +665,107 @@ class QueryTests(unittest.TestCase):
         self.assertNotIn('Deactivation flags: Hit Points greater', passive['summary'])
         self.assertEqual(passive['phases'][0]['duration'], -1)
 
+    def test_gamma_supersession_names_all_five_source_edges(self):
+        expected = {
+            'wh2_dlc15_unit_passive_grim_discipline':
+                [('wh2_main_unit_passive_martial_mastery', 'Martial Mastery'),
+                 ('wh2_main_unit_passive_martial_prowess', 'Martial Prowess')],
+            'wh2_main_character_passive_grand_arcane_conduit':
+                [('wh_main_character_abilities_arcane_conduit', 'Arcane Conduit')],
+            'wh3_main_daemon_arms_passive_for_the_slaughter_upgraded':
+                [('wh3_main_daemon_arms_passive_for_the_slaughter', 'For the Slaughter!')],
+            'wh3_main_daemon_arms_passive_unending_feast_upgraded':
+                [('wh3_main_daemon_arms_passive_unending_feast', 'Blighted Feast')],
+        }
+        with (SOURCE / 'data/unit_stats/abilities/tables/unit_ability_superseded_abilities_set_elements.csv').open(
+                encoding='utf-8', newline='') as stream:
+            source_elements = list(csv.DictReader(stream))
+        self.assertEqual(sum(map(len, expected.values())), 5)
+        for owner, replacements in expected.items():
+            definition = self.q.one('native_ability_definitions', 'key', owner)
+            set_key = definition['superseded_abilities_set']
+            self.assertEqual({r['superseded_ability_key'] for r in source_elements if r['set_key'] == set_key},
+                             {key for key, _ in replacements})
+            detail = self.q.get_passive_detail(owner)
+            mechanic = detail['mechanic']
+            self.assertIn('Source-defined replacement:', mechanic['summary'])
+            self.assertNotIn('linked unit_abilities_tables.superseded_abilities_set', mechanic['summary'])
+            self.assertIn('when applicable', mechanic['summary'])
+            self.assertIn('does not identify the selected configuration', mechanic['summary'])
+            self.assertEqual('requires effect enabling' in mechanic['summary'],
+                             mechanic['requires_effect_enabling'])
+            elements = self.q.rows('native_unit_ability_superseded_abilities_set_elements', 'set_key', set_key)
+            self.assertTrue({e['record_id'] for e in elements} <= set(mechanic['provenance_refs']))
+            for replaced, name in replacements:
+                self.assertIn(name, mechanic['summary'])
+                self.assertTrue(any(e['superseded_ability_key'] == replaced for e in elements))
+            link = self.q.rows('unit_abilities', 'ability_key', owner)[0]
+            unit = self.check(self.q.get_unit_profile(link['unit_key']))
+            ordinary = next(m for m in unit['passives']['abilities'] if m['key'] == owner)
+            self.assertEqual(ordinary['summary'], mechanic['summary'])
+        control = self.q.get_passive_detail('wh2_main_unit_passive_martial_prowess')['mechanic']
+        self.assertNotIn('Source-defined replacement:', control['summary'])
+
+    def test_gamma_interception_distances_are_condition_scoped(self):
+        inventory = {
+            'wh2_dlc13_lord_passive_fleet_footed': 70,
+            'wh2_dlc15_lord_passive_best_of_da_best': 30,
+            'wh2_dlc16_lord_passive_gwindalors_vantage': 70,
+            'wh2_dlc25_hero_passive_tools_of_judgement': 15,
+            'wh3_cp1_lord_passive_master_of_the_hunt': 50,
+            'wh3_dlc23_unit_passive_malign_authority': 55,
+            'wh3_dlc24_unit_passive_eternal_duty': 55,
+            'wh3_dlc24_unit_passive_sacred_duty': 55,
+            'wh3_dlc24_unit_passive_spawn_kin_kroxigors': 35,
+            'wh3_dlc24_unit_passive_spawn_kin_skinks': 35,
+            'wh3_dlc25_character_passive_worthy_foe': 15,
+            'wh3_dlc26_unit_passive_grey_supremacy': 35,
+            'wh3_dlc27_unit_passive_battle_songs': 100,
+            'wh3_dlc29_character_passive_winterborn_bastion': 15,
+            'wh3_dlc29_hero_passive_kraken_hunter': 30,
+            'wh3_dlc29_spell_protector_of_the_empire': 35,
+            'wh3_main_character_passive_loner': 30,
+            'wh3_main_daemon_legs_passive_sinful_footing': 100,
+            'wh3_twa08_unit_passive_goreshell': 30,
+            'wh_dlc05_hero_passive_hawkish_precision': 70,
+            'wh_dlc05_unit_passive_guardians_of_the_wildwood': 55,
+            'wh_dlc06_unit_passive_squigs_go_wild': 30,
+            'wh_dlc07_unit_passive_the_peasants_duty': 55,
+            'wh_pro04_unit_abilities_soul_devourer': 200,
+        }
+        self.assertEqual(len(inventory), 24)
+        for key, distance in inventory.items():
+            casting = self.q.one('native_ability_casting', 'key', key)
+            self.assertEqual(casting['target_intercept_range'], distance)
+            detail = self.q.get_passive_detail(key)['mechanic']
+            conditions = [c for role in detail['conditions'].values() for c in role
+                          if 'intercept_range' in c['key']]
+            self.assertEqual(len(conditions), 1, key)
+            condition = conditions[0]
+            phrase = f'{distance:g}-metre interception range'
+            self.assertIn(phrase, condition['summary'])
+            self.assertIn(phrase, detail['summary'])
+            self.assertIn(casting['record_id'], condition['provenance_refs'])
+            link = self.q.rows('unit_abilities', 'ability_key', key)[0]
+            unit = self.check(self.q.get_unit_profile(link['unit_key']))
+            ordinary = next(m for m in unit['passives']['abilities'] if m['key'] == key)
+            self.assertEqual(ordinary['summary'], detail['summary'])
+            self.assertEqual(ordinary['conditions'], detail['conditions'])
+        spawn = self.q.get_passive_detail('wh3_dlc24_unit_passive_spawn_kin_kroxigors')['mechanic']
+        self.assertIn('Deactivates when: no skink allies in 35-metre interception range', spawn['summary'])
+        songs = self.q.get_passive_detail('wh3_dlc27_unit_passive_battle_songs')['mechanic']
+        self.assertEqual(songs['native_parameters']['effect_range'], 55)
+        self.assertIn('within 55 metres', songs['summary'])
+        self.assertIn('100-metre interception range', songs['summary'])
+        self.assertIn('Deactivates when: cannot find enemies', songs['summary'])
+        from ctw_adviser.queries import Packet
+        condition = self.q.rows('native_special_ability_to_auto_deactivate_flags',
+                                'special_ability', 'wh3_dlc24_unit_passive_spawn_kin_kroxigors')[0]
+        for absent in (None, 0, -1):
+            short = Packet(self.q).condition(condition, condition['deactivate_flag'],
+                                             'deactivation', [], {'target_intercept_range': absent})
+            self.assertNotIn('-metre interception range', short['summary'])
+
     def test_weapon_variants_and_shared_pools_keep_default_first(self):
         unit = self.check(self.q.get_unit_profile('Lothern Sea Guard'))
         self.assertEqual(unit['ranged']['slot'], 'primary')
