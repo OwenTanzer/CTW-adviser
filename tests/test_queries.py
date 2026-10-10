@@ -243,7 +243,7 @@ class QueryTests(unittest.TestCase):
             for phase in m['phases']:
                 self.assertIn(f'phase duration {phase["duration"]:g} seconds' if phase['duration'] >= 0 else 'no fixed phase expiry while active', text)
             if key in INTENSITY_STAGED_PASSIVES:
-                self.assertIn('time spent in melee while the ability is active', text)
+                self.assertIn('time spent in melee; updates only while the ability is active', text)
                 self.assertIn('effective scaling and stacking remain unverified', text)
                 self.assertIn('no time-based intensity decay', text)
             if key in MELEE_STAGED_PASSIVES:
@@ -771,7 +771,7 @@ class QueryTests(unittest.TestCase):
             self.assertEqual(mechanic['phases'][0]['lifecycle'][field], value)
         mechanic = self.q.get_passive_detail('wh2_dlc09_unit_passive_unstable_mark_ii_sand')['mechanic']
         self.assertIn('max amount: 1.3', mechanic['summary'])
-        self.assertIn('effective scaling and stacking unverified', mechanic['summary'])
+        self.assertIn('effective scaling and stacking remain unverified', mechanic['summary'])
         self.assertNotIn('source path:', mechanic['summary'])
 
     def test_alpha4_compact_provenance_is_explicit_and_snapshot_validated(self):
@@ -816,6 +816,116 @@ class QueryTests(unittest.TestCase):
         result = subprocess.run(command, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)['provenance_mode'], 'expanded')
+
+    def core_mechanics(self):
+        return [self.q.get_passive_detail(row[0])['mechanic'] for row in self.q.db.execute(
+            "SELECT DISTINCT ability_key FROM unit_abilities JOIN ability_option_metadata USING(ability_key) WHERE classification='core_passive' ORDER BY 1")]
+
+    def test_alpha4_healing_family_units_limits_and_nonstandard_exception(self):
+        from ctw_adviser.queries import Packet
+        mechanics = [m for m in self.core_mechanics() if any(e['kind']=='healing' for e in m['effects'])]
+        self.assertEqual(len(mechanics), 55)
+        for m in mechanics:
+            self.assertNotIn('amount units', m['summary'])
+            self.assertNotIn('Healing units', m['summary'])
+            for effect in (e for e in m['effects'] if e['kind']=='healing'):
+                n = effect['native_parameters']; text = Packet.healing_summary(n)
+                if n['heal_amount'] and n['hp_change_frequency']==1:
+                    self.assertIn(f'{n["heal_amount"]*100:g}% maximum health per second', text)
+                    self.assertIn('maximum health', m['summary'])
+                if n['barrier_heal_amount']:
+                    self.assertIn(f'{n["barrier_heal_amount"]*100:g}% maximum barrier per application', m['summary'])
+                self.assertIn('resurrect dead entities', text)
+                self.assertIn('healing limits and modifiers', text)
+        for key in ('wh2_dlc11_unit_passive_the_hunger','wh3_dlc23_hero_passive_the_hunger',
+                    'wh_main_lord_passive_the_hunger','wh2_dlc16_hero_passive_running_with_the_pack'):
+            text = self.q.get_passive_detail(key)['mechanic']['summary']
+            self.assertIn('0.1% maximum health per second', text)
+            self.assertIn('does not resurrect', text)
+        lucky = self.q.get_passive_detail('wh3_dlc23_hero_passive_lucky_git')['mechanic']
+        self.assertIn('interval setting 1.5', lucky['summary'])
+        self.assertIn('does not establish tick arithmetic or total healing', lucky['summary'])
+        self.assertNotIn('0.4%', lucky['summary'])
+        n = {'heal_amount':None,'barrier_heal_amount':0,'hp_change_frequency':None,'resurrect':None}
+        self.assertIn('amount unknown', Packet.healing_summary(n))
+        self.assertIn('interval unknown', Packet.healing_summary(n))
+
+    def test_alpha4_intensity_family_all_drivers_and_lifecycle(self):
+        from ctw_adviser.queries import INTENSITY_DRIVERS
+        mechanics = [m for m in self.core_mechanics() if any(e.get('native_kind')=='intensity_settings' for e in m['effects'])]
+        self.assertEqual(len(mechanics), 63)
+        seen = set()
+        for m in mechanics:
+            for e in (e for e in m['effects'] if e.get('native_kind')=='intensity_settings'):
+                n=e['native_parameters']; driver=n['intensity_source']; seen.add(driver)
+                source=self.q.one('native_special_ability_intensity_sources','source_type',driver)
+                text=m['summary']
+                self.assertIn(INTENSITY_DRIVERS[driver], text)
+                self.assertIn('source default '+str(n['default_amount']), text)
+                self.assertIn('max amount: '+str(n['max_amount']), text)
+                self.assertIn('updates only while the ability is active' if source['updates_only_when_ability_active'] else 'updates are not restricted to active periods', text)
+                self.assertIn(source['record_id'], e['provenance_refs'])
+                self.assertIn('effective scaling and stacking remain unverified', text)
+                if n['intensity_decay_delay']==-1:
+                    self.assertIn('no time-based intensity decay', text)
+                else:
+                    self.assertIn(f'decay begins {n["intensity_decay_delay"]:g} seconds', text)
+                    self.assertIn(f'decay duration of {n["intensity_decay_duration"]:g} seconds', text)
+                self.assertIn('reinforcement pool resets intensity' if n['reset_intensity_in_reinforcement_pool'] else 'reinforcement pool does not reset intensity', text)
+                if m['native_parameters']['intensity_based_activation']:
+                    self.assertIn('active above zero intensity and inactive otherwise', text)
+                if 'combined_' in driver:
+                    self.assertIn('relative weights', text)
+        self.assertEqual(seen, set(INTENSITY_DRIVERS))
+
+    def test_alpha4_positive_ignition_and_execution_keep_distinct_native_values(self):
+        from ctw_adviser.queries import Packet
+        for key,value in (('wh_dlc04_unit_passive_balefire',10),('wh3_cp1_lord_passive_fire_warrior',50),('wh3_main_lord_passive_blaze_of_devotion',10)):
+            m=self.q.get_passive_detail(key)['mechanic']
+            effect=next(e for e in m['effects'] if 'imbue_ignition' in e.get('native_parameters',{}))
+            self.assertEqual(effect['kind'],'phase_behavior')
+            self.assertEqual(effect['native_parameters']['imbue_ignition'],value)
+            self.assertIn('Grants flaming attacks',m['summary'])
+            self.assertNotIn('ignition encoding not verified',m['summary'])
+            phase=self.q.one('native_ability_phases','id',effect['phase_ref'])
+            phase['imbue_ignition']=-1
+            effects=Packet(self.q).phase_effects(phase,[])
+            self.assertTrue(any(e['kind']=='unresolved' and e.get('native_parameters',{}).get('imbue_ignition')==-1 for e in effects))
+        m=self.q.get_passive_detail('wh3_dlc26_character_passive_forboding_executioner')['mechanic']
+        self.assertIn('at or below 30% health',m['summary'])
+        self.assertIn('20%',m['summary'])
+        self.assertEqual(next(e for e in m['effects'] if e['kind']=='periodic_damage')['native_parameters']['damage_amount'],732)
+        self.assertEqual(next(e for e in m['effects'] if 'execute_ratio' in e.get('native_parameters',{}))['native_parameters']['execute_ratio'],.3)
+        validate(m,self.schema['$defs']['mechanic'],self.schema)
+
+    def test_alpha4_damage_and_fatigue_shared_units_are_not_total_damage(self):
+        mechanics=self.core_mechanics()
+        fatigue=[m for m in mechanics if any('fatigue_change_ratio' in e.get('native_parameters',{}) for e in m['effects'])]
+        self.assertEqual(len(fatigue),22)
+        for m in fatigue:
+            self.assertIn('% of maximum fatigue per second',m['summary'])
+            self.assertNotIn('fatigue scale',m['summary'])
+        for key,damage in (('wh2_dlc15_unit_passive_thermal_thorax',4),('wh2_dlc16_character_passive_murder_of_spites',2)):
+            m=self.q.get_passive_detail(key)['mechanic']
+            self.assertIn(f'Damage: {damage} per entity per application',m['summary'])
+            self.assertIn('maximum affected entities per application: 4',m['summary'])
+            self.assertEqual('unreliable on small unit sizes' in m['summary'],damage<4)
+            self.assertNotIn('damage units and effective timing',m['summary'])
+
+    def test_alpha4_broader_review_deduplicates_only_incidental_qualifications(self):
+        for key in ('wh3_cp1_unit_passive_implacable_spirit','wh3_dlc23_unit_passive_dig_in','wh3_dlc25_unit_passive_blackpowder_discipline'):
+            text=self.q.get_passive_detail(key)['mechanic']['summary']
+            self.assertEqual(text.count('combination rule'),1)
+            self.assertNotIn('exact combination rule remains unverified',text)
+        for key in ('wh2_dlc16_unit_passive_warp_discharge','wh2_dlc17_unit_passive_searing_bile_blood','wh2_dlc17_unit_passive_spurting_bile_blood'):
+            text=self.q.get_passive_detail(key)['mechanic']['summary']
+            self.assertNotIn('recharge progresses',text)
+            self.assertIn('Readiness/recharge conditions:',text)
+            self.assertIn('Recharge timer settings:',text)
+            self.assertNotIn('Exact launch scheduling',text)
+        self.assertIn('every incoming hit',self.q.get_passive_detail('wh2_dlc17_unit_passive_spurting_bile_blood')['mechanic']['summary'])
+        self.assertIn('exact contact recipients',self.q.get_passive_detail('wh2_main_unit_passive_rebirth')['mechanic']['summary'])
+        self.assertIn('repeatability',self.q.get_passive_detail('wh2_dlc16_lord_passive_conjoined_destiny')['mechanic']['summary'])
 
     def test_attribute_polarity_describes_application_not_benefit(self):
         from ctw_adviser.queries import Packet

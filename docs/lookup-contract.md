@@ -800,3 +800,49 @@ threshold equality. Removing these from default prose does not resolve them.
 
 Recovery verification: 90 tests pass, including deferred-evidence integrity,
 identical mechanical views and a compact-response size regression.
+
+### Broader qualification review — reconstruction of `0ca456b` (packet 1.14.0)
+
+All 55 healing-bearing definitions and all 63 intensity-bearing definitions are
+covered by family regressions. Standard one-second healing is expressed as a
+percentage of maximum health, barrier healing as a proportion of maximum barrier
+per application. Intervals, resurrection flags, recipients, healing limits and
+modifiers remain distinct. Lucky Git's 1.5-second setting still does not establish
+effective tick arithmetic or total healing. Conjoined Destiny's 1.1-second phase
+is not multiplied into a guaranteed total; failure/survival branches retain their
+success, repeatability and recipient qualifications. `healing_effective_limits`
+replaces the generic unknown-units diagnostic.
+
+This restores the recorded interpretation based on
+[CA's healing-system announcement](https://www.totalwar.com/blog/total-war-warhammer-3-quality-of-life-updates/),
+the pinned Regeneration/Conjoined Destiny calibration and native phase schema.
+The historical `heal_amount` field description alone is not proof of the modern
+percentage scale. The CA page was unavailable (403) during recovery; its recorded
+interpretation is restored, not represented as a new runtime measurement.
+
+Intensity explanations cover all 13 retained drivers, the source's active-only
+update flag, source default/maximum, set versus linear scaling, timed/no-timed
+decay, reinforcement reset and intensity-based activation. Source-scale numbers
+are not displayed as percentages. Exact formulas, stacking, composite-driver
+weights and ordinary deactivation resets remain bounded uncertainties. New
+source references point to retained intensity-source rows, not fabricated facts.
+
+Positive ignition settings 10/50 grant flaming attacks; the pinned field/UI
+meaning is a switch, not a damage percentage. Native values and unknown negative
+sentinels remain distinct. Foreboding Executioner's source-defined execution
+threshold is 30% target health, separate from its 20% target-eligibility exclusion
+and damage amount 732. All 22 fatigue definitions retain source fraction-per-second
+units; damage templates retain per-entity/application meaning and low-value caveats.
+
+Remove duplicated climbing/equipment/platform ambiguity and melee-recharge prose;
+keep the generated condition once in its correct role. Move incidental launch,
+departure and phase-transition scheduling to these optional research notes.
+Retain per-hit-retaliation warnings, payload separation, spell-wind-up ambiguity,
+target placement, failure recipients and other consequential limitations.
+
+Recovery verification: 95 tests pass. The complete comparison again passed all
+503 ability/culture combinations and 3,181 roster contexts, with native facts and
+payloads unchanged. This reconstructed batch changes 126 summaries relative to
+the preceding recovery commit, not the historical reported 151; overlapping
+templates were restored in different earlier batches. Sea Guard is 11,670 bytes
+versus 23,322 at the published baseline (compact UTF-8 JSON).

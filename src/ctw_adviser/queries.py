@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.13.0'
+PACKET_VERSION = '1.14.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -45,41 +45,38 @@ RESEARCHED_PASSIVES = {
         'Damage parameters are separate from ordinary weapon attacks and from the separately activated Lightning Strike ability.',
     'wh2_dlc16_lord_passive_conjoined_destiny':
         'Low-health healing for the Sisters of Twilight, disabled above 20% health. '
-        'A 30-second preparation phase precedes a self-healing phase with amount setting 0.25, interval setting 1 and duration setting 1.1. '
-        'The published ability description identifies this as a 25% heal. Countdown interruption, repeatability and effective healing caps remain unverified.',
+        'A 30-second preparation phase precedes self-healing at 25% maximum health per second, with a 1-second interval and a 1.1-second phase. '
+        'The published ability description identifies this as a 25% heal; phase duration alone is not a total-healing formula. Countdown interruption, repeatability and effective healing caps remain unverified.',
     'wh3_dlc23_hero_passive_lucky_git':
         'One-use low-health healing for Gorduz Backstabber, disabled above 25% health. '
         'Prepares for 5 seconds, then heals himself during a 30-second phase. Healing amount setting 0.006 and interval setting 1.5 are retained separately; '
         'the published 0.60% healing-rate description does not establish tick arithmetic or total healing. Interruption behavior remains unverified.',
     'wh3_dlc26_character_passive_bloodborn':
         'One-use low-health healing for Skarr Bloodwrath, disabled above 25% health. '
-        'A 1-second buffer precedes a 1-second self-healing phase with amount setting 0.2 and interval setting 1. '
-        'This is healing of the living host, with resurrection disabled. Effective healing amount and caps remain unverified.',
+        'A 1-second buffer precedes a 1-second self-healing phase at 20% maximum health per second, with a 1-second interval. '
+        'This is healing of the living host, with resurrection disabled; healing limits and modifiers still apply.',
     'wh3_cp1_unit_passive_implacable_spirit':
         'After 25 seconds stationary, the Gate Master gains missile range x1.4, armour-piercing missile damage x1.25 and +15 percentage points missile resistance. '
-        'These effects target the Gate Master himself, not nearby allies. Movement disables the ability; requires effect enabling. '
-        'The additional climbing/equipment/platform restriction is retained below; its exact combination rule remains unverified.',
+        'These effects target the Gate Master himself, not nearby allies. Movement disables the ability; requires effect enabling.',
     'wh3_dlc23_unit_passive_dig_in':
         'After 25 seconds stationary, the host gains missile range x1.4, +15 percentage points missile resistance and Expert Charge Defence. '
-        'These are self-targeted benefits; movement disables the ability. '
-        'The additional climbing/equipment/platform restriction is retained below; its exact combination rule remains unverified.',
+        'These are self-targeted benefits; movement disables the ability.',
     'wh3_dlc25_unit_passive_blackpowder_discipline':
         'After 10 seconds stationary, the host gains +40 accuracy and +10 reload skill until movement disables the ability. '
-        'Reload skill is a stat bonus, not a 10% reduction in reload time. '
-        'The additional climbing/equipment/platform restriction is retained below; its exact combination rule remains unverified.',
+        'Reload skill is a stat bonus, not a 10% reduction in reload time.',
     'wh3_dlc25_lord_passive_feast_of_the_maggot_lord':
         'One-use last chance at death for Tamurkhan, requiring an enemy lord or hero within the 30-metre interception range. '
-        'His self-targeted phase grants Cannot Die and healing (amount setting 0.03, interval setting 1, duration 7); '
+        'His self-targeted phase grants Cannot Die and heals at 3% maximum health per second (1-second interval, 7-second phase); '
         'a separate enemy-targeted phase deals damage (amount 424, interval setting 1, duration 7, maximum one affected entity). '
-        'This is a survival response, not an unconditional death explosion. Exact target priority, phase overlap and success requirements remain unverified.',
+        'This is a survival response, not an unconditional death explosion. Phase overlap and success requirements remain unverified; healing limits and modifiers still apply.',
     'wh3_dlc25_unit_passive_unbinding_spirit_of_grungni':
         'The Spirit of Grungni provides support for 150 seconds, then enters a 5-second disengagement phase and leaves the battlefield to resupply. '
         'The removal phase damages the airship itself (amount 16000, interval setting 1); it does not damage nearby enemies. '
-        'This describes the base summoned-airship ability; campaign upgrades and exact removal scheduling are not evaluated.',
+        'This describes the base summoned-airship ability, without campaign upgrades.',
     'wh3_dlc27_unit_passive_burrowing_instinct':
         'When the Dread Maw breaks, it shatters and leaves the battle rather than rallying. '
         'The self-targeted leadership penalty is -100 and the behavior requests battlefield departure. '
-        'The internal stance named rebirth belongs to this departure sequence, not resurrection. Exact departure timing remains unverified.',
+        'The internal stance named rebirth belongs to this departure sequence, not resurrection.',
     'wh3_twa08_unit_passive_redirecting_aura':
         'Enemy missile units within 55 metres of the Green Guardian have their projectiles redirected toward the firing unit. '
         'Eligibility concerns nearby enemy shooters, not merely projectiles aimed at the Guardian. '
@@ -93,22 +90,20 @@ RESEARCHED_PASSIVES = {
         'Requires effect enabling. Projectile and explosion parameters are retained separately from his ordinary attacks. '
         'Exact strike placement and interrupted recharge remain unverified.',
     'wh2_dlc16_unit_passive_warp_discharge':
-        'Morskittar\'s Hellion releases a damaging magical vortex associated with melee combat; recharge progresses while engaged in melee. '
-        'The vortex is a separate damage payload, not a modifier to each melee hit. Exact launch scheduling remains unverified.',
+        'Morskittar\'s Hellion releases a damaging magical vortex associated with melee combat. '
+        'The vortex is a separate damage payload, not a modifier to each melee hit.',
     'wh2_dlc17_unit_passive_searing_bile_blood':
-        'The Vorbergland Broodmother releases a damaging bile vortex associated with melee combat; recharge progresses while engaged in melee. '
-        'The linked vortex supplies the armour-piercing damage parameters. The records do not establish retaliation on every incoming hit; exact launch scheduling remains unverified.',
+        'The Vorbergland Broodmother releases a damaging bile vortex associated with melee combat. '
+        'The linked vortex supplies the armour-piercing damage parameters. The records do not establish retaliation on every incoming hit.',
     'wh2_dlc17_unit_passive_spurting_bile_blood':
-        'The Jabberslythe releases a damaging bile vortex associated with melee combat; recharge progresses while engaged in melee. '
-        'The records do not establish retaliation on every incoming hit. Vortex damage is separate from ordinary melee damage; exact launch scheduling remains unverified.',
+        'The Jabberslythe releases a damaging bile vortex associated with melee combat. '
+        'The records do not establish retaliation on every incoming hit. Vortex damage is separate from ordinary melee damage.',
     'wh3_dlc24_unit_passive_tides_of_transformation':
         'The Mutalith Vortex Beast releases the linked transformation vortex, with recharge progressing while engaged in melee. '
-        'Its 32-second self-targeted phase has no numerical modifier; the damaging effect belongs to the separate vortex payload. '
-        'Exact launch timing and phase-to-vortex synchronization remain unverified.',
+        'Its 32-second self-targeted phase has no numerical modifier; the damaging effect belongs to the separate vortex payload.',
     'wh3_dlc26_unit_passive_hellraiser':
         'The Hellforged Bellowers release the linked damaging vortex in melee; recharge progresses in melee and the ability deactivates outside melee. '
-        'Its 6-second self-targeted phase has no numerical modifier; outward damage belongs to the separate vortex payload. '
-        'Exact launch scheduling remains unverified.',
+        'Its 6-second self-targeted phase has no numerical modifier; outward damage belongs to the separate vortex payload.',
     'wh2_dlc15_unit_passive_giant_explodin_spores':
         'Logey Bogey\'s Spore Splodaz release explosive spores on entering melee; the published description associates this with the charge. '
         'Spores recharge outside melee, with initial recharge 0 and subsequent recharge 60. '
@@ -122,15 +117,15 @@ RESEARCHED_PASSIVES = {
     'wh3_main_daemon_body_passive_foreboding_ignition':
         'One-use low-health release of an expanding damaging vortex, disabled above 10% host health. '
         'Requires effect enabling. This is a low-health response, not an established death trigger. '
-        'Vortex parameters remain separate from ordinary attacks; release timing remains unverified.',
+        'Vortex parameters remain separate from ordinary attacks.',
     'wh3_main_lord_passive_wrath_of_khorne':
         'Punishes enemy spellcasting within the 100-metre interception range with a separate damaging vortex; recharge setting 15. '
         'Requires effect enabling. The target restriction checks for an ability winding up; spellcasting is the reviewed interpretation of the published description. '
-        'The treatment of non-spell abilities, simultaneous casters, target priority and exact firing timing remain unverified. This does not establish spell cancellation.',
+        'The treatment of non-spell abilities and simultaneous casters remains unverified. This does not establish spell cancellation.',
     'wh_dlc06_lord_passive_locus_of_power':
         'Causes a damaging miscast-like explosion when an enemy casts within the 100-metre interception range of the Anvil of Doom; recharge setting 6. '
         'Damage is supplied by the linked vortex rather than added to ordinary attacks. The target restriction checks for an ability winding up. '
-        'The treatment of non-spell abilities, simultaneous casters, target priority and exact firing timing remain unverified. This does not establish spell cancellation.',
+        'The treatment of non-spell abilities and simultaneous casters remains unverified. This does not establish spell cancellation.',
 }
 
 EXPLAINED_PHASE_ROLES = {
@@ -287,6 +282,21 @@ STATIONARY_STAGED_PASSIVES = {'wh3_dlc24_character_passive_bulwark_of_the_gate',
 MELEE_STAGED_PASSIVES = {'wh3_dlc27_unit_passive_murderous_euphoria', 'wh3_dlc27_unit_passive_murderous_euphoria_druchii',
     'wh3_main_daemon_arms_passive_for_the_slaughter', 'wh3_main_daemon_arms_passive_for_the_slaughter_upgraded'}
 INTENSITY_STAGED_PASSIVES = {'wh2_dlc10_lord_passive_blood_frenzy', 'wh_dlc08_unit_passive_berserk', 'wh3_dlc29_unit_passive_drakenhof_banner'}
+INTENSITY_DRIVERS = {
+    'all_wom_spent': 'Winds of Magic spent by all casters',
+    'allies_in_range': 'allies in range',
+    'combined_time_in_melee_and_self_wom_spent': 'combined time in melee and the bearer\'s Winds of Magic expenditure',
+    'damage_taken': 'damage taken',
+    'damage_taken_and_combined_time_in_melee_self_wom_spent_damage_taken': 'damage taken, time in melee and the bearer\'s Winds of Magic expenditure',
+    'enemies_in_range': 'enemies in range',
+    'enemy_in_range_low_morale': 'low-leadership enemies in range',
+    'harmony': 'Harmony',
+    'kills_made': 'kills made',
+    'mastery_of_elemental_winds': 'Mastery of the Elemental Winds',
+    'nearby_all_deaths': 'nearby deaths of allies or enemies',
+    'nearby_enemy_deaths': 'nearby enemy deaths',
+    'time_in_melee': 'time spent in melee',
+}
 TRAIT_TEXT = {
     'magical': ('ui_unit_bullet_point_enums_tooltip_ward_physical',
                 'Magical attacks bypass physical resistance; scoped to this attack.'),
@@ -921,7 +931,7 @@ class Packet:
                     if role:
                         effect['reason'] = role
                     elif casting and (casting['vortex'] or casting['bombardment']):
-                        effect['reason'] = 'Ability phase with no numerical modifier; damage comes from the separately linked vortex or bombardment. Exact phase-to-payload timing remains unverified.'
+                        effect['reason'] = 'Ability phase with no numerical modifier; damage comes from the separately linked vortex or bombardment.'
                 if effect.get('native_kind') == 'phase' and (
                         effect['phase_ref'] == 'wh2_main_unit_passive_rebirth_buffer' or
                         (key in RESEARCHED_PASSIVES and (effect['phase_ref'] in EXPLAINED_PHASE_ROLES or
@@ -931,7 +941,7 @@ class Packet:
                     gaps[:] = [gap for gap in gaps if not (
                         gap['code'] == 'phase_effect_unknown' and gap['summary'] == phase_ref + ': no mapped numerical effect.')]
                 if key == 'wh3_dlc27_unit_passive_burrowing_instinct' and effect.get('native_kind') == 'phase_behavior':
-                    effect['reason'] = 'The rebirth stance is used with battlefield departure when the Dread Maw breaks, not resurrection; exact transition timing remains unverified.'
+                    effect['reason'] = 'The rebirth stance is used with battlefield departure when the Dread Maw breaks, not resurrection.'
                     if set(effect['native_parameters']) == {'requested_stance'}:
                         effect['kind'] = 'phase_behavior'
                         gaps[:] = [gap for gap in gaps if not (
@@ -977,7 +987,7 @@ class Packet:
             effects.append({'kind': 'healing', 'phase_ref': key,
                             'native_parameters': {**{k: phase[k] for k in ('heal_amount', 'barrier_heal_amount', 'hp_change_frequency')},
                                                   'resurrect': boolean(phase['resurrect']), 'limits': {}}, 'provenance_refs': refs})
-            self.gap(gaps, 'healing_units_limits', 'abilities', key + ': quantities, cadence and resurrection are native; effective healing units/caps are not certified.', refs)
+            self.gap(gaps, 'healing_effective_limits', 'abilities', key + ': healing limits, modifiers and realised totals are not calculated; nonstandard intervals do not establish tick arithmetic.', refs)
         for edge in self.q.rows('relation_edges', 'source_record', phase['record_id'], 'relation,target_key_json,edge_ordinal'):
             if edge['target_record']:
                 effects.append({'kind': 'payload_reference', 'phase_ref': key,
@@ -986,8 +996,10 @@ class Packet:
                  if v not in (0, None, False) and k not in ('effect_type', 'affects_allies', 'affects_enemies')}
         # Classify supported behavior independently of any remaining opaque settings.
         explained = {k: other.pop(k) for k in ('imbue_magical', 'imbue_contact', 'fatigue_change_ratio') if k in other}
-        if key == 'wh_dlc04_unit_passive_balefire' and other.get('imbue_ignition') == 10:
+        if other.get('imbue_ignition', 0) > 0:
             explained['imbue_ignition'] = other.pop('imbue_ignition')
+        if 0 < other.get('execute_ratio', 0) <= 1:
+            explained['execute_ratio'] = other.pop('execute_ratio')
         if key == 'wh2_dlc09_unit_passive_spirit_conduit' and other.get('mana_regen_mod') == 0.2:
             explained['mana_regen_mod'] = other.pop('mana_regen_mod')
         if explained:
@@ -1000,6 +1012,8 @@ class Packet:
                 meanings.append('Attacks apply the linked contact effect ' + explained['imbue_contact'] + ' while this phase is active.')
             if 'imbue_ignition' in explained:
                 meanings.append('Grants flaming attacks; the native setting is not an attack-damage percentage.')
+            if 'execute_ratio' in explained:
+                meanings.append('Instant execution at or below this fraction of target health; separate target eligibility still applies.')
             if 'mana_regen_mod' in explained:
                 meanings.append('Increases power recharge by 20% (reviewed Spirit Conduit interpretation).')
             effects.append({'kind': 'phase_behavior', 'phase_ref': key, 'native_kind': 'phase_behavior',
@@ -1069,6 +1083,55 @@ class Packet:
         effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + refs))
         return description
 
+    @staticmethod
+    def healing_summary(n):
+        parts = []
+        amount = n['heal_amount']; barrier = n['barrier_heal_amount']; interval = n['hp_change_frequency']
+        if amount is None:
+            parts.append('Health healing amount unknown')
+        elif amount != 0:
+            if interval == 1:
+                parts.append(f'Heals {amount * 100:g}% maximum health per second')
+            else:
+                parts.append(f'Healing amount setting {amount:g}; nonstandard interval does not establish effective rate or tick arithmetic')
+        if barrier is None:
+            parts.append('Barrier healing amount unknown')
+        elif barrier != 0:
+            parts.append(f'Restores {barrier * 100:g}% maximum barrier per application')
+        parts.append(f'healing interval: {interval:g} seconds' if interval is not None else 'healing interval unknown')
+        parts.append('excess healing can resurrect dead entities' if n['resurrect'] is True else
+                     'does not resurrect dead entities' if n['resurrect'] is False else 'resurrection setting unknown')
+        parts.append('subject to healing limits and modifiers; realised totals are not calculated')
+        return '; '.join(parts)
+
+    def intensity_summary(self, effect, mechanic):
+        n = effect['native_parameters']
+        source = self.q.one('native_special_ability_intensity_sources', 'source_type', n['intensity_source'])
+        effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + self.refs(source)))
+        text = 'Intensity is driven by ' + INTENSITY_DRIVERS.get(n['intensity_source'], n['intensity_source'])
+        if source:
+            text += ('; updates only while the ability is active' if source['updates_only_when_ability_active'] else
+                     '; updates are not restricted to active periods')
+        text += '; ' + {'linear_multiplier':'linear scaling', 'set':'source-set intensity'}.get(n['intensity_type'], 'unmapped intensity type ' + n['intensity_type'])
+        text += f' (source default {n["default_amount"]}, max amount: {n["max_amount"]})'
+        if n['intensity_decay_delay'] == -1:
+            text += '; no time-based intensity decay is scheduled'
+        elif n['intensity_decay_delay'] is not None and n['intensity_decay_delay'] >= 0:
+            text += f'; decay begins {n["intensity_decay_delay"]:g} seconds after the last contribution'
+            if n['intensity_decay_duration'] is not None:
+                text += f', with a full-scale-to-zero decay duration of {n["intensity_decay_duration"]:g} seconds'
+        if n['reset_intensity_in_reinforcement_pool'] is not None:
+            text += ('; returning to the reinforcement pool resets intensity' if n['reset_intensity_in_reinforcement_pool'] else
+                     '; returning to the reinforcement pool does not reset intensity')
+        if mechanic.get('native_parameters', {}).get('intensity_based_activation') is True:
+            text += '; active above zero intensity and inactive otherwise'
+        text += '. Listed phase values are not a promise of full strength on activation; effective scaling and stacking remain unverified'
+        if 'combined_' in n['intensity_source']:
+            text += '; relative weights of the combined drivers are not established'
+        if n['intensity_source'] == 'time_in_melee':
+            text += '; ordinary deactivation reset is not established'
+        return text
+
     def summary(self, mechanic):
         """Deterministic templates use only emitted structured evidence."""
         pieces = {}
@@ -1084,8 +1147,7 @@ class Packet:
                 if n['damage_amount'] is not None and 0 < n['damage_amount'] < 4:
                     text += '; source warns that amounts below 4 are unreliable on small unit sizes'
             elif kind == 'healing':
-                n = effect['native_parameters']
-                text = f'Healing amount: {n["heal_amount"]}; barrier healing amount: {n["barrier_heal_amount"]}; interval setting: {n["hp_change_frequency"]}; resurrection: {"enabled" if n["resurrect"] is True else "disabled" if n["resurrect"] is False else "unknown"} (amount units, effective timing and healing caps not verified)'
+                text = self.healing_summary(effect['native_parameters'])
             elif kind == 'attribute_effect':
                 name, refs = self.loc('unit_attributes_onscreen_name_' + effect['attribute_key'])
                 if not name:
@@ -1118,19 +1180,8 @@ class Packet:
                         text += '; contact effect affects allies: ' + str(f['contact_affects_allies']).lower() + ', enemies: ' + str(f['contact_affects_enemies']).lower()
                     text += ' (effective damage and exact recipients unverified)'
 
-            elif effect.get('native_kind') == 'intensity_settings' and effect['native_parameters']['intensity_source'] == 'time_in_melee':
-                n = effect['native_parameters']
-                source = self.q.one('native_special_ability_intensity_sources', 'source_type', n['intensity_source'])
-                effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + self.refs(source)))
-                text = 'Intensity is driven by time spent in melee'
-                if source and source['updates_only_when_ability_active']:
-                    text += ' while the ability is active'
-                text += f'; linear scaling (source default {n["default_amount"]}, maximum {n["max_amount"]})'
-                text += '. Listed phase values are not a promise of full strength on activation; effective scaling and stacking remain unverified'
-                if n['intensity_decay_delay'] == -1:
-                    text += '; no time-based intensity decay is scheduled'
-                if n['reset_intensity_in_reinforcement_pool']:
-                    text += '; returning to the reinforcement pool resets intensity'
+            elif effect.get('native_kind') == 'intensity_settings':
+                text = self.intensity_summary(effect, mechanic)
             elif effect.get('native_parameters'):
                 parameters = {k: v for k, v in effect['native_parameters'].items()
                               if k not in ('ability', 'source_path', 'source_line', 'source_patch')}
@@ -1143,6 +1194,8 @@ class Packet:
                         description = self.contact_summary(v, effect)
                     elif k == 'imbue_ignition' and kind == 'phase_behavior':
                         description = 'Grants flaming attacks'
+                    elif k == 'execute_ratio' and kind == 'phase_behavior':
+                        description = f'Instantly executes targets at or below {v * 100:g}% health; separate target eligibility applies'
                     elif k == 'mana_regen_mod' and kind == 'phase_behavior':
                         description = f'Power recharge {v * 100:+g}%'
                     elif k in PHASE_ACTIONS and isinstance(v, bool):
@@ -1271,7 +1324,7 @@ class Packet:
                 result += 'A buffer phase precedes healing. ' if has_buffer else 'The retained sequence has a healing phase and no buffer phase. '
                 n = heal['native_parameters']
                 duration = next(p['duration'] for p in mechanic['phases'] if p['key'] == heal['phase_ref'])
-                result += f'Healing amount setting: {n["heal_amount"]:g}; interval setting: {n["hp_change_frequency"]:g}; duration setting: {duration:g}. '
+                result += self.healing_summary(n) + f'; healing phase duration {duration:g} seconds. '
                 result += f'Failure chance: {f["miscast_chance"]:.0%} (interpreted from the casting definition). '
                 result += ('Failure uses a zero-direct-damage explosion to deliver a damaging contact effect, '
                            'with allies enabled and enemies excluded; exact contact recipients are unverified. ')
@@ -1284,7 +1337,7 @@ class Packet:
                     result += 'Use and recharge settings are -1 sentinels; repeatability is not established. '
                 if mechanic.get('requires_effect_enabling'):
                     result += 'Requires effect enabling. '
-                return result + 'Healing units and caps remain unverified.'
+                return result.rstrip()
         if key == 'wh2_main_unit_passive_the_rats_emerge':
             spawn = next((e for e in mechanic['effects'] if e['kind'] == 'summon' and e['trigger'] == 'on_death'), None)
             if spawn:
@@ -1295,11 +1348,14 @@ class Packet:
         if key == 'wh2_main_unit_passive_too_horrible_to_die':
             f = next((e['failure_context'] for e in mechanic['effects'] if 'failure_context' in e), None)
             if f and f['miscast_chance'] is not None:
+                heal = next(e for e in mechanic['effects'] if e['kind'] == 'healing')
+                duration = next(p['duration'] for p in mechanic['phases'] if p['key'] == heal['phase_ref'])
                 return ('Low-health survival mechanic with a buffer phase followed by healing. '
+                        + self.healing_summary(heal['native_parameters']) + f'; healing phase duration {duration:g} seconds. '
                         f'Failure chance: {f["miscast_chance"]:.0%} (interpreted from the casting definition). '
                         'The failure branch uses an explosion to deliver a damaging contact effect; '
                         f'the explosion itself has {f["explosion_base_damage"]:g} base and {f["explosion_ap_damage"]:g} armour-piercing direct damage. '
-                        'Healing amount interpretation and exact contact recipients remain unverified; '
+                        'Exact contact recipients remain unverified; '
                         'the death summon is a separate mechanic.')
         return EXPLAINED_PASSIVES.get(key)
 
