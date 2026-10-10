@@ -945,3 +945,13 @@ Git push credential. Each of the six published commit trees exactly matches its
 tested local reconstruction; commit metadata/IDs differ. Commit messages retain
 the local reconstruction ID and original missing-batch ID. The table above uses
 the actual GitHub commit IDs, not local-only references.
+
+## Packet 1.16: broader unit findings
+
+See [Chej's findings](chej-findings.md) for field definitions, source mappings,
+compatibility aliases and evidence boundaries. Ordinary packets add weapon
+firing policy, supply evidence, unit reload skill, exact override relationships,
+root explosion mechanics, ground/flight speed, component health contributions
+and native primary-body firing arcs. Expanded provenance remains optional.
+Consumers must consult `ammunition_supply.assignment_status`; a normalized
+count on a conflicting attachment is not a resolved effective supply.

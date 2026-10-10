@@ -102,6 +102,8 @@ def dependency_edges(contract):
         TABLE + 'projectiles_scaling_damages.csv', 'key')
     add(UNIT + 'source_exports/db/missile_weapons_tables/data__.tsv', 'default_projectile',
         projectile, 'projectile_key')
+    add(UNIT + 'source_exports/db/unit_missile_weapon_junctions_tables/data__.tsv',
+        'unit', LOOKUP + 'unit_weapon_links__wh3__9.0__ultra.csv', 'unit_key', reverse=True, multiple=True)
     add(LOOKUP + 'unit_contact_effects__wh3__9.0__ultra.csv', 'effect_key', PHASE, 'id')
     add(TABLE + 'special_ability_behaviour_groups_to_types.csv', 'behaviour',
         TABLE + 'special_ability_behaviour_to_ability_junctions.csv', 'behaviour', optional_attachment=True)

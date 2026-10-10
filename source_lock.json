@@ -3,7 +3,7 @@
   "source_repository": "https://github.com/OwenTanzer/CTW-data",
   "source_commit": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
   "source_tree": "3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196",
-  "contract_sha256": "076e734f1bbf3c984c41238c1f14fa409396e8e442effa5db7a8d219442e40fe",
+  "contract_sha256": "fd689183d941d88f021e5a750fd9eaa78ba14c35e93481001d251582d8823802",
   "owners": {
     "units": {
       "schema": 4,
@@ -1262,6 +1262,30 @@
       "bytes": 876,
       "sha256": "f4c39c3db973785f55de07f6b29a6347b06b3c7157c8bdbce75d6817cb2a7a3a",
       "git_blob_sha": "1a33d9541f5baee87c4130ad7934dbb0c31a7799"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "bytes": 1677120,
+      "sha256": "deca81795dd1af2a894406423779e4730e322d365ffd41150e34271d82410a38",
+      "git_blob_sha": "37c0f7b9be640ad17619a770c9eb1cb2de0b3acf"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "bytes": 590081,
+      "sha256": "831966e3ab48dd3660d2dcf232a8742d92643368433f90ddd7eec8017c83f42b",
+      "git_blob_sha": "4be49f4cdcc2790d89c604188b58de45c7e58afd"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/unit_missile_weapon_junctions_tables/data__.tsv",
+      "bytes": 31016,
+      "sha256": "517b82e54bef24dc3a0e587fac4f0a29ba36f7496f30c0f3ab13cb414c74ff4c",
+      "git_blob_sha": "cb5a12b981dcc6902e173f831f966ed518756bf5"
+    },
+    {
+      "path": "data/unit_stats/source_exports/db/battle_entity_stats_tables/data__.tsv",
+      "bytes": 7862,
+      "sha256": "2c365778320a0ddb7a5a33a52568532824505c4136806624554f1e6ae8aa8eaa",
+      "git_blob_sha": "e61e2bfd866704d8913206a6858dea5114752c91"
     }
   ]
 }

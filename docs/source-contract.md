@@ -109,3 +109,11 @@ Do not refresh expected hashes just to make a failed check pass.
 The packet schema and fixtures, importer, SQLite store and query interface are
 implemented in the subsequent phases described by the lookup/store contracts.
 Issue #2 stays open through its remaining packaging and integration checks.
+
+## Contract 2: unit mechanics supplements
+
+The reviewed scope extension for Chej's findings retains four existing native
+exports at the unchanged pin. See [field mappings and selection rules](chej-findings.md).
+Raw field coverage supplements normalized facts without overriding source
+ammunition disagreements. The lock fingerprints the expanded contract and files;
+existing snapshots must be rebuilt before serving packet 1.16.

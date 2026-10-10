@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.15.0'
+PACKET_VERSION = '1.16.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -1688,6 +1688,8 @@ class Packet:
             unit['activated_options'].append(entry)
             if entry['classification'] == 'unresolved':
                 self.gap(gaps, 'classification_unresolved', 'activated_options', row['ability_key'] + ': classification unresolved.', refs)
+        from .unit_semantics import supplement
+        supplement(self, unit, profile, components)
         gaps.sort(key=lambda g: (g['section'], g['code'], g['summary']))
         return unit
 

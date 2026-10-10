@@ -14,7 +14,7 @@ import re
 ROOT=Path(__file__).resolve().parents[1]
 ANNOTATIONS={'$schema','$id','title','description','$defs'}
 KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf','allOf','if','then','else'}
-CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0'}
+CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0'}
 
 def check_schema(s):
     if not isinstance(s,dict):raise ValueError('only object schemas supported')
@@ -74,7 +74,7 @@ def validate(value,s,root,path='$'):
 
 def packet_checks(p, provenance_resolver=None):
     if p.get('provenance_mode') == 'deferred':
-        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0') or p['sources'] or p['provenance']:
+        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0','1.16.0') or p['sources'] or p['provenance']:
             raise ValueError('invalid deferred evidence envelope')
         if provenance_resolver is None:
             raise ValueError('deferred evidence requires a snapshot-bound provenance resolver')

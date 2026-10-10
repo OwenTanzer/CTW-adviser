@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ctw-adviser:evidence-packet:1.15.0",
-  "title": "CTW adviser evidence packet v1.15.0 (accepts earlier fixtures)",
+  "$id": "urn:ctw-adviser:evidence-packet:1.16.0",
+  "title": "CTW adviser evidence packet v1.16.0 (accepts earlier fixtures)",
   "type": "object",
   "properties": {
     "schema_version": {
@@ -21,7 +21,8 @@
         "1.12.0",
         "1.13.0",
         "1.14.0",
-        "1.15.0"
+        "1.15.0",
+        "1.16.0"
       ]
     },
     "mode": {
@@ -396,6 +397,12 @@
             "minLength": 1
           },
           "minItems": 1
+        },
+        "health_contribution": {
+          "type": [
+            "number",
+            "null"
+          ]
         }
       },
       "required": [
@@ -456,6 +463,76 @@
             "$ref": "#/$defs/component"
           },
           "minItems": 0
+        },
+        "firing_arc": {
+          "type": "object",
+          "properties": {
+            "primary_body_key": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "native_fire_arc_close": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "interpretation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "primary_body_key",
+            "native_fire_arc_close",
+            "interpretation",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
+        },
+        "health_aggregation": {
+          "type": "object",
+          "properties": {
+            "rule": {
+              "enum": [
+                "primary_and_separate_crew",
+                "primary_body_only"
+              ]
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "rule",
+            "summary",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -711,6 +788,21 @@
             "minLength": 1
           },
           "minItems": 1
+        },
+        "native_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "detail_ref": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
@@ -912,6 +1004,219 @@
               "null"
             ]
           }
+        },
+        "firing_policy": {
+          "type": "object",
+          "properties": {
+            "precursor": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "summary": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "precursor",
+            "summary",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
+        },
+        "reload": {
+          "type": "object",
+          "properties": {
+            "projectile_base_interval": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit_reload_skill": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "projectile_base_interval",
+            "unit_reload_skill",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
+        },
+        "ammunition_supply": {
+          "type": "object",
+          "properties": {
+            "native_weapon_pool": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "primary",
+                    "secondary"
+                  ]
+                }
+              ]
+            },
+            "native_primary_capacity": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "native_secondary_capacity": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "infinite_secondary": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "assignment_status": {
+              "enum": [
+                "source_disagreement",
+                "sources_agree",
+                "unresolved"
+              ]
+            },
+            "effective_pool": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "primary",
+                    "secondary"
+                  ]
+                }
+              ]
+            },
+            "qualification": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "native_weapon_pool",
+            "native_primary_capacity",
+            "native_secondary_capacity",
+            "infinite_secondary",
+            "assignment_status",
+            "effective_pool",
+            "qualification",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
+        },
+        "entity_stat_overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "junction_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "base_melee_weapon": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                ]
+              },
+              "base_missile_weapon": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                ]
+              },
+              "detail_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "provenance_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "junction_id",
+              "key",
+              "base_melee_weapon",
+              "base_missile_weapon",
+              "detail_ref",
+              "provenance_refs"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
         }
       },
       "required": [
@@ -1257,6 +1562,219 @@
               "null"
             ]
           }
+        },
+        "firing_policy": {
+          "type": "object",
+          "properties": {
+            "precursor": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "summary": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "precursor",
+            "summary",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
+        },
+        "reload": {
+          "type": "object",
+          "properties": {
+            "projectile_base_interval": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unit_reload_skill": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "projectile_base_interval",
+            "unit_reload_skill",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
+        },
+        "ammunition_supply": {
+          "type": "object",
+          "properties": {
+            "native_weapon_pool": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "primary",
+                    "secondary"
+                  ]
+                }
+              ]
+            },
+            "native_primary_capacity": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "native_secondary_capacity": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "infinite_secondary": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "assignment_status": {
+              "enum": [
+                "source_disagreement",
+                "sources_agree",
+                "unresolved"
+              ]
+            },
+            "effective_pool": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "primary",
+                    "secondary"
+                  ]
+                }
+              ]
+            },
+            "qualification": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "native_weapon_pool",
+            "native_primary_capacity",
+            "native_secondary_capacity",
+            "infinite_secondary",
+            "assignment_status",
+            "effective_pool",
+            "qualification",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
+        },
+        "entity_stat_overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "junction_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "base_melee_weapon": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                ]
+              },
+              "base_missile_weapon": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                ]
+              },
+              "detail_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "provenance_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "junction_id",
+              "key",
+              "base_melee_weapon",
+              "base_missile_weapon",
+              "detail_ref",
+              "provenance_refs"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
         },
         "variants": {
           "type": "array",
@@ -2606,6 +3124,40 @@
                 "number",
                 "null"
               ]
+            },
+            "ground_speed": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "flight_speed": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "speed_basis": {
+              "const": "primary_body_run_speed"
+            },
+            "primary_body_key": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
             }
           },
           "required": [
@@ -5760,7 +6312,8 @@
               "1.12.0",
               "1.13.0",
               "1.14.0",
-              "1.15.0"
+              "1.15.0",
+              "1.16.0"
             ]
           }
         },
@@ -5832,7 +6385,8 @@
               "1.12.0",
               "1.13.0",
               "1.14.0",
-              "1.15.0"
+              "1.15.0",
+              "1.16.0"
             ]
           }
         },
@@ -5974,7 +6528,8 @@
             "enum": [
               "1.13.0",
               "1.14.0",
-              "1.15.0"
+              "1.15.0",
+              "1.16.0"
             ]
           }
         },
@@ -5986,6 +6541,123 @@
         "required": [
           "provenance_mode"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.16.0"
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "properties": {
+          "units": {
+            "items": {
+              "properties": {
+                "movement": {
+                  "required": [
+                    "ground_speed",
+                    "flight_speed",
+                    "speed_basis",
+                    "primary_body_key",
+                    "provenance_refs"
+                  ]
+                },
+                "body": {
+                  "required": [
+                    "firing_arc",
+                    "health_aggregation"
+                  ],
+                  "properties": {
+                    "components": {
+                      "items": {
+                        "required": [
+                          "health_contribution"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "ranged": {
+                  "if": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "const": "present"
+                      }
+                    },
+                    "required": [
+                      "status"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "firing_policy",
+                      "reload",
+                      "ammunition_supply",
+                      "entity_stat_overrides"
+                    ],
+                    "properties": {
+                      "explosion": {
+                        "anyOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "required": [
+                              "native_parameters",
+                              "detail_ref"
+                            ],
+                            "properties": {
+                              "native_parameters": {
+                                "$ref": "#/$defs/parameters_explosions"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "variants": {
+                        "items": {
+                          "required": [
+                            "firing_policy",
+                            "reload",
+                            "ammunition_supply",
+                            "entity_stat_overrides"
+                          ],
+                          "properties": {
+                            "explosion": {
+                              "anyOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "required": [
+                                    "native_parameters",
+                                    "detail_ref"
+                                  ],
+                                  "properties": {
+                                    "native_parameters": {
+                                      "$ref": "#/$defs/parameters_explosions"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   ]

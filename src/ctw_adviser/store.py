@@ -41,7 +41,7 @@ def create_native_table(db, name, columns, keys, *, constraints=()):
     # source-identity uniqueness even for native blank key components.
     present = {c['name'] for c in columns}
     for key in dict.fromkeys([*keys, 'unit_key', 'base_unit_key', 'mounted_unit_key',
-                              'unit_name', 'special_ability', 'phase']):
+                              'unit_name', 'special_ability', 'phase', 'unit']):
         if key in present:
             suffix = '_nocase' if key == 'unit_name' else ''
             collate = ' COLLATE NOCASE' if key == 'unit_name' else ''

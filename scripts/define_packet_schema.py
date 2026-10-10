@@ -6,7 +6,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from ctw_adviser.queries import PACKET_VERSION
-VERSIONS=['1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0']
+VERSIONS=['1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0']
 VERSIONS=VERSIONS[:VERSIONS.index(PACKET_VERSION)+1]
 S={'type':'string','minLength':1}; N={'type':['number','null']}; B={'type':['boolean','null']}
 def enum(*values):return {'enum':list(values)}
@@ -34,6 +34,17 @@ defs['explosion']=obj({'id':S,'key':S,**numbers('base_damage','ap_damage','radiu
 defs['ranged_attack']=obj({'id':S,'weapon_key':nullable(S),'projectile_key':nullable(S),'component_ref':nullable(S),'slot':S,'ammunition_pool':nullable(S),'is_default':B,
  **numbers('range','minimum_range','ammunition','reload_time','base_damage','ap_damage','projectiles_per_shot','shots_per_volley','burst_size','burst_shot_delay','velocity','accuracy','spread','marksmanship_bonus','calibration_distance','calibration_area'),
  'explosion':nullable(ref('explosion')),'detail_ref':S,'provenance_refs':refs,'native_parameters':native},['id','weapon_key','projectile_key','component_ref','slot','ammunition_pool','is_default','range','minimum_range','ammunition','reload_time','base_damage','ap_damage','projectiles_per_shot','shots_per_volley','burst_size','burst_shot_delay','velocity','accuracy','spread','marksmanship_bonus','calibration_distance','calibration_area','explosion','detail_ref','provenance_refs'])
+# Additive 1.16 fields; required only in the new version below.
+defs['component']['properties']['health_contribution']=N
+defs['body']['properties'].update({
+ 'firing_arc':obj({'primary_body_key':nullable(S),'native_fire_arc_close':N,'interpretation':S,'provenance_refs':arr(S)}),
+ 'health_aggregation':obj({'rule':enum('primary_and_separate_crew','primary_body_only'),'summary':S,'provenance_refs':arr(S)})})
+defs['explosion']['properties'].update({'native_parameters':native,'detail_ref':S})
+defs['ranged_attack']['properties'].update({
+ 'firing_policy':obj({'precursor':B,'summary':nullable(S),'provenance_refs':arr(S)}),
+ 'reload':obj({'projectile_base_interval':N,'unit_reload_skill':{'type':['integer','null']},'provenance_refs':arr(S)}),
+ 'ammunition_supply':obj({'native_weapon_pool':nullable(enum('primary','secondary')),'native_primary_capacity':N,'native_secondary_capacity':N,'infinite_secondary':B,'assignment_status':enum('source_disagreement','sources_agree','unresolved'),'effective_pool':nullable(enum('primary','secondary')),'qualification':nullable(S),'provenance_refs':arr(S)}),
+ 'entity_stat_overrides':arr(obj({'junction_id':S,'key':S,'base_melee_weapon':nullable(S),'base_missile_weapon':nullable(S),'detail_ref':S,'provenance_refs':refs}))})
 defs['melee']=obj({**defs['melee_attack']['properties'],'variants':arr(ref('melee_attack'))},[*defs['melee_attack']['required'],'variants'])
 defs['ranged_present']=obj({'status':const('present'),**defs['ranged_attack']['properties'],'variants':arr(ref('ranged_attack'))},['status',*defs['ranged_attack']['required'],'variants'])
 defs['ranged']= {'oneOf':[{'type':'null'},ref('ranged_present'),obj({'status':enum('unresolved','omitted')})]}
@@ -69,7 +80,7 @@ defs['option']=obj({'key':S,'name':nullable(S),'classification':enum('activated_
 defs['passives']=obj({'protection':obj(numbers('armour','shield_block_chance','physical_resistance','missile_resistance','spell_resistance','fire_resistance','ward_save')),
  'attack_traits':obj({'melee':nullable(ref('traits')),'ranged':nullable(ref('traits')),'explosion':nullable(ref('traits')),'additional':arr(ref('extra_traits'))}),
  'attributes':arr(ref('attribute')),'abilities':arr(ref('mechanic'))})
-defs['unit']=obj({'identity':ref('identity'),'body':ref('body'),'movement':obj(numbers('speed','mass')),'leadership':N,'melee':nullable(ref('melee')),'ranged':ref('ranged'),'passives':ref('passives'),
+defs['unit']=obj({'identity':ref('identity'),'body':ref('body'),'movement':obj({**numbers('speed','mass','ground_speed','flight_speed'),'speed_basis':const('primary_body_run_speed'),'primary_body_key':nullable(S),'provenance_refs':arr(S)},['speed','mass']),'leadership':N,'melee':nullable(ref('melee')),'ranged':ref('ranged'),'passives':ref('passives'),
  'cost':obj(numbers('multiplayer','campaign_recruitment','campaign_upkeep')),'activated_options':arr(ref('option')),'coverage':ref('coverage'),'provenance_refs':refs})
 defs['source']=obj({'path':S,'sha256':{'type':'string','pattern':'^[0-9a-f]{64}$'},'owner':S})
 defs['evidence']=obj({'source_id':S,'logical_record':{'type':'integer','minimum':2},'key':mapping({'type':'string'}),'source_line':{'type':['integer','null'],'minimum':1},'source_patch':nullable(S),'source_path':nullable(S),'lineage_refs':arr(S)},['source_id','logical_record','key','source_line','source_patch'])
@@ -171,8 +182,20 @@ schema['allOf'].append({
 })
 schema['properties']['provenance_mode']=enum('deferred','expanded')
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum(*[v for v in VERSIONS if v in ('1.13.0','1.14.0','1.15.0')])},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum(*[v for v in VERSIONS if v in ('1.13.0','1.14.0','1.15.0','1.16.0')])},'required':['schema_version']},
  'then':{'required':['provenance_mode']}
+})
+
+new_attack={'required':['firing_policy','reload','ammunition_supply','entity_stat_overrides'],
+ 'properties':{'explosion':{'anyOf':[{'type':'null'},{'required':['native_parameters','detail_ref'],'properties':{'native_parameters':ref('parameters_explosions')}}]}}}
+schema['allOf'].append({
+ 'if':{'properties':{'schema_version':const('1.16.0')},'required':['schema_version']},
+ 'then':{'properties':{'units':{'items':{'properties':{
+  'movement':{'required':['ground_speed','flight_speed','speed_basis','primary_body_key','provenance_refs']},
+  'body':{'required':['firing_arc','health_aggregation'],'properties':{'components':{'items':{'required':['health_contribution']}}}},
+  'ranged':{'if':{'type':'object','properties':{'status':const('present')},'required':['status']},
+   'then':{**new_attack,'properties':{**new_attack['properties'],'variants':{'items':new_attack}}}}
+ }}}}}
 })
 
 if __name__=='__main__':

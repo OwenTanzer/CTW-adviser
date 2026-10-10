@@ -614,7 +614,10 @@ class QueryTests(unittest.TestCase):
         for name in ('sea_guard', 'blue_horrors', 'kroxigor', 'queen_bess', 'wargor'):
             fixture = json.loads((ROOT / f'fixtures/source_backed/{name}.json').read_text())['units'][0]
             unit = self.check(self.q.get_unit_profile(fixture['identity']['unit_key']))
-            for group in ('movement', 'leadership', 'cost'):
+            # Historical fixtures establish the original values; 1.16 adds
+            # separately tested native movement fields without changing them.
+            self.assertEqual({k: unit['movement'][k] for k in fixture['movement']}, fixture['movement'])
+            for group in ('leadership', 'cost'):
                 self.assertEqual(unit[group], fixture[group])
             for field in ('entity_count', 'hp_per_entity', 'total_hp', 'barrier_health', 'size'):
                 self.assertEqual(unit['body'][field], fixture['body'][field])
