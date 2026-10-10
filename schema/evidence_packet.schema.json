@@ -5073,6 +5073,591 @@
           "$ref": "#/$defs/node_attack_payload"
         }
       ]
+    },
+    "parameters_casting": {
+      "type": "object",
+      "properties": {
+        "wind_up_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "active_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "recharge_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "num_uses": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "effect_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "target_intercept_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "affect_self": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "always_affect_self": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "only_affect_target": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "num_effected_friendly_units": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "num_effected_enemy_units": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "update_targets_every_frame": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "initial_recharge": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "min_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "target_self": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "target_friends": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "target_enemies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "target_ground": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "only_affect_owned_units": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "update_phase_by_ability_duration": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "shared_recharge_time": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "intensity_based_activation": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "spawned_unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "spawn_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "spawn_is_transformation": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "spawn_is_decoy": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "spawn_shares_health_and_fatigue": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "behaviour": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "formation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "activated_projectile": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bombardment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vortex": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mom_vortex_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "wind_up_time",
+        "active_time",
+        "recharge_time",
+        "num_uses",
+        "effect_range",
+        "target_intercept_range",
+        "affect_self",
+        "always_affect_self",
+        "only_affect_target",
+        "num_effected_friendly_units",
+        "num_effected_enemy_units",
+        "update_targets_every_frame",
+        "initial_recharge",
+        "min_range",
+        "target_self",
+        "target_friends",
+        "target_enemies",
+        "target_ground",
+        "only_affect_owned_units",
+        "update_phase_by_ability_duration",
+        "shared_recharge_time",
+        "intensity_based_activation",
+        "spawned_unit",
+        "spawn_type",
+        "spawn_is_transformation",
+        "spawn_is_decoy",
+        "spawn_shares_health_and_fatigue",
+        "behaviour",
+        "formation",
+        "activated_projectile",
+        "bombardment",
+        "vortex",
+        "mom_vortex_key"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_lifecycle": {
+      "type": "object",
+      "properties": {
+        "effect_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cant_move": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "freeze_fatigue": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fatigue_change_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "inspiration_aura_range_mod": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ability_recharge_change": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mana_regen_mod": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mana_max_depletion_mod": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "imbue_magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "imbue_ignition": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "imbue_contact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "affects_allies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "affects_enemies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "replenish_ammo": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spreading": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "freeze_recharge": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "remove_magical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "execute_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "requested_stance": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "effect_type",
+        "cant_move",
+        "freeze_fatigue",
+        "fatigue_change_ratio",
+        "inspiration_aura_range_mod",
+        "ability_recharge_change",
+        "mana_regen_mod",
+        "mana_max_depletion_mod",
+        "imbue_magical",
+        "imbue_ignition",
+        "imbue_contact",
+        "affects_allies",
+        "affects_enemies",
+        "replenish_ammo",
+        "spreading",
+        "freeze_recharge",
+        "remove_magical",
+        "execute_ratio",
+        "requested_stance"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_melee": {
+      "type": "object",
+      "properties": {
+        "weapon_length": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "splash_attack_target_size": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "splash_attack_power_multiplier": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "collision_attack_max_targets": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "collision_attack_max_targets_cooldown": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "contact_phase": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scaling_damage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "weapon_length",
+        "splash_attack_target_size",
+        "splash_attack_power_multiplier",
+        "collision_attack_max_targets",
+        "collision_attack_max_targets_cooldown",
+        "contact_phase",
+        "scaling_damage"
+      ],
+      "additionalProperties": false
+    },
+    "parameters_ranged": {
+      "type": "object",
+      "properties": {
+        "shot_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "collision_radius": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mass": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "gravity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "can_target_airborne": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_damage_allies": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_damage_buildings": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "projectile_penetration": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "penetration_entity_size_cap": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_penetration": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "expiry_range": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "expire_on_impact": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_bounce": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "can_roll": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "homing_params": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scaling_damage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contact_stat_effect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "overhead_stat_effect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shrapnel_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "spawned_vortex": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "shot_type",
+        "collision_radius",
+        "mass",
+        "gravity",
+        "can_target_airborne",
+        "can_damage_allies",
+        "can_damage_buildings",
+        "projectile_penetration",
+        "penetration_entity_size_cap",
+        "max_penetration",
+        "expiry_range",
+        "expire_on_impact",
+        "can_bounce",
+        "can_roll",
+        "homing_params",
+        "scaling_damage",
+        "contact_stat_effect",
+        "overhead_stat_effect",
+        "shrapnel_key",
+        "spawned_vortex"
+      ],
+      "additionalProperties": false
     }
   },
   "allOf": [
@@ -5138,6 +5723,146 @@
                   "$ref": "#/$defs/current_node"
                 },
                 "minItems": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "1.10.0"
+            ]
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "properties": {
+          "units": {
+            "items": {
+              "properties": {
+                "melee": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "properties": {
+                        "native_parameters": {
+                          "$ref": "#/$defs/parameters_melee"
+                        },
+                        "variants": {
+                          "items": {
+                            "properties": {
+                              "native_parameters": {
+                                "$ref": "#/$defs/parameters_melee"
+                              }
+                            },
+                            "required": [
+                              "native_parameters"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "native_parameters"
+                      ]
+                    }
+                  ]
+                },
+                "ranged": {
+                  "if": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "const": "present"
+                      }
+                    },
+                    "required": [
+                      "status"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "native_parameters": {
+                        "$ref": "#/$defs/parameters_ranged"
+                      },
+                      "variants": {
+                        "items": {
+                          "properties": {
+                            "native_parameters": {
+                              "$ref": "#/$defs/parameters_ranged"
+                            }
+                          },
+                          "required": [
+                            "native_parameters"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "native_parameters"
+                    ]
+                  }
+                },
+                "passives": {
+                  "properties": {
+                    "abilities": {
+                      "items": {
+                        "properties": {
+                          "native_parameters": {
+                            "$ref": "#/$defs/parameters_casting"
+                          },
+                          "phases": {
+                            "items": {
+                              "properties": {
+                                "lifecycle": {
+                                  "$ref": "#/$defs/parameters_lifecycle"
+                                }
+                              }
+                            }
+                          },
+                          "effects": {
+                            "items": {
+                              "if": {
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "stat_modifier",
+                                      "attribute_effect",
+                                      "periodic_damage",
+                                      "healing",
+                                      "phase_behavior",
+                                      "phase_role",
+                                      "visual_indicator"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "kind"
+                                ]
+                              },
+                              "then": {
+                                "properties": {
+                                  "phase_ref": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }

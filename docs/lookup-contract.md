@@ -704,3 +704,29 @@ within 35 metres.” Its enabling flag is retained as an availability qualificat
 not presented as a missing battle trigger. Acquisition details are deferred to
 live testing; empty condition arrays are not replaced with speculative conditions.
 The wording draws its value, range and recipients from the retained records.
+
+## Alpha 4 recovery (10 October 2026)
+
+The six local repairs recorded on 1–2 October were never published and their
+checkout was later pruned. This sequence reconstructs their behavior on published
+PR #11 head `804206d7fbf4edd3581de1f6446dbf0c2d028211`; it does not claim to recover
+the original Git objects. Historical test/summary counts are not substituted for
+new verification. Later firing-arc, ammunition-pool, explosion, flight-speed,
+entity-override, reload-skill and component-health review candidates are excluded.
+The data pin and import scope remain unchanged.
+
+### Validation — reconstruction of `3ffc012` (packet 1.10.0)
+
+Require the entire source-typed casting, phase-lifecycle and ordinary melee/ranged
+parameter projections, including attack variants. Missing fields/objects and
+incorrect types fail; explicit nulls, zero and negative sentinels remain legal.
+Melee component references now receive the same integrity check as ranged ones.
+Phase-bound effect kinds cannot lose their phase association. Source-qualified
+effect attachment checks also reject healing moved to the wrong existing phase,
+while legitimate ability-level payload references remain legal. Lucky Git's
+five-second preparation and thirty-second healing phases are regression-tested.
+Older fixture shapes remain version-gated. The schema generator reproduces the
+checked-in schema so regeneration cannot silently discard these protections.
+
+Recovery verification: 87 tests pass; full roster audit passes 2,409 unit keys and
+32,795 source locators. This batch changes validation, not emitted game values.

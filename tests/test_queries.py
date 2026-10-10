@@ -154,6 +154,62 @@ class QueryTests(unittest.TestCase):
         packet_checks(packet)
         return packet['units'][0]
 
+    def test_alpha4_required_mechanical_projections_and_types(self):
+        import copy
+        sea = self.q.get_unit_profile('Lothern Sea Guard', limit=256)
+        gorduz = self.q.get_unit_profile('wh3_dlc23_chd_cha_gorduz_backstabber', limit=256)
+        forge = self.q.get_passive_detail('wh_main_hero_passive_forgefire')['mechanic']
+        prowess = next(m for m in sea['units'][0]['passives']['abilities'] if m['key'] == 'wh2_main_unit_passive_martial_prowess')
+        for name, params in {'casting':forge['native_parameters'], 'lifecycle':prowess['phases'][0]['lifecycle'],
+                             'melee':gorduz['units'][0]['melee']['native_parameters'], 'ranged':sea['units'][0]['ranged']['native_parameters']}.items():
+            schema = self.schema['$defs']['parameters_' + name]
+            self.assertEqual(set(params), set(schema['required']))
+            validate(params, schema, self.schema)
+            with self.assertRaises(ValueError): validate({}, schema, self.schema)
+            for field in schema['required']:
+                with self.subTest(projection=name, field=field):
+                    missing = dict(params); del missing[field]
+                    with self.assertRaises(ValueError): validate(missing, schema, self.schema)
+                    validate({**params, field:None}, schema, self.schema)
+                    typ = schema['properties'][field]['type'][0]
+                    for bad in (['banana', True] if typ in ('integer','number') else [7]):
+                        with self.assertRaises(ValueError): validate({**params, field:bad}, schema, self.schema)
+                    if typ in ('integer','number'):
+                        for sentinel in (0,-1): validate({**params,field:sentinel}, schema, self.schema)
+        for key in ('Lothern Sea Guard','wh_main_emp_art_helblaster_volley_gun','wh_main_dwf_art_flame_cannon','wh3_dlc23_chd_cha_gorduz_backstabber'):
+            packet = self.q.get_unit_profile(key, limit=256); self.check(packet)
+            for group in ('melee','ranged'):
+                attack = packet['units'][0][group]
+                if not attack or 'native_parameters' not in attack: continue
+                for index in range(1 + len(attack['variants'])):
+                    bad = copy.deepcopy(packet); parent = bad['units'][0][group]
+                    target = parent if index == 0 else parent['variants'][index-1]
+                    del target['native_parameters']
+                    with self.assertRaises(ValueError): self.check(bad)
+        bad = copy.deepcopy(sea); bad['units'][0]['passives']['abilities'][0]['native_parameters'] = {}
+        with self.assertRaises(ValueError): self.check(bad)
+        bad = copy.deepcopy(sea); bad['units'][0]['passives']['abilities'][0]['phases'][0]['lifecycle'] = {}
+        with self.assertRaises(ValueError): self.check(bad)
+
+    def test_alpha4_melee_references_and_healing_phase_attachment(self):
+        import copy
+        for key in ('wh3_dlc23_chd_cha_gorduz_backstabber','wh_main_emp_art_helblaster_volley_gun','wh_main_dwf_art_flame_cannon'):
+            packet = self.q.get_unit_profile(key, limit=256); self.check(packet)
+            packet['units'][0]['melee']['component_ref'] = 'component:nonexistent'
+            with self.assertRaises(ValueError): self.check(packet)
+        packet = self.q.get_unit_profile('wh3_dlc23_chd_cha_gorduz_backstabber', limit=256)
+        lucky = next(m for m in packet['units'][0]['passives']['abilities'] if m['key'] == 'wh3_dlc23_hero_passive_lucky_git')
+        healing = next(e for e in lucky['effects'] if e['kind'] == 'healing')
+        self.assertEqual(healing['phase_ref'], 'wh3_dlc23_hero_passive_lucky_git_ii')
+        phases = {p['key']:p for p in lucky['phases']}
+        self.assertEqual(phases['wh3_dlc23_hero_passive_lucky_git_i']['duration'], 5)
+        self.assertEqual(phases[healing['phase_ref']]['duration'], 30)
+        for bad_phase in (None, 'wh3_dlc23_hero_passive_lucky_git_i'):
+            bad = copy.deepcopy(packet)
+            m = next(m for m in bad['units'][0]['passives']['abilities'] if m['key'] == lucky['key'])
+            next(e for e in m['effects'] if e['kind'] == 'healing')['phase_ref'] = bad_phase
+            with self.assertRaises(ValueError): self.check(bad)
+
     def test_murderous_indicator_consolidation_is_lossless_and_qualified(self):
         links = self.q.rows('unit_abilities', 'ability_key', MURDEROUS_INDICATOR)
         self.assertEqual(len(links), 115)

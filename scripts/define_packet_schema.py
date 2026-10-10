@@ -114,6 +114,22 @@ defs['current_node']={'oneOf':[ref('node_'+kind) for kind in [*payload_tables, '
 
 # Older fixture shapes remain valid only under their declared version.
 # These fields are always emitted by the current serving interface.
+mechanical_projections={
+ 'casting': ('data/unit_stats/abilities/tables/ability_casting.csv',
+  'wind_up_time active_time recharge_time num_uses effect_range target_intercept_range affect_self always_affect_self only_affect_target num_effected_friendly_units num_effected_enemy_units update_targets_every_frame initial_recharge min_range target_self target_friends target_enemies target_ground only_affect_owned_units update_phase_by_ability_duration shared_recharge_time intensity_based_activation spawned_unit spawn_type spawn_is_transformation spawn_is_decoy spawn_shares_health_and_fatigue behaviour formation activated_projectile bombardment vortex mom_vortex_key'),
+ 'lifecycle': ('data/unit_stats/abilities/tables/ability_phases.csv',
+  'effect_type cant_move freeze_fatigue fatigue_change_ratio inspiration_aura_range_mod ability_recharge_change mana_regen_mod mana_max_depletion_mod imbue_magical imbue_ignition imbue_contact affects_allies affects_enemies replenish_ammo spreading freeze_recharge remove_magical execute_ratio requested_stance'),
+ 'melee': ('data/unit_stats/source_exports/db/melee_weapons_tables/data__.tsv',
+  'weapon_length splash_attack_target_size splash_attack_power_multiplier collision_attack_max_targets collision_attack_max_targets_cooldown contact_phase scaling_damage'),
+ 'ranged': ('data/unit_stats/lookups/projectiles__wh3__9.0.csv',
+  'shot_type collision_radius mass gravity can_target_airborne can_damage_allies can_damage_buildings projectile_penetration penetration_entity_size_cap max_penetration expiry_range expire_on_impact can_bounce can_roll homing_params scaling_damage contact_stat_effect overhead_stat_effect shrapnel_key spawned_vortex'),
+}
+for kind,(path,fields) in mechanical_projections.items():
+ columns={c['name']:c['type'] for d in contract['datasets'] if d['path']==path for c in d['columns']}
+ defs['parameters_'+kind]=obj({k:{'type':[source_types[columns[k]],'null']} for k in fields.split()})
+attack_projection=lambda kind: {'properties':{'native_parameters':ref('parameters_'+kind)},'required':['native_parameters']}
+melee_projection=attack_projection('melee')
+ranged_projection=attack_projection('ranged')
 schema['allOf']=[{
  'if':{'properties':{'schema_version':enum('1.9.0','1.10.0')},'required':['schema_version']},
  'then':{'properties':{
@@ -127,6 +143,20 @@ schema['allOf']=[{
   'payload_graph':{'properties':{'nodes':arr(ref('current_node'))}}
  }}
 }]
+schema['allOf'].append({
+ 'if':{'properties':{'schema_version':enum('1.10.0')},'required':['schema_version']},
+ 'then':{'properties':{'units':{'items':{'properties':{
+  'melee':{'anyOf':[{'type':'null'}, {**melee_projection,'properties':{**melee_projection['properties'],'variants':{'items':melee_projection}}}]},
+  'ranged':{'if':{'type':'object','properties':{'status':const('present')},'required':['status']},
+            'then':{**ranged_projection,'properties':{**ranged_projection['properties'],'variants':{'items':ranged_projection}}}},
+  'passives':{'properties':{'abilities':{'items':{'properties':{
+   'native_parameters':ref('parameters_casting'),
+   'phases':{'items':{'properties':{'lifecycle':ref('parameters_lifecycle')}}},
+   'effects':{'items':{'if':{'properties':{'kind':enum('stat_modifier','attribute_effect','periodic_damage','healing','phase_behavior','phase_role','visual_indicator')},'required':['kind']},
+                       'then':{'properties':{'phase_ref':S}}}}
+  }}}}}
+ }}}}}
+})
 
 if __name__=='__main__':
  (ROOT/'schema/evidence_packet.schema.json').write_text(json.dumps(schema,indent=2)+'\n')

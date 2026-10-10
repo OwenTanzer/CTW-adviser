@@ -116,6 +116,7 @@ def packet_checks(p):
         if len(components)!=len(u['body']['components']):raise ValueError('duplicate component id')
         def add(a,kind,component=None):
             if a['id'] in attacks:raise ValueError('duplicate attack id')
+            if component is not None and component not in components:raise ValueError('unknown component')
             attacks[a['id']]={'kind':kind,'component':component}
         if u['melee']:
             add(u['melee'],'melee',u['melee'].get('component_ref'))
@@ -144,6 +145,16 @@ def packet_checks(p):
             phases={x['key'] for x in m['phases']}
             for e in m['effects']:
                 if e['phase_ref'] is not None and e['phase_ref'] not in phases:raise ValueError('unknown effect phase')
+                # Validate source-qualified attachment, not just membership in
+                # the ability's phase list. Ability-level payloads remain legal.
+                phase_sources={'data/unit_stats/abilities/tables/ability_phases.csv':'id',
+                               'data/unit_stats/abilities/tables/phase_stat_effects.csv':'phase',
+                               'data/unit_stats/abilities/tables/phase_attribute_effects.csv':'phase'}
+                if p['schema_version'] == '1.10.0':
+                    attached={evidence[r]['key'].get(phase_sources[p['sources'][evidence[r]['source_id']]['path']])
+                              for r in e['provenance_refs'] if p['sources'][evidence[r]['source_id']]['path'] in phase_sources}
+                    attached &= phases
+                    if attached and e['phase_ref'] not in attached:raise ValueError('effect conflicts with source phase attachment')
                 if e['kind']=='stat_modifier' and e['operation']!='native' and e['native_operation']!={'add':'add','multiply':'mult'}[e['operation']]:raise ValueError('operation mapping mismatch')
         actual={'components':len(u['body']['components']),'weapons':sum(v['kind']!='explosion' for v in attacks.values()),'attributes':len(u['passives']['attributes']),'abilities':len(u['passives']['abilities']),'activated_options':len(u['activated_options'])}
         if any(s['returned']!=actual[s['name']] for s in sections):raise ValueError('returned count differs from packet')
