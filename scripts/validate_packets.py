@@ -14,7 +14,7 @@ import re
 ROOT=Path(__file__).resolve().parents[1]
 ANNOTATIONS={'$schema','$id','title','description','$defs'}
 KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf','allOf','if','then','else'}
-CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0'}
+CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0'}
 
 def check_schema(s):
     if not isinstance(s,dict):raise ValueError('only object schemas supported')
@@ -74,7 +74,7 @@ def validate(value,s,root,path='$'):
 
 def packet_checks(p, provenance_resolver=None):
     if p.get('provenance_mode') == 'deferred':
-        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0') or p['sources'] or p['provenance']:
+        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0') or p['sources'] or p['provenance']:
             raise ValueError('invalid deferred evidence envelope')
         if provenance_resolver is None:
             raise ValueError('deferred evidence requires a snapshot-bound provenance resolver')
@@ -138,7 +138,7 @@ def packet_checks(p, provenance_resolver=None):
             if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned']+offset)):raise ValueError('partial section needs overflow/cursor')
             if gaps is not None and s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in gaps):raise ValueError('unqualified unresolved/omitted section')
         if gaps is not None and status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in gaps):raise ValueError('missing ranged gap')
-        if p['schema_version'] in ('1.16.0','1.17.0'):
+        if p['schema_version'] in ('1.16.0','1.17.0','1.18.0'):
             body=u['body'];movement=u['movement']
             if movement['speed']!=movement['ground_speed']:
                 raise ValueError('movement speed differs from primary-body run speed')
@@ -172,7 +172,7 @@ def packet_checks(p, provenance_resolver=None):
                     expected_pool=None if disagreement else native
                     if supply['assignment_status']!=expected_status or supply['effective_pool']!=expected_pool:
                         raise ValueError('ammunition supply status conflicts with retained pools')
-                    if p['schema_version']=='1.17.0':
+                    if p['schema_version'] in ('1.17.0','1.18.0'):
                         capacity=supply['native_'+expected_pool+'_capacity'] if expected_pool else None
                         unlimited=(supply['infinite_secondary'] if expected_pool=='secondary' else False) if expected_pool else None
                         if supply['capacity']!=capacity or supply['unlimited'] is not unlimited:

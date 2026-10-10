@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.17.0'
+PACKET_VERSION = '1.18.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -297,11 +297,11 @@ TRAIT_TEXT = {
     'magical': ('ui_unit_bullet_point_enums_tooltip_ward_physical',
                 'Magical attacks bypass physical resistance; scoped to this attack.'),
     'flaming': ('ui_unit_bullet_point_enums_tooltip_flaming_attacks',
-                'Flaming attacks interact with fire vulnerability and healing suppression.'),
+                'Flaming attacks deal extra damage to fire-vulnerable targets, halve healing while the target is on fire, and add a +50% building-damage modifier; scoped to this attack.'),
     'bonus_vs_infantry': ('unit_stat_localisations_tooltip_text_stat_bonus_vs_infantry',
                           'Numeric bonus against infantry-sized targets; distinct from the qualitative Anti-Infantry label.'),
     'bonus_vs_large': ('unit_stat_localisations_tooltip_text_stat_bonus_vs_large',
-                       'Numeric bonus against large targets; distinct from the qualitative Anti-Large label.'),
+                       'Numeric bonus against large combat targets (horse-sized cavalry and larger); native medium is included in the reviewed combat-size mapping.'),
 }
 
 
@@ -957,7 +957,35 @@ class Packet:
             self.passive_payloads(mechanic, gaps)
             _, tooltip_refs = self.loc('unit_abilities_tooltip_text_' + key)
             mechanic['provenance_refs'] += tooltip_refs
+        mechanic['spreadings'] = []
+        for origin in mechanic['phases']:
+            spreading_key = origin['lifecycle'].get('spreading')
+            if not spreading_key:
+                continue
+            spreading = self.q.one('native_special_ability_spreadings', 'key', spreading_key)
+            linked = self.q.one('native_ability_phases', 'id', spreading['phase']) if spreading else None
+            if not spreading or not linked:
+                continue  # Existing unresolved reference and stored gap remain.
+            # Describe one linked phase without recursively claiming propagation behavior.
+            effects = [e for e in self.phase_effects(dict(linked, spreading=None), gaps)
+                       if not (e['kind'] == 'payload_reference' and e['relationship'] == 'special_ability_phases_tables.spreading')]
+            linked_mechanic = dict(mechanic, key='', effects=effects, phases=[], conditions={}, native_parameters={})
+            description = self.summary(linked_mechanic)
+            mechanic['spreadings'].append({
+                'origin_phase': origin['key'], 'key': spreading_key, 'phase_key': linked['id'],
+                'radius': spreading['spread_radius'], 'summary': description,
+                'detail_ref': self.detail('record', spreading['record_id']),
+                'phase_detail_ref': self.detail('record', linked['record_id']),
+                'provenance_refs': list(dict.fromkeys(self.refs(spreading, linked) +
+                    [ref for effect in effects for ref in effect['provenance_refs']]))})
         mechanic['summary'] = self.summary(mechanic)
+        if any((mechanic['native_parameters'].get(f) or 0) > 0 for f in ('num_effected_friendly_units', 'num_effected_enemy_units')):
+            mechanic['summary'] += ' Recipient limits do not establish target choice or whether the bearer consumes a friendly slot.'
+        for spread in mechanic['spreadings']:
+            radius = str(spread['radius']) if spread['radius'] is not None else 'unknown'
+            mechanic['summary'] += (' Spreading links to phase ' + spread['phase_key'] +
+                ' with native spread radius ' + radius + ': ' + spread['summary'] +
+                ' Propagation timing, recipient selection and repeated-spread stacking are not established.')
         return mechanic
 
     def phase_effects(self, phase, gaps):
@@ -1051,7 +1079,16 @@ class Packet:
         groups = [label for field, label in (('target_self','the bearer'),
                   ('target_friends','other friendly units'),('target_enemies','enemy units')) if phase.get(field) is True]
         scope = 'Affects ' + (' and '.join(groups) if groups else 'recipients not established by the phase flags')
-        radius = mechanic.get('native_parameters', {}).get('effect_range')
+        casting = mechanic.get('native_parameters', {})
+        limits = []
+        for flag, field, label in [('target_friends','num_effected_friendly_units','friendly'),
+                                   ('target_enemies','num_effected_enemy_units','enemy')]:
+            cap = casting.get(field)
+            if phase.get(flag) and cap is not None and cap > 0:
+                limits.append(f'up to {cap:g} {label} unit' + ('s' if cap != 1 else ''))
+        if limits:
+            scope += ' (casting limit: ' + '; '.join(limits) + ')'
+        radius = casting.get('effect_range')
         if radius is not None and radius > 0 and (phase.get('target_friends') or phase.get('target_enemies')):
             scope += f' within {radius:g} metres'
         duration = phase.get('duration')
@@ -1167,6 +1204,8 @@ class Packet:
             elif kind == 'visual_indicator':
                 text = effect['purpose']
             elif kind == 'payload_reference':
+                if effect['relationship'] == 'special_ability_phases_tables.spreading' and any(s['origin_phase'] == ph for s in mechanic.get('spreadings', [])):
+                    continue
                 if effect['relationship'] == 'special_ability_phases_tables.imbue_contact':
                     # The phase_behavior explains the same contact link inline.
                     continue
@@ -1188,6 +1227,8 @@ class Packet:
                               if k not in ('ability', 'source_path', 'source_line', 'source_patch')}
                 pieces_for_effect = []
                 for k, v in parameters.items():
+                    if k == 'spreading' and any(s['key'] == v for s in mechanic.get('spreadings', [])):
+                        continue
                     if k == 'fatigue_change_ratio' and isinstance(v, (int, float)):
                         description = (f'Fatigue change: {v * 100:+g}% of maximum fatigue per second'
                                        + (' (restores vigour)' if v < 0 else ''))
@@ -1218,6 +1259,8 @@ class Packet:
             else:
                 text = effect['reason']
             text = text.rstrip('.')
+            if not text:
+                continue
             if text not in pieces.setdefault(ph, []):
                 pieces[ph].append(text)
         clauses = []
@@ -1230,7 +1273,9 @@ class Packet:
             if mechanic.get('key') in MIXED_RECIPIENT_PASSIVES:
                 label = 'Enemy effect — ' if all(p['target_enemies'] for p in phases) else 'Friendly effect — '
             else:
-                label = f'Phase {index} — ' if len(phase_keys) > 1 else 'While active — '
+                orders = {p['order'] for p in phases}
+                shared_order = any(p['key'] != key and p['order'] in orders for p in mechanic['phases'])
+                label = ('Recipient branch — ' if shared_order else f'Phase {index} — ') if len(phase_keys) > 1 else 'While active — '
             clauses.append(label + scope + ': ' + '; '.join(entries) + '.')
         for entries in pieces.values():
             clauses.append('Effect: ' + '; '.join(entries) + '.')
@@ -1466,7 +1511,7 @@ class Packet:
                     continue
                 table, row = self.q.record(target)
                 # The explosion already has its own scoped attack and damage.
-                if table == 'explosions':
+                if table == 'explosions' and rid == root_id:
                     continue
                 node_ref = self.detail('record', target)
                 if not any(n['id'] == node_ref for n in graph['nodes']):
@@ -1480,8 +1525,11 @@ class Packet:
                               'order': edge['edge_ordinal'], 'provenance_refs': [self.evidence(rid)]}
                 if graph_edge not in graph['edges']:
                     graph['edges'].append(graph_edge)
-                if depth < 1:
+                if depth < 8:
                     queue.append((target, node_ref, depth + 1))
+                elif self.q.rows('relation_edges', 'source_record', target):
+                    self.gap(gaps, 'payload_depth_limit', 'weapons',
+                             'Further payload branches omitted; retrieve ' + node_ref + '.', self.refs(row))
                 if table == 'native_ability_phases':
                     for effect_table in ('native_phase_stat_effects', 'native_phase_attribute_effects'):
                         for effect in self.q.rows(effect_table, 'phase', row['id']):
@@ -1572,7 +1620,7 @@ class Packet:
                      'ap_damage': profile['weapon_ap_damage'] if primary else (raw or {}).get('ap_damage'),
                      'attack_interval': profile['attack_interval'] if primary else (raw or {}).get('melee_attack_interval'),
                      'max_splash_targets': profile['max_splash_targets'] if primary else (raw or {}).get('splash_attack_max_attacks'),
-                     'native_parameters': self.native('melee_weapons', raw or {}, ('weapon_length', 'splash_attack_target_size', 'splash_attack_power_multiplier', 'collision_attack_max_targets', 'collision_attack_max_targets_cooldown', 'contact_phase', 'scaling_damage')),
+                     'native_parameters': self.native('melee_weapons', raw or {}, ('building_damage_multiplier', 'weapon_length', 'splash_attack_target_size', 'splash_attack_power_multiplier', 'collision_attack_max_targets', 'collision_attack_max_targets_cooldown', 'contact_phase', 'scaling_damage')),
                      'provenance_refs': self.refs(w, raw) + [ev], 'detail_ref': self.detail('record', (raw or w)['record_id'])}
                 if not raw:
                     self.gap(gaps, 'weapon_join_missing', 'weapons', str(w['melee_weapon_key']) + ': native weapon missing.', self.refs(w))
@@ -1581,6 +1629,8 @@ class Packet:
                         if a[field] != raw[native_field]:
                             self.gap(gaps, 'normalized_weapon_discrepancy', 'weapons',
                                      w['melee_weapon_key'] + ': normalized ' + field + ' differs from native ' + native_field + '.', a['provenance_refs'])
+                a['parameter_explanations'] = {
+                    'building_damage_multiplier': 'Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated.'}
                 melee.append(a)
                 self.weapon_payload(raw, a['id'], gaps)
                 traits = self.traits('melee', a, dict(profile, record_id=ev) if primary else (raw or w), component, normalized=primary)
@@ -1601,7 +1651,7 @@ class Packet:
                      'component_ref': component, 'slot': w['slot'], 'ammunition_pool': w['ammunition_pool'],
                      'is_default': boolean(w['is_default_projectile']), 'ammunition': w['ammunition'], 'accuracy': profile['accuracy'],
                      **{k: p[v] for k, v in mapping.items()}, 'explosion': None,
-                     'native_parameters': self.native('projectiles', p, ('shot_type', 'collision_radius', 'mass', 'gravity', 'can_target_airborne', 'can_damage_allies', 'can_damage_buildings', 'projectile_penetration', 'penetration_entity_size_cap', 'max_penetration', 'expiry_range', 'expire_on_impact', 'can_bounce', 'can_roll', 'homing_params', 'scaling_damage', 'contact_stat_effect', 'overhead_stat_effect', 'shrapnel_key', 'spawned_vortex')),
+                     'native_parameters': self.native('projectiles', p, ('trajectory_sight', 'fixed_elevation', 'max_elevation', 'building_damage_multiplier', 'shot_type', 'collision_radius', 'mass', 'gravity', 'can_target_airborne', 'can_damage_allies', 'can_damage_buildings', 'projectile_penetration', 'penetration_entity_size_cap', 'max_penetration', 'expiry_range', 'expire_on_impact', 'can_bounce', 'can_roll', 'homing_params', 'scaling_damage', 'contact_stat_effect', 'overhead_stat_effect', 'shrapnel_key', 'spawned_vortex')),
                      'detail_ref': self.detail('record', p['record_id']), 'provenance_refs': self.refs(w, p)}
                 if w['projectile_key'] == profile['source_projectile_key'] and w['missile_weapon_key'] == profile['source_missile_weapon_key']:
                     for out, normalized in (('range', 'range'), ('reload_time', 'reload_time'), ('base_damage', 'missile_base_damage'), ('ap_damage', 'missile_ap_damage'), ('projectiles_per_shot', 'projectiles_per_shot'), ('ammunition', 'ammunition')):
@@ -1616,6 +1666,9 @@ class Packet:
                     self.weapon_payload(x, a['explosion']['id'], gaps)
                 elif p['explosion_key']:
                     self.gap(gaps, 'explosion_join_missing', 'weapons', p['explosion_key'] + ': explosion unresolved.', self.refs(p))
+                a['parameter_explanations'] = {
+                    'trajectory': 'Native trajectory mode and elevation settings; these alone do not establish line of sight, obstacle clearance or firing eligibility.',
+                    'building_damage_multiplier': 'Native projectile building-damage multiplier; does not override can_damage_buildings=false. Combined siege damage is not calculated.'}
                 ranged.append(a)
                 self.weapon_payload(p, a['id'], gaps)
                 self.attach_traits(attack_traits, 'ranged', self.traits('ranged', a, p, component))

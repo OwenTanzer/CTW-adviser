@@ -30,6 +30,31 @@
       "kind": "source_backed",
       "assertions": "fixtures/source_backed/queen_bess.assertions.json",
       "purpose": "Selected source projection; coverage gaps remain explicit."
+    },
+    {
+      "path": "fixtures/synthetic/compound_and_variants.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/complete_dummy.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/unresolved_ranged.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/melee_projection.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
+    },
+    {
+      "path": "fixtures/synthetic/passive_overflow.json",
+      "kind": "synthetic",
+      "purpose": "Invented structural fixture; never game evidence."
     }
   ]
 }

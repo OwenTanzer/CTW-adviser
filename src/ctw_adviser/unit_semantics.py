@@ -4,6 +4,17 @@ def supplement(context, unit, profile, components):
     q = context.q
     land = q.one('land_units', 'key', profile['source_land_unit_key'])
     entity = q.one('battle_entities', 'key', profile['source_battle_entity_key'])
+    size = unit['body']['size']
+    combat_class = ('large' if size in ('medium', 'large', 'very_large') else
+                    'infantry' if size in ('small', 'very_small') else None)
+    _, class_refs = context.loc('ui_unit_bullet_point_enums_tooltip_anti_large')
+    _, charge_refs = context.loc('ui_unit_bullet_point_enums_tooltip_charge_reflector_vs_large')
+    unit['body']['target_classification'] = {
+        'combat_class': combat_class,
+        'status': 'reviewed_mapping' if combat_class else 'unresolved',
+        'summary': ('Combat target class: ' + combat_class + '. Native body size remains ' + size +
+                    '. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.') if combat_class else 'Combat target class is unresolved for this native size.',
+        'provenance_refs': (context.refs(entity) if entity else []) + class_refs + charge_refs}
     movement = unit['movement']
     movement.update(speed_basis='primary_body_run_speed',
                     primary_body_key=profile['source_battle_entity_key'],

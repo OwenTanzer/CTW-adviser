@@ -44,7 +44,7 @@ for sections, modes, continuation, detail/provenance commands and interpretation
 boundaries. The public Datasette inspection deployment follows reviewed merges;
 it is separate from the offline query library and future client adapters.
 
-Packet 1.16.0 includes the Alpha 4 repairs first released in 1.15.0 and the
+Packet 1.18.0 includes the Alpha 4 repairs first released in 1.15.0 and the
 Chej unit supplements. Default packets keep
 inline evidence IDs and defer source/provenance dictionaries; use
 `--include-provenance` to expand them or the `provenance` command to resolve IDs.

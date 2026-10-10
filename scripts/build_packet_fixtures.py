@@ -184,6 +184,7 @@ def main():
   for field in ['sources','provenance','detail_refs','trait_descriptions']:packet[field].update(second[field])
   for assertion in second_assertions:assertion['pointer']=assertion['pointer'].replace('/units/0/','/units/1/');assertions.append(assertion)
   path=f'work/generated_examples/{a}_vs_{b}.json';ap=f'work/generated_examples/{a}_vs_{b}.assertions.json';dump(ROOT/path,packet);dump(ROOT/ap,assertions);generated.append({'path':path,'kind':'source_backed','assertions':ap,'purpose':'Reproducible named pair; generated locally and not committed.'})
- dump(ROOT/'fixtures/manifest.json',{'schema_version':'1.1.0','fixtures':entries})
+ synthetic=[entry for entry in json.loads((ROOT/'fixtures/manifest.json').read_text())['fixtures'] if entry['kind']=='synthetic']
+ dump(ROOT/'fixtures/manifest.json',{'schema_version':'1.1.0','fixtures':entries+synthetic})
  dump(ROOT/'work/generated_examples/manifest.json',{'schema_version':'1.1.0','fixtures':generated})
 if __name__=='__main__':main()

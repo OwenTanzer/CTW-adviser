@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:ctw-adviser:evidence-packet:1.17.0",
-  "title": "CTW adviser evidence packet v1.17.0 (accepts earlier fixtures)",
+  "$id": "urn:ctw-adviser:evidence-packet:1.18.0",
+  "title": "CTW adviser evidence packet v1.18.0 (accepts earlier fixtures)",
   "type": "object",
   "properties": {
     "schema_version": {
@@ -23,7 +23,8 @@
         "1.14.0",
         "1.15.0",
         "1.16.0",
-        "1.17.0"
+        "1.17.0",
+        "1.18.0"
       ]
     },
     "mode": {
@@ -534,6 +535,49 @@
             "provenance_refs"
           ],
           "additionalProperties": false
+        },
+        "target_classification": {
+          "type": "object",
+          "properties": {
+            "combat_class": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "infantry",
+                    "large"
+                  ]
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "reviewed_mapping",
+                "unresolved"
+              ]
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1
+            },
+            "provenance_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "combat_class",
+            "status",
+            "summary",
+            "provenance_refs"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -736,6 +780,13 @@
               "boolean",
               "null"
             ]
+          }
+        },
+        "parameter_explanations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -1230,6 +1281,13 @@
             "additionalProperties": false
           },
           "minItems": 0
+        },
+        "parameter_explanations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       },
       "required": [
@@ -1366,6 +1424,13 @@
             "$ref": "#/$defs/melee_attack"
           },
           "minItems": 0
+        },
+        "parameter_explanations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       },
       "required": [
@@ -1807,6 +1872,13 @@
             "$ref": "#/$defs/ranged_attack"
           },
           "minItems": 0
+        },
+        "parameter_explanations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       },
       "required": [
@@ -2870,6 +2942,64 @@
         "detail_ref": {
           "type": "string",
           "minLength": 1
+        },
+        "spreadings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "origin_phase": {
+                "type": "string",
+                "minLength": 1
+              },
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "phase_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "radius": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1
+              },
+              "detail_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "phase_detail_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "provenance_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "origin_phase",
+              "key",
+              "phase_key",
+              "radius",
+              "summary",
+              "detail_ref",
+              "phase_detail_ref",
+              "provenance_refs"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
         }
       },
       "required": [
@@ -6163,6 +6293,12 @@
             "string",
             "null"
           ]
+        },
+        "building_damage_multiplier": {
+          "type": [
+            "number",
+            "null"
+          ]
         }
       },
       "required": [
@@ -6298,6 +6434,30 @@
             "string",
             "null"
           ]
+        },
+        "trajectory_sight": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fixed_elevation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_elevation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "building_damage_multiplier": {
+          "type": [
+            "number",
+            "null"
+          ]
         }
       },
       "required": [
@@ -6339,7 +6499,8 @@
               "1.14.0",
               "1.15.0",
               "1.16.0",
-              "1.17.0"
+              "1.17.0",
+              "1.18.0"
             ]
           }
         },
@@ -6413,7 +6574,8 @@
               "1.14.0",
               "1.15.0",
               "1.16.0",
-              "1.17.0"
+              "1.17.0",
+              "1.18.0"
             ]
           }
         },
@@ -6557,7 +6719,8 @@
               "1.14.0",
               "1.15.0",
               "1.16.0",
-              "1.17.0"
+              "1.17.0",
+              "1.18.0"
             ]
           }
         },
@@ -6577,7 +6740,8 @@
           "schema_version": {
             "enum": [
               "1.16.0",
-              "1.17.0"
+              "1.17.0",
+              "1.18.0"
             ]
           }
         },
@@ -6695,7 +6859,10 @@
       "if": {
         "properties": {
           "schema_version": {
-            "const": "1.17.0"
+            "enum": [
+              "1.17.0",
+              "1.18.0"
+            ]
           }
         },
         "required": [
@@ -6734,6 +6901,120 @@
                               "required": [
                                 "capacity",
                                 "unlimited"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.18.0"
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "properties": {
+          "units": {
+            "items": {
+              "properties": {
+                "body": {
+                  "required": [
+                    "target_classification"
+                  ]
+                },
+                "passives": {
+                  "properties": {
+                    "abilities": {
+                      "items": {
+                        "required": [
+                          "spreadings"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "melee": {
+                  "if": {
+                    "type": "object"
+                  },
+                  "then": {
+                    "required": [
+                      "parameter_explanations"
+                    ],
+                    "properties": {
+                      "native_parameters": {
+                        "required": [
+                          "building_damage_multiplier"
+                        ]
+                      },
+                      "variants": {
+                        "items": {
+                          "required": [
+                            "parameter_explanations"
+                          ],
+                          "properties": {
+                            "native_parameters": {
+                              "required": [
+                                "building_damage_multiplier"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "ranged": {
+                  "if": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "const": "present"
+                      }
+                    },
+                    "required": [
+                      "status"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "parameter_explanations"
+                    ],
+                    "properties": {
+                      "native_parameters": {
+                        "required": [
+                          "building_damage_multiplier",
+                          "trajectory_sight",
+                          "fixed_elevation",
+                          "max_elevation"
+                        ]
+                      },
+                      "variants": {
+                        "items": {
+                          "required": [
+                            "parameter_explanations"
+                          ],
+                          "properties": {
+                            "native_parameters": {
+                              "required": [
+                                "building_damage_multiplier",
+                                "trajectory_sight",
+                                "fixed_elevation",
+                                "max_elevation"
                               ]
                             }
                           }

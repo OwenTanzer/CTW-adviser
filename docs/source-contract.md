@@ -117,3 +117,13 @@ exports at the unchanged pin. See [field mappings and selection rules](chej-find
 Raw field coverage supplements normalized facts without overriding source
 ammunition disagreements. The lock fingerprints the expanded contract and files;
 existing snapshots must be rebuilt before serving packet 1.16.
+
+## Reviewed ammunition migration (10 October 2026)
+
+The current pin is `2b5965e78c85dc795451dad188756a173b247be5` (CTW-data PR #42).
+Native missile-weapon pool selection replaces the upstream attachment-role
+heuristic. The 255 changed link rows, six default ammo values, new builder helper,
+metadata hashes and compatibility gate are reviewed in [the acceptance record](chej-findings-2.md).
+No raw combat source values or import columns change. The separate combat target
+class is an adviser interpretation; the historical normalized is_large field is
+retained without being promoted into combat eligibility.

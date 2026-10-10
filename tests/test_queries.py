@@ -163,7 +163,7 @@ class QueryTests(unittest.TestCase):
         for name, params in {'casting':forge['native_parameters'], 'lifecycle':prowess['phases'][0]['lifecycle'],
                              'melee':gorduz['units'][0]['melee']['native_parameters'], 'ranged':sea['units'][0]['ranged']['native_parameters']}.items():
             schema = self.schema['$defs']['parameters_' + name]
-            self.assertEqual(set(params), set(schema['required']))
+            self.assertEqual(set(params), set(schema['properties']))
             validate(params, schema, self.schema)
             with self.assertRaises(ValueError): validate({}, schema, self.schema)
             for field in schema['required']:
