@@ -730,3 +730,25 @@ checked-in schema so regeneration cannot silently discard these protections.
 
 Recovery verification: 87 tests pass; full roster audit passes 2,409 unit keys and
 32,795 source locators. This batch changes validation, not emitted game values.
+
+### General explanations — reconstruction of `b6473c0` (packet 1.11.0)
+
+Default generic summaries group effects by their owning phase and name self,
+friendly and enemy recipients, positive aura ranges and finite phase durations.
+Readable stat labels preserve base/AP, resistance-type and reload-skill
+distinctions. Additive resistance/block changes are percentage points, not
+multipliers; spell-mastery multipliers are rendered as percent changes. Conditions
+remain in their source roles: target exclusions are not host activation rules.
+Granted contact effects describe what attacks apply, the contact recipients,
+modifiers and duration, without claiming an immediate aura-wide debuff. Negative
+`stat_weakness_flame` is described as reduced fire resistance, separately from
+the host's resistance bonus. Exact stat keys/values remain structured.
+
+Balefire's ignition is explained as flaming attacks and Spirit Conduit's 0.2 as
++20% power recharge, not reserve generation. Regeneration states its reviewed
+0.10% maximum-health rate, 20% fire weakness and absence of entity resurrection;
+effective healing limits remain. These narrow interpretations are generalized
+only in the separately recorded family/resource follow-through below.
+
+Recovery verification: 88 tests pass, including whole-roster readable-stat and
+generic-aura coverage plus named contact/recipient/regeneration regressions.

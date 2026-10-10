@@ -1,8 +1,13 @@
 """Author the v1 evidence schema; no source data or combat calculation."""
 import json
 from pathlib import Path
+import sys
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'src'))
+from ctw_adviser.queries import PACKET_VERSION
+VERSIONS=['1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0']
+VERSIONS=VERSIONS[:VERSIONS.index(PACKET_VERSION)+1]
 S={'type':'string','minLength':1}; N={'type':['number','null']}; B={'type':['boolean','null']}
 def enum(*values):return {'enum':list(values)}
 def arr(item,minimum=0):return {'type':'array','items':item,'minItems':minimum}
@@ -42,7 +47,7 @@ effects={
  'periodic_damage':{'native_parameters':obj(numbers('damage_amount','hp_change_frequency','max_damaged_entities'))},
  'healing':{'native_parameters':obj({**numbers('heal_amount','barrier_heal_amount','hp_change_frequency'),'resurrect':B,'limits':native})},
  'summon':{'unit_key':S,'unit_name':nullable(S),'trigger':enum('on_death','low_health','unresolved'),'trigger_basis':S,'spawn_type':nullable(S),'num_uses':N,'native_parameters':native},
- 'phase_behavior':{'native_kind':const('phase_behavior'),'native_parameters':{**obj({'imbue_magical':B,'imbue_contact':nullable(S),'requested_stance':S}, []), 'anyOf':[{'required':[k]} for k in ('imbue_magical','imbue_contact','requested_stance')]},'reason':S},
+ 'phase_behavior':{'native_kind':const('phase_behavior'),'native_parameters':{**obj({'imbue_magical':B,'imbue_contact':nullable(S),'requested_stance':S,'imbue_ignition':N,'mana_regen_mod':N}, []), 'anyOf':[{'required':[k]} for k in ('imbue_magical','imbue_contact','requested_stance','imbue_ignition','mana_regen_mod')]},'reason':S},
  'phase_role':{'native_kind':S,'native_parameters':native,'reason':S},
  'visual_indicator':{'purpose':S},
  'payload_reference':{'node_ref':S,'relationship':S},
@@ -66,8 +71,8 @@ defs['snapshot']=obj({'commit':{'type':'string','pattern':'^[0-9a-f]{40}$'},'own
 defs['description']=obj({'summary':S,'provenance_refs':refs})
 defs['node']=obj({'id':S,'kind':S,'key':S,'native_parameters':native,'provenance_refs':refs})
 defs['edge']=obj({'from':S,'to':S,'relationship':S,'order':{'type':['integer','null']},'provenance_refs':refs})
-schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-adviser:evidence-packet:1.10.0','title':'CTW adviser evidence packet v1.10.0 (accepts earlier fixtures)',
- **obj({'schema_version':enum('1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0'),'mode':enum('combined','melee','missile'),'snapshot':ref('snapshot'),'units':arr(ref('unit'),1),
+schema={'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'urn:ctw-adviser:evidence-packet:'+PACKET_VERSION,'title':'CTW adviser evidence packet v'+PACKET_VERSION+' (accepts earlier fixtures)',
+ **obj({'schema_version':enum(*VERSIONS),'mode':enum('combined','melee','missile'),'snapshot':ref('snapshot'),'units':arr(ref('unit'),1),
  'trait_descriptions':mapping(ref('description')),'sources':mapping(ref('source')),'provenance':mapping(ref('evidence')),'detail_refs':mapping(obj({'kind':S,'key':S})),
  'payload_graph':obj({'nodes':arr(ref('node')),'edges':arr(ref('edge'))}),'scenario':{'type':'object'}},['schema_version','mode','snapshot','units','trait_descriptions','sources','provenance','detail_refs','payload_graph']),'$defs':defs}
 
@@ -131,7 +136,7 @@ attack_projection=lambda kind: {'properties':{'native_parameters':ref('parameter
 melee_projection=attack_projection('melee')
 ranged_projection=attack_projection('ranged')
 schema['allOf']=[{
- 'if':{'properties':{'schema_version':enum('1.9.0','1.10.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum(*VERSIONS[VERSIONS.index('1.9.0'):])},'required':['schema_version']},
  'then':{'properties':{
   'units':{'items':{'properties':{
    'identity':{'required':['profile_unit_key','unit_keys']},
@@ -144,7 +149,7 @@ schema['allOf']=[{
  }}
 }]
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum('1.10.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum(*VERSIONS[VERSIONS.index('1.10.0'):])},'required':['schema_version']},
  'then':{'properties':{'units':{'items':{'properties':{
   'melee':{'anyOf':[{'type':'null'}, {**melee_projection,'properties':{**melee_projection['properties'],'variants':{'items':melee_projection}}}]},
   'ranged':{'if':{'type':'object','properties':{'status':const('present')},'required':['status']},

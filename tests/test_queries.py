@@ -95,13 +95,13 @@ class QueryTests(unittest.TestCase):
             self.assertFalse(any(e['kind'] == 'unresolved' and
                                  field in e.get('native_parameters', {}) for e in effects))
             self.assertFalse(any(g['code'] == 'phase_behavior_semantics' for g in detail['gaps']))
-        # Do not certify the unknown setting merely because another field is explained.
+        # This positive ignition switch has a reviewed interpretation, not a damage multiplier.
         mixed = self.q.get_passive_detail('wh_dlc04_unit_passive_balefire', include_diagnostics=True)
-        self.assertTrue(any(e['kind'] == 'phase_behavior' and e['native_parameters'] == {'imbue_magical': True}
+        self.assertTrue(any(e['kind'] == 'phase_behavior' and e['native_parameters'] == {'imbue_magical': True, 'imbue_ignition': 10}
                             for e in mixed['mechanic']['effects']))
-        self.assertTrue(any(e['kind'] == 'unresolved' and e['native_parameters'] == {'imbue_ignition': 10}
+        self.assertFalse(any(e['kind'] == 'unresolved' and 'imbue_ignition' in e['native_parameters']
                             for e in mixed['mechanic']['effects']))
-        self.assertTrue(any(g['code'] == 'phase_behavior_semantics' for g in mixed['gaps']))
+        self.assertFalse(any(g['code'] == 'phase_behavior_semantics' for g in mixed['gaps']))
         for key in ('wh2_dlc11_unit_passive_abandon_ship', 'wh3_dlc27_unit_passive_split_up_hidden'):
             detail = self.q.get_passive_detail(key)
             summon = next(e for e in detail['mechanic']['effects'] if e['kind'] == 'summon')
@@ -209,6 +209,31 @@ class QueryTests(unittest.TestCase):
             m = next(m for m in bad['units'][0]['passives']['abilities'] if m['key'] == lucky['key'])
             next(e for e in m['effects'] if e['kind'] == 'healing')['phase_ref'] = bad_phase
             with self.assertRaises(ValueError): self.check(bad)
+
+    def test_alpha4_general_scope_stats_and_contact_explanations(self):
+        examples = {
+            'wh_dlc04_unit_passive_balefire': ('bearer and other friendly units within 35 metres', 'Fire resistance +20 percentage points', 'Grants flaming attacks'),
+            'wh2_dlc09_unit_passive_spirit_conduit': ('other friendly units within 100 metres', 'Spell mastery +20%', 'Power recharge +20%', 'cannot cast spells'),
+            'wh2_dlc09_character_passive_blessing_of_asaph': ('within 55 metres', 'Armour-piercing missile damage x1.15', 'Reload skill +15', 'Attacks apply Poison on contact to enemies', 'for 10 seconds'),
+            'wh3_dlc26_character_passive_skaramors_butchers': ('within 35 metres', 'Attacks apply Sundered Armour on contact to enemies: Armour -30 for 30 seconds'),
+            'wh3_dlc26_unit_passive_piggy_back_joust': ('Charge speed x1.25', 'Attacks apply Disorientated on contact to enemies', 'Speed x0.7', 'Melee attack -6', 'Melee defence -4', 'for 22 seconds'),
+            'wh_dlc06_unit_passive_power_of_the_dragonback': ('Fire resistance +20 percentage points', 'Attacks apply Flammable on contact to enemies', 'Fire resistance -20 percentage points', 'for 10 seconds'),
+            'wh_main_unit_passive_regeneration': ('0.10% maximum health per second', '20% fire weakness', 'without resurrecting'),
+        }
+        for key, phrases in examples.items():
+            summary = self.q.get_passive_detail(key)['mechanic']['summary']
+            for phrase in phrases:
+                with self.subTest(key=key, phrase=phrase): self.assertIn(phrase, summary)
+        keys = [r[0] for r in self.q.db.execute("SELECT DISTINCT a.ability_key FROM unit_abilities a JOIN ability_option_metadata m USING(ability_key) WHERE m.classification='core_passive'")]
+        for key in keys:
+            m = self.q.get_passive_detail(key)['mechanic']
+            self.assertNotIn('stat_', m['summary'], key)
+            # Reviewed bespoke summaries have their own recipient/event wording.
+            from ctw_adviser.queries import EXPLAINED_PASSIVES
+            if key not in EXPLAINED_PASSIVES and key not in ('wh_main_hero_passive_forgefire','wh_main_unit_passive_regeneration'):
+                radius = m['native_parameters']['effect_range']
+                if radius is not None and radius > 0 and any(p['target_friends'] or p['target_enemies'] for p in m['phases']):
+                    self.assertIn(f'within {radius:g} metres', m['summary'], key)
 
     def test_murderous_indicator_consolidation_is_lossless_and_qualified(self):
         links = self.q.rows('unit_abilities', 'ability_key', MURDEROUS_INDICATOR)

@@ -14,6 +14,7 @@ import re
 ROOT=Path(__file__).resolve().parents[1]
 ANNOTATIONS={'$schema','$id','title','description','$defs'}
 KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf','allOf','if','then','else'}
+CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0'}
 
 def check_schema(s):
     if not isinstance(s,dict):raise ValueError('only object schemas supported')
@@ -98,7 +99,7 @@ def packet_checks(p):
         ranged=u['ranged'];status=u['coverage']['ranged']
         melee_status=u['coverage']['melee']
         gaps=u['coverage'].get('gaps')
-        if gaps is None and (p['schema_version'] not in ('1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0') or 'diagnostic_count' not in u['coverage']):raise ValueError('missing diagnostic coverage')
+        if gaps is None and (p['schema_version'] not in CURRENT_VERSIONS | {'1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0'} or 'diagnostic_count' not in u['coverage']):raise ValueError('missing diagnostic coverage')
         if gaps is not None and 'diagnostic_count' in u['coverage'] and u['coverage']['diagnostic_count']!=len(gaps):raise ValueError('diagnostic count mismatch')
         if (u['melee'] is None)==(melee_status=='present'):raise ValueError('melee absence/status contradiction')
         if gaps is not None and melee_status in ('unresolved','omitted') and not any(g['section']=='melee' for g in gaps):raise ValueError('missing melee gap')
@@ -150,7 +151,7 @@ def packet_checks(p):
                 phase_sources={'data/unit_stats/abilities/tables/ability_phases.csv':'id',
                                'data/unit_stats/abilities/tables/phase_stat_effects.csv':'phase',
                                'data/unit_stats/abilities/tables/phase_attribute_effects.csv':'phase'}
-                if p['schema_version'] == '1.10.0':
+                if p['schema_version'] in CURRENT_VERSIONS:
                     attached={evidence[r]['key'].get(phase_sources[p['sources'][evidence[r]['source_id']]['path']])
                               for r in e['provenance_refs'] if p['sources'][evidence[r]['source_id']]['path'] in phase_sources}
                     attached &= phases

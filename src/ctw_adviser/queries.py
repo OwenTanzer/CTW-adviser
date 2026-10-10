@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.10.0'
+PACKET_VERSION = '1.11.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -193,6 +193,12 @@ TARGET_SUMMON_PASSIVES = {
 SECTIONS = ('components', 'weapons', 'attributes', 'abilities', 'activated_options')
 MODES = ('combined', 'melee', 'missile')
 CONDITION_TEXT = {
+    'hasnt_casting_ability': 'cannot cast spells',
+    'unit_is_commander_class': 'commander-class units',
+    'unit_is_not_commander_class': 'non-commander units',
+    'unit_is_not_construct': 'non-construct units',
+    'is_not_missile_unit': 'non-missile units',
+    'cannot_perform_missile_attack': 'cannot perform missile attacks',
     'engaged_in_melee': 'engaged in melee',
     'engaged_in_melee_anything': 'engaged in melee with any opponent',
     'out_of_melee': 'not engaged in melee',
@@ -212,6 +218,23 @@ STAT_NAMES = {
     'stat_melee_damage_ap': 'melee_ap_damage', 'stat_melee_damage_base': 'melee_base_damage',
     'scalar_speed': 'speed',
 }
+STAT_LABELS = {
+    'stat_armour': 'Armour', 'stat_morale': 'Leadership', 'stat_reloading': 'Reload skill',
+    'stat_accuracy': 'Accuracy', 'stat_mass': 'Mass', 'stat_damage_reflection': 'Damage reflection',
+    'stat_healing_power': 'Healing power', 'stat_resistance_all': 'Ward save',
+    'stat_resistance_flame': 'Fire resistance', 'stat_resistance_magic': 'Magic resistance',
+    'stat_resistance_missile': 'Missile resistance', 'physical_resistance': 'Physical resistance',
+    'stat_missile_block_chance': 'Missile block chance', 'stat_weakness_flame': 'Fire resistance',
+    'melee_ap_damage': 'Armour-piercing melee damage', 'melee_base_damage': 'Base melee damage',
+    'scalar_missile_damage_ap': 'Armour-piercing missile damage', 'scalar_missile_damage_base': 'Base missile damage',
+    'scalar_missile_explosion_damage_ap': 'Armour-piercing missile explosion damage',
+    'scalar_missile_explosion_damage_base': 'Base missile explosion damage',
+    'scalar_missile_range': 'Missile range', 'scalar_spell_mastery': 'Spell mastery',
+    'scalar_bracing': 'Bracing', 'scalar_charge_speed': 'Charge speed',
+    'scalar_miscast_chance': 'Miscast chance',
+}
+PERCENTAGE_POINT_STATS = {'physical_resistance', 'stat_resistance_all', 'stat_resistance_flame',
+    'stat_resistance_magic', 'stat_resistance_missile', 'stat_missile_block_chance', 'stat_weakness_flame'}
 PROTECTION = ('armour', 'shield_block_chance', 'physical_resistance',
               'missile_resistance', 'spell_resistance', 'fire_resistance', 'ward_save')
 CASTING_FIELDS = (
@@ -949,12 +972,20 @@ class Packet:
                  if v not in (0, None, False) and k not in ('effect_type', 'affects_allies', 'affects_enemies')}
         # Classify supported behavior independently of any remaining opaque settings.
         explained = {k: other.pop(k) for k in ('imbue_magical', 'imbue_contact') if k in other}
+        if key == 'wh_dlc04_unit_passive_balefire' and other.get('imbue_ignition') == 10:
+            explained['imbue_ignition'] = other.pop('imbue_ignition')
+        if key == 'wh2_dlc09_unit_passive_spirit_conduit' and other.get('mana_regen_mod') == 0.2:
+            explained['mana_regen_mod'] = other.pop('mana_regen_mod')
         if explained:
             meanings = []
             if 'imbue_magical' in explained:
                 meanings.append('Enables magical attacks while this phase is active.')
             if 'imbue_contact' in explained:
                 meanings.append('Attacks apply the linked contact effect ' + explained['imbue_contact'] + ' while this phase is active.')
+            if 'imbue_ignition' in explained:
+                meanings.append('Grants flaming attacks; the native setting is not an attack-damage percentage.')
+            if 'mana_regen_mod' in explained:
+                meanings.append('Increases power recharge by 20% (reviewed Spirit Conduit interpretation).')
             effects.append({'kind': 'phase_behavior', 'phase_ref': key, 'native_kind': 'phase_behavior',
                             'native_parameters': explained, 'reason': ' '.join(meanings), 'provenance_refs': refs})
         if other:
@@ -973,15 +1004,60 @@ class Packet:
             self.gap(gaps, 'phase_effect_unknown', 'abilities', key + ': no mapped numerical effect.', refs)
         return effects
 
+    def stat_summary(self, stat, operation, value, native_operation=None):
+        label = STAT_LABELS.get(stat, re.sub(r'^(stat|scalar)_', '', stat).replace('_', ' ').capitalize())
+        if value is None:
+            return label + ': unknown'
+        if operation == 'add':
+            return f'{label} {value:+g}' + (' percentage points' if stat in PERCENTAGE_POINT_STATS else '')
+        if operation == 'multiply':
+            if stat == 'scalar_spell_mastery':
+                return f'{label} {(value - 1) * 100:+g}%'
+            return f'{label} x{value:g}'
+        return f'{label}: value {value}; operation {native_operation} is not mapped'
+
+    def phase_scope(self, phase, mechanic):
+        groups = [label for field, label in (('target_self','the bearer'),
+                  ('target_friends','other friendly units'),('target_enemies','enemy units')) if phase.get(field) is True]
+        scope = 'Affects ' + (' and '.join(groups) if groups else 'recipients not established by the phase flags')
+        radius = mechanic.get('native_parameters', {}).get('effect_range')
+        if radius is not None and radius > 0 and (phase.get('target_friends') or phase.get('target_enemies')):
+            scope += f' within {radius:g} metres'
+        duration = phase.get('duration')
+        if duration is not None and duration >= 0:
+            scope += f'; phase duration {duration:g} seconds'
+        return scope
+
+    def contact_summary(self, key, effect):
+        phase = self.q.one('native_ability_phases', 'id', key)
+        name, name_refs = self.loc('unit_abilities_onscreen_name_' + key)
+        if not name:
+            name, name_refs = self.loc('unit_abilities_onscreen_name_' + key.replace('_contact_', '_passive_'))
+        name = name or key.split('_contact_')[-1].replace('_', ' ').title()
+        if not phase:
+            return 'Attacks apply contact effect ' + name + ' (details unresolved)'
+        refs = self.refs(phase) + name_refs
+        pieces = []
+        for row in self.q.rows('native_phase_stat_effects', 'phase', key, 'stat,record_id'):
+            pieces.append(self.stat_summary(STAT_NAMES.get(row['stat'], row['stat']),
+                          {'add':'add','mult':'multiply'}.get(row['how'], 'native'), row['value'], row['how']))
+            refs += self.refs(row)
+        recipients = [label for field,label in (('affects_allies','allies'),('affects_enemies','enemies')) if phase[field]]
+        description = f'Attacks apply {name} on contact'
+        if recipients: description += ' to ' + ' and '.join(recipients)
+        if pieces: description += ': ' + ', '.join(pieces)
+        if phase['duration'] is not None and phase['duration'] >= 0:
+            description += f' for {phase["duration"]:g} seconds'
+        effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + refs))
+        return description
+
     def summary(self, mechanic):
         """Deterministic templates use only emitted structured evidence."""
-        pieces = []
+        pieces = {}
         for effect in mechanic['effects']:
             kind = effect['kind']; ph = effect['phase_ref']
-            prefix = (ph + ': ') if len({p['key'] for p in mechanic['phases']}) > 1 and ph else ''
             if kind == 'stat_modifier':
-                value = effect['value']; op = effect['operation']
-                text = (f'{effect["stat"]} ' + (f'{value:+g}' if value is not None else 'unknown')) if op == 'add' else f'{effect["stat"]} x{value:g}' if op == 'multiply' and value is not None else f'{effect["stat"]}: value {value}; operation {effect["native_operation"]} is not mapped'
+                text = self.stat_summary(effect['stat'], effect['operation'], effect['value'], effect['native_operation'])
             elif kind == 'periodic_damage':
                 n = effect['native_parameters']
                 text = f'Periodic damage amount: {n["damage_amount"]}; interval setting: {n["hp_change_frequency"]}; maximum affected entities: {n["max_damaged_entities"]} (damage units and effective timing not verified)'
@@ -1006,6 +1082,9 @@ class Packet:
             elif kind == 'visual_indicator':
                 text = effect['purpose']
             elif kind == 'payload_reference':
+                if effect['relationship'] == 'special_ability_phases_tables.imbue_contact':
+                    # The phase_behavior explains the same contact link inline.
+                    continue
                 text = 'linked ' + effect['relationship']
                 if effect.get('failure_context'):
                     f = effect['failure_context']
@@ -1022,7 +1101,13 @@ class Packet:
                               if k not in ('ability', 'source_path', 'source_line', 'source_patch')}
                 pieces_for_effect = []
                 for k, v in parameters.items():
-                    if k in PHASE_ACTIONS and isinstance(v, bool):
+                    if k == 'imbue_contact' and isinstance(v, str):
+                        description = self.contact_summary(v, effect)
+                    elif k == 'imbue_ignition' and kind == 'phase_behavior':
+                        description = 'Grants flaming attacks'
+                    elif k == 'mana_regen_mod' and kind == 'phase_behavior':
+                        description = f'Power recharge {v * 100:+g}%'
+                    elif k in PHASE_ACTIONS and isinstance(v, bool):
                         description = PHASE_ACTIONS[k] if v else PHASE_LABELS[k] + ': disabled'
                     else:
                         description = PHASE_LABELS.get(k, k.replace('_', ' ')) + ': ' + compact(v)
@@ -1035,9 +1120,20 @@ class Packet:
             else:
                 text = effect['reason']
             text = text.rstrip('.')
-            if prefix + text not in pieces:
-                pieces.append(prefix + text)
-        result = ('Effect: ' if all(e['kind'] in ('summon', 'visual_indicator') for e in mechanic['effects']) else 'While active: ') + '; '.join(pieces) + '.'
+            if text not in pieces.setdefault(ph, []):
+                pieces[ph].append(text)
+        clauses = []
+        phase_keys = list(dict.fromkeys(p['key'] for p in mechanic['phases']))
+        for index, key in enumerate(phase_keys, 1):
+            entries = pieces.pop(key, [])
+            if not entries: continue
+            phases = [p for p in mechanic['phases'] if p['key'] == key]
+            scope = '; '.join(dict.fromkeys(self.phase_scope(p, mechanic) for p in phases))
+            label = f'Phase {index} — ' if len(phase_keys) > 1 else 'While active — '
+            clauses.append(label + scope + ': ' + '; '.join(entries) + '.')
+        for entries in pieces.values():
+            clauses.append('Effect: ' + '; '.join(entries) + '.')
+        result = ' '.join(clauses)
         result = self.explained_summary(mechanic) or result
         for category, label in (
             ('activates_when', 'Activation conditions'),
@@ -1063,6 +1159,9 @@ class Packet:
 
     def explained_summary(self, mechanic):
         key = mechanic.get('key')
+        if key == 'wh_main_unit_passive_regeneration':
+            return ('While active, heals the bearer at 0.10% maximum health per second, without resurrecting dead entities. '
+                    'Has 20% fire weakness; healing remains subject to healing limits and modifiers.')
         if key == 'wh_main_hero_passive_forgefire':
             for effect in mechanic['effects']:
                 if (effect['kind'] == 'stat_modifier' and effect['stat'] == 'stat_armour'
