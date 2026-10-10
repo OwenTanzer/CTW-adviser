@@ -1922,7 +1922,9 @@ class Packet:
             text = '; '.join(describe(row) for row in rows)
             if next(s for s in unit['coverage']['sections'] if s['name'] == 'weapons')['state'] != 'complete':
                 text += '; weapon page is partial'
-            return text, [ref for row in rows for ref in row['provenance_refs']]
+            return text, [ref for row in rows for ref in
+                          (row['provenance_refs'] +
+                           (row['ammunition_supply']['provenance_refs'] if field == 'ammunition' else []))]
 
         for dimension, field, label in (('range', 'range', 'metres'), ('ammunition', 'ammunition', 'ammunition units')):
             values = [ranged_values(unit, field, label) for unit in units]

@@ -761,6 +761,31 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(len(paths), len(set(paths)))
         self.assertGreater(len(paths), 0)
 
+    def test_paired_ammunition_claim_cites_native_capacity_and_pool_sources(self):
+        import copy
+        packet = self.q.get_matchup_evidence('Lothern Sea Guard', 'Blue Horrors of Tzeentch')
+        self.check(packet)
+        cited = next(d['provenance_refs'] for d in packet['comparison']['dimensions']
+                     if d['dimension'] == 'ammunition')
+        attack_refs = set()
+        supply_refs = set()
+        for unit in packet['units']:
+            for attack in [unit['ranged']] + unit['ranged']['variants']:
+                attack_refs.update(attack['provenance_refs'])
+                supply_refs.update(attack['ammunition_supply']['provenance_refs'])
+        self.assertEqual(set(cited), attack_refs | supply_refs)
+        self.assertEqual(len(cited), len(set(cited)))
+        self.assertTrue(supply_refs - attack_refs)
+        resolved = self.q.get_provenance(sorted(supply_refs))
+        paths = {resolved['sources'][resolved['provenance'][ref]['source_id']]['path'] for ref in supply_refs}
+        self.assertIn('data/unit_stats/source_exports/db/land_units_tables/data__.tsv', paths)
+        self.assertIn('data/unit_stats/source_exports/db/missile_weapons_tables/data__.tsv', paths)
+        mutated = copy.deepcopy(packet)
+        ammo = next(d for d in mutated['comparison']['dimensions'] if d['dimension'] == 'ammunition')
+        ammo['provenance_refs'].remove(next(iter(supply_refs - attack_refs)))
+        with self.assertRaisesRegex(ValueError, 'ammunition comparison lacks scoped supply evidence'):
+            packet_checks(mutated, provenance_resolver=self.q.get_provenance)
+
     def test_components_barrier_and_known_none(self):
         unit = self.check(self.q.get_unit_profile('wh_main_grn_art_doom_diver_catapult'))
         self.assertEqual(sorted(c['count'] for c in unit['body']['components']), [4, 40])

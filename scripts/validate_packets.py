@@ -234,6 +234,18 @@ def packet_checks(p, provenance_resolver=None):
                 [d['dimension'] for d in comparison['dimensions']]!=
                 ['range','ammunition','attack_types','material_conditions']):
             raise ValueError('comparison does not match the ordered unit pair')
+        supply_refs=set()
+        for u in p['units']:
+            ranged=u['ranged']
+            if ranged and ranged['status']=='present':
+                for attack in [ranged,*ranged['variants']]:
+                    supply_refs.update(attack['provenance_refs'])
+                    supply_refs.update(attack['ammunition_supply']['provenance_refs'])
+            else:
+                supply_refs.update(u['provenance_refs'])
+        cited=comparison['dimensions'][1]['provenance_refs']
+        if len(cited)!=len(set(cited)) or set(cited)!=supply_refs:
+            raise ValueError('ammunition comparison lacks scoped supply evidence')
     graph=p['payload_graph'];nodes={n['id'] for n in graph['nodes']}
     if len(nodes)!=len(graph['nodes']):raise ValueError('duplicate graph node')
     if any(e['from'] not in nodes or e['to'] not in nodes for e in graph['edges']):raise ValueError('dangling graph edge')
