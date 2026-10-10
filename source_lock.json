@@ -1,9 +1,9 @@
 {
   "lock_version": 1,
   "source_repository": "https://github.com/OwenTanzer/CTW-data",
-  "source_commit": "2b5965e78c85dc795451dad188756a173b247be5",
-  "source_tree": "17cf1c66f9507d9694b6026a944aa49ac79379d0",
-  "contract_sha256": "b2f7c1363ea8bdffc8f91f48fe7491b26da5daf10e2532ffab8cb5e26e4461cd",
+  "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+  "source_tree": "a682a56f25daca27ff08a9b4a506b4dbf0c42778",
+  "contract_sha256": "81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16",
   "owners": {
     "units": {
       "schema": 4,
@@ -1292,6 +1292,36 @@
       "bytes": 621,
       "sha256": "9b10e97505bb028243db870d879f6133dc54c0ca36a567d0086d9308bb189608",
       "git_blob_sha": "a5dae87acc5d124f6dcefe9f7182e0518d67e9ef"
+    },
+    {
+      "path": "scripts/ammunition_compatibility_migration.json",
+      "bytes": 176928,
+      "sha256": "e90b6ab6c5604cdc5dd0135bf8fc8b697c1b2a33fcf156813c561015e746ec80",
+      "git_blob_sha": "25743f48018bd0888c514b3ff2849e9a11276181"
+    },
+    {
+      "path": "scripts/magic_payload_baseline.json",
+      "bytes": 293287,
+      "sha256": "1b4632f7f3ee98a002e475616da1317b6581c21a15168b6ff140a9be6f0b11a4",
+      "git_blob_sha": "c49ba2b647c590b87bf5a328df0c5118c086b908"
+    },
+    {
+      "path": "scripts/magic_audit.py",
+      "bytes": 8579,
+      "sha256": "abfc6a9e966f127939f812cd856e34721dd40c963ab7a78b5604444eec7ee937",
+      "git_blob_sha": "20605461d5a0fbc1023434b366de4d0bf3fed782"
+    },
+    {
+      "path": "data/magic/output_manifest.json",
+      "bytes": 180532,
+      "sha256": "0ea131d9462ee05ef55db14617c137c26fe903dddf690f3dd59c354262c0953a",
+      "git_blob_sha": "ff52c89ac285b4bb19b3bc62cfd884481cf9eca2"
+    },
+    {
+      "path": "data/magic/payload_baseline_comparison.json",
+      "bytes": 1548,
+      "sha256": "dc78b008e170e50c9ceff020c6a8cc2976d6ec5b3db4d673a537ff16b32f047e",
+      "git_blob_sha": "38c0704358ef91c7b257d8dfd552e7a7e88e9d92"
     }
   ]
 }

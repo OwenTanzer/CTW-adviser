@@ -9,7 +9,7 @@ import sqlite3
 # Store schema 3 spans more than one import contract. Query packet 1.16 needs
 # the native unit supplements selected by contract 2; an older schema-3 store
 # cannot satisfy those lookups even when it uses the same CTW-data source pin.
-SUPPORTED_CONTRACT_SHA256 = 'b2f7c1363ea8bdffc8f91f48fe7491b26da5daf10e2532ffab8cb5e26e4461cd'
+SUPPORTED_CONTRACT_SHA256 = '81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16'
 
 
 def quote(name: str) -> str:

@@ -215,9 +215,9 @@ STAT_NAMES = {
 }
 STAT_LABELS = {
     'stat_armour': 'Armour', 'stat_morale': 'Leadership', 'stat_reloading': 'Reload skill',
-    'stat_accuracy': 'Accuracy', 'stat_mass': 'Mass', 'stat_damage_reflection': 'Damage reflection',
-    'stat_healing_power': 'Healing power', 'stat_resistance_all': 'Ward save',
-    'stat_resistance_flame': 'Fire resistance', 'stat_resistance_magic': 'Magic resistance',
+    'stat_accuracy': 'Accuracy', 'stat_mass': 'Mass', 'stat_damage_reflection': 'Melee Damage Reflection',
+    'stat_healing_power': 'Incoming Healing Modifier', 'stat_resistance_all': 'Ward save',
+    'stat_resistance_flame': 'Fire resistance', 'stat_resistance_magic': 'Spell Resistance',
     'stat_resistance_missile': 'Missile resistance', 'physical_resistance': 'Physical resistance',
     'stat_missile_block_chance': 'Missile block chance', 'stat_weakness_flame': 'Fire resistance',
     'melee_ap_damage': 'Armour-piercing melee damage', 'melee_base_damage': 'Base melee damage',
@@ -753,6 +753,14 @@ class Packet:
         # Shared UI wording often states eligibility, opposite to the flag.
         # Explain the encoded predicate; preserve localization through evidence.
         meaning = 'the host unit is alive' if key == 'unit_alive' else CONDITION_TEXT.get(key)
+        if key in ('unit_is_moulder_monster', 'other_abilities_just_activated_after_wind_up'):
+            invalid_text, invalid_refs = self.loc('special_ability_invalid_usage_flags_flag_description_' + key)
+            refs = list(dict.fromkeys(refs + invalid_refs))
+            if key == 'unit_is_moulder_monster':
+                meaning = 'target is not a Clan Moulder Monster'
+            else:
+                meaning = ('casting-related condition (UI invalid state: casting is absent; '
+                           'native key refers to post-wind-up activation; exact predicate and timing unresolved)')
         health = re.fullmatch(r'health_(above|below)_(\d+)%(_base)?', key)
         if health:
             meaning = 'health ' + health[1] + ' ' + health[2] + '%' + (' of base health' if health[3] else '')
@@ -1068,12 +1076,18 @@ class Packet:
         if value is None:
             return label + ': unknown'
         if operation == 'add':
-            return f'{label} {value:+g}' + (' percentage points' if stat in PERCENTAGE_POINT_STATS else '')
+            return f'{label} {value:+g}' + (' percentage points' if stat in PERCENTAGE_POINT_STATS else '') + self.stat_scope(stat)
         if operation == 'multiply':
             if stat == 'scalar_spell_mastery':
                 return f'{label} {(value - 1) * 100:+g}%'
-            return f'{label} x{value:g}'
+            return f'{label} x{value:g}' + self.stat_scope(stat)
         return f'{label}: value {value}; operation {native_operation} is not mapped'
+
+    @staticmethod
+    def stat_scope(stat):
+        return {'stat_healing_power': ' (healing and regeneration received)',
+                'stat_damage_reflection': ' (damage returned to the attacker on a melee hit)',
+                'stat_resistance_magic': ' (spell damage, not all magical attacks)'}.get(stat, '')
 
     def phase_scope(self, phase, mechanic):
         groups = [label for field, label in (('target_self','the bearer'),
@@ -1177,6 +1191,10 @@ class Packet:
             kind = effect['kind']; ph = effect['phase_ref']
             if kind == 'stat_modifier':
                 text = self.stat_summary(effect['stat'], effect['operation'], effect['value'], effect['native_operation'])
+                if self.stat_scope(effect['stat']):
+                    _, label_refs = self.loc('unit_stat_localisations_onscreen_name_' + effect['stat'])
+                    _, scope_refs = self.loc('unit_stat_localisations_tooltip_text_' + effect['stat'])
+                    effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + label_refs + scope_refs))
             elif kind == 'periodic_damage':
                 n = effect['native_parameters']
                 text = f'Damage: {n["damage_amount"]} per entity per application; application interval: {n["hp_change_frequency"]} seconds'
@@ -1235,7 +1253,10 @@ class Packet:
                     elif k == 'imbue_contact' and isinstance(v, str):
                         description = self.contact_summary(v, effect)
                     elif k == 'imbue_ignition' and kind == 'phase_behavior':
-                        description = 'Grants flaming attacks'
+                        description = ('Grants flaming attacks to this phase’s recipients while active: '
+                                       + TRAIT_TEXT['flaming'][1].replace('; scoped to this attack.', '.'))
+                        _, flaming_refs = self.loc(TRAIT_TEXT['flaming'][0])
+                        effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + flaming_refs))
                     elif k == 'execute_ratio' and kind == 'phase_behavior':
                         description = f'Instantly executes targets at or below {v * 100:g}% health; separate target eligibility applies'
                     elif k == 'mana_regen_mod' and kind == 'phase_behavior':

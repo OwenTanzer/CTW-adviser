@@ -13,7 +13,7 @@ def dump(path,value):path.parent.mkdir(parents=True,exist_ok=True);path.write_te
 
 class Example:
  def __init__(self,root):
-  self.root=root;self.cache={};self.assertions=[];self.packet={'schema_version':'1.1.0','mode':'combined','snapshot':{'commit':'2b5965e78c85dc795451dad188756a173b247be5','owners':{'units':{'patch':'9.0','build':'25507028','schema':4},'abilities':{'patch':'9.0.1','build':'25546563','schema':1}},'baseline':{'game':'warhammer_3','unit_scale':'ultra','rank':0,'context':'unmodified custom battle'}},'units':[],'trait_descriptions':{},'sources':{},'provenance':{},'detail_refs':{},'payload_graph':{'nodes':[],'edges':[]}}
+  self.root=root;self.cache={};self.assertions=[];self.packet={'schema_version':'1.1.0','mode':'combined','snapshot':{'commit':'595e22764b22e748afdbafafcb0a6258973e2451','owners':{'units':{'patch':'9.0','build':'25507028','schema':4},'abilities':{'patch':'9.0.1','build':'25546563','schema':1}},'baseline':{'game':'warhammer_3','unit_scale':'ultra','rank':0,'context':'unmodified custom battle'}},'units':[],'trait_descriptions':{},'sources':{},'provenance':{},'detail_refs':{},'payload_graph':{'nodes':[],'edges':[]}}
  def records(self,path):
   if path not in self.cache:
    with (self.root/path).open(encoding='utf-8',newline='') as f:self.cache[path]=list(enumerate(csv.DictReader(f,delimiter='\t' if path.endswith('.tsv') else ','),2))
@@ -168,7 +168,7 @@ def main():
  parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ctw-root',type=Path,required=True);args=parser.parse_args()
  from verify_sources import verify
  lock=json.loads((ROOT/'source_lock.json').read_text());contract=json.loads((ROOT/'schema/import_contract.json').read_text())
- if lock['source_commit']!='2b5965e78c85dc795451dad188756a173b247be5':raise ValueError('fixture definitions require explicit review for a new source pin')
+ if lock['source_commit']!='595e22764b22e748afdbafafcb0a6258973e2451':raise ValueError('fixture definitions require explicit review for a new source pin')
  checked=verify(args.ctw_root,lock,contract)
  if checked['status']!='passed':raise ValueError(checked['errors'])
  approved=json.loads((ROOT/'fixtures/design/approved-examples.json').read_text());entries=[];generated=[];built={}

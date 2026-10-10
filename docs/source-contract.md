@@ -1,6 +1,6 @@
 # Pinned source contract — issue #2, step 1
 
-The source is CTW-data commit `2b5965e78c85dc795451dad188756a173b247be5`.
+The source is CTW-data commit `595e22764b22e748afdbafafcb0a6258973e2451`.
 `source_lock.json` pins every selected input by SHA-256 and byte count, also
 recording its Git blob identity. `schema/import_contract.json` supplies explicit
 headers, types, keys, expected counts, field mappings, owner gates and joins.
@@ -120,10 +120,18 @@ existing snapshots must be rebuilt before serving packet 1.16.
 
 ## Reviewed ammunition migration (10 October 2026)
 
-The current pin is `2b5965e78c85dc795451dad188756a173b247be5` (CTW-data PR #42).
+The current pin is `595e22764b22e748afdbafafcb0a6258973e2451` (CTW-data PR #42).
 Native missile-weapon pool selection replaces the upstream attachment-role
 heuristic. The 255 changed link rows, six default ammo values, new builder helper,
 metadata hashes and compatibility gate are reviewed in [the acceptance record](chej-findings-2.md).
 No raw combat source values or import columns change. The separate combat target
 class is an adviser interpretation; the historical normalized is_large field is
 retained without being promoted into combat eligibility.
+
+## Compatibility follow-through
+
+The third-review pin additionally locks the exact ammunition migration, unchanged
+historical payload baseline, reconciliation validator, magic output manifest and
+baseline comparison. These five authority artifacts expand verification only;
+no imported table or raw combat value changes. See [Chej findings 3](chej-findings-3.md)
+for upstream continuous-integration evidence and downstream acceptance.

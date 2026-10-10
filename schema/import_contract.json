@@ -1,6 +1,6 @@
 {
   "contract_version": 2,
-  "source_commit": "2b5965e78c85dc795451dad188756a173b247be5",
+  "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
   "baseline": {
     "game": "warhammer_3",
     "patch": "9.0",
