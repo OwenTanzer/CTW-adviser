@@ -27,7 +27,7 @@ def audit(db):
      classes[a['slot']]+=1
      disagreements.append({'unit':key,'weapon':a['weapon_key'],'projectile':a['projectile_key'],
       'slot':a['slot'],'normalized_pool':a['ammunition_pool'],'normalized_ammunition':a['ammunition'],
-      'native_pool':a['ammunition_supply']['native_weapon_pool'],'decision':'unresolved_engine_precedence'})
+      'native_pool':a['ammunition_supply']['native_weapon_pool'],'decision':'normalized_source_mapping_mismatch'})
   return {'unit_keys':units,'health_reconciliation_failures':health,'missing_movement':missing,
    'override_attack_rows':len(returned_overrides),
    'missing_override_junctions':sorted(expected_overrides-returned_overrides),

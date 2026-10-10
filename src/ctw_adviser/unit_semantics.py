@@ -46,13 +46,16 @@ def supplement(context, unit, profile, components):
         native_pool = None if flag is None else ('secondary' if flag else 'primary')
         disagreement = native_pool is not None and native_pool != attack['ammunition_pool']
         infinite = None if not land or land['infinite_secondary_ammo'] is None else bool(land['infinite_secondary_ammo'])
+        effective_pool = None if disagreement else native_pool
         attack['ammunition_supply'] = {
             'native_weapon_pool': native_pool,
             'native_primary_capacity': (land or {}).get('primary_ammo'),
             'native_secondary_capacity': (land or {}).get('secondary_ammo'),
             'infinite_secondary': infinite,
             'assignment_status': 'source_disagreement' if disagreement else ('sources_agree' if native_pool else 'unresolved'),
-            'effective_pool': None if disagreement else native_pool,
+            'effective_pool': effective_pool,
+            'capacity': (land or {}).get(effective_pool + '_ammo') if effective_pool else None,
+            'unlimited': (infinite if effective_pool == 'secondary' else False) if effective_pool else None,
             'qualification': ('Normalized attachment pool and native weapon flag disagree; effective supply is unresolved.' if disagreement else None),
             'provenance_refs': context.refs(land, weapon)}
         attack['entity_stat_overrides'] = []

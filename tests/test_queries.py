@@ -671,8 +671,8 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(unit['ranged']['ammunition'], 22)
         extra = unit['ranged']['variants']
         self.assertTrue(extra)
-        self.assertEqual(extra[0]['ammunition_pool'], 'secondary')
-        self.assertEqual(extra[0]['ammunition'], 0)
+        self.assertEqual(extra[0]['ammunition_pool'], 'primary')
+        self.assertEqual(extra[0]['ammunition'], 22)
         packet = self.q.get_unit_profile('wh_main_dwf_art_cannon', section='weapons', limit=1)
         refs = []
         while True:

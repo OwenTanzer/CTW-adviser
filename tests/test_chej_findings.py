@@ -37,16 +37,32 @@ class ChejFindings(unittest.TestCase):
     self.assertIs(a['firing_policy']['precursor'],True)
     self.assertIn('ordered charge target',a['firing_policy']['summary'])
   self.assertIs(self.unit('wh2_main_hef_inf_lothern_sea_guard_0')['ranged']['firing_policy']['precursor'],False)
- def test_pool_conflicts_not_silently_resolved(self):
+ def test_native_pool_mapping(self):
   for key,weapon in [('wh2_main_hef_inf_lothern_sea_guard_0','wh3_dlc27_hef_sea_guard_bow_anti_infantry'),('wh3_dlc23_chd_veh_iron_daemon_1dreadquake','wh3_dlc23_chd_veh_iron_daemon_cannonade_secondary')]:
    r=self.unit(key)['ranged'];a=next(a for a in [r,*r['variants']] if a['weapon_key']==weapon)
-   self.assertEqual(a['ammunition_supply']['assignment_status'],'source_disagreement')
-   self.assertIsNone(a['ammunition_supply']['effective_pool'])
+   expected=('primary',22) if 'sea_guard' in weapon else ('secondary',40)
+   self.assertEqual(a['ammunition_supply']['assignment_status'],'sources_agree')
+   self.assertEqual((a['ammunition_supply']['effective_pool'],a['ammunition_supply']['capacity']),expected)
+   self.assertIs(a['ammunition_supply']['unlimited'],False)
+ def test_conflicting_pool_stays_unresolved(self):
+  damaged=Path(self.temp.name)/'pool-conflict.sqlite'
+  with sqlite3.connect(damaged) as out:self.q.db.backup(out)
+  with sqlite3.connect(damaged) as db:
+   db.execute("UPDATE missile_weapons SET use_secondary_ammo_pool=1 WHERE key='wh3_dlc27_hef_sea_guard_bow_anti_infantry'")
+  with Queries(damaged) as q:
+   r=q.get_unit_profile('wh2_main_hef_inf_lothern_sea_guard_0')['units'][0]['ranged']
+   s=next(a for a in r['variants'] if a['weapon_key']=='wh3_dlc27_hef_sea_guard_bow_anti_infantry')['ammunition_supply']
+   self.assertEqual(s['assignment_status'],'source_disagreement')
+   for field in ['effective_pool','capacity','unlimited']:self.assertIsNone(s[field])
  def test_infinite_and_override_identity(self):
   self.assertIs(self.unit('wh2_main_hef_inf_lothern_sea_guard_0')['ranged']['ammunition_supply']['infinite_secondary'],False)
   for suffix in ['','_grungni','_grungni_mp']:
    r=self.unit('wh3_dlc25_dwf_veh_thunderbarge'+suffix)['ranged']
    self.assertIs(r['ammunition_supply']['infinite_secondary'],True)
+   for a in [r,*r['variants']]:
+    supply=a['ammunition_supply']
+    self.assertIs(supply['unlimited'],supply['effective_pool']=='secondary')
+    self.assertEqual(supply['capacity'],a['ammunition'])
    if suffix=='_grungni_mp':self.assertEqual(r['variants'],[])
   r=self.unit('wh3_dlc25_emp_veh_marienburg_land_ship')['ranged']
   overrides=[o for a in r['variants'] for o in a['entity_stat_overrides']]
@@ -87,7 +103,7 @@ class ChejFindings(unittest.TestCase):
    ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['body']['firing_arc'].__setitem__('primary_body_key','wrong')),
    ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['ranged']['reload'].__setitem__('projectile_base_interval',999)),
    ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['ranged']['ammunition_supply'].__setitem__('effective_pool',None)),
-   ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['ranged']['variants'][0]['ammunition_supply'].__setitem__('assignment_status','sources_agree')),
+   ('wh2_main_hef_inf_lothern_sea_guard_0',lambda u:u['ranged']['variants'][0]['ammunition_supply'].__setitem__('assignment_status','source_disagreement')),
    ('wh2_dlc11_cst_art_queen_bess',lambda u:u['body']['components'][0].__setitem__('health_contribution',1)),
    ('wh2_dlc11_cst_art_queen_bess',lambda u:u['body']['health_aggregation'].__setitem__('rule','primary_body_only')),
   ]:

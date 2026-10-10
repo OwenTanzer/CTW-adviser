@@ -1,6 +1,6 @@
 # Pinned source contract — issue #2, step 1
 
-The source is CTW-data commit `3b5d13d94c5ed3eb4b9c6ce61cc75854b4426196`.
+The source is CTW-data commit `2b5965e78c85dc795451dad188756a173b247be5`.
 `source_lock.json` pins every selected input by SHA-256 and byte count, also
 recording its Git blob identity. `schema/import_contract.json` supplies explicit
 headers, types, keys, expected counts, field mappings, owner gates and joins.
