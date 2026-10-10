@@ -772,3 +772,31 @@ Recovery verification: 89 tests pass. The preceding complete comparison checked
 503 ability/culture combinations and 3,181 roster contexts against `804206d7`,
 including all 193 aura and 175 qualification-inventory keys; native mechanical
 facts and payloads were unchanged and no summary retained a raw `stat_` label.
+
+### Default context — reconstruction of `882375b` (packet 1.13.0)
+
+Unit, matchup, relation and passive responses default to `provenance_mode:
+deferred`, with empty `sources`/`provenance` dictionaries and unchanged inline
+evidence IDs. Python `include_provenance=True` or CLI `--include-provenance`
+expands the dictionaries; `get_provenance` remains a separate explicit lookup.
+Validation of a deferred packet requires a snapshot-bound resolver and rejects
+missing IDs, conflicting expansions and mismatched snapshot metadata. Expanded
+validation remains self-contained. Coverage diagnostics and raw graph expansion
+remain separate opt-ins. This is not a loss of source evidence or calculation
+inputs. Regression coverage compares both views and CLI behavior and requires the
+Sea Guard compact view to be less than 60% of its expanded size.
+
+Remove incidental event-scheduling/threshold-equality disclaimers from reviewed
+death and low-health routes, duplicated recharge prose and runtime-development
+coverage text in default responses. Retain material distinctions: low-health is
+not death, failure is conditional, payloads are not ordinary attacks, summon
+placement/kill requirements and lifetimes may be unknown. Periodic damage now
+states per-entity applications, source intervals and affected-entity limits,
+including the source warning for damage below 4 on small unit sizes.
+
+Optional research questions still include Lightning Strike target priority and
+behavior without eligible targets, exact death/failure-event scheduling and
+threshold equality. Removing these from default prose does not resolve them.
+
+Recovery verification: 90 tests pass, including deferred-evidence integrity,
+identical mechanical views and a compact-response size regression.

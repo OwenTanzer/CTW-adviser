@@ -164,6 +164,11 @@ schema['allOf'].append({
   }}}}}
  }}}}}
 })
+schema['properties']['provenance_mode']=enum('deferred','expanded')
+schema['allOf'].append({
+ 'if':{'properties':{'schema_version':enum(*[v for v in VERSIONS if v in ('1.13.0','1.14.0','1.15.0')])},'required':['schema_version']},
+ 'then':{'required':['provenance_mode']}
+})
 
 if __name__=='__main__':
  (ROOT/'schema/evidence_packet.schema.json').write_text(json.dumps(schema,indent=2)+'\n')

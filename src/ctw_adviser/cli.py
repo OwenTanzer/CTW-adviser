@@ -29,6 +29,7 @@ def main():
         query.add_argument('--limit', type=int, default=32)
         query.add_argument('--cursor')
         query.add_argument('--include-diagnostics', action='store_true', help='Include development coverage notes for inspection')
+        query.add_argument('--include-provenance', action='store_true', help='Expand source and provenance dictionaries (default: deferred)')
         if command == 'passive':
             query.add_argument('--include-graph', action='store_true', help='Expand the raw source graph and lineage')
             query.add_argument('--include-documentation', action='store_true', help='Include the optional reviewed explanation source-documentation link')
@@ -45,7 +46,7 @@ def main():
                 options = dict(mode=args.mode, subculture=args.subculture, section=args.section,
                                cursor=args.cursor, limit=args.limit,
                                scenario=json.loads(args.scenario) if args.scenario else None,
-                               include_diagnostics=args.include_diagnostics)
+                               include_diagnostics=args.include_diagnostics, include_provenance=args.include_provenance)
                 if args.command == 'resolve':
                     result = queries.resolve_unit(key, args.subculture)
                 elif args.command == 'matchup':
@@ -59,6 +60,7 @@ def main():
                 elif args.command == 'passive':
                     result = queries.get_passive_detail(key, culture=args.culture, limit=args.limit, cursor=args.cursor,
                                                         include_diagnostics=args.include_diagnostics,
+                                                        include_provenance=args.include_provenance,
                                                         include_documentation=args.include_documentation, include_graph=args.include_graph)
                 elif args.command == 'detail':
                     result = queries.get_detail(key, limit=args.limit, cursor=args.cursor)

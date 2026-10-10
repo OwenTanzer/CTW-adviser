@@ -106,7 +106,7 @@ class QueryTests(unittest.TestCase):
             detail = self.q.get_passive_detail(key)
             summon = next(e for e in detail['mechanic']['effects'] if e['kind'] == 'summon')
             self.assertEqual(summon['trigger'], 'low_health')
-            self.assertIn('unverified', summon['trigger_basis'])
+            self.assertIn('health', summon['trigger_basis'])
             self.assertFalse(detail['mechanic']['conditions']['activates_when'])
 
     def test_payload_mechanical_fields_cannot_disappear(self):
@@ -151,7 +151,7 @@ class QueryTests(unittest.TestCase):
 
     def check(self, packet):
         validate(packet, self.schema, self.schema)
-        packet_checks(packet)
+        packet_checks(packet, provenance_resolver=self.q.get_provenance)
         return packet['units'][0]
 
     def test_alpha4_required_mechanical_projections_and_types(self):
@@ -340,7 +340,7 @@ class QueryTests(unittest.TestCase):
 
     def test_lightning_strike_targeting_and_damage_stay_separate(self):
         key = 'wh3_dlc29_passive_spell_lightning_strike'
-        detail = self.q.get_passive_detail(key)
+        detail = self.q.get_passive_detail(key, include_provenance=True)
         m = detail['mechanic']; c = m['native_parameters']
         self.assertTrue(c['target_enemies'])
         self.assertFalse(c['target_ground'])
@@ -513,7 +513,7 @@ class QueryTests(unittest.TestCase):
                 summon = next(e for e in m['effects'] if e['kind'] == 'summon')
                 self.assertEqual((summon['unit_name'], summon['num_uses']), (name, uses))
                 self.assertEqual(summon['trigger'], 'unresolved')
-                self.assertIn('whether summoning requires a kill', m['summary'])
+                self.assertIn('whether summoning requires a kill', m['summary'].lower())
                 self.assertNotIn('at the host position', m['summary'])
                 self.assertIn('caster-versus-target', summon['trigger_basis'])
                 self.assertEqual(m['conditions']['deactivates_when'], [])
@@ -531,7 +531,7 @@ class QueryTests(unittest.TestCase):
 
     def test_exploding_unit_is_source_backed_visual_indicator(self):
         key = 'wh2_dlc15_unit_abilities_exploding_unit'
-        detail = self.q.get_passive_detail(key, include_diagnostics=True)
+        detail = self.q.get_passive_detail(key, include_diagnostics=True, include_provenance=True)
         mechanic = detail['mechanic']
         self.assertEqual([e['kind'] for e in mechanic['effects']], ['visual_indicator'])
         effect = mechanic['effects'][0]
@@ -773,6 +773,49 @@ class QueryTests(unittest.TestCase):
         self.assertIn('max amount: 1.3', mechanic['summary'])
         self.assertIn('effective scaling and stacking unverified', mechanic['summary'])
         self.assertNotIn('source path:', mechanic['summary'])
+
+    def test_alpha4_compact_provenance_is_explicit_and_snapshot_validated(self):
+        key = 'wh2_main_hef_inf_lothern_sea_guard_1'
+        compact = self.q.get_unit_profile(key)
+        expanded = self.q.get_unit_profile(key, include_provenance=True)
+        self.assertEqual(compact['provenance_mode'], 'deferred')
+        self.assertEqual(expanded['provenance_mode'], 'expanded')
+        self.assertEqual(compact['units'], expanded['units'])
+        self.assertEqual(compact['detail_refs'], expanded['detail_refs'])
+        self.assertEqual((compact['sources'], compact['provenance']), ({}, {}))
+        self.assertTrue(expanded['provenance'])
+        self.assertLess(len(json.dumps(compact)), .6 * len(json.dumps(expanded)))
+        self.assertNotIn('runtime', compact['snapshot']['coverage'])
+        self.check(compact)
+        packet_checks(expanded)
+        with self.assertRaisesRegex(ValueError, 'snapshot-bound'):
+            packet_checks(compact)
+        def wrong_snapshot(ids):
+            result = self.q.get_provenance(ids)
+            result['snapshot']['commit'] = '0' * 40
+            return result
+        with self.assertRaisesRegex(ValueError, 'different snapshot'):
+            packet_checks(compact, wrong_snapshot)
+        def missing_records(ids):
+            result = self.q.get_provenance(ids)
+            result['provenance'] = {}
+            return result
+        with self.assertRaisesRegex(ValueError, 'unresolved deferred'):
+            packet_checks(compact, missing_records)
+        broken = json.loads(json.dumps(compact))
+        broken['units'][0]['melee']['provenance_refs'].append('invented-evidence')
+        with self.assertRaises(ValueError):
+            packet_checks(broken, self.q.get_provenance)
+        detail = self.q.get_passive_detail('wh2_main_unit_passive_martial_prowess')
+        full = self.q.get_passive_detail('wh2_main_unit_passive_martial_prowess', include_provenance=True)
+        self.assertEqual(detail['mechanic'], full['mechanic'])
+        self.assertEqual(detail['payload_graph'], full['payload_graph'])
+        self.assertEqual(detail['provenance'], {})
+        self.assertTrue(full['provenance'])
+        command = [sys.executable, str(ROOT / 'scripts/query_snapshot.py'), 'unit', '--db', str(self.output), key, '--include-provenance']
+        result = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)['provenance_mode'], 'expanded')
 
     def test_attribute_polarity_describes_application_not_benefit(self):
         from ctw_adviser.queries import Packet

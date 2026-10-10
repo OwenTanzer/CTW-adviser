@@ -31,7 +31,7 @@ def main():
         keys = [r[0] for r in q.db.execute('SELECT unit_key FROM unit_aliases ORDER BY unit_key')]
         for index, key in enumerate(keys):
             try:
-                start = time.perf_counter(); packet = q.get_unit_profile(key)
+                start = time.perf_counter(); packet = q.get_unit_profile(key, include_provenance=True)
                 latencies.append(time.perf_counter() - start)
                 validate(packet, schema, schema); packet_checks(packet)
                 size = len(json.dumps(packet, separators=(',', ':'), ensure_ascii=False).encode())

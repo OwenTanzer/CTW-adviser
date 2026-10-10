@@ -72,7 +72,32 @@ def validate(value,s,root,path='$'):
         if 'pattern' in s and re.search(s['pattern'],value) is None:raise ValueError(path+': pattern mismatch')
     if typ in ('integer','number') and 'minimum' in s and value<s['minimum']:raise ValueError(path+': below minimum')
 
-def packet_checks(p):
+def packet_checks(p, provenance_resolver=None):
+    if p.get('provenance_mode') == 'deferred':
+        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0') or p['sources'] or p['provenance']:
+            raise ValueError('invalid deferred evidence envelope')
+        if provenance_resolver is None:
+            raise ValueError('deferred evidence requires a snapshot-bound provenance resolver')
+        requested=set()
+        def collect(x):
+            if isinstance(x,dict):
+                for k,v in x.items():
+                    if k in ('provenance_refs','classification_evidence'):requested.update(v)
+                    else:collect(v)
+            elif isinstance(x,list):
+                for v in x:collect(v)
+        collect(p)
+        sources={}; provenance={}; ids=sorted(requested)
+        for start in range(0,len(ids),256):
+            chunk=provenance_resolver(ids[start:start+256])
+            if any(chunk['snapshot'].get(k)!=p['snapshot'].get(k) for k in ('commit','owners','baseline')):
+                raise ValueError('provenance belongs to a different snapshot')
+            for target,field in ((sources,'sources'),(provenance,'provenance')):
+                for key,value in chunk[field].items():
+                    if key in target and target[key]!=value:raise ValueError('conflicting evidence expansion')
+                    target[key]=value
+        if not requested <= provenance.keys():raise ValueError('unresolved deferred evidence')
+        p={**p,'sources':sources,'provenance':provenance}
     evidence=p['provenance'];details=p['detail_refs']
     for e in evidence.values():
         if e['source_id'] not in p['sources']:raise ValueError('dangling source')

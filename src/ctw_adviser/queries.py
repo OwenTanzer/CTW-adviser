@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.12.0'
+PACKET_VERSION = '1.13.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -40,8 +40,8 @@ RESEARCHED_PASSIVES = {
         'The Celestial Hurricanum automatically targets enemies within a 40-metre interception range and launches a lightning bombardment from above the selected target. '
         'Each bombardment specifies one projectile, with spread radius setting 1. The magical projectile deals 0 base and 18 armour-piercing damage; '
         'its separate magical explosion deals 0 base and 18 armour-piercing damage with radius 8. Both can damage allies. '
-        'Initial recharge is 0, recharge setting 10 seconds, active time 4 seconds and shared-recharge setting 5 seconds; these do not establish an exact repeating attack interval. '
-        'Target priority, behavior without an eligible target and shared-recharge interactions remain unverified. '
+        'Active time is 4 seconds and the shared-recharge setting is 5 seconds; these do not establish an exact repeating attack interval. '
+        'Effective firing cadence and shared-recharge interactions remain unverified. '
         'Damage parameters are separate from ordinary weapon attacks and from the separately activated Lightning Strike ability.',
     'wh2_dlc16_lord_passive_conjoined_destiny':
         'Low-health healing for the Sisters of Twilight, disabled above 20% health. '
@@ -148,15 +148,15 @@ EXPLAINED_PASSIVES = {
     'wh2_dlc13_unit_passive_kaboom':
         'One-use death blast for the Steam Tank variant carrying Kaboom!, interpreted from the unit-alive exclusion and explosion definition. '
         'The expanding flaming blast can hit allies and enemies; its contact effect reduces enemy leadership by 8, with duration setting 10. '
-        'Blast parameters are separate from ordinary weapon damage. Exact death-event scheduling remains unverified.',
+        'Blast parameters are separate from ordinary weapon damage.',
     'wh3_dlc26_unit_abilities_blow_apart':
         'One-use death blast for the Colossal Squig, supported by the unit-alive exclusion and death tooltip. '
         'The expanding blast can hit allies and enemies; its contact effect reduces enemy leadership by 8 and multiplies speed by 0.85, with duration setting 10. '
         'A separate self-targeted damage phase is retained; it is not outward blast damage or proof of a living-unit suicide trigger. '
-        'Exact death-event scheduling and self-phase execution remain unverified.',
+        'The self-phase does not establish additional outward damage.',
     'wh2_dlc11_unit_passive_abandon_ship':
         'Necrofex low-health summon: summons a Zombie Pirate Deckhand Mob at the host position, with one use. '
-        'Disabled above 50% host health; exact threshold equality and summon timing remain unverified. '
+        'Disabled above 50% host health. '
         'A separate self-targeted phase has damage amount 3, interval setting 1, duration setting 1 and maximum one affected entity. '
         'This is distinct from the Land Ship death blast with the same ability name; summoned-unit lifetime remains unverified.',
     'wh3_dlc29_lord_passive_arch_necromancer': None,
@@ -179,7 +179,7 @@ EXPLAINED_PASSIVES = {
     **dict.fromkeys(DEATH_PAYLOAD_PASSIVES),
     'wh3_dlc27_unit_passive_split_up_hidden':
         'Separate low-health summon route for the Sea Elemental: summons Oceanids at the host position, with one use. '
-        'It is disabled above 25% health; exact threshold equality and event timing remain unverified. '
+        'It is disabled above 25% health. '
         'Its outward pulse has zero damage but retains a knockback force setting. '
         'The damaging death blast belongs to the other Split Up ability; these are not one death-triggered summon.',
 }
@@ -431,7 +431,7 @@ class Queries:
 
     def get_matchup_evidence(self, unit_a, unit_b=None, mode='combined', scenario=None,
                             *, subculture=None, subculture_b=None, section=None,
-                            cursor=None, limit=32, include_diagnostics=False):
+                            cursor=None, limit=32, include_diagnostics=False, include_provenance=False):
         if mode not in MODES or (section is not None and section not in SECTIONS):
             raise ValueError('unsupported mode or section')
         if type(limit) is not int or not 1 <= limit <= 256:
@@ -464,7 +464,17 @@ class Queries:
             if not include_diagnostics:
                 del coverage['gaps']
         context.prune()
-        return packet
+        return self.response_view(packet, include_provenance, include_diagnostics)
+
+    @staticmethod
+    def response_view(result, include_provenance, include_diagnostics):
+        result['provenance_mode'] = 'expanded' if include_provenance else 'deferred'
+        if not include_provenance:
+            result['sources'] = {}; result['provenance'] = {}
+        if not include_diagnostics:
+            result['snapshot']['coverage'] = {k:v for k,v in result['snapshot'].get('coverage',{}).items()
+                                               if k not in ('runtime','semantic','structural')}
+        return result
 
     def get_coverage_notes(self, unit_a, unit_b=None, **kwargs):
         """Explicit inspection of development caveats, separate from combat facts."""
@@ -540,7 +550,7 @@ class Queries:
                 'provenance': c.packet['provenance']}
 
     def get_passive_detail(self, key, *, culture='*', limit=128, cursor=None, include_diagnostics=False,
-                           include_documentation=False, include_graph=False):
+                           include_documentation=False, include_graph=False, include_provenance=False):
         option = self.one('ability_option_metadata', 'ability_key', key)
         if not option or option['classification'] != 'core_passive':
             raise ValueError('passive detail requires a classified core passive')
@@ -564,7 +574,7 @@ class Queries:
                 'url': PASSIVE_RESEARCH_DOCUMENTATION,
                 'basis': 'Reviewed interpretation of pinned source records with separately attributed external corroboration; numerical records retain their pinned patch scope.',
             }
-        return result
+        return self.response_view(result, include_provenance, include_diagnostics)
 
     def get_detail(self, ref, *, limit=128, cursor=None):
         """Cycle-safe bounded graph with explicit continuation and every edge."""
@@ -818,7 +828,7 @@ class Packet:
                 _, tooltip_refs = self.loc('unit_abilities_tooltip_text_' + key)
                 mechanic['conditions']['activates_when'].append({
                     'key': 'on_death',
-                    'summary': 'the host dies (reviewed interpretation of this death-blast definition and unit-alive exclusion; exact scheduling unverified)',
+                    'summary': 'the host dies (reviewed interpretation of this death-blast definition and unit-alive exclusion)',
                     'provenance_refs': list(dict.fromkeys(self.refs(casting) + tooltip_refs + [r for c in alive for r in c['provenance_refs']]))})
         if key in DEATH_PAYLOAD_PASSIVES and casting:
             for behavior in self.q.rows('native_special_ability_behaviour_groups_to_types', 'group', casting['behaviour']):
@@ -829,7 +839,7 @@ class Packet:
                 if event:
                     event_refs = self.refs(casting, behavior)
                     mechanic['conditions']['activates_when'].append({
-                        'key': behavior['behaviour'], 'summary': event + ' (interpreted from the behavior definition; exact scheduling unverified)',
+                        'key': behavior['behaviour'], 'summary': event + ' (interpreted from the behavior definition)',
                         'provenance_refs': event_refs})
                     mechanic['provenance_refs'] += event_refs
         if key in SURVIVAL_PASSIVES and casting and casting['miscast_explosion']:
@@ -879,7 +889,7 @@ class Packet:
             mechanic['effects'].append({
                 'kind': 'summon', 'phase_ref': None, 'unit_key': unit_key,
                 'unit_name': unit_name, 'trigger': 'on_death' if death_spawn else 'unresolved',
-                'trigger_basis': 'Reviewed interpretation of passive summon with unit_alive deactivation; exact death-event scheduling unverified.' if death_spawn else 'Activation event not established by summon fields.',
+                'trigger_basis': 'Reviewed interpretation of passive summon with unit_alive deactivation.' if death_spawn else 'Activation event not established by summon fields.',
                 'spawn_type': casting['spawn_type'], 'num_uses': casting['num_uses'],
                 'native_parameters': self.native('native_ability_casting', casting,
                     ('spawn_is_transformation', 'spawn_is_decoy', 'spawn_shares_health_and_fatigue')),
@@ -887,14 +897,14 @@ class Packet:
             if key == 'wh3_dlc27_unit_passive_split_up_hidden':
                 mechanic['effects'][-1]['trigger'] = 'low_health'
                 mechanic['effects'][-1]['trigger_basis'] = (
-                    'Low-health summon route, disabled above 25% health. Exact threshold equality and event scheduling unverified; not the death-blast route.')
+                    'Low-health summon route, disabled above 25% health; not the death-blast route.')
             if key == 'wh2_dlc11_unit_passive_abandon_ship':
                 mechanic['effects'][-1]['trigger'] = 'low_health'
-                mechanic['effects'][-1]['trigger_basis'] = 'Host low-health summon, disabled above 50% host health; exact threshold equality and scheduling unverified.'
+                mechanic['effects'][-1]['trigger_basis'] = 'Host low-health summon, disabled above 50% host health.'
             if key in TARGET_SUMMON_PASSIVES:
                 mechanic['effects'][-1]['trigger_basis'] = (
                     'Enemy-targeted damage and summon; target health/class restrictions are not caster conditions. '
-                    'Whether summoning requires the target to die, exact timing and caster-versus-target placement anchor remain unverified.')
+                    'Whether summoning requires the target to die and caster-versus-target placement anchor remain unverified.')
             if key in TARGET_SUMMON_PASSIVES or key == 'wh2_dlc11_unit_passive_abandon_ship':
                 mechanic['effects'][-1]['provenance_refs'] = list(dict.fromkeys(spawn_refs + [
                     r for role in ('invalid_targets', 'deactivates_when') for c in mechanic['conditions'][role] for r in c['provenance_refs']]))
@@ -905,7 +915,7 @@ class Packet:
         if key in EXPLAINED_PASSIVES:
             for effect in mechanic['effects']:
                 if effect.get('native_kind') == 'phase' and effect['phase_ref'] == 'wh2_main_unit_passive_rebirth_buffer':
-                    effect['reason'] = 'Buffer phase before the healing phase; duration setting 1, with no numerical modifier. Exact transition timing unverified.'
+                    effect['reason'] = 'Buffer phase before the healing phase; duration 1 second, with no numerical modifier.'
                 if key in RESEARCHED_PASSIVES and effect.get('native_kind') == 'phase':
                     role = EXPLAINED_PHASE_ROLES.get(effect['phase_ref'])
                     if role:
@@ -932,7 +942,7 @@ class Packet:
                     if behavior['behaviour'] == 'tamurkhan_death':
                         mechanic['conditions']['activates_when'].append({
                             'key': 'tamurkhan_death',
-                            'summary': 'Tamurkhan reaches death with an eligible nearby enemy character (reviewed death-response behavior; exact execution timing unverified)',
+                            'summary': 'Tamurkhan reaches death with an eligible nearby enemy character (reviewed death-response behavior)',
                             'provenance_refs': self.refs(casting, behavior)})
             if key in ('wh3_main_lord_passive_wrath_of_khorne', 'wh_dlc06_lord_passive_locus_of_power'):
                 for condition in mechanic['conditions']['invalid_targets']:
@@ -1068,7 +1078,11 @@ class Packet:
                 text = self.stat_summary(effect['stat'], effect['operation'], effect['value'], effect['native_operation'])
             elif kind == 'periodic_damage':
                 n = effect['native_parameters']
-                text = f'Periodic damage amount: {n["damage_amount"]}; interval setting: {n["hp_change_frequency"]}; maximum affected entities: {n["max_damaged_entities"]} (damage units and effective timing not verified)'
+                text = f'Damage: {n["damage_amount"]} per entity per application; application interval: {n["hp_change_frequency"]} seconds'
+                limit = n['max_damaged_entities']
+                text += '; no entity-count limit per application' if limit is not None and limit < 0 else f'; maximum affected entities per application: {limit}'
+                if n['damage_amount'] is not None and 0 < n['damage_amount'] < 4:
+                    text += '; source warns that amounts below 4 are unreliable on small unit sizes'
             elif kind == 'healing':
                 n = effect['native_parameters']
                 text = f'Healing amount: {n["heal_amount"]}; barrier healing amount: {n["barrier_heal_amount"]}; interval setting: {n["hp_change_frequency"]}; resurrection: {"enabled" if n["resurrect"] is True else "disabled" if n["resurrect"] is False else "unknown"} (amount units, effective timing and healing caps not verified)'
@@ -1102,7 +1116,7 @@ class Packet:
                     if 'contact_damage_amount' in f:
                         text += f'; delivers a contact effect with damage amount {f["contact_damage_amount"]}, interval setting {f["contact_hp_change_frequency"]}, duration setting {f["contact_duration"]}, maximum affected entities {f["contact_max_damaged_entities"]}'
                         text += '; contact effect affects allies: ' + str(f['contact_affects_allies']).lower() + ', enemies: ' + str(f['contact_affects_enemies']).lower()
-                    text += ' (failure scheduling, effective damage and exact recipients unverified)'
+                    text += ' (effective damage and exact recipients unverified)'
 
             elif effect.get('native_kind') == 'intensity_settings' and effect['native_parameters']['intensity_source'] == 'time_in_melee':
                 n = effect['native_parameters']
@@ -1217,11 +1231,11 @@ class Packet:
                       f'Target interception range setting: {c["target_intercept_range"]:g}. '
                       f'Enemy damage phase: amount {n["damage_amount"]:g}, interval setting {n["hp_change_frequency"]:g}, '
                       f'duration setting {duration:g}, maximum affected entities {n["max_damaged_entities"]:g}. '
-                      f'Uses: {spawn["num_uses"]:g}; recharge setting: {c["recharge_time"]:g}. ')
+                      f'Uses: {spawn["num_uses"]:g}. ')
             if mechanic['requires_effect_enabling']:
                 result += 'Requires effect enabling. '
             return result + ('Summon placement uses the unit-position setting; whether this anchors to the caster or target is unverified. '
-                             'Exact threshold equality, target selection, damage timing, whether summoning requires a kill, and summoned-unit lifetime remain unverified.')
+                             'Whether summoning requires a kill and summoned-unit lifetime remain unverified.')
         if key in DEATH_PAYLOAD_PASSIVES:
             vortex = self.q.one('native_vortices', 'vortex_key', mechanic['native_parameters']['vortex'])
             if vortex:
@@ -1246,7 +1260,7 @@ class Packet:
                             if stat['stat'] == 'stat_morale' and stat['how'] == 'add':
                                 result += f'The blast also delivers a contact effect: leadership {stat["value"]:+g}, duration setting {phase["duration"]:g}. '
                                 mechanic['provenance_refs'] += self.refs(vortex, phase, stat)
-                result += 'Damage, radius, delay and duration settings are retained separately; exact hit scheduling and overlap remain unverified.'
+                result += 'Damage, radius, delay and duration settings are retained separately; blast overlap remains unverified.'
                 return result
         if key in SURVIVAL_PASSIVES and key != 'wh2_main_unit_passive_too_horrible_to_die':
             f = next((e['failure_context'] for e in mechanic['effects'] if 'failure_context' in e), None)
@@ -1270,14 +1284,14 @@ class Packet:
                     result += 'Use and recharge settings are -1 sentinels; repeatability is not established. '
                 if mechanic.get('requires_effect_enabling'):
                     result += 'Requires effect enabling. '
-                return result + 'Threshold equality, failure scheduling, healing units and caps remain unverified.'
+                return result + 'Healing units and caps remain unverified.'
         if key == 'wh2_main_unit_passive_the_rats_emerge':
             spawn = next((e for e in mechanic['effects'] if e['kind'] == 'summon' and e['trigger'] == 'on_death'), None)
             if spawn:
                 return ('Summons ' + (spawn['unit_name'] or spawn['unit_key']) +
                         ' upon the host dying, at its position. This is a separate death-triggered summon from Too Horrible to Die; '
                         'the two abilities do not establish a single heal-versus-summon coin flip. '
-                        'Exact spawn timing and summoned-unit lifetime remain unverified.')
+                        'Summoned-unit lifetime remains unverified.')
         if key == 'wh2_main_unit_passive_too_horrible_to_die':
             f = next((e['failure_context'] for e in mechanic['effects'] if 'failure_context' in e), None)
             if f and f['miscast_chance'] is not None:
@@ -1285,7 +1299,7 @@ class Packet:
                         f'Failure chance: {f["miscast_chance"]:.0%} (interpreted from the casting definition). '
                         'The failure branch uses an explosion to deliver a damaging contact effect; '
                         f'the explosion itself has {f["explosion_base_damage"]:g} base and {f["explosion_ap_damage"]:g} armour-piercing direct damage. '
-                        'Failure timing, healing amount interpretation and exact contact recipients remain unverified; '
+                        'Healing amount interpretation and exact contact recipients remain unverified; '
                         'the death summon is a separate mechanic.')
         return EXPLAINED_PASSIVES.get(key)
 
