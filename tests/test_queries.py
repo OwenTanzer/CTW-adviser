@@ -756,17 +756,17 @@ class QueryTests(unittest.TestCase):
         self.check(projected)
         self.assertEqual(projected['units'][0]['coverage']['ranged'], 'omitted')
 
-    def test_native_phase_parameters_are_visible_without_invented_units(self):
+    def test_native_phase_parameters_remain_visible_with_reviewed_units(self):
         for key, field, value, text in (
-            ('wh_main_character_abilities_arcane_conduit', 'mana_regen_mod', 0.4, 'Mana regeneration modifier: 0.4'),
+            ('wh_main_character_abilities_arcane_conduit', 'mana_regen_mod', 0.4, 'Power recharge +40%'),
         ):
             mechanic = self.q.get_passive_detail(key)['mechanic']
             self.assertIn(text, mechanic['summary'])
-            self.assertIn('not verified', mechanic['summary'])
+            self.assertNotIn('regeneration unit scale and timing not verified', mechanic['summary'])
             self.assertNotIn('scalar modifier', mechanic['summary'])
             self.assertNotIn('..', mechanic['summary'])
             effect = next(e for e in mechanic['effects'] if e.get('native_kind') == 'phase_behavior')
-            self.assertEqual(effect['kind'], 'unresolved')
+            self.assertEqual(effect['kind'], 'phase_behavior')
             self.assertEqual(effect['native_parameters'][field], value)
             self.assertEqual(mechanic['phases'][0]['lifecycle'][field], value)
         mechanic = self.q.get_passive_detail('wh2_dlc09_unit_passive_unstable_mark_ii_sand')['mechanic']
@@ -926,6 +926,64 @@ class QueryTests(unittest.TestCase):
         self.assertIn('every incoming hit',self.q.get_passive_detail('wh2_dlc17_unit_passive_spurting_bile_blood')['mechanic']['summary'])
         self.assertIn('exact contact recipients',self.q.get_passive_detail('wh2_main_unit_passive_rebirth')['mechanic']['summary'])
         self.assertIn('repeatability',self.q.get_passive_detail('wh2_dlc16_lord_passive_conjoined_destiny')['mechanic']['summary'])
+
+    def test_alpha4_resource_families_share_signed_units_without_changing_values(self):
+        fields={'mana_regen_mod':19,'mana_max_depletion_mod':3,'replenish_ammo':2,'ability_recharge_change':2}
+        counts={field:0 for field in fields}; definitions=set()
+        for m in self.core_mechanics():
+            seen=set()
+            for e in m['effects']:
+                for field,value in e.get('native_parameters',{}).items():
+                    if field not in fields:continue
+                    seen.add(field);definitions.add(m['key'])
+                    self.assertEqual(e['kind'],'phase_behavior')
+                    validate(e,self.schema['$defs']['effect_phase_behavior'],self.schema)
+                    phase=next(p for p in m['phases'] if p['key']==e['phase_ref'])
+                    self.assertEqual(phase['lifecycle'][field],value)
+                    if field=='mana_regen_mod':expected=f'Power recharge {value*100:+g}%'
+                    elif field=='mana_max_depletion_mod':expected=f'Power reserve change: {value:+g} Winds of Magic points per second'
+                    elif field=='replenish_ammo':expected=f'Restores {value*100:g}% of maximum ammunition at phase start'
+                    else:expected=f'Reduces ability cooldowns by {-value:g} seconds'
+                    self.assertIn(expected,m['summary'])
+                    broken=json.loads(json.dumps(e));broken['native_parameters'][field]='not-a-number'
+                    with self.assertRaises(ValueError):validate(broken,self.schema['$defs']['effect_phase_behavior'],self.schema)
+            for field in seen:counts[field]+=1
+            for obsolete in ('time units not verified','absolute amount versus ammunition fraction not verified','regeneration unit scale and timing not verified'):
+                self.assertNotIn(obsolete,m['summary'])
+        self.assertEqual(counts,fields)
+        self.assertEqual(len(definitions),23)
+
+    def test_alpha4_resource_examples_keep_recipients_intensity_and_timers(self):
+        giver=self.q.get_passive_detail('wh3_dlc20_unit_passive_giver_of_arcane_glory')['mechanic']
+        resource=next(e for e in giver['effects'] if 'mana_max_depletion_mod' in e.get('native_parameters',{}))
+        self.assertEqual(resource['native_parameters']['mana_max_depletion_mod'],.15)
+        self.assertTrue(all(p['target_self'] and not p['target_friends'] for p in giver['phases'] if p['key']==resource['phase_ref']))
+        self.assertIn('nearby deaths',giver['summary']);self.assertIn('scaling and stacking remain unverified',giver['summary'])
+        leech=self.q.get_passive_detail('wh3_dlc29_lord_passive_arcane_leech')['mechanic']
+        for text in ('enemy units within 35 metres','Power recharge -40%','Power recharge +80%',
+                     '-0.05 Winds of Magic points per second','+0.1 Winds of Magic points per second','no enemy spellcaster','cannot cast spells'):
+            self.assertIn(text,leech['summary'])
+        self.assertNotIn('net transfer',leech['summary'])
+        chaos=self.q.get_passive_detail('wh3_dlc27_unit_passive_dual_personality_chaosbrand')['mechanic']
+        self.assertIn('+0.07 Winds of Magic points per second',chaos['summary'])
+        self.assertIn('health above 50%',chaos['summary'])
+        for key,pct in (('wh3_dlc23_unit_passive_extra_reload',5),('wh3_main_unit_passive_skullfeast',10)):
+            m=self.q.get_passive_detail(key)['mechanic']
+            self.assertIn(f'Restores {pct}% of maximum ammunition at phase start',m['summary'])
+            self.assertIn('phase duration 5 seconds',m['summary'])
+            self.assertTrue(m['conditions']['recharges_when'])
+        for key,seconds in (('wh2_dlc17_lord_passive_master_of_the_ancient_lore',5),('wh3_main_lord_passive_prismatic_plurality',10)):
+            m=self.q.get_passive_detail(key)['mechanic']
+            self.assertIn(f'Reduces ability cooldowns by {seconds} seconds',m['summary'])
+            self.assertNotIn('cooldowns per second',m['summary'])
+        # Synthetic signed cases exercise the shared formatter, not claimed game abilities.
+        from ctw_adviser.queries import Packet
+        m=json.loads(json.dumps(self.q.get_passive_detail('wh3_dlc23_unit_passive_extra_reload')['mechanic']))
+        e=next(e for e in m['effects'] if 'replenish_ammo' in e.get('native_parameters',{}))
+        e['native_parameters']['replenish_ammo']=-.6
+        self.assertIn('Spends 60% of maximum ammunition at phase start',Packet(self.q).summary(m))
+        e['native_parameters']={'ability_recharge_change':5}
+        self.assertIn('Increases ability cooldowns by 5 seconds',Packet(self.q).summary(m))
 
     def test_attribute_polarity_describes_application_not_benefit(self):
         from ctw_adviser.queries import Packet

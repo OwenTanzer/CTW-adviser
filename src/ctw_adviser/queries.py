@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.14.0'
+PACKET_VERSION = '1.15.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -269,11 +269,7 @@ PHASE_ACTIONS = {
 }
 PHASE_QUALIFICATIONS = {
     'inspiration_aura_range_mod': 'range units not verified',
-    'ability_recharge_change': 'time units not verified',
-    'mana_regen_mod': 'regeneration unit scale and timing not verified',
-    'mana_max_depletion_mod': 'unit scale not verified',
     'imbue_ignition': 'ignition encoding not verified',
-    'replenish_ammo': 'absolute amount versus ammunition fraction not verified',
     'execute_ratio': 'execution threshold and application rule not verified',
     'requested_stance': 'stance execution behavior not verified',
 }
@@ -995,13 +991,12 @@ class Packet:
         other = {k: v for k, v in self.native('native_ability_phases', phase, PHASE_FIELDS).items()
                  if v not in (0, None, False) and k not in ('effect_type', 'affects_allies', 'affects_enemies')}
         # Classify supported behavior independently of any remaining opaque settings.
-        explained = {k: other.pop(k) for k in ('imbue_magical', 'imbue_contact', 'fatigue_change_ratio') if k in other}
+        explained = {k: other.pop(k) for k in ('imbue_magical', 'imbue_contact', 'fatigue_change_ratio',
+                     'mana_regen_mod', 'mana_max_depletion_mod', 'replenish_ammo', 'ability_recharge_change') if k in other}
         if other.get('imbue_ignition', 0) > 0:
             explained['imbue_ignition'] = other.pop('imbue_ignition')
         if 0 < other.get('execute_ratio', 0) <= 1:
             explained['execute_ratio'] = other.pop('execute_ratio')
-        if key == 'wh2_dlc09_unit_passive_spirit_conduit' and other.get('mana_regen_mod') == 0.2:
-            explained['mana_regen_mod'] = other.pop('mana_regen_mod')
         if explained:
             meanings = []
             if 'fatigue_change_ratio' in explained:
@@ -1015,7 +1010,13 @@ class Packet:
             if 'execute_ratio' in explained:
                 meanings.append('Instant execution at or below this fraction of target health; separate target eligibility still applies.')
             if 'mana_regen_mod' in explained:
-                meanings.append('Increases power recharge by 20% (reviewed Spirit Conduit interpretation).')
+                meanings.append('Fractional power-recharge rate modifier; not reserve generation in points per second.')
+            if 'mana_max_depletion_mod' in explained:
+                meanings.append('Signed reserve change in Winds of Magic points per second; intensity scaling remains separate.')
+            if 'replenish_ammo' in explained:
+                meanings.append('Reviewed fraction of maximum ammunition restored at phase start; negative values spend ammunition. Shot rounding is not calculated.')
+            if 'ability_recharge_change' in explained:
+                meanings.append('Signed ability cooldown change in seconds; negative values reduce cooldowns. Not a per-second subtraction.')
             effects.append({'kind': 'phase_behavior', 'phase_ref': key, 'native_kind': 'phase_behavior',
                             'native_parameters': explained, 'reason': ' '.join(meanings), 'provenance_refs': refs})
         if other:
@@ -1198,6 +1199,12 @@ class Packet:
                         description = f'Instantly executes targets at or below {v * 100:g}% health; separate target eligibility applies'
                     elif k == 'mana_regen_mod' and kind == 'phase_behavior':
                         description = f'Power recharge {v * 100:+g}%'
+                    elif k == 'mana_max_depletion_mod' and kind == 'phase_behavior':
+                        description = f'Power reserve change: {v:+g} Winds of Magic points per second'
+                    elif k == 'replenish_ammo' and kind == 'phase_behavior':
+                        description = f'{"Restores" if v > 0 else "Spends"} {abs(v) * 100:g}% of maximum ammunition at phase start'
+                    elif k == 'ability_recharge_change' and kind == 'phase_behavior':
+                        description = f'{"Reduces" if v < 0 else "Increases"} ability cooldowns by {abs(v):g} seconds'
                     elif k in PHASE_ACTIONS and isinstance(v, bool):
                         description = PHASE_ACTIONS[k] if v else PHASE_LABELS[k] + ': disabled'
                     else:

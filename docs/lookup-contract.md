@@ -1,9 +1,9 @@
-# Evidence packet contract 1.10.0
+# Evidence packet contract 1.15.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.10.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.15.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -23,21 +23,26 @@ agent output. Stored `coverage_gaps` and generated query caveats remain availabl
 without copying diagnostic notes into a second serving file. Stable interpretation
 rules belong in this contract and issue #6's skill guidance.
 
-Phase behavior with unmapped semantics is still `kind: unresolved`, but
-its summary names the available parameters and exact values (for example,
-`Mana regeneration modifier: 0.4` or `Fatigue change ratio: -0.0025`). These
-labels describe source fields; they do not establish percent units, per-second
-rates, recipient applicability or engine arithmetic. The corresponding native
-keys, values, phase links and evidence remain intact. Intensity summaries expose
-their settings with scaling/stacking qualification, excluding repeated source
-locator metadata from the prose. Generic implementation notes stay in diagnostics.
+Phase behavior with unmapped semantics remains `kind: unresolved`. Reviewed
+healing, fatigue, ignition, execution and resource interpretations now have
+readable units; native keys, values, phase links and evidence remain intact.
+Intensity summaries explain source drivers and lifecycle while retaining material
+scaling/stacking qualifications. The Alpha 4 recovery sections below record
+sources, interpretations and limits. No engine arithmetic is applied to units.
 
 ## Ordinary output
 
 A packet has one snapshot/baseline, one or more qualified `units`, shared trait
-descriptions, compact source/provenance dictionaries and optional graph details.
+descriptions, inline evidence IDs and optional expanded provenance/graph details.
 Single-unit and two-unit requests use the same schema. No winner, calculated
 damage, interpreted trigger satisfaction or modified baseline belongs here.
+
+Default unit/matchup/passive responses declare `provenance_mode: deferred` and
+leave `sources`/`provenance` empty. Pass `include_provenance=True` (CLI
+`--include-provenance`) to expand them or resolve IDs using `get_provenance`.
+`packet_checks(packet, provenance_resolver=queries.get_provenance)` validates a
+deferred unit/matchup packet against its snapshot; expanded packets validate
+without a resolver. Diagnostics and raw graphs remain independent opt-ins.
 
 Each unit retains the approved groups: `identity`, `body`, `movement`,
 `leadership`, `melee`, `ranged`, `passives`, `cost`, `activated_options`, coverage
@@ -666,7 +671,7 @@ interactions, healing amounts or kill requirements remain beside the relevant fa
 
 ### Consistency repairs (packet 1.10.0)
 
-Current packets (1.9.0 and 1.10.0) require every condition role, the diagnostic
+Packets from 1.9.0 onward require every condition role, the diagnostic
 count, and the consolidated profile identities. Earlier fixture versions retain
 their earlier requirements; their compatibility does not waive current fields.
 
@@ -843,6 +848,42 @@ target placement, failure recipients and other consequential limitations.
 Recovery verification: 95 tests pass. The complete comparison again passed all
 503 ability/culture combinations and 3,181 roster contexts, with native facts and
 payloads unchanged. This reconstructed batch changes 126 summaries relative to
-the preceding recovery commit, not the historical reported 151; overlapping
-templates were restored in different earlier batches. Sea Guard is 11,670 bytes
+the preceding recovery commit, not the historical reported 151. This is not a
+byte-for-byte recovery; family coverage and preserved facts, rather than matching
+overlapping historical summary counts, are the acceptance checks. Sea Guard is 11,670 bytes
 versus 23,322 at the published baseline (compact UTF-8 JSON).
+
+### Resource interpretation — reconstruction of `101e72d` (packet 1.15.0)
+
+The shared resource formatter covers 23 definitions (19 recharge, three reserve,
+two ammunition, two cooldown; categories overlap). Spirit Conduit was already
+explained, so this batch repairs 22 additional summaries. All native numbers,
+phase scopes, conditions, intensity settings and independent recharge timers
+remain intact. The source pin and import scope do not change.
+
+| Native setting | Reviewed interpretation | Evidence and limits |
+| --- | --- | --- |
+| `mana_regen_mod` | Fractional power-recharge rate change; 0.4 means +40%. | [CA Update 5.0](https://community.creative-assembly.com/total-war/total-war-warhammer/blogs/17-total-war-warhammer-iii-update-5-0) corrects Prismatic Amplifier to 160%; its pinned native setting is 1.6. The activated item is calibration evidence only, not a newly imported passive. This is not reserve generation. |
+| `mana_max_depletion_mod` | Signed reserve change in Winds of Magic points per second. | [CA Hotfix 5.1.1](https://community.creative-assembly.com/total-war/total-war-warhammer/forums/7-patch-notes-amp-announcements/threads/6072-total-war-warhammer-iii-hotfix-5-1-1) establishes Giver of Arcane Glory's 0.15 at maximum intensity on the shrine itself; nearby allies retain mastery. Intensity scaling is not calculated. |
+| `replenish_ammo` | Fraction of maximum ammunition restored at phase start; negative values spend ammunition. | Reviewed inference from the pinned phase-start/relative field description and native full/partial/negative examples, corroborated by CA's [generated scripting reference](https://chadvandy.github.io/tw_modding_resources/WH3/battle/battle_unit.html#set_current_ammo_unary). That separate API establishes the 0–1 convention, not identical engine implementation. No live-game confirmation, continuous refill or shot rounding is claimed. |
+| `ability_recharge_change` | Signed cooldown change in seconds; negative values reduce cooldowns. | Native signed-time field meaning plus [the mod author's Prismatic Plurality change log](https://www.patreon.com/Team_Radious/posts/radious-total-3-99183456), which describes vanilla −10 seconds changed to −5. Only the unit is corroborated; no mod balance value is imported. Not multiplied by phase duration or treated as repeated per-second subtraction. |
+
+Giver of Arcane Glory keeps self-only +100% power recharge/+0.15 reserve change,
+with mastery on self and friends and its nearby-death intensity qualification.
+Chaosbrand keeps +20% recharge/+0.07 reserve change and its above-50%-health
+deactivation. Arcane Leech keeps enemy −40%/−0.05 within 35 metres and self
++80%/+0.1, with spellcaster eligibility; no net-transfer, target-count or
+conservation formula is inferred. Extra Reload/Skullfeast restore 5%/10% at phase
+start with their separate readiness/timers. Master of the Ancient Lore/Prismatic
+Plurality reduce cooldowns by 5/10 seconds, preserving their different conditions.
+
+The obsolete generic time-unit, ammunition-unit and mana-scale disclaimers are
+removed. Retained uncertainty concerns actual scaling, stacking, rounding and
+realised outcomes, not already interpreted basic units.
+
+Recovery verification: all 97 tests pass. Exactly 22 additional summaries change
+relative to the preceding recovery commit; all 23 resource-bearing definitions
+have typed shared-unit and native-value preservation regressions. Signed synthetic
+cases check spending ammunition and increasing cooldowns without inventing game
+abilities. The suite contains 12 reconstructed test methods beyond the published
+85, not recovered byte-identical historical test files.

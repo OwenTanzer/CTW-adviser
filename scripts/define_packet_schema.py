@@ -57,6 +57,9 @@ defs['effect_phase_behavior']['properties']['native_parameters']['properties']['
 defs['effect_phase_behavior']['properties']['native_parameters']['anyOf'].append({'required':['fatigue_change_ratio']})
 defs['effect_phase_behavior']['properties']['native_parameters']['properties']['execute_ratio']=N
 defs['effect_phase_behavior']['properties']['native_parameters']['anyOf'].append({'required':['execute_ratio']})
+for field in ('mana_max_depletion_mod','replenish_ammo','ability_recharge_change'):
+ defs['effect_phase_behavior']['properties']['native_parameters']['properties'][field]=N
+ defs['effect_phase_behavior']['properties']['native_parameters']['anyOf'].append({'required':[field]})
 defs['effect_payload_reference']['properties']['failure_context']=native
 
 defs['effect']={'oneOf':[ref('effect_'+name) for name in effects]}
