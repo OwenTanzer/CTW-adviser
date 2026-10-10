@@ -752,3 +752,23 @@ only in the separately recorded family/resource follow-through below.
 
 Recovery verification: 88 tests pass, including whole-roster readable-stat and
 generic-aura coverage plus named contact/recipient/regeneration regressions.
+
+### Stage follow-through — reconstruction of `95045d4` (packet 1.12.0)
+
+Guardian Shield and Wrath of the Sands label friendly/enemy effect groups rather
+than implying temporal order from recipient edges. Bulwark of the Gate and
+Defensive Stance describe 10-second first stages and indefinite second stages.
+Both Murderous Euphoria and For the Slaughter! variants retain their separate
+25/25/indefinite stages, final contact effect and 35/45-metre ranges. Stage bonuses
+are not added together. Interruption/restart behavior remains qualified.
+Blood Frenzy, Berserk and Drakenhof Banner retain their distinct phase lengths,
+melee-driven intensity, active-only updates, no timed decay and reinforcement
+reset. Their intensity formula/ordinary reset behavior is not calculated.
+The source-defined fatigue ratio is a fraction of maximum fatigue per second,
+with negative values restoring vigour, across the entire family. Relevant
+initial/subsequent recharge timers are visible even without recharge-context rows.
+
+Recovery verification: 89 tests pass. The preceding complete comparison checked
+503 ability/culture combinations and 3,181 roster contexts against `804206d7`,
+including all 193 aura and 175 qualification-inventory keys; native mechanical
+facts and payloads were unchanged and no summary retained a raw `stat_` label.

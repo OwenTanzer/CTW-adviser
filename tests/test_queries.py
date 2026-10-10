@@ -235,6 +235,30 @@ class QueryTests(unittest.TestCase):
                 if radius is not None and radius > 0 and any(p['target_friends'] or p['target_enemies'] for p in m['phases']):
                     self.assertIn(f'within {radius:g} metres', m['summary'], key)
 
+    def test_alpha4_stages_mixed_recipients_recharge_and_fatigue(self):
+        from ctw_adviser.queries import STATIONARY_STAGED_PASSIVES, MELEE_STAGED_PASSIVES, INTENSITY_STAGED_PASSIVES
+        for key in STATIONARY_STAGED_PASSIVES | MELEE_STAGED_PASSIVES | INTENSITY_STAGED_PASSIVES:
+            m = self.q.get_passive_detail(key)['mechanic']; text = m['summary']
+            self.assertIn('successive phases', text); self.assertIn('do not add the stages together', text)
+            for phase in m['phases']:
+                self.assertIn(f'phase duration {phase["duration"]:g} seconds' if phase['duration'] >= 0 else 'no fixed phase expiry while active', text)
+            if key in INTENSITY_STAGED_PASSIVES:
+                self.assertIn('time spent in melee while the ability is active', text)
+                self.assertIn('effective scaling and stacking remain unverified', text)
+                self.assertIn('no time-based intensity decay', text)
+            if key in MELEE_STAGED_PASSIVES:
+                seconds = 60 if 'euphoria' in key else 25
+                self.assertIn(f'subsequent recharge: {seconds}.0 seconds', text)
+        for key in ('wh3_dlc24_unit_passive_guardian_shield','wh3_dlc29_unit_abilities_wrath_of_the_sands'):
+            text = self.q.get_passive_detail(key)['mechanic']['summary']
+            self.assertIn('Friendly effect —', text); self.assertIn('Enemy effect —', text)
+            self.assertNotIn('Phase 1', text); self.assertNotIn('successive', text)
+        fatigue = self.q.get_passive_detail('wh3_dlc24_unit_passive_solar_engine')['mechanic']
+        self.assertIn('-0.25% of maximum fatigue per second (restores vigour)', fatigue['summary'])
+        e = next(e for e in fatigue['effects'] if 'fatigue_change_ratio' in e.get('native_parameters',{}))
+        self.assertEqual(e['kind'],'phase_behavior'); self.assertEqual(e['native_parameters']['fatigue_change_ratio'],-0.0025)
+        validate(e,self.schema['$defs']['effect_phase_behavior'],self.schema)
+
     def test_murderous_indicator_consolidation_is_lossless_and_qualified(self):
         links = self.q.rows('unit_abilities', 'ability_key', MURDEROUS_INDICATOR)
         self.assertEqual(len(links), 115)
@@ -735,7 +759,6 @@ class QueryTests(unittest.TestCase):
     def test_native_phase_parameters_are_visible_without_invented_units(self):
         for key, field, value, text in (
             ('wh_main_character_abilities_arcane_conduit', 'mana_regen_mod', 0.4, 'Mana regeneration modifier: 0.4'),
-            ('wh3_dlc24_unit_passive_solar_engine', 'fatigue_change_ratio', -0.0025, 'Fatigue change ratio: -0.0025'),
         ):
             mechanic = self.q.get_passive_detail(key)['mechanic']
             self.assertIn(text, mechanic['summary'])

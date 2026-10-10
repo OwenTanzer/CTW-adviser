@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.11.0'
+PACKET_VERSION = '1.12.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -273,7 +273,6 @@ PHASE_ACTIONS = {
     'remove_magical': 'Removes magical attacks',
 }
 PHASE_QUALIFICATIONS = {
-    'fatigue_change_ratio': 'fatigue scale and update interval not verified',
     'inspiration_aura_range_mod': 'range units not verified',
     'ability_recharge_change': 'time units not verified',
     'mana_regen_mod': 'regeneration unit scale and timing not verified',
@@ -283,6 +282,11 @@ PHASE_QUALIFICATIONS = {
     'execute_ratio': 'execution threshold and application rule not verified',
     'requested_stance': 'stance execution behavior not verified',
 }
+MIXED_RECIPIENT_PASSIVES = {'wh3_dlc24_unit_passive_guardian_shield', 'wh3_dlc29_unit_abilities_wrath_of_the_sands'}
+STATIONARY_STAGED_PASSIVES = {'wh3_dlc24_character_passive_bulwark_of_the_gate', 'wh3_main_unit_passive_defensive_stance'}
+MELEE_STAGED_PASSIVES = {'wh3_dlc27_unit_passive_murderous_euphoria', 'wh3_dlc27_unit_passive_murderous_euphoria_druchii',
+    'wh3_main_daemon_arms_passive_for_the_slaughter', 'wh3_main_daemon_arms_passive_for_the_slaughter_upgraded'}
+INTENSITY_STAGED_PASSIVES = {'wh2_dlc10_lord_passive_blood_frenzy', 'wh_dlc08_unit_passive_berserk', 'wh3_dlc29_unit_passive_drakenhof_banner'}
 TRAIT_TEXT = {
     'magical': ('ui_unit_bullet_point_enums_tooltip_ward_physical',
                 'Magical attacks bypass physical resistance; scoped to this attack.'),
@@ -971,13 +975,15 @@ class Packet:
         other = {k: v for k, v in self.native('native_ability_phases', phase, PHASE_FIELDS).items()
                  if v not in (0, None, False) and k not in ('effect_type', 'affects_allies', 'affects_enemies')}
         # Classify supported behavior independently of any remaining opaque settings.
-        explained = {k: other.pop(k) for k in ('imbue_magical', 'imbue_contact') if k in other}
+        explained = {k: other.pop(k) for k in ('imbue_magical', 'imbue_contact', 'fatigue_change_ratio') if k in other}
         if key == 'wh_dlc04_unit_passive_balefire' and other.get('imbue_ignition') == 10:
             explained['imbue_ignition'] = other.pop('imbue_ignition')
         if key == 'wh2_dlc09_unit_passive_spirit_conduit' and other.get('mana_regen_mod') == 0.2:
             explained['mana_regen_mod'] = other.pop('mana_regen_mod')
         if explained:
             meanings = []
+            if 'fatigue_change_ratio' in explained:
+                meanings.append('Fatigue change per second as a fraction of maximum fatigue; negative values restore vigour.')
             if 'imbue_magical' in explained:
                 meanings.append('Enables magical attacks while this phase is active.')
             if 'imbue_contact' in explained:
@@ -1026,6 +1032,8 @@ class Packet:
         duration = phase.get('duration')
         if duration is not None and duration >= 0:
             scope += f'; phase duration {duration:g} seconds'
+        elif duration == -1 and mechanic.get('key') in STATIONARY_STAGED_PASSIVES | MELEE_STAGED_PASSIVES | INTENSITY_STAGED_PASSIVES:
+            scope += '; no fixed phase expiry while active'
         return scope
 
     def contact_summary(self, key, effect):
@@ -1096,12 +1104,28 @@ class Packet:
                         text += '; contact effect affects allies: ' + str(f['contact_affects_allies']).lower() + ', enemies: ' + str(f['contact_affects_enemies']).lower()
                     text += ' (failure scheduling, effective damage and exact recipients unverified)'
 
+            elif effect.get('native_kind') == 'intensity_settings' and effect['native_parameters']['intensity_source'] == 'time_in_melee':
+                n = effect['native_parameters']
+                source = self.q.one('native_special_ability_intensity_sources', 'source_type', n['intensity_source'])
+                effect['provenance_refs'] = list(dict.fromkeys(effect['provenance_refs'] + self.refs(source)))
+                text = 'Intensity is driven by time spent in melee'
+                if source and source['updates_only_when_ability_active']:
+                    text += ' while the ability is active'
+                text += f'; linear scaling (source default {n["default_amount"]}, maximum {n["max_amount"]})'
+                text += '. Listed phase values are not a promise of full strength on activation; effective scaling and stacking remain unverified'
+                if n['intensity_decay_delay'] == -1:
+                    text += '; no time-based intensity decay is scheduled'
+                if n['reset_intensity_in_reinforcement_pool']:
+                    text += '; returning to the reinforcement pool resets intensity'
             elif effect.get('native_parameters'):
                 parameters = {k: v for k, v in effect['native_parameters'].items()
                               if k not in ('ability', 'source_path', 'source_line', 'source_patch')}
                 pieces_for_effect = []
                 for k, v in parameters.items():
-                    if k == 'imbue_contact' and isinstance(v, str):
+                    if k == 'fatigue_change_ratio' and isinstance(v, (int, float)):
+                        description = (f'Fatigue change: {v * 100:+g}% of maximum fatigue per second'
+                                       + (' (restores vigour)' if v < 0 else ''))
+                    elif k == 'imbue_contact' and isinstance(v, str):
                         description = self.contact_summary(v, effect)
                     elif k == 'imbue_ignition' and kind == 'phase_behavior':
                         description = 'Grants flaming attacks'
@@ -1129,11 +1153,21 @@ class Packet:
             if not entries: continue
             phases = [p for p in mechanic['phases'] if p['key'] == key]
             scope = '; '.join(dict.fromkeys(self.phase_scope(p, mechanic) for p in phases))
-            label = f'Phase {index} — ' if len(phase_keys) > 1 else 'While active — '
+            if mechanic.get('key') in MIXED_RECIPIENT_PASSIVES:
+                label = 'Enemy effect — ' if all(p['target_enemies'] for p in phases) else 'Friendly effect — '
+            else:
+                label = f'Phase {index} — ' if len(phase_keys) > 1 else 'While active — '
             clauses.append(label + scope + ': ' + '; '.join(entries) + '.')
         for entries in pieces.values():
             clauses.append('Effect: ' + '; '.join(entries) + '.')
         result = ' '.join(clauses)
+        key = mechanic.get('key')
+        if key in STATIONARY_STAGED_PASSIVES | MELEE_STAGED_PASSIVES | INTENSITY_STAGED_PASSIVES:
+            context = ('While stationary, ' if key in STATIONARY_STAGED_PASSIVES else
+                       'While in melee, ' if key in MELEE_STAGED_PASSIVES else 'During an activation, ')
+            result = context + 'successive phases use the following stage-specific bonuses; do not add the stages together. ' + result
+            if key in STATIONARY_STAGED_PASSIVES | MELEE_STAGED_PASSIVES:
+                result += ' Phase durations describe uninterrupted progression; interruption and restart timing are not established.'
         result = self.explained_summary(mechanic) or result
         for category, label in (
             ('activates_when', 'Activation conditions'),
@@ -1147,12 +1181,12 @@ class Packet:
             conditions = mechanic['conditions'].get(category, [])
             if conditions:
                 result += ' ' + label + ': ' + '; '.join(c['summary'] for c in conditions) + '.'
-        if mechanic['conditions'].get('recharges_when'):
-            timers = mechanic['native_parameters']
+        timers = mechanic.get('native_parameters', {})
+        if mechanic['conditions'].get('recharges_when') or any((timers.get(k) or 0) > 0 for k in ('initial_recharge','recharge_time')):
             settings = []
             for field, label in (('initial_recharge', 'initial recharge'), ('recharge_time', 'subsequent recharge')):
                 if timers.get(field) is not None and timers[field] >= 0:
-                    settings.append(label + ': ' + str(timers[field]))
+                    settings.append(label + ': ' + str(timers[field]) + ' seconds')
             if settings:
                 result += ' Recharge timer settings: ' + '; '.join(settings) + '.'
         return result

@@ -53,6 +53,8 @@ effects={
  'payload_reference':{'node_ref':S,'relationship':S},
  'unresolved':{'native_kind':S,'native_parameters':native,'reason':S}}
 for name,properties in effects.items():defs['effect_'+name]=obj({'kind':const(name),**effect_common,**properties})
+defs['effect_phase_behavior']['properties']['native_parameters']['properties']['fatigue_change_ratio']=N
+defs['effect_phase_behavior']['properties']['native_parameters']['anyOf'].append({'required':['fatigue_change_ratio']})
 defs['effect_payload_reference']['properties']['failure_context']=native
 
 defs['effect']={'oneOf':[ref('effect_'+name) for name in effects]}
