@@ -3,7 +3,7 @@
 General single-unit matchup adviser. CTW-data owns game facts; this repository
 owns rebuildable serving artifacts and, in later increments, matchup calculations.
 
-Current implementation: issue #2, phases 1–3 — pinned contracts and fixtures,
+Current implementation: issue #2, phases 1-3 and local phase-5 packaging - pinned contracts and fixtures,
 an offline STRICT SQLite snapshot builder, and indexed JSON evidence retrieval
 with unit resolution, inline passive explanations, projections and continuation.
 The combat evaluator is later work.
@@ -36,15 +36,18 @@ See [source contract](docs/source-contract.md) and
 [lookup contract](docs/lookup-contract.md) for packet semantics and fixture rebuilds.
 See the [store contract](docs/store-contract.md) for build boundaries, source
 accounting, dependency selection and atomic installation.
+See [local rebuild and measurements](docs/local-rebuild.md) for the reproducible
+SQLite artifact, SHA-256 manifest, verification and packet benchmark.
 
 Query commands require only the built SQLite file. Ambiguous names return
 candidates; source aliases and availability remain distinct. Python callers use
 `Queries` from `ctw_adviser.queries` as a context manager. See the lookup contract
 for sections, modes, continuation, detail/provenance commands and interpretation
-boundaries. The public Datasette inspection deployment follows reviewed merges;
-it is separate from the offline query library and future client adapters.
+boundaries. The public Datasette inspection deployment is separate from the
+offline query library and future client adapters. Its version must be checked
+against a reviewed merge before claiming parity.
 
-Packet 1.18.0 includes the Alpha 4 repairs first released in 1.15.0 and the
+Packet 1.19.0 includes the Alpha 4 repairs first released in 1.15.0 and the
 Chej unit supplements. Default packets keep
 inline evidence IDs and defer source/provenance dictionaries; use
 `--include-provenance` to expand them or the `provenance` command to resolve IDs.
