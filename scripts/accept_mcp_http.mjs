@@ -19,7 +19,7 @@ try {
   assert.deepEqual(new Set(listed.tools.map(t => t.name)), new Set([
     'resolve_unit', 'get_unit_combat_profile', 'get_matchup_evidence',
     'resolve_effect', 'get_effect', 'get_detail', 'get_provenance',
-    'evaluate_single_unit_matchup', 'evaluate_effect_damage'
+    'evaluate_single_unit_matchup', 'evaluate_effect_damage', 'evaluate_effect_engagement'
   ]));
   for (const tool of listed.tools) {
     assert.ok(tool.inputSchema && tool.outputSchema && tool.description);

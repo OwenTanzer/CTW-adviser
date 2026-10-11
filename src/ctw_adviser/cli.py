@@ -10,6 +10,7 @@ from .queries import Queries, ResolutionError
 from .model import movement_phase
 from .combat import evaluate_matchup
 from .effect_calc import evaluate_effect_damage
+from .effect_engagement import evaluate_effect_engagement
 
 
 def main():
@@ -45,6 +46,19 @@ def main():
     effect_damage.add_argument('--caster', help='Optional caster unit; checked against qualified source access links')
     effect_damage.add_argument('--subculture')
     effect_damage.add_argument('--target-subculture')
+    engagement = commands.add_parser('effect-engagement', help='Compare a #5 engagement with and without one buff/debuff')
+    engagement.add_argument('--db', type=Path, required=True)
+    engagement.add_argument('effect')
+    engagement.add_argument('unit_a')
+    engagement.add_argument('unit_b')
+    engagement.add_argument('--recipient', choices=('a', 'b'), default='a')
+    engagement.add_argument('--relation', choices=('friendly', 'enemy'), default='friendly')
+    engagement.add_argument('--phase')
+    engagement.add_argument('--caster')
+    engagement.add_argument('--scenario', help='JSON #5 matchup scenario shared by both runs')
+    engagement.add_argument('--subculture-a')
+    engagement.add_argument('--subculture-b')
+    engagement.add_argument('--include-matchups', action='store_true', help='Embed both full #5 matchup results')
     for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance',
                     'resolve-effect', 'effect', 'unit-effects'):
         query = commands.add_parser(command)
@@ -82,6 +96,13 @@ def main():
                 result = evaluate_matchup(queries, args.unit_a, args.unit_b,
                                           scenario=json.loads(args.scenario) if args.scenario else None,
                                           subculture_a=args.subculture_a, subculture_b=args.subculture_b)
+        elif args.command == 'effect-engagement':
+            with Queries(args.db) as queries:
+                result = evaluate_effect_engagement(queries, args.effect, args.unit_a, args.unit_b,
+                                                    recipient=args.recipient, relation=args.relation, phase=args.phase,
+                                                    scenario=json.loads(args.scenario) if args.scenario else None,
+                                                    caster=args.caster, subculture_a=args.subculture_a,
+                                                    subculture_b=args.subculture_b, include_matchups=args.include_matchups)
         elif args.command == 'effect-damage':
             with Queries(args.db) as queries:
                 result = evaluate_effect_damage(queries, args.effect, args.target,

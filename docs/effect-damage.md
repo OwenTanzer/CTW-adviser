@@ -124,3 +124,118 @@ A fresh independent-style sweep on this exact evaluator tree completed all
 1,884 pinned effects against Lothern Sea Guard with zero errors: 216
 `calculated`, 493 `partial` and 1,175 `blocked`. These regression checks are
 not live-battle observations; `empirical_calibration` is null.
+
+# Buff/debuff engagement comparison — issue #20, increment B
+
+`ctw_adviser.effect_engagement.evaluate_effect_engagement(queries, effect,
+unit_a, unit_b, *, recipient="a", relation="friendly", phase=None,
+scenario=None, caster=None, ...)` runs the same #5 `evaluate_matchup`
+engagement twice: without and with one effect phase applied to one side. It
+returns the deltas, the changed inputs and both full matchup results. Model
+version: `effect-engagement-0.1.0`. CLI: `effect-engagement`. MCP:
+`evaluate_effect_engagement`.
+
+```sh
+PYTHONPATH=src python -m ctw_adviser.cli effect-engagement --db work/adviser.sqlite \
+  wh2_main_spell_plague_wither "Lothern Sea Guard" "Bloodletters of Khorne" \
+  --recipient b --relation enemy \
+  --scenario '{"separation_metres":40,"sides":{"a":{"order":"hold"},"b":{"order":"approach"}}}'
+```
+
+**Shared baseline.** `evaluate_matchup` gained one optional `unit_modifier`
+hook. It receives deep copies of the two verified packets; `source_facts` and
+`identities` still report the unmodified packets. The unmodified run is
+byte-identical to a standalone #5 call with the same scenario, which is tested.
+Base profiles never change.
+
+**Applied modifiers.** Only phase stat effects that map to inputs the #5
+model reads are applied, using their native `add` or `mult` operation:
+
+- melee attack, defence, base/AP damage and charge bonus
+- speed
+- armour, physical, missile, magic and flame resistance, and ward (`stat_resistance_all`)
+- missile block chance
+- missile base/AP damage
+- melee bonus versus large or infantry
+
+Changed inputs are listed with before and after values. Morale, reload,
+accuracy and other stats, and healing, summons and attributes, are listed as
+unsupported. If nothing supported remains, the result is
+`blocked: no_supported_modifier`.
+Effect-owned modifier and variant citations must resolve in the same-snapshot
+effect packet before an engagement result is returned. Unit evidence in the
+embedded #5 matchups retains its separate packet provenance.
+
+**Recipients.** `relation=enemy` requires an enemy-targeting phase link;
+self/friendly cast selection can produce an outward aura. Its coverage is
+unverified. `friendly` requires a friends or self phase link. A self-only phase
+requires a supplied caster and matching resolved recipient identity;
+otherwise it is blocked. A supplied `caster` is checked against qualified
+access links.
+
+**Timing.** The effect is assumed active from the engagement start; cast timing,
+wind-up and refresh are not modeled. For a selected later-order phase, its
+source start time is unknown: `window.start_seconds` is null and comparisons
+are conditional on that phase being active at the selected window origin.
+A phase shorter than the horizon gives two
+comparisons:
+
+- `active_window`: both runs truncated at phase expiry. This is the primary comparison.
+- `horizon`: the effect held for the whole horizon. This is an upper bound.
+
+A null or sentinel duration reports only the horizon bound, as `partial`.
+Intensity-scaled abilities use full listed values and are flagged. Stacking,
+replacement, recipient caps and area coverage are not modeled.
+
+Verified with `tests/test_effect_engagement.py` (19 tests, from source evidence and a synthetic citation probe):
+
+- Hand of Glory: a friendly spell attack buff lowers only the enemy's survivability
+- Wither: an enemy armour debuff, plus the ineligible-relation block
+- Aura of Inertia: an enemy phase from a self cast, with reach uncertainty
+- Potion of Charoi: a self-only phase cannot modify an unrelated unit
+- Crooked Dice phase III: later-stage start remains unresolved
+- a nonexistent Wither modifier provenance ID is rejected before return
+- Shanty Verse: a non-spell defence buff
+- Wild Mantle of Ghorok: inverse effects (armour down, attack up) both reflected
+- Tomb King Rally: the morale-only block
+- active-window expiry, and a shared baseline identical to #5
+- a zero modifier giving zero delta
+- unchanged base profiles and input validation
+- library/CLI/MCP equality
+
+These are regression checks, not live observations.
+
+## Review round: response budget, sensitivity and coverage
+
+- **Compact engagement results by default.** Each run reports its verdict,
+  contact and ledgers; full #5 results are opt-in (`include_matchups`). A
+  Daemon Prince engagement drops from 1.27 MB, over the hosted 1 MiB cap, to
+  21 KB. Compact and full results agree on every comparison.
+- **Sensitivity.** Each comparison lists the four #5 collision-probability
+  corners with the favored side with and without the effect, and both runs'
+  one-parameter flip thresholds.
+- **Clamping.** Modifiers that push a field below its domain (armour, damage,
+  attack, block chance) are clamped at the bound, marked `clamped` with the
+  unclamped value, and flagged `modifier_clamped`. The full-inventory sweep
+  found 20 such effects that previously failed.
+- **Replacement.** `replacement.supersedes` lists superseded effects. Only the
+  selected effect's phase is applied, never stacked with its variants.
+- **Eligibility.** A self or friendly-cast ability reaches enemies only through
+  enemy-targeting phases or payloads that can damage enemies; this is
+  labeled as aura or self-centred.
+
+[Recorded predictions](effect-predictions.json) come from
+`scripts/record_effect_predictions.py`. They give exact inputs and key outputs
+for seven damage and five engagement cases, plus sweeps of 1,884 damage effects
+and 829 stat-phase effects with no errors:
+
+- **Damage:** 216 calculated, 493 partial, 648 ineligible recipients and 527
+  without an outward damage payload.
+- **Engagement:** 94 calculated, 403 partial, 221 self-only phases blocked
+  without a verified caster, 84 without a supported modifier, 25 needing a
+  phase choice and 2 ineligible recipients. The sweep intentionally provides
+  no caster identity.
+- **Latency on this host:** damage median 29 ms; engagement median 2.16 s,
+  since it runs up to four full #5 engagements with their sensitivity.
+
+These are model predictions, not live observations.
