@@ -7,19 +7,54 @@ the hosting platform; the local listener defaults to loopback.
 from __future__ import annotations
 
 import argparse
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import math
 import os
 from pathlib import Path
 import sys
 import threading
+import time
 
 from .mcp import PROTOCOL_VERSION, SERVER_VERSION, _response, dispatch_method
 from .queries import Queries
+from .store import SUPPORTED_CONTRACT_SHA256
 
 MAX_REQUEST_BYTES = 64 * 1024
 MAX_RESPONSE_BYTES = 1024 * 1024
 MAX_CONNECTIONS = 16
+MAX_REQUESTS_PER_MINUTE = 60
+BODY_READ_SECONDS = 10
+EXPECTED_SOURCE_COMMIT = "595e22764b22e748afdbafafcb0a6258973e2451"
+EXPECTED_SNAPSHOT_ID = f"{EXPECTED_SOURCE_COMMIT}:{SUPPORTED_CONTRACT_SHA256}:store3"
+
+
+def verify_hosted_snapshot(queries: Queries):
+    if (queries.snapshot.get("source_commit") != EXPECTED_SOURCE_COMMIT or
+            queries.snapshot.get("id") != EXPECTED_SNAPSHOT_ID):
+        raise ValueError("hosted MCP requires the pinned CTW-data snapshot; rebuild from source_lock.json")
+
+
+class SlidingWindowLimiter:
+    """Process-wide request cap independent of untrusted forwarded IP headers."""
+
+    def __init__(self, capacity=MAX_REQUESTS_PER_MINUTE, window_seconds=60, clock=time.monotonic):
+        self.capacity = capacity
+        self.window_seconds = window_seconds
+        self.clock = clock
+        self._arrivals = deque()
+        self._lock = threading.Lock()
+
+    def admit(self):
+        with self._lock:
+            now = self.clock()
+            while self._arrivals and now - self._arrivals[0] >= self.window_seconds:
+                self._arrivals.popleft()
+            if len(self._arrivals) >= self.capacity:
+                return False, max(1, math.ceil(self.window_seconds - (now - self._arrivals[0])))
+            self._arrivals.append(now)
+            return True, 0
 
 
 class BoundedHTTPServer(ThreadingHTTPServer):
@@ -28,6 +63,7 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
     def __init__(self, *args, **kwargs):
         self._connections = threading.BoundedSemaphore(MAX_CONNECTIONS)
+        self.rate_limiter = SlidingWindowLimiter()
         super().__init__(*args, **kwargs)
 
     def process_request(self, request, client_address):
@@ -58,6 +94,9 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
 
 def make_handler(db_path: str, allowed_origins: frozenset[str]):
+    with Queries(db_path) as queries:
+        verify_hosted_snapshot(queries)
+
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
         server_version = "CTW-MCP/" + SERVER_VERSION
@@ -69,9 +108,13 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
         def _send(self, status: int, payload=None, *, headers=None):
             body = (json.dumps(payload, ensure_ascii=False, allow_nan=False,
                                separators=(",", ":")).encode("utf-8") if payload is not None else b"")
+            # A stateless exchange has no reason to retain a worker on an idle
+            # HTTP/1.1 connection after the response has been delivered.
+            self.close_connection = True
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8" if body else "application/json")
             self.send_header("Content-Length", str(len(body)))
+            self.send_header("Connection", "close")
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
             for key, value in (headers or {}).items():
@@ -87,8 +130,36 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
                 return False
             return True
 
+        def _admit_request(self):
+            admitted, retry_after = self.server.rate_limiter.admit()
+            if not admitted:
+                self._send(429, {"error": "request rate exceeded"},
+                           headers={"Retry-After": str(retry_after)})
+            return admitted
+
+        def _read_body(self, length: int):
+            # BufferedReader.read(length) can wait indefinitely when a peer
+            # trickles bytes just before each socket idle timeout. read1 makes
+            # at most one underlying read, so the absolute deadline is checked
+            # between chunks as well as applied to each socket operation.
+            deadline = time.monotonic() + BODY_READ_SECONDS
+            remaining = length
+            chunks = []
+            while remaining:
+                seconds_left = deadline - time.monotonic()
+                if seconds_left <= 0:
+                    raise TimeoutError("request body deadline exceeded")
+                self.connection.settimeout(min(15, seconds_left))
+                chunk = self.rfile.read1(min(remaining, 8192))
+                if not chunk:
+                    raise ConnectionError("client disconnected during upload")
+                chunks.append(chunk)
+                remaining -= len(chunk)
+            self.connection.settimeout(15)
+            return b"".join(chunks)
+
         def do_GET(self):
-            if not self._origin_ok():
+            if not self._admit_request() or not self._origin_ok():
                 return
             if self.path == "/healthz":
                 self._send(200, {"status": "ok", "transport": "streamable-http",
@@ -100,12 +171,12 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
                 self._send(404, {"error": "not found"})
 
         def do_DELETE(self):
-            if not self._origin_ok():
+            if not self._admit_request() or not self._origin_ok():
                 return
             self._send(405, {"error": "stateless server has no sessions"}, headers={"Allow": "POST, GET"})
 
         def do_OPTIONS(self):
-            if self._origin_ok():
+            if self._admit_request() and self._origin_ok():
                 self._send(405, {"error": "method not allowed"}, headers={"Allow": "POST, GET"})
 
         do_HEAD = do_OPTIONS
@@ -113,7 +184,7 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
         do_PATCH = do_OPTIONS
 
         def do_POST(self):
-            if not self._origin_ok():
+            if not self._admit_request() or not self._origin_ok():
                 return
             if self.path != "/mcp":
                 self._send(404, {"error": "not found"})
@@ -127,21 +198,31 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
             if version is not None and version != PROTOCOL_VERSION:
                 self._send(400, {"error": "unsupported MCP protocol version"})
                 return
+            lengths = self.headers.get_all("Content-Length", [])
+            if len(lengths) > 1 or self.headers.get("Transfer-Encoding") is not None:
+                self.close_connection = True
+                self._send(400, {"error": "unsupported request framing"})
+                return
             try:
-                length = int(self.headers.get("Content-Length", ""))
+                length = int(lengths[0]) if lengths else -1
             except ValueError:
                 length = -1
             if length < 0:
                 self._send(411, {"error": "Content-Length required"})
                 return
             if length > MAX_REQUEST_BYTES:
-                if length <= 2 * MAX_REQUEST_BYTES:
-                    self.rfile.read(length)
                 self.close_connection = True
                 self._send(413, {"error": "request exceeds 64 KiB"})
                 return
             try:
-                request = json.loads(self.rfile.read(length).decode("utf-8", errors="strict"))
+                request = json.loads(self._read_body(length).decode("utf-8", errors="strict"))
+            except TimeoutError:
+                self.close_connection = True
+                self._send(408, {"error": "request body deadline exceeded"})
+                return
+            except ConnectionError:
+                self.close_connection = True
+                return
             except (UnicodeError, json.JSONDecodeError):
                 self._send(400, _response(None, error={"code": -32700, "message": "invalid UTF-8 JSON"}))
                 return
@@ -192,8 +273,6 @@ def main():
     if args.host not in ("127.0.0.1", "::1", "localhost") and not args.allow_public:
         parser.error("non-loopback binding requires --allow-public")
     db_path = str(Path(args.db).resolve(strict=True))
-    with Queries(db_path):
-        pass
     configured = [item.strip() for item in os.environ.get("CTW_ALLOWED_ORIGINS", "").split(",") if item.strip()]
     server = BoundedHTTPServer((args.host, args.port), make_handler(db_path, frozenset(args.allowed_origin + configured)))
     try:

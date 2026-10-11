@@ -41,15 +41,26 @@ responses are JSON (including `structuredContent` and an equivalent text
 block). The server is stateless: it issues no `Mcp-Session-Id`, does not retain
 conversations, and does not produce unsolicited messages. GET `/mcp` and DELETE
 `/mcp` return 405 because there is no SSE stream or session to close. The MCP
-SDK reconnects by initializing again; a disconnected request does not mutate
+server sends `Connection: close` after each response, releasing its worker slot.
+The SDK reconnects by initializing again; a disconnected request does not mutate
 the source or leave a session behind. Stdio remains available with
 `PYTHONPATH=src python -m ctw_adviser.mcp --db work/adviser.sqlite`.
 
 The server opens an already built SQLite artifact through `Queries` in
-`mode=ro` with `query_only=ON` and rejects unsupported schema/contract at
-startup. Ordinary calls never fetch, rebuild or write source data. Request
+`mode=ro` with `query_only=ON` and rejects unsupported schema, contract, source
+commit or snapshot ID at startup. The hosted source commit must be
+`595e22764b22e748afdbafafcb0a6258973e2451`, and the ID must match that
+commit, the supported contract hash and `store3`. This identity check does not
+replace the build manifest's file-integrity verification. Ordinary calls never
+fetch, rebuild or write source data. Request
 bodies are limited to 64 KiB, responses to 1 MiB, concurrent connections to
-16 and inactive sockets to 15 seconds. Tool schemas retain 1–256 item paging
+16, inactive sockets to 15 seconds and complete body upload to 10 seconds.
+Handled HTTP requests, including `/healthz`, are also capped at 60 per rolling
+minute per server process; excess requests receive HTTP 429 with `Retry-After`.
+The limit is global because reverse proxy
+addresses and forwarded IP headers are not reliable user identities. If the
+service is scaled beyond one replica, each replica has its own limit. Tool
+schemas retain 1-256 item paging
 limits and 64 IDs per provenance call. Oversize responses return an actionable
 JSON-RPC error asking for a smaller limit or section. Origin headers are checked
 against exact `--allowed-origin` values or comma-separated
@@ -72,33 +83,42 @@ data or equations.
 
 The inspected Railway project is **CTW Datasette**
 (`c9508545-a42a-4f74-84bf-092de49ab94a`), environment **production**
-(`79823054-462e-4d00-b962-94ad526c4b4f`). Its one service,
+(`79823054-462e-4d00-b962-94ad526c4b4f`). Its existing inspection service,
 **ctw-datasette** (`892527d7-a069-4df0-835a-0d71b792f3f7`), is a successful
 inspection deployment at `https://ctw-datasette-production.up.railway.app`.
 It must stay an inspection app; that URL is not an MCP endpoint. The observed
 source is `OwenTanzer/CTW-adviser` branch `main`, with Railway config pointing
 to commit `f3dab8b346a348c0fb22d79e18bc7328b12f094c` at inspection time.
 
-The preferred hosted target is a **separate** `ctw-adviser-mcp` service in the
+The approved hosted target is a **separate** `ctw-adviser-mcp` service in the
 same project and production environment, with its own Railway HTTPS domain.
-Set `RAILWAY_DOCKERFILE_PATH=Dockerfile.mcp` on that service, and set its
-health-check path to `/healthz` with a 120-second timeout in service settings.
+An empty service (`ec9aff14-4f04-4386-a62b-d83657a0c927`) is configured
+with `Dockerfile.mcp` and `/healthz` with a 120-second timeout. It currently
+has no source, variables, domain or deployment.
 Railway's legacy `railway.toml` config path is unavailable to new services;
-the repository root file continues to belong to Datasette. This target needs an explicit decision
-because another Railway service may incur cost. An alternative is a separately
-approved host with HTTPS termination that runs this same image and `/mcp`
-path. Do not repurpose the Datasette service or point a client at it. No
-service/domain/variable has been created by this candidate.
+the repository root file continues to belong to Datasette. Do not repurpose
+the Datasette service or point a client at it.
 
-The current candidate uses **public, unauthenticated read-only access** to
-public game data. This avoids a shared secret and supports standard MCP clients,
-but anyone with the URL can call it and individual revocation is unavailable.
-Before production, approve this public policy with platform rate limiting, or
-choose individual OAuth with revocation at a gateway. The latter needs a
-separate security design and configuration; no credential or permission
-expansion is included here. TLS must terminate at the platform HTTPS domain.
+Owen approved up to US$5 per month of additional usage for this service.
+Railway's hard spending limit is workspace-wide, has a US$10 minimum, and
+shuts down every workload in the workspace when reached; it cannot enforce a
+US$5 incremental cap for this service. Track its current and estimated cost
+from the workspace Usage page's project/service breakdown after release.
+Replica CPU/memory limits and Serverless sleep can reduce usage but do not cap
+egress or guarantee a dollar ceiling. Keep one replica, inspect its first-day
+usage and projected end-of-cycle cost, and stop or reconfigure it before an
+additional US$5 is incurred. No workspace-wide spending limit has changed.
 
-For each reviewed release: build the image at a reviewed adviser commit;
+Owen approved **public, unauthenticated read-only access** for the initial
+endpoint. Anyone with the URL can call it, and individual revocation is
+unavailable. The process-wide rolling limit, connection cap and body/response
+limits bound ordinary traffic; production may add platform edge controls after
+inspection. TLS must terminate at the platform HTTPS domain. No credential or
+permission expansion is included here.
+
+Do not attach a source, issue a domain or deploy until independent transport
+review and the integrated combat review pass. For each reviewed release: build
+the image at a reviewed adviser commit;
 download exactly the files in `source_lock.json` from the pinned CTW-data
 commit during image build; verify hashes and contract; build the SQLite file;
 inspect integrity; then publish the image. Redeploy only after review, record
