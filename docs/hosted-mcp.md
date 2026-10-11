@@ -1,6 +1,6 @@
 # Hosted MCP transport candidate (issue #3)
 
-The same six read-only tools served over stdio are available at `/mcp` using
+The same eight read-only tools served over stdio are available at `/mcp` using
 MCP Streamable HTTP protocol `2025-06-18`. This is a deployable candidate, not a
 live endpoint or a completed ChatGPT Work connection. The existing Railway
 Datasette URL is only for human inspection.
@@ -52,7 +52,7 @@ The server opens an already built SQLite artifact through `Queries` in
 `mode=ro` with `query_only=ON` and rejects unsupported schema, contract, source
 commit or snapshot ID at startup. The hosted source commit must be
 `595e22764b22e748afdbafafcb0a6258973e2451`, and the ID must match that
-commit, the supported contract hash and `store3`. This identity check does not
+commit, the supported contract hash and `store4`. This identity check does not
 replace the build manifest's file-integrity verification. Ordinary calls never
 fetch, rebuild or write source data. Request
 bodies are limited to 64 KiB, responses to 1 MiB, concurrent connections to
@@ -133,7 +133,7 @@ inspect integrity; then publish the image. Redeploy only after review, record
 deployment ID and require Railway `SUCCESS`, `/healthz`, and the remote SDK
 acceptance command above. Record returned source commit, base patch/build
 `9.0/25507028`, unit scale `ultra`, owner-specific supplemental patch/build,
-store schema 3, packet 1.19.0 and model version. On mismatch, stop rollout and
+store schema 4, packet 1.20.0 and model version. On mismatch, stop rollout and
 restore the previous successful deployment. A source refresh changes the lock,
 contract and verification evidence through its separate reviewed process.
 
@@ -141,7 +141,7 @@ For ChatGPT Work, once HTTPS, access policy and service are approved and live,
 go to ChatGPT Plugins, select **+ → Add custom MCP server**, enter a name and
 description, and supply the final `https://<domain>/mcp` URL under Connection.
 Choose the approved authentication mode, review the risk warning, create the
-plugin, and inspect the six discovered tools. Install it, start a new chat,
+plugin, and inspect the eight discovered tools. Install it, start a new chat,
 select the plugin with `@`, and run the exact-name, ambiguity and pair probes.
 Workspace policy can restrict custom servers. If tool metadata changes, refresh
 the connection and start a new chat before retesting. These steps follow the

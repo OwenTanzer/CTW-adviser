@@ -170,3 +170,13 @@ seconds; its four checked access plans used indexed SEARCH operations, with
 that earlier layout, not the current schema-3 artifact. Timing
 depends on hardware/runtime; packet size and assembled-query performance belong
 to phase 3. Full reports remain reproducible under ignored `work/`.
+
+## Store schema 4 (#19)
+
+Schema 4 adds `effect_abilities`, `effect_variants` and `effect_access` as
+distinct tables linked by stable keys to definitions, casting records and unit
+identities, plus an index on `unit_profiles.source_land_unit_key` for exact
+summon mapping. Activated definitions and casting records are retained in full
+and follow the same bounded dependency joins as passives. Unit tables are
+unchanged. Schema-3 artifacts are rejected and must be rebuilt. See
+[activated effects](activated-effects.md).

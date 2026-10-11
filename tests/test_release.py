@@ -26,8 +26,8 @@ class ReleaseVerificationTests(unittest.TestCase):
         lock = json.loads((ROOT / 'source_lock.json').read_text(encoding='utf-8'))
         contract = json.loads((ROOT / 'schema/import_contract.json').read_text(encoding='utf-8'))
         snapshot = {
-            'id': lock['source_commit'] + ':' + lock['contract_sha256'] + ':store3',
-            'schema_version': 3, 'source_commit': lock['source_commit'],
+            'id': lock['source_commit'] + ':' + lock['contract_sha256'] + ':store4',
+            'schema_version': 4, 'source_commit': lock['source_commit'],
             'contract_sha256': lock['contract_sha256'],
             'baseline_json': json.dumps(contract['baseline'], sort_keys=True, separators=(',', ':')),
             'owners_json': json.dumps(lock['owners'], sort_keys=True, separators=(',', ':')),
@@ -57,7 +57,8 @@ class ReleaseVerificationTests(unittest.TestCase):
             'counts': {'roster_rows': 0, 'unit_profiles': 0, 'source_unit_keys': 0,
                        'classifications': {}},
             'build_query_plans': {key: ['SEARCH synthetic fixture'] for key in
-                ('unit_key', 'unit_name', 'source_unit_name', 'alias_key', 'relations', 'reverse_edge')},
+                ('unit_key', 'unit_name', 'source_unit_name', 'alias_key', 'relations', 'reverse_edge',
+                 'effect_key', 'effect_name', 'unit_effects', 'effect_units', 'effect_variant_reverse')},
         }
         cls.manifest_path.write_text(json.dumps(cls.manifest), encoding='utf-8')
 

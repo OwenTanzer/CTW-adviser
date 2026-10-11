@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.19.0'
+PACKET_VERSION = '1.20.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -243,6 +243,46 @@ CASTING_FIELDS = (
     'spawn_is_decoy', 'spawn_shares_health_and_fatigue', 'behaviour', 'formation',
     'activated_projectile', 'bombardment', 'vortex', 'mom_vortex_key',
 )
+EFFECT_ACTIVATION_FIELDS = (
+    'mana_cost', 'num_uses', 'initial_recharge', 'recharge_time', 'shared_recharge_time',
+    'wind_up_time', 'active_time', 'miscast_chance', 'miscast_global_bonus',
+    'current_mana_moves_to_reserve', 'intensity_based_activation', 'update_phase_by_ability_duration',
+)
+EFFECT_DISTANCE_FIELDS = ('target_intercept_range', 'effect_range', 'min_range')
+EFFECT_DISTANCE_LABELS = {
+    'target_intercept_range': 'native target/interception distance setting',
+    'effect_range': 'native effect range setting',
+    'min_range': 'native minimum range setting',
+}
+EFFECT_TARGET_FIELDS = (
+    'target_self', 'target_friends', 'target_enemies', 'target_ground',
+    'target_ground_under_allies', 'target_ground_under_enemies', 'only_affect_target',
+    'affect_self', 'always_affect_self', 'only_affect_owned_units', 'affect_siege_equipment',
+    'num_effected_friendly_units', 'num_effected_enemy_units', 'update_targets_every_frame',
+)
+EFFECT_PAYLOAD_TABLES = {
+    'native_vortices', 'native_bombardments', 'projectiles', 'explosions', 'native_ability_phases',
+    'native_phase_stat_effects', 'native_phase_attribute_effects', 'native_projectile_shrapnels',
+    'native_special_ability_spreadings', 'native_special_ability_contact_phase_groups',
+    'native_projectiles_scaling_damages', 'native_projectile_penetration_junctions',
+}
+# Readable labels for activated payload roots in effect summaries only.
+EFFECT_RELATION_LABELS = {
+    'unit_special_abilities_tables.bombardment': 'launches the linked bombardment',
+    'unit_special_abilities_tables.vortex': 'creates the linked vortex',
+    'data/unit_stats/abilities/tables/ability_casting.csv.activated_projectile': 'fires the linked projectile',
+    'data/unit_stats/abilities/tables/ability_casting.csv.miscast_explosion': 'conditional miscast explosion (failure branch)',
+    'data/unit_stats/abilities/tables/ability_casting.csv.mom_vortex_key': 'linked mom_vortex_key reference',
+}
+MAX_PAYLOAD_CHAINS = 24
+# Child kinds that deliver a further effect; modifiers such as penetration do not.
+TRANSPORTED_KINDS = {'native_vortices', 'native_bombardments', 'projectiles', 'explosions', 'native_ability_phases',
+                     'native_projectile_shrapnels', 'native_special_ability_spreadings',
+                     'native_special_ability_contact_phase_groups'}
+DIRECT_DAMAGE_FIELDS = {
+    'projectiles': ('base_damage', 'ap_damage'), 'explosions': ('base_damage', 'ap_damage'),
+    'native_vortices': ('damage', 'damage_ap'), 'native_ability_phases': ('damage_amount',),
+}
 PHASE_FIELDS = (
     'effect_type', 'cant_move', 'freeze_fatigue', 'fatigue_change_ratio',
     'inspiration_aura_range_mod', 'ability_recharge_change', 'mana_regen_mod',
@@ -606,9 +646,15 @@ class Queries:
             for field in ('definition_record', 'casting_record'):
                 if row[field]:
                     c.evidence(row[field])
+            effect = self.one('effect_abilities', 'ability_key', key)
+            if effect:
+                return {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'status': 'available', 'option': row,
+                        'effect_ref': 'effect:' + key, 'sources': c.packet['sources'], 'provenance': c.packet['provenance']}
             return {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'status': 'deferred', 'option': row,
                     'sources': c.packet['sources'], 'provenance': c.packet['provenance'],
-                    'reason': 'Activated and unresolved effect payloads are outside this interface.'}
+                    'reason': 'Unresolved classifications have no effect payload interface.'}
+        if kind == 'effect':
+            return self.get_effect(key, limit=limit, cursor=cursor)
         if kind == 'availability':
             unit = self.resolved(key)
             c = Packet(self)
@@ -678,6 +724,107 @@ class Queries:
                 'state': 'partial' if queue else 'complete', 'cursor': next_cursor,
                 'sources': c.packet['sources'], 'provenance': c.packet['provenance']}
 
+    # -- Issue #19: spells and activated abilities -------------------------
+
+    def resolve_effect(self, query, unit=None, subculture=None):
+        """Exact key, else case-insensitive label; shared labels stay candidates."""
+        if not isinstance(query, str) or not query.strip():
+            raise ValueError('effect query must be a nonempty string')
+        query = query.strip()
+        exact = self.one('effect_abilities', 'ability_key', query)
+        rows = [exact] if exact else [dict(r) for r in self.db.execute(
+            'SELECT * FROM effect_abilities WHERE name=? COLLATE NOCASE ORDER BY ability_key', (query,))]
+        unit_keys = None
+        if unit is not None:
+            unit_keys = set(self.resolved(unit, subculture)['source_unit_keys'])
+            rows = [r for r in rows if any(a['unit_key'] in unit_keys for a in
+                                           self.rows('effect_access', 'ability_key', r['ability_key'], 'unit_key'))]
+        candidates = [{'ability_key': r['ability_key'], 'name': r['name'], 'effect_kind': r['effect_kind'],
+                       'source_type': r['source_type'], 'keywords': json.loads(r['keywords_json'])} for r in rows]
+        status = 'resolved' if len(candidates) == 1 else 'ambiguous' if candidates else 'not_found'
+        return {'status': status, 'query': query, 'candidates': candidates,
+                'resolved': candidates[0] if status == 'resolved' else None}
+
+    def get_unit_effects(self, unit, *, subculture=None, include_provenance=False):
+        """Unit -> qualified activated effects: keywords and references only."""
+        resolved = self.resolved(unit, subculture)
+        c = Packet(self)
+        links = []
+        for key in resolved['source_unit_keys']:
+            links.extend(self.rows('effect_access', 'unit_key', key, 'ability_key,culture_key,link_record'))
+        effects = []
+        for link in links:
+            effect = self.one('effect_abilities', 'ability_key', link['ability_key'])
+            effects.append({'ability_key': effect['ability_key'], 'name': effect['name'],
+                            'effect_kind': effect['effect_kind'], 'keywords': json.loads(effect['keywords_json']),
+                            'unit_key': link['unit_key'], 'culture_key': link['culture_key'], 'route': link['route'],
+                            'requires_effect_enabling': boolean(link['requires_effect_enabling']),
+                            'qualification': link['qualification'],
+                            'provenance_refs': [c.evidence(link['link_record'])],
+                            'detail_ref': c.detail('effect', effect['ability_key'])})
+        result = {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'unit': resolved,
+                  'effects': effects, 'routes_not_imported': ['character skill/rank bindings', 'items, traits, mounts and scripts'],
+                  'sources': c.packet['sources'], 'provenance': c.packet['provenance'], 'detail_refs': c.packet['detail_refs']}
+        return self.response_view(result, include_provenance, False)
+
+    def get_effect(self, query, *, unit=None, subculture=None, culture=None, limit=32, cursor=None,
+                   include_diagnostics=False, include_provenance=False):
+        """Specialized spell/activated-ability evidence with qualified unit access."""
+        if type(limit) is not int or not 1 <= limit <= 256:
+            raise ValueError('limit must be an integer between 1 and 256')
+        resolution = self.resolve_effect(query, unit, subculture)
+        if resolution['status'] != 'resolved':
+            raise ResolutionError(resolution)
+        key = resolution['resolved']['ability_key']
+        effect = self.one('effect_abilities', 'ability_key', key)
+        if self.one('native_ability_casting', 'key', key) is None or self.one('native_ability_definitions', 'key', key) is None:
+            raise ValueError('missing retained casting or definition record for ' + key)
+        binding = {'unit_key': 'effect:' + key, 'subculture_key': culture}
+        offset = self.decode_cursor(cursor, binding, 'combined', 'activated_options', limit)['offset'] if cursor else 0
+        c = Packet(self)
+        gaps = []
+        access = self.rows('effect_access', 'ability_key', key, 'unit_key,culture_key,link_record')
+        if culture is not None:
+            access = [a for a in access if a['culture_key'] == culture]
+        link = ({'ability_key': key, 'culture_key': access[0]['culture_key'], 'record_id': access[0]['link_record']}
+                if access else {'ability_key': key, 'culture_key': culture or '*', 'record_id': None})
+        option = self.one('ability_option_metadata', 'ability_key', key)
+        mechanic = c.mechanic(link, option, gaps, activated=True)
+        casting = self.one('native_ability_casting', 'key', key)
+        c.passive_payloads(mechanic, gaps, visit_limit=128, depth_limit=8, allowed=EFFECT_PAYLOAD_TABLES)
+        page = access[offset:offset + limit]
+        packet = {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'],
+                  'effect': {
+                      'identity': {'ability_key': key, 'name': effect['name'], 'effect_kind': effect['effect_kind'],
+                                   'kind_basis': effect['kind_basis'], 'source_type': effect['source_type'],
+                                   'ability_type': effect['ability_type'], 'keywords': json.loads(effect['keywords_json']),
+                                   'provenance_refs': c.refs({'record_id': effect['definition_record']},
+                                                             {'record_id': effect['casting_record']})},
+                      'variants': c.effect_variants(key),
+                      'activation': c.effect_fields(casting, EFFECT_ACTIVATION_FIELDS, gaps),
+                      'distances': {k: {'value': casting[k], 'meaning': EFFECT_DISTANCE_LABELS[k]} for k in EFFECT_DISTANCE_FIELDS},
+                      'targeting': c.effect_fields(casting, EFFECT_TARGET_FIELDS, gaps),
+                      'mechanic': mechanic,
+                      'payload': c.payload_chains(mechanic, casting),
+                      'summons': c.summon_units(mechanic),
+                      'access': {'total': len(access), 'returned': len(page), 'offset': offset,
+                                 'cursor': self.cursor(binding, 'combined', 'activated_options', offset + limit, limit)
+                                 if offset + limit < len(access) else None,
+                                 'links': [c.access_link(a) for a in page],
+                                 'routes_not_imported': ['character skill/rank bindings', 'items, traits, mounts and scripts']},
+                      'interpretation': ('Source parameters and linked payload records, not calculated damage, buff application '
+                                         'or availability. Linked access is qualified and not proof of acquisition.'),
+                  },
+                  'sources': c.packet['sources'], 'provenance': c.packet['provenance'],
+                  'detail_refs': c.packet['detail_refs'], 'payload_graph': c.packet['payload_graph'],
+                  'diagnostic_count': len(gaps)}
+        for relation, label in EFFECT_RELATION_LABELS.items():
+            mechanic['summary'] = mechanic['summary'].replace('linked ' + relation, label)
+        packet['effect']['summary'] = c.effect_summary(packet['effect'])
+        if include_diagnostics:
+            packet['gaps'] = gaps
+        return self.response_view(packet, include_provenance, include_diagnostics)
+
 
 class Packet:
     def __init__(self, queries):
@@ -720,7 +867,7 @@ class Packet:
         return rid
 
     def refs(self, *rows):
-        return list(dict.fromkeys(self.evidence(r['record_id']) for r in rows if r is not None))
+        return list(dict.fromkeys(self.evidence(r['record_id']) for r in rows if r is not None and r.get('record_id')))
 
     def detail(self, kind, key):
         ref = kind + ':' + key
@@ -827,7 +974,7 @@ class Packet:
         return result + (' The packet does not identify the selected configuration or support '
                          'adding the superseded bonuses.')
 
-    def mechanic(self, link, option, gaps):
+    def mechanic(self, link, option, gaps, activated=False):
         key = link['ability_key']
         definition = self.q.one('native_ability_definitions', 'key', key)
         casting = self.q.one('native_ability_casting', 'key', key)
@@ -878,7 +1025,8 @@ class Packet:
             if source:
                 self.stored_gaps(source['record_id'], 'abilities', gaps)
                 for edge in self.q.rows('relation_edges', 'source_record', source['record_id'], 'relation,target_key_json,edge_ordinal'):
-                    if edge['relation'] in ('unit_special_abilities_tables.key', 'unit_abilities_tables.type', 'unit_abilities_tables.source_type'):
+                    if edge['relation'] in ('unit_special_abilities_tables.key', 'unit_abilities_tables.type', 'unit_abilities_tables.source_type',
+                                            'unit_abilities_tables.overpower_option'):
                         continue
                     if edge['target_record']:
                         mechanic['effects'].append({'kind': 'payload_reference', 'phase_ref': None,
@@ -950,8 +1098,11 @@ class Packet:
                                if c['key'] == 'unit_alive' for r in c['provenance_refs']]
             mechanic['effects'].append({
                 'kind': 'summon', 'phase_ref': None, 'unit_key': unit_key,
-                'unit_name': unit_name, 'trigger': 'on_death' if death_spawn else 'unresolved',
-                'trigger_basis': 'Reviewed interpretation of passive summon with unit_alive deactivation.' if death_spawn else 'Activation event not established by summon fields.',
+                'unit_name': unit_name, 'trigger': 'on_death' if death_spawn else 'on_activation' if activated else 'unresolved',
+                'trigger_basis': ('Reviewed interpretation of passive summon with unit_alive deactivation.' if death_spawn else
+                                  'Deliberately activated ability with a spawned unit; spawn timing relative to wind-up and phases, '
+                                  'lifetime and entity count are unverified.' if activated else
+                                  'Activation event not established by summon fields.'),
                 'spawn_type': casting['spawn_type'], 'num_uses': casting['num_uses'],
                 'native_parameters': self.native('native_ability_casting', casting,
                     ('spawn_is_transformation', 'spawn_is_decoy', 'spawn_shares_health_and_fatigue')),
@@ -1266,7 +1417,8 @@ class Packet:
                 text = verb + name if verb else name + ': application rule unknown (source token: ' + str(effect['native_parameters']['attribute_type']) + ')'
             elif kind == 'summon':
                 text = 'Summons ' + (effect['unit_name'] or effect['unit_key'])
-                text += {'on_death': ' upon the host dying', 'low_health': ' at low host health'}.get(effect['trigger'], ' (activation event unresolved)')
+                text += {'on_death': ' upon the host dying', 'low_health': ' at low host health',
+                         'on_activation': ' when activated'}.get(effect['trigger'], ' (activation event unresolved)')
                 text += ' at the host position' if effect['spawn_type'] == 'unit_position' else '; spawn placement: ' + str(effect['spawn_type'])
                 if effect['num_uses'] is not None and effect['num_uses'] >= 0:
                     text += f'; uses: {effect["num_uses"]:g}'
@@ -1487,11 +1639,11 @@ class Packet:
                         'the death summon is a separate mechanic.')
         return EXPLAINED_PASSIVES.get(key)
 
-    def passive_payloads(self, mechanic, gaps):
+    def passive_payloads(self, mechanic, gaps, *, visit_limit=64, depth_limit=4, allowed=None):
         """Reuse the existing graph for the reviewed examples' calculation inputs."""
         graph = self.packet['payload_graph']
-        allowed = {'native_vortices', 'native_bombardments', 'projectiles', 'explosions',
-                   'native_ability_phases', 'native_phase_stat_effects', 'native_phase_attribute_effects'}
+        allowed = allowed or {'native_vortices', 'native_bombardments', 'projectiles', 'explosions',
+                              'native_ability_phases', 'native_phase_stat_effects', 'native_phase_attribute_effects'}
         roots = [e['node_ref'].split(':', 1)[1] for e in mechanic['effects'] if e['kind'] == 'payload_reference']
         queue = [(rid, 0) for rid in roots]; visited = set()
         def add(rid, table, row):
@@ -1508,7 +1660,7 @@ class Packet:
             rid, depth = queue.pop(0)
             if rid in visited:
                 continue
-            if len(visited) >= 64:
+            if len(visited) >= visit_limit:
                 self.gap(gaps, 'payload_detail_required', 'abilities', mechanic['key'] + ': further payload records require detail expansion.', [self.evidence(rid)])
                 break
             visited.add(rid)
@@ -1531,7 +1683,7 @@ class Packet:
                 child_table, child = self.q.record(target)
                 if child_table not in allowed:
                     continue
-                if depth >= 4:
+                if depth >= depth_limit:
                     self.detail('record', target)
                     self.gap(gaps, 'payload_detail_required', 'abilities', mechanic['key'] + ': further payload records require detail expansion.', self.refs(row))
                     continue
@@ -1541,6 +1693,159 @@ class Packet:
                 if item not in graph['edges']:
                     graph['edges'].append(item)
                 queue.append((target, depth + 1))
+
+    # -- Issue #19 effect packet helpers ------------------------------------
+
+    def effect_fields(self, casting, fields, gaps):
+        values = self.native('native_ability_casting', casting, fields)
+        sentinels = sorted(k for k, v in values.items() if isinstance(v, (int, float)) and not isinstance(v, bool) and v < 0)
+        if sentinels:
+            self.gap(gaps, 'native_sentinel', 'activated_options', casting['key'] + ': negative native settings '
+                     + ', '.join(sentinels) + ' are sentinels; runtime meaning is unresolved.', self.refs(casting))
+        return {'values': values, 'native_sentinels': sentinels, 'provenance_refs': self.refs(casting)}
+
+    def effect_variants(self, key):
+        variants = []
+        for row in self.q.rows('effect_variants', 'ability_key', key, 'relation,variant_key'):
+            variants.append({'direction': 'outgoing', 'relation': row['relation'], 'ability_key': row['variant_key'],
+                             'status': row['status'], 'provenance_refs': self.refs({'record_id': row['source_record']}),
+                             'detail_ref': self.detail('effect', row['variant_key']) if row['variant_ability'] else None})
+        for row in self.q.db.execute('SELECT * FROM effect_variants WHERE variant_key=? ORDER BY relation,ability_key', (key,)):
+            variants.append({'direction': 'incoming', 'relation': row['relation'], 'ability_key': row['ability_key'],
+                             'status': row['status'], 'provenance_refs': self.refs({'record_id': row['source_record']}),
+                             'detail_ref': self.detail('effect', row['ability_key'])})
+        return variants
+
+    @staticmethod
+    def effect_summary(effect):
+        identity = effect['identity']
+        kind = ('bound spell' if identity['source_type'] == 'bound' else 'spell') if identity['effect_kind'] == 'spell' else 'activated ability'
+        targeting = effect['targeting']['values']
+        targets = [label for field, label in (('target_enemies', 'enemies'), ('target_friends', 'friends'),
+                                              ('target_self', 'self'), ('target_ground', 'ground')) if targeting.get(field)]
+        text = (identity['name'] or identity['ability_key']) + ': ' + kind
+        text += '; targets ' + '/'.join(targets) if targets else '; no direct target selection flag'
+        distance = effect['distances']['target_intercept_range']['value']
+        if distance is not None and distance > 0:
+            text += f'; target/interception distance setting {distance:g}'
+        timing = effect['activation']['values']
+        parts = []
+        for field, label in (('mana_cost', 'cost'), ('wind_up_time', 'wind-up'), ('active_time', 'active time'),
+                             ('recharge_time', 'recharge'), ('num_uses', 'uses')):
+            value = timing.get(field)
+            if value is not None and value >= 0 and not (field == 'mana_cost' and value == 0):
+                parts.append(f'{label} {value:g}')
+        if parts:
+            text += '; ' + ', '.join(parts)
+        text += '.'
+        for chain in effect['payload']['chains'][:3]:
+            text += (' Failure branch: ' if chain['branch'] == 'conditional_failure' else ' Payload: ') + ' -> '.join(chain['path']) + '.'
+        if len(effect['payload']['chains']) > 3:
+            text += f" {len(effect['payload']['chains']) - 3} further payload paths in payload.chains."
+        mechanic = effect['mechanic']['summary']
+        if mechanic:
+            text += ' ' + mechanic
+        if effect['access']['total']:
+            text += f" Linked to {effect['access']['total']} unit record(s) as qualified access."
+        else:
+            text += ' No unit ability link in this snapshot; character skill routes are not yet imported.'
+        return text
+
+    def access_link(self, row):
+        alias = self.q.one('unit_aliases', 'unit_key', row['unit_key'])
+        profile = self.q.one('unit_profiles', 'unit_key', alias['profile_unit_key']) if alias else None
+        return {'unit_key': row['unit_key'], 'unit_name': profile['unit_name'] if profile else None,
+                'profile_unit_key': alias['profile_unit_key'] if alias else None,
+                'mapping': 'roster_profile' if profile else 'no_roster_profile',
+                'culture_key': row['culture_key'], 'route': row['route'],
+                'requires_effect_enabling': boolean(row['requires_effect_enabling']),
+                'qualification': row['qualification'], 'provenance_refs': [self.evidence(row['link_record'])]}
+
+    def summon_units(self, mechanic):
+        """Summoned land-unit keys -> canonical profiles; no name matching."""
+        result = []
+        for effect in mechanic['effects']:
+            if effect['kind'] != 'summon':
+                continue
+            profiles = [dict(r) for r in self.q.db.execute(
+                'SELECT unit_key,unit_name,record_id FROM unit_profiles WHERE source_land_unit_key=? ORDER BY unit_key',
+                (effect['unit_key'],))]
+            result.append({'land_unit_key': effect['unit_key'], 'trigger': effect['trigger'],
+                           'mapping': 'roster_profiles' if profiles else 'unmapped_land_unit',
+                           'units': [{'unit_key': p['unit_key'], 'unit_name': p['unit_name']} for p in profiles],
+                           'provenance_refs': effect['provenance_refs'] + self.refs(*profiles)})
+        return result
+
+    def payload_chains(self, mechanic, casting):
+        """Readable root-to-leaf paths over the bounded payload graph.
+
+        A zero-direct-damage node with children is a transport, not a terminal
+        no-effect result. Values are source settings, never damage totals.
+        """
+        graph = self.packet['payload_graph']
+        nodes = {n['id']: n for n in graph['nodes']}
+        children = {}; phase_effects = {}
+        for edge in graph['edges']:
+            target = phase_effects if edge['relationship'] == 'phase_effect' else children
+            target.setdefault(edge['from'], []).append((edge['relationship'], edge['to']))
+        roots = [(e['relationship'], e['node_ref']) for e in mechanic['effects']
+                 if e['kind'] == 'payload_reference' and e['node_ref'] in nodes]
+        miscast = casting['miscast_explosion'] if casting else None
+
+        def describe(node):
+            n = node['native_parameters']; kind = node['kind']
+            key_values = json.loads(node['key']) if node['key'].startswith('{') else {'key': node['key']}
+            text = kind.removeprefix('native_') + ' ' + ' / '.join(str(v) for v in key_values.values())
+            fields = DIRECT_DAMAGE_FIELDS.get(kind, ())
+            values = {f: n.get(f) for f in fields if f in n}
+            for extra in ('radius', 'start_radius', 'goal_radius', 'duration', 'heal_amount', 'num_projectiles', 'amount'):
+                if n.get(extra) not in (None, 0, 0.0):
+                    values[extra] = n[extra]
+            if values:
+                text += ' (' + ', '.join(f'{k} {v:g}' if isinstance(v, (int, float)) else f'{k} {v}' for k, v in values.items()) + ')'
+            effects = []
+            for _, effect_id in phase_effects.get(node['id'], []):
+                e = nodes[effect_id]['native_parameters']
+                if 'stat' in e:
+                    effects.append(f"{e['stat']} {e.get('how')} {e.get('value')}")
+                elif 'attribute' in e:
+                    effects.append(f"{e.get('attribute_type')} attribute {e['attribute']}")
+            if effects:
+                text += ' [effects: ' + '; '.join(effects) + ']'
+            if fields and all((n.get(f) or 0) == 0 for f in fields if f in n) and any(
+                    nodes[child]['kind'] in TRANSPORTED_KINDS for _, child in children.get(node['id'], []) if child in nodes):
+                text += ' [zero direct damage; transports linked payload]'
+            return text
+
+        chains = []; overflow = []
+
+        def walk(node_id, path, seen):
+            node = nodes[node_id]
+            path = path + [describe(node)]
+            refs = list(dict.fromkeys(node['provenance_refs'] + [r for _, e in phase_effects.get(node_id, [])
+                                                                  for r in nodes[e]['provenance_refs']]))
+            nexts = [(rel, child) for rel, child in children.get(node_id, []) if child in nodes and child not in seen]
+            if not nexts or len(path) >= 10:
+                if len(chains) < MAX_PAYLOAD_CHAINS:
+                    chains.append({'path': path, 'leaf_ref': node_id, 'provenance_refs': refs})
+                else:
+                    overflow.append(node_id)
+                return
+            for _, child in nexts:
+                walk(child, path, seen | {child})
+
+        for relation, node_id in roots:
+            before = len(chains)
+            walk(node_id, [], {node_id})
+            branch = 'conditional_failure' if relation.endswith('.miscast_explosion') else 'activation'
+            for chain in chains[before:]:
+                chain['root_relationship'] = relation
+                chain['branch'] = branch
+                if branch == 'conditional_failure':
+                    chain['condition'] = {'miscast_chance': casting['miscast_chance'],
+                                          'note': 'Failure probability interpreted from the field name; engine execution unverified.'}
+        return {'chains': chains, 'complete': not overflow, 'omitted_leaf_refs': sorted(set(overflow)),
+                'note': 'Paths follow retained payload edges; definition reuse is not a separate event and values are not damage totals.'}
 
     def traits(self, kind, attack, row, component=None, normalized=False):
         if normalized:
@@ -1871,11 +2176,14 @@ class Packet:
                         classification.append(self.evidence(option[field]))
             else:
                 classification = self.refs(row)
+            effect = q.one('effect_abilities', 'ability_key', row['ability_key'])
             entry = {'key': row['ability_key'], 'name': name, 'culture_key': row['culture_key'],
                      'classification': option['classification'] if option else 'unresolved',
                      'requires_effect_enabling': boolean(option['requires_effect_enabling']) if option else None,
                      'classification_evidence': classification, 'provenance_refs': refs,
-                     'detail_ref': self.detail('option', row['ability_key'])}
+                     'effect_kind': effect['effect_kind'] if effect else None,
+                     'keywords': json.loads(effect['keywords_json']) if effect else [],
+                     'detail_ref': self.detail('effect' if effect else 'option', row['ability_key'])}
             unit['activated_options'].append(entry)
             if entry['classification'] == 'unresolved':
                 self.gap(gaps, 'classification_unresolved', 'activated_options', row['ability_key'] + ': classification unresolved.', refs)
