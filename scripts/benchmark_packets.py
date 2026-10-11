@@ -1,8 +1,8 @@
 """Measure fixed compact-packet cases with a local SQLite snapshot.
 
 Times include query and JSON serialization, not network or service latency.
-Warm repetitions reuse one connection; fresh repetitions reopen a connection
-but do not clear the operating system's file cache.
+Warm repetitions reuse one connection; fresh repetitions include connection
+opening and query/serialization, but do not clear the operating system's file cache.
 """
 import argparse
 import json
@@ -40,6 +40,14 @@ def packet_bytes(queries, case):
                       separators=(',', ':')).encode('utf-8')
 
 
+def fresh_packet_ms(db, case):
+    """Measure connection opening plus first packet and serialization."""
+    begin = perf_counter()
+    with Queries(db) as fresh:
+        packet_bytes(fresh, case)
+        return (perf_counter() - begin) * 1000
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--db', type=Path, required=True)
@@ -58,10 +66,7 @@ def main():
                 begin = perf_counter()
                 blob = packet_bytes(queries, case)
                 samples.append((perf_counter() - begin) * 1000)
-            with Queries(args.db) as fresh:
-                begin = perf_counter()
-                packet_bytes(fresh, case)
-                fresh_ms = (perf_counter() - begin) * 1000
+            fresh_ms = fresh_packet_ms(args.db, case)
             cases.append({'case': case, 'kind': 'single' if isinstance(case, str) else 'pair',
                           'bytes': len(blob), 'warm_median_ms': statistics.median(samples),
                           'warm_p95_ms': sorted(samples)[min(len(samples) - 1,
@@ -75,7 +80,7 @@ def main():
     _, heap_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     report = {
-        'scope': 'local query plus compact UTF-8 JSON serialization; no network or cold disk cache',
+        'scope': 'warm: local query plus compact UTF-8 JSON serialization; fresh: connection opening plus first query and serialization; no network or cold disk cache',
         'repetitions': args.repetitions,
         'runtime': {'python': platform.python_version(), 'sqlite': sqlite3.sqlite_version,
                     'os': platform.platform(), 'machine': platform.machine(),

@@ -304,6 +304,13 @@ class QueryTests(unittest.TestCase):
                 self.assertNotIn('explanation_documentation', detail)
                 documented = self.q.get_passive_detail(key, include_documentation=True)
                 self.assertIn('explanation_documentation', documented)
+                self.assertEqual(
+                    documented['explanation_documentation']['url'],
+                    'https://github.com/OwenTanzer/CTW-adviser/blob/'
+                    '4c9676cfc3814450624bfdaa484c0e4c7087f8f6/'
+                    'docs/lookup-contract.md#focused-passive-research')
+                self.assertIn('separately attributed external corroboration',
+                              documented['explanation_documentation']['basis'])
                 self.assertEqual(detail['mechanic'], documented['mechanic'])
                 link = self.q.rows('unit_abilities', 'ability_key', key)[0]
                 packet = self.q.get_unit_profile(link['unit_key'], section='abilities', limit=256)
