@@ -129,6 +129,19 @@ class CombatTests(unittest.TestCase):
         overridden = evaluate_matchup(q, "a", "b", scenario={"sides": {"a": {"projectiles_per_cycle": 3}}})
         self.assertGreater(overridden["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
 
+    def test_lethal_arrival_precedes_later_firing_opportunity(self):
+        q = PacketQueries()
+        q.mutate = lambda p: p["units"][1]["ranged"].__setitem__("base_damage", 100000)
+        result = evaluate_matchup(q, "a", "b", scenario={"separation_metres": 10,
+            "duration_seconds": 1, "sides": {
+                "a": {"order": "hold", "facing": "rear", "first_shot_delay_seconds": 0,
+                      "cycle_seconds": .5, "collision_probability": 1, "fight": False},
+                "b": {"order": "hold", "first_shot_delay_seconds": 0,
+                      "cycle_seconds": .5, "collision_probability": 1, "fight": False}}})
+        self.assertEqual(result["derived"]["ledgers"][0]["shots_fired_per_shooter"], 1)
+        self.assertLess(result["derived"]["ledgers"][0]["stopping"]["health_depleted_seconds"], .5)
+        self.assertEqual(result["derived"]["ledgers"][1]["shots_fired_per_shooter"], 2)
+
 
 @unittest.skipUnless(DB.exists(), "set CTW_ADVISER_DB to a built pinned snapshot")
 class PinnedStoreTests(unittest.TestCase):
@@ -167,6 +180,74 @@ class PinnedStoreTests(unittest.TestCase):
                                          "a": {"active_contacts": 12}, "b": {"fight": False}}})
             self.assertGreater(dense["derived"]["ledgers"][1]["incoming_damage"]["melee"],
                                sparse["derived"]["ledgers"][1]["incoming_damage"]["melee"])
+
+    def test_nonpositive_velocity_and_exact_fire_range(self):
+        with Queries(DB) as q:
+            artillery = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario={
+                "separation_metres": 200, "duration_seconds": 1,
+                "sides": {"a": {"order": "hold", "fight": False},
+                          "b": {"order": "hold", "fight": False, "first_shot_delay_seconds": 0}}})
+            self.assertEqual(artillery["source_facts"][1]["ranged"]["velocity"], -1)
+            self.assertEqual(artillery["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            self.assertEqual(artillery["verdict"]["status"], "indeterminate")
+            explicit = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario={
+                "separation_metres": 200, "duration_seconds": 1,
+                "sides": {"a": {"order": "hold", "fight": False},
+                          "b": {"order": "hold", "fight": False, "first_shot_delay_seconds": 0,
+                                "flight_seconds": .25}}})
+            self.assertGreater(explicit["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            bess = evaluate_matchup(q, "Queen Bess", "Reiksguard", scenario={
+                "separation_metres": 55, "duration_seconds": 2,
+                "sides": {"a": {"order": "hold", "first_shot_delay_seconds": .75,
+                                "cycle_seconds": 10, "fight": False},
+                          "b": {"order": "approach", "fire": False, "fight": False}}})
+            self.assertEqual(bess["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+            self.assertEqual(bess["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+
+    def test_component_target_class_and_targetability(self):
+        with Queries(DB) as q:
+            scenario = {"separation_metres": 0, "duration_seconds": 1,
+                        "sides": {"a": {"fire": False},
+                                  "b": {"fire": False, "fight": False,
+                                        "target_component_role": "crew_or_rider"}}}
+            crew = evaluate_matchup(q, "Lothern Sea Guard (Shields)", "Doom Diver Catapults",
+                                    scenario=scenario)
+            mechanics = crew["derived"]["event_mechanics"][0]["melee"]
+            self.assertEqual(mechanics["target_combat_class"], "infantry")
+            self.assertIsNone(mechanics["per_hit"])
+            self.assertEqual(crew["derived"]["ledgers"][1]["incoming_damage"]["melee"], 0)
+            self.assertEqual(crew["verdict"]["status"], "indeterminate")
+            scenario["sides"]["b"].update(assume_targetable=True,
+                                           assume_unit_protection_for_component=True)
+            assumed_crew = evaluate_matchup(q, "Lothern Sea Guard (Shields)", "Doom Diver Catapults",
+                                            scenario=scenario)
+            engine = evaluate_matchup(q, "Lothern Sea Guard (Shields)", "Doom Diver Catapults",
+                                      scenario={"separation_metres": 0, "duration_seconds": 1,
+                                                "sides": {"a": {"fire": False},
+                                                          "b": {"fire": False, "fight": False}}})
+            crew_hit = assumed_crew["derived"]["event_mechanics"][0]["melee"]
+            engine_hit = engine["derived"]["event_mechanics"][0]["melee"]
+            self.assertEqual(crew_hit["per_hit"]["size_bonus_as_base"], 0)
+            self.assertEqual(engine_hit["per_hit"]["size_bonus_as_base"], 16)
+            self.assertLess(crew_hit["unmodified_hit_probability"], engine_hit["unmodified_hit_probability"])
+
+    def test_melee_contact_flip_and_fractional_charge(self):
+        with Queries(DB) as q:
+            base = {"separation_metres": 0, "sides": {"b": {"active_contacts": 1}}}
+            one = evaluate_matchup(q, "Bloodletters of Khorne", "Kroxigor", scenario=base)
+            base["sides"]["b"]["active_contacts"] = 2
+            two = evaluate_matchup(q, "Bloodletters of Khorne", "Kroxigor", scenario=base)
+            self.assertNotEqual(one["verdict"]["represented_point_ordering"],
+                                two["verdict"]["represented_point_ordering"])
+            self.assertTrue(one["verdict"]["bounds_cross"])
+            self.assertTrue(two["verdict"]["bounds_cross"])
+            charge = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario={
+                "separation_metres": 4.9, "duration_seconds": 1,
+                "sides": {"a": {"fire": False, "active_contacts": 1,
+                                "charge_duration_seconds": 1},
+                          "b": {"fire": False, "fight": False}}})
+            self.assertAlmostEqual(charge["derived"]["phase_timing"]["contact"]["seconds"], .5)
+            self.assertLess(charge["derived"]["ledgers"][1]["incoming_damage"]["melee"], 8.12)
 
     def test_cli_library_equality(self):
         scenario = {"separation_metres": 100, "sides": {"a": {"active_contacts": 4}}}

@@ -39,10 +39,16 @@ are caller assumptions, not observed coordinate conversion.
 `fight`, `facing` (front, side, rear), `collision_probability` (default 0.5),
 `firing_entities` (attached component count), `cycle_seconds` (illustrative
 default: listed projectile reload times 1.25), `first_shot_delay_seconds` (1),
+`flight_seconds` (optional measured or explicitly assumed flight duration),
 `projectiles_per_cycle` (1 only when the source projectile, volley and burst
 counts are all one), `explosion_entities_per_collision` (1), `active_contacts`
 (default min(8, living primary bodies)), `charge_duration_seconds` (0),
 `target_component_role` (primary), and `combat_effective_fraction` (0.5).
+For a nonprimary target with unknown targetability, the caller may explicitly
+set `assume_targetable=true` and `assume_unit_protection_for_component=true`;
+without both assumptions damage to that component is withheld. Known false
+targetability cannot be overridden. Component size, including small artillery
+crew, selects the size bonus instead of the primary engine size.
 Unknown fields or incompatible baselines fail visibly. The 0.5 collision
 probability, cycle multiplier, firing/contact counts and speed conversion are
 uncalibrated model inputs. Card accuracy is never used as collision probability;
@@ -66,8 +72,13 @@ explained alongside the nominal side.
 ## Calculation boundary
 
 Straight-line approach uses relative speed and declared path/terrain factors.
-Shots are discrete and limited by the selected attack's ammunition pool; their
-flight time uses distance/listed velocity. The model selects a single default
+Shots are discrete and limited by the selected attack's ammunition pool. Range,
+minimum range and living shooters are checked at the exact scheduled shot time;
+arriving impacts are processed before later firing opportunities. Flight time
+uses shot-time distance/listed velocity only when the source velocity is positive.
+A zero or negative native velocity is preserved as source evidence and produces
+no scheduled impact unless `flight_seconds` is supplied as a scenario assumption.
+The model selects a single default
 ranged attack and primary melee attack. Nontrivial projectile, volley and burst
 nesting requires `projectiles_per_cycle`; otherwise that attack is omitted with
 a gap. Damage first resolves armour, AP, applicable ordinary resistances and
@@ -83,6 +94,10 @@ Health depletion, component casualties, combat-effectiveness threshold,
 firing cessation, contact and routing remain separate. Contact ends this
 model's firing schedule. Engine disablement and crew-based firing cessation are
 unknown without a validated rule, even if a component reaches zero health.
+`bounds_cross` includes tested contact-count switches as well as collision
+probability corners; `one_parameter_flip_thresholds` identifies the sampled
+change. An unresolved targetability, component protection or flight path that
+could change the outcome prevents a favored verdict.
 Daemonic source attributes distinguish rout inapplicability from unknown
 instability/death behavior. Other morale and special death effects are not
 projected. Passives, activated effects, fatigue, collision attacks, splash

@@ -13,7 +13,7 @@ import math
 from .model import ORDERS, _entry, _number
 from .queries import Queries
 
-MODEL_VERSION = "combat-0.1.0"
+MODEL_VERSION = "combat-0.1.1"
 SIDES = ("a", "b")
 FACING = {"front": 1.0, "side": 0.6, "rear": 0.3}
 
@@ -56,10 +56,17 @@ def _armour_survival(armour):
     return ((upper - low) - (upper * upper - low * low) / 200) / (high - low)
 
 
-def _damage_per_hit(base, ap, target, traits, kind, facing):
+def _target_class(target, component=None):
+    if component is None:
+        return target["body"].get("target_classification", {}).get("combat_class")
+    return {"small": "infantry", "very_small": "infantry",
+            "medium": "large", "large": "large", "very_large": "large"}.get(component.get("size"))
+
+
+def _damage_per_hit(base, ap, target, traits, kind, facing, target_component=None):
     base = _number(base, "base_damage")
     ap = _number(ap, "ap_damage")
-    classification = target["body"].get("target_classification", {}).get("combat_class")
+    classification = _target_class(target, target_component)
     bonus_key = {"infantry": "bonus_vs_infantry", "large": "bonus_vs_large"}.get(classification)
     bonus = _number(traits.get(bonus_key) or 0, "size_bonus") if bonus_key else 0.0
     # The historical relation adds the size bonus to weapon strength. Its split
@@ -91,7 +98,8 @@ def _pool(unit, target_role):
     components = body.get("components") or []
     if not components:
         components = [{"id": "primary", "role": "primary", "count": body["entity_count"],
-                       "known_hp_total": body["total_hp"], "primary": True}]
+                       "known_hp_total": body["total_hp"], "primary": True,
+                       "size": body.get("size"), "targetable": True}]
     eligible = [c for c in components if c.get("primary") or c.get("health_contribution", 0)]
     if target_role == "primary":
         selected = next((c for c in eligible if c.get("primary")), None)
@@ -108,7 +116,7 @@ def _pool(unit, target_role):
         pools[c["id"]] = {"role": c["role"], "initial_hp": float(hp), "remaining_hp": float(hp),
                           "initial_entities": float(count), "hp_per_entity": float(hp / count),
                           "primary": bool(c.get("primary"))}
-    return pools, selected["id"]
+    return pools, selected["id"], selected
 
 
 def _scenario(value):
@@ -143,7 +151,8 @@ def _scenario(value):
             raise ValueError(f"{key} must be boolean")
     allowed_side = {"order", "fire", "fight", "facing", "ranged_attack_id", "collision_probability", "firing_entities",
                     "cycle_seconds", "first_shot_delay_seconds", "projectiles_per_cycle", "explosion_entities_per_collision",
-                    "active_contacts", "charge_duration_seconds", "target_component_role", "combat_effective_fraction"}
+                    "active_contacts", "charge_duration_seconds", "target_component_role", "combat_effective_fraction",
+                    "flight_seconds", "assume_targetable", "assume_unit_protection_for_component"}
     for side in SIDES:
         user = sides.get(side, {})
         if not isinstance(user, dict) or set(user) - allowed_side:
@@ -154,6 +163,9 @@ def _scenario(value):
             raise ValueError("order or facing is unsupported")
         if type(user.get("fire", True)) is not bool or type(user.get("fight", True)) is not bool:
             raise ValueError("fire and fight must be boolean")
+        for name in ("assume_targetable", "assume_unit_protection_for_component"):
+            if type(user.get(name, False)) is not bool:
+                raise ValueError(f"{name} must be boolean")
         normalized["sides"][side] = {
             "order": order, "fire": user.get("fire", True), "fight": user.get("fight", True), "facing": facing,
             "ranged_attack_id": user.get("ranged_attack_id"),
@@ -162,10 +174,13 @@ def _scenario(value):
             "cycle_seconds": None if user.get("cycle_seconds") is None else _setting(user, "cycle_seconds", 1, f"{side}.cycle_seconds", positive=True),
             "first_shot_delay_seconds": _setting(user, "first_shot_delay_seconds", 1, f"{side}.first_shot_delay_seconds"),
             "projectiles_per_cycle": None if user.get("projectiles_per_cycle") is None else _setting(user, "projectiles_per_cycle", 1, f"{side}.projectiles_per_cycle", positive=True),
+            "flight_seconds": None if user.get("flight_seconds") is None else _setting(user, "flight_seconds", 0, f"{side}.flight_seconds"),
             "explosion_entities_per_collision": _setting(user, "explosion_entities_per_collision", 1, f"{side}.explosion_entities_per_collision"),
             "active_contacts": None if user.get("active_contacts") is None else _setting(user, "active_contacts", 1, f"{side}.active_contacts"),
             "charge_duration_seconds": _setting(user, "charge_duration_seconds", 0, f"{side}.charge_duration_seconds"),
             "target_component_role": user.get("target_component_role", "primary"),
+            "assume_targetable": user.get("assume_targetable", False),
+            "assume_unit_protection_for_component": user.get("assume_unit_protection_for_component", False),
             "combat_effective_fraction": _setting(user, "combat_effective_fraction", .5, f"{side}.combat_effective_fraction", fraction=True),
         }
     return normalized
@@ -185,7 +200,7 @@ def _validate_source(packet, scenario):
 
 
 def _prepare(unit, side, setting):
-    pools, target = _pool(unit, setting["target_component_role"])
+    pools, target, target_source = _pool(unit, setting["target_component_role"])
     primary = next(p for p in pools.values() if p["primary"])
     ranged = _attacks(unit, "ranged")
     selected = ([x for x in ranged if x["id"] == setting["ranged_attack_id"]]
@@ -198,6 +213,21 @@ def _prepare(unit, side, setting):
     melee = _attacks(unit, "melee")
     m = melee[0] if melee else None
     gaps = []
+    target_supported = True
+    if target_source.get("targetable") is False:
+        gaps.append("selected target component is marked untargetable; damage omitted")
+        target_supported = False
+    elif target_source.get("targetable") is not True and not setting["assume_targetable"]:
+        gaps.append("selected target component has unknown targetability; damage omitted unless assumed targetable")
+        target_supported = False
+    if not target_source.get("primary") and not setting["assume_unit_protection_for_component"]:
+        gaps.append("nonprimary component has no verified armour/resistance profile; damage omitted unless unit protection is assumed")
+        target_supported = False
+    elif not target_source.get("primary"):
+        gaps.append("nonprimary component uses unit-card protection and melee defence by explicit scenario assumption")
+    if target_source.get("size") not in ("very_small", "small", "medium", "large", "very_large"):
+        gaps.append("selected target component size is unresolved; damage omitted")
+        target_supported = False
     weapon_state = next((x["state"] for x in unit["coverage"]["sections"] if x["name"] == "weapons"), "unresolved")
     if weapon_state != "complete":
         gaps.append("weapon section is " + weapon_state + "; selected attacks may omit alternatives")
@@ -215,8 +245,11 @@ def _prepare(unit, side, setting):
     if m and m.get("native_parameters", {}).get("collision_attack_max_targets"):
         gaps.append("collision attacks have separate timing and are not included")
     if attack:
-        if any(attack.get(field) is None for field in ("range", "base_damage", "ap_damage", "velocity")):
-            gaps.append("selected ranged attack has missing range, damage or velocity; shots omitted")
+        if any(attack.get(field) is None for field in ("range", "base_damage", "ap_damage")):
+            gaps.append("selected ranged attack has missing range or damage; shots omitted")
+            attack = None
+        elif setting["flight_seconds"] is None and (attack.get("velocity") is None or attack["velocity"] <= 0):
+            gaps.append("projectile velocity is missing or a nonpositive native sentinel; supply flight_seconds to schedule impacts")
             attack = None
     if attack:
         counts = [attack.get(k) for k in ("projectiles_per_shot", "shots_per_volley", "burst_size")]
@@ -231,7 +264,8 @@ def _prepare(unit, side, setting):
         supply = attack.get("ammunition_supply") if attack else None
         if supply and (supply.get("assignment_status") != "sources_agree" or supply.get("unlimited")):
             gaps.append("ammunition pool or finite exhaustion unresolved")
-    return {"unit": unit, "pools": pools, "target": target, "primary": primary,
+    return {"unit": unit, "pools": pools, "target": target, "target_source": target_source,
+            "target_supported": target_supported, "primary": primary,
             "initial_barrier": _number(unit["body"].get("barrier_health") or 0, "barrier_health"),
             "remaining_barrier": _number(unit["body"].get("barrier_health") or 0, "barrier_health"),
             "ranged": attack, "melee": m, "gaps": gaps, "shot_events": 0,
@@ -276,123 +310,155 @@ def _score(states):
 
 
 def _run(states, scenario, timing):
+    """Advance impacts, shots and contact in time order; integrate melee between events."""
     duration = scenario["duration_seconds"]
     contact = timing["contact"]["seconds"]
-    closing = timing["closing_speed_metres_per_second"]
-    speed = closing if closing is not None else 0
+    closing = timing["closing_speed_metres_per_second"] or 0.0
     separation = scenario["separation_metres"]
     queue = []
-    for i, state in enumerate(states):
-        attack = state["ranged"]
-        if attack:
-            state["next_shot"] = timing["range_entry"][i]["seconds"]
-            if state["next_shot"] is not None:
-                state["next_shot"] += scenario["sides"][SIDES[i]]["first_shot_delay_seconds"]
-    # One-second expected-value ticks. Shot events retain discrete complete-cycle
-    # times and arrival times; melee contributes rate-integrated one-second terms.
-    for tick in range(math.ceil(duration)):
-        t = float(tick)
-        dt = min(1.0, duration - t)
-        distance = max(0, separation - speed * t)
+    epsilon = 1e-9
+
+    def distance_at(t):
+        return max(0.0, separation - closing * t)
+
+    def update_stops(t):
         for i, state in enumerate(states):
             cfg = scenario["sides"][SIDES[i]]
+            pools = state["pools"]
+            if sum(p["remaining_hp"] for p in pools.values()) <= 0 and state["stops"]["health_depleted_seconds"] is None:
+                state["stops"]["health_depleted_seconds"] = t
+            if (_living(state["primary"]) / state["primary"]["initial_entities"] <= cfg["combat_effective_fraction"]
+                    and state["stops"]["combat_ineffective_seconds"] is None):
+                state["stops"]["combat_ineffective_seconds"] = t
             attack = state["ranged"]
-            if not cfg["fire"] or not scenario["line_of_sight"] or not attack or state["next_shot"] is None:
+            if attack and state["stops"]["firing_ceased_seconds"] is None:
+                firing_component = pools.get(attack.get("component_ref"), state["primary"])
+                ammo = _ammo_limit(attack)
+                if (_living(firing_component) == 0 or (ammo is not None and state["shots_fired"] >= ammo)
+                        or (contact is not None and t >= contact)):
+                    state["stops"]["firing_ceased_seconds"] = t
+
+    def melee_between(start, end):
+        if contact is None or end <= contact or end <= start:
+            return
+        start = max(start, contact)
+        dt = end - start
+        midpoint = (start + end) / 2
+        events = []
+        for i, attacker in enumerate(states):
+            cfg = scenario["sides"][SIDES[i]]
+            defender = states[1 - i]
+            attack = attacker["melee"]
+            if not cfg["fight"] or not attack or not defender["target_supported"] or not _living(attacker["primary"]):
                 continue
-            if contact is not None and t >= contact:
-                continue
-            if not (attack["minimum_range"] or 0) <= distance <= attack["range"]:
-                continue
-            cycle = cfg["cycle_seconds"]
-            if cycle is None:
-                continue
-            ammo = _ammo_limit(attack)
-            if ammo is None:
-                continue
-            while state["next_shot"] <= t + dt - 1e-9 and state["shots_fired"] < ammo:
-                fired_at = state["next_shot"]
-                if contact is not None and fired_at >= contact:
-                    break
-                shooter_count = cfg["firing_entities"]
-                if shooter_count is None:
-                    component = state["pools"].get(attack.get("component_ref"))
-                    shooter_count = component["initial_entities"] if component else state["primary"]["initial_entities"]
-                component = state["pools"].get(attack.get("component_ref"), state["primary"])
-                shooter_count = min(shooter_count, _living(component))
-                if shooter_count <= 0:
-                    break
-                flight = distance / attack["velocity"] if attack.get("velocity") else None
-                if flight is not None:
-                    heapq.heappush(queue, (fired_at + flight, i, shooter_count * cfg["projectiles_per_cycle"], distance))
-                state["shot_events"] += 1
-                state["shots_fired"] += 1
-                state["next_shot"] += cycle
-        while queue and queue[0][0] <= t + dt:
-            arrived, i, projectiles, _ = heapq.heappop(queue)
+            contacts = cfg["active_contacts"]
+            if contacts is None:
+                contacts = min(8, attacker["primary"]["initial_entities"])
+            contacts = min(contacts, _living(attacker["primary"]))
+            traits = _traits(attacker["unit"], attack["id"])
+            classification = _target_class(defender["unit"], defender["target_source"])
+            bonus_field = {"infantry": "bonus_vs_infantry", "large": "bonus_vs_large"}.get(classification)
+            bonus = traits.get(bonus_field, 0) or 0
+            decay = cfg["charge_duration_seconds"]
+            elapsed = max(0.0, midpoint - contact)
+            charge_fraction = min(1.0, max(0.0, 1 - elapsed / decay)) if decay else 0.0
+            charge = (attack.get("charge_bonus") or 0) * charge_fraction
+            facing = scenario["sides"][SIDES[1 - i]]["facing"]
+            defence = (defender["melee"] or {}).get("defence") or 0
+            hit = min(.90, max(.08, .35 + ((attack["attack"] + bonus + charge -
+                                         defence * FACING[facing]) / 100)))
+            damage = _damage_per_hit(attack["base_damage"] + charge, attack["ap_damage"],
+                                     defender["unit"], traits, "melee", facing, defender["target_source"])
+            if damage and attack.get("attack_interval"):
+                events.append((1 - i, contacts * dt / attack["attack_interval"] * hit,
+                               damage["per_unblocked_hit"]))
+        # Both directions use the same pre-segment living counts.
+        for target, hits, damage in events:
+            _apply(states[target], "melee", hits, damage)
+
+    def impacts_due(t):
+        while queue and queue[0][0] <= t + epsilon:
+            _, i, projectiles = heapq.heappop(queue)
             attacker, defender = states[i], states[1 - i]
+            if not defender["target_supported"]:
+                continue
             attack = attacker["ranged"]
             cfg = scenario["sides"][SIDES[i]]
             facing = scenario["sides"][SIDES[1 - i]]["facing"]
             traits = _traits(attacker["unit"], attack["id"])
-            direct = _damage_per_hit(attack["base_damage"], attack["ap_damage"], defender["unit"], traits, "missile", facing)
+            direct = _damage_per_hit(attack["base_damage"], attack["ap_damage"], defender["unit"],
+                                     traits, "missile", facing, defender["target_source"])
             if direct:
                 hits = projectiles * cfg["collision_probability"] * (1 - direct["shield_block_probability"])
                 _apply(defender, "direct", hits, direct["per_unblocked_hit"])
             explosion = attack.get("explosion")
             if explosion:
-                ex_traits = _traits(attacker["unit"], explosion["id"])
-                ex = _damage_per_hit(explosion["base_damage"], explosion["ap_damage"], defender["unit"], ex_traits, "explosion", facing)
+                ex = _damage_per_hit(explosion["base_damage"], explosion["ap_damage"], defender["unit"],
+                                      _traits(attacker["unit"], explosion["id"]), "explosion", facing,
+                                      defender["target_source"])
                 if ex:
                     _apply(defender, "explosion", projectiles * cfg["collision_probability"] *
                            cfg["explosion_entities_per_collision"], ex["per_unblocked_hit"])
-        if contact is not None and t + dt > contact:
-            melee_dt = t + dt - max(t, contact)
-            # Simultaneous expected attacks use pre-tick living counts.
-            events = []
-            for i, attacker in enumerate(states):
-                cfg = scenario["sides"][SIDES[i]]
-                attack = attacker["melee"]
-                defender = states[1 - i]
-                if not cfg["fight"] or not attack or not _living(attacker["primary"]):
-                    continue
-                target_cfg = scenario["sides"][SIDES[1 - i]]
-                contacts = cfg["active_contacts"]
-                if contacts is None:
-                    contacts = min(8, attacker["primary"]["initial_entities"])
-                contacts = min(contacts, _living(attacker["primary"]))
-                traits = _traits(attacker["unit"], attack["id"])
-                classification = defender["unit"]["body"].get("target_classification", {}).get("combat_class")
-                bonus_field = {"infantry": "bonus_vs_infantry", "large": "bonus_vs_large"}.get(classification)
-                bonus = traits.get(bonus_field, 0) or 0
-                charge = 0.0
-                if cfg["charge_duration_seconds"] and t - contact < cfg["charge_duration_seconds"]:
-                    charge = (attack.get("charge_bonus") or 0) * max(0, 1 - (t - contact) / cfg["charge_duration_seconds"])
-                facing = target_cfg["facing"]
-                hit = min(.90, max(.08, .35 + ((attack.get("attack") or 0) + bonus + charge -
-                                             (defender["melee"] or {}).get("defence", 0) * FACING[facing]) / 100))
-                damage = _damage_per_hit(attack["base_damage"] + charge, attack["ap_damage"],
-                                         defender["unit"], traits, "melee", facing)
-                if damage and attack.get("attack_interval"):
-                    events.append((1 - i, contacts * melee_dt / attack["attack_interval"] * hit,
-                                   damage["per_unblocked_hit"]))
-            for target, hits, damage in events:
-                _apply(states[target], "melee", hits, damage)
-        for i, state in enumerate(states):
-            own_cfg = scenario["sides"][SIDES[i]]
-            all_hp = sum(p["remaining_hp"] for p in state["pools"].values())
-            primary_living = _living(state["primary"])
-            if all_hp <= 0 and state["stops"]["health_depleted_seconds"] is None:
-                state["stops"]["health_depleted_seconds"] = t + dt
-            if primary_living / state["primary"]["initial_entities"] <= own_cfg["combat_effective_fraction"] and state["stops"]["combat_ineffective_seconds"] is None:
-                state["stops"]["combat_ineffective_seconds"] = t + dt
-            attack = state["ranged"]
-            if attack and state["stops"]["firing_ceased_seconds"] is None:
-                ammo = _ammo_limit(attack)
-                firing_component = state["pools"].get(attack.get("component_ref"), state["primary"])
-                if _living(firing_component) == 0 or (ammo is not None and state["shots_fired"] >= ammo) or (contact is not None and t + dt >= contact):
-                    state["stops"]["firing_ceased_seconds"] = t + dt
-    return states
+            update_stops(t)
 
+    def shots_due(t):
+        if t >= duration - epsilon:
+            return
+        for i, state in enumerate(states):
+            attack = state["ranged"]
+            due = state["next_shot"]
+            if attack is None or due is None or due > t + epsilon:
+                continue
+            cfg = scenario["sides"][SIDES[i]]
+            ammo = _ammo_limit(attack)
+            cycle = cfg["cycle_seconds"]
+            if not cfg["fire"] or not scenario["line_of_sight"] or cycle is None or ammo is None:
+                state["next_shot"] = None
+                continue
+            if (contact is not None and due >= contact - epsilon) or state["shots_fired"] >= ammo:
+                state["next_shot"] = None
+                continue
+            distance = distance_at(due)
+            component = state["pools"].get(attack.get("component_ref"), state["primary"])
+            shooters = cfg["firing_entities"] if cfg["firing_entities"] is not None else component["initial_entities"]
+            shooters = min(shooters, _living(component))
+            if shooters > 0 and (attack.get("minimum_range") or 0) <= distance <= attack["range"]:
+                flight = (cfg["flight_seconds"] if cfg["flight_seconds"] is not None
+                          else distance / attack["velocity"])
+                heapq.heappush(queue, (due + flight, i, shooters * cfg["projectiles_per_cycle"]))
+                state["shot_events"] += 1
+                state["shots_fired"] += 1
+            state["next_shot"] = due + cycle if shooters > 0 and state["shots_fired"] < ammo else None
+        update_stops(t)
+
+    for i, state in enumerate(states):
+        attack = state["ranged"]
+        cfg = scenario["sides"][SIDES[i]]
+        entry = timing["range_entry"][i]["seconds"]
+        if attack and cfg["fire"] and cfg["cycle_seconds"] is not None and entry is not None:
+            state["next_shot"] = entry + cfg["first_shot_delay_seconds"]
+    t = 0.0
+    update_stops(t)
+    shots_due(t)
+    impacts_due(t)
+    while t < duration - epsilon:
+        candidates = [duration, math.floor(t + epsilon) + 1.0]
+        if contact is not None and contact > t + epsilon:
+            candidates.append(contact)
+        if queue:
+            candidates.append(queue[0][0])
+        candidates += [state["next_shot"] for state in states
+                       if state["next_shot"] is not None and state["next_shot"] > t + epsilon]
+        next_t = min(x for x in candidates if x > t + epsilon)
+        melee_between(t, next_t)
+        t = next_t
+        update_stops(t)
+        # Arrivals at a timestamp precede any new shot. Simultaneous new shots
+        # are scheduled together before zero-flight impacts are applied.
+        impacts_due(t)
+        shots_due(t)
+        impacts_due(t)
+    return states
 
 def _timing(states, scenario):
     speed = [s["unit"]["movement"].get("speed") for s in states]
@@ -443,7 +509,14 @@ def _mechanics(units, scenario):
     for i, attacker in enumerate(units):
         defender = units[1 - i]
         cfg = scenario["sides"][SIDES[i]]
-        facing = scenario["sides"][SIDES[1 - i]]["facing"]
+        target_cfg = scenario["sides"][SIDES[1 - i]]
+        facing = target_cfg["facing"]
+        _, _, component = _pool(defender, target_cfg["target_component_role"])
+        target_supported = (component.get("targetable") is True or
+                            (component.get("targetable") is None and target_cfg["assume_targetable"]))
+        target_supported = (target_supported and component.get("size") in
+                            ("very_small", "small", "medium", "large", "very_large") and
+                            (component.get("primary") or target_cfg["assume_unit_protection_for_component"]))
         ranged = _attacks(attacker, "ranged")
         requested = cfg["ranged_attack_id"]
         selected = (next((a for a in ranged if a["id"] == requested), None) if requested else
@@ -456,31 +529,38 @@ def _mechanics(units, scenario):
                 missile = {"attack_id": selected["id"], "collision_probability": cfg["collision_probability"],
                            "complete_cycle_seconds_assumed": cfg["cycle_seconds"],
                            "projectiles_per_cycle_assumed": cfg["projectiles_per_cycle"],
+                           "scheduled": bool(cfg["fire"] and
+                                             (cfg["flight_seconds"] is not None or (selected.get("velocity") or 0) > 0)),
                            "direct": _damage_per_hit(selected["base_damage"], selected["ap_damage"],
-                                                     defender, traits, "missile", facing), "explosion": None}
+                                                     defender, traits, "missile", facing, component) if target_supported else None,
+                           "explosion": None}
                 ex = selected.get("explosion")
                 if ex:
                     missile["explosion"] = {"radius_source_metres": ex.get("radius"),
                                             "affected_entities_assumed": cfg["explosion_entities_per_collision"],
                                             "damage": _damage_per_hit(ex["base_damage"], ex["ap_damage"], defender,
-                                                                      _traits(attacker, ex["id"]), "explosion", facing)}
+                                                                      _traits(attacker, ex["id"]), "explosion", facing,
+                                                                      component) if target_supported else None}
         melee = None
         attack = _attacks(attacker, "melee")
         defending_attack = _attacks(defender, "melee")
         if attack and defending_attack:
             a = attack[0]
-            classification = defender["body"].get("target_classification", {}).get("combat_class")
+            classification = _target_class(defender, component)
             bonus_field = {"infantry": "bonus_vs_infantry", "large": "bonus_vs_large"}.get(classification)
             bonus = (_traits(attacker, a["id"]).get(bonus_field) or 0) if bonus_field else 0
             hit = min(.90, max(.08, .35 + ((a.get("attack") or 0) + bonus -
                                          (defending_attack[0].get("defence") or 0) * FACING[facing]) / 100))
-            melee = {"attack_id": a["id"], "unmodified_hit_probability": hit,
+            melee = {"attack_id": a["id"], "unmodified_hit_probability": hit if target_supported else None,
+                     "target_combat_class": classification, "target_component_role": component["role"],
+                     "targetability_source": component.get("targetable"), "target_supported": bool(target_supported),
                      "target_facing": facing, "active_contacts_assumed": cfg["active_contacts"] if cfg["active_contacts"] is not None else min(8, attacker["body"]["entity_count"]),
                      "attack_interval_source_seconds": a.get("attack_interval"),
                      "charge_bonus_source": a.get("charge_bonus"),
                      "charge_decay_duration_assumed_seconds": cfg["charge_duration_seconds"],
                      "per_hit": _damage_per_hit(a.get("base_damage"), a.get("ap_damage"), defender,
-                                                _traits(attacker, a["id"]), "melee", facing) if a.get("base_damage") is not None and a.get("ap_damage") is not None else None}
+                                                _traits(attacker, a["id"]), "melee", facing, component)
+                     if target_supported and a.get("base_damage") is not None and a.get("ap_damage") is not None else None}
         result.append({"side": SIDES[i], "missile": missile, "melee": melee})
     return result
 
@@ -493,8 +573,8 @@ def _simulate(units, scenario):
         attack = state["ranged"]
         if attack and cfg["cycle_seconds"] is None:
             state["gaps"].append("effective complete firing cycle not supplied; no shots scheduled")
-        if attack and not attack.get("velocity"):
-            state["gaps"].append("projectile velocity missing; flight and impact not scheduled")
+        if attack and cfg["flight_seconds"] is not None:
+            state["gaps"].append("projectile flight duration supplied as a scenario assumption")
         if attack and attack.get("explosion") and cfg["explosion_entities_per_collision"] == 1:
             state["gaps"].append("splash reach assumes one entity per colliding projectile")
         if state["melee"] and cfg["active_contacts"] is None:
@@ -582,6 +662,8 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                         "favored": _winner(rows), "effective_survivability_fraction": [r["effective_survivability_fraction"] for r in rows]})
     sensitivity = _sensitivity(units, sc, nominal) if sc["historical_relations_apply_to_patch_9"] else []
     gaps = [*summary[0]["coverage_gaps"], *summary[1]["coverage_gaps"]]
+    material_unresolved = any(any(marker in gap for marker in
+                                  ("damage omitted", "schedule impacts", "nesting unresolved")) for gap in gaps)
     gaps.extend("source coverage: " + g["code"] + " - " + g["summary"] for u in units for g in u["coverage"].get("gaps", []))
     gaps += ["no routing or morale model",
              "entity casualties use pooled expected damage, not hit allocation", "shield facing and projectile block eligibility are simplified",
@@ -610,15 +692,19 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                  "When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.",
                                  "Unspecified active contacts use min(8, living primary bodies); firing entities use the attached component count.",
                                  "Direct and explosion are separate expected hit events; default splash reach is one entity per collision.",
-                                 "Straight flight time is distance divided by listed muzzle velocity; trajectory and obstruction effects are unknown.",
+                                 "Positive listed velocity gives straight flight time from exact shot distance; nonpositive native sentinels require explicit flight_seconds.",
+                                 "Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.",
                                  "Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled."],
             "derived": {"phase_timing": timing,
                         "event_mechanics": _mechanics(units, sc) if sc["historical_relations_apply_to_patch_9"] else None,
                         "ledgers": summary},
-            "verdict": {"status": "conditional" if nominal not in ("tie", "indeterminate") else "indeterminate",
-                        "nominal_favored": nominal, "criterion": "remaining modeled health plus barrier fraction at horizon",
+            "verdict": {"status": "conditional" if nominal not in ("tie", "indeterminate") and not material_unresolved else "indeterminate",
+                        "nominal_favored": nominal if not material_unresolved else "indeterminate",
+                        "represented_point_ordering": nominal,
+                        "criterion": "remaining modeled health plus barrier fraction at horizon",
                         "collision_probability_corners": corners,
-                        "bounds_cross": len({c["favored"] for c in corners}) > 1,
+                        "bounds_cross": len({c["favored"] for c in corners}) > 1 or bool(sensitivity),
+                        "material_mechanic_unresolved": material_unresolved,
                         "one_parameter_flip_thresholds": sensitivity,
                         "qualification": "Nominal result depends on uncalibrated firing/contact assumptions; routing is unknown."},
             "limitations": list(dict.fromkeys(gaps)),
