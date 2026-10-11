@@ -4679,6 +4679,32 @@
         "access": {
           "$ref": "#/$defs/effect_access"
         },
+        "origins": {
+          "type": "object",
+          "properties": {
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "origin": {"enum": ["unit", "skill/trait", "item"]},
+                  "status": {"enum": ["verified_relation", "verified_skill_relation", "source_labeled_only"]},
+                  "route": {"type": "string"},
+                  "relation_count": {"type": "integer", "minimum": 0},
+                  "evidence_refs": {"type": "array", "items": {"type": "string"}}
+                },
+                "required": ["origin", "status", "route", "relation_count", "evidence_refs"],
+                "additionalProperties": false
+              }
+            },
+            "represented_grant_route": {"type": "boolean"},
+            "coverage": {"enum": ["partial"]},
+            "unknown": {"type": "string"},
+            "note": {"type": "string"}
+          },
+          "required": ["tags", "represented_grant_route", "coverage", "unknown", "note"],
+          "additionalProperties": false
+        },
         "interpretation": {
           "type": "string",
           "minLength": 1
@@ -4698,6 +4724,7 @@
         "payload",
         "summons",
         "access",
+        "origins",
         "interpretation",
         "summary"
       ],

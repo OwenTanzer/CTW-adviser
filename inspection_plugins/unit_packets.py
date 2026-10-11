@@ -33,17 +33,22 @@ def table(value):
                                '</td></tr>' for k, v in value.items()) + '</table>'
 
 
-def page(content, query=''):
-    return '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CTW · unit evidence inspection</title><style>
+def page(content, query='', detail=False):
+    shell = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTW evidence inspection</title><style>
 body{font:16px/1.5 system-ui,sans-serif;background:#f5f4f0;color:#172b3a;margin:0}main{max-width:1100px;margin:auto;padding:28px}
 a{color:#155a79}h1{margin-bottom:4px}h2{font-size:1.35rem}h3{margin-bottom:6px}.preview{background:#f9e5bc;padding:10px 16px;border-radius:6px}
 .release-preview{background:#7c2d12;color:white;padding:12px 16px;border-radius:6px;margin:12px 0}.release-preview a{color:white}
 .card{background:white;border:1px solid #d5d9d8;border-radius:8px;padding:18px;margin:16px 0}input,select,button{font:inherit;padding:8px;border:1px solid #a7b5b9;border-radius:4px}
 input{width:min(65%,520px)}button{background:#172b3a;color:white;cursor:pointer}table{border-collapse:collapse;width:100%;margin:12px 0}th,td{padding:7px 10px;border-bottom:1px solid #e5e8e7;text-align:left;vertical-align:top}th{width:30%;font-weight:500}
 pre{font:13px/1.5 ui-monospace,monospace;overflow:auto;max-height:500px;background:#f1f4f4;padding:14px}summary{cursor:pointer}small,.muted{color:#52656e}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.grid .card{margin:0}
-</style><main><nav><a href="/inspect">Unit evidence</a> · <a href="/ctw/find_units?name=">Name search</a> · <a href="/ctw">All source tables</a> · <a href="https://github.com/OwenTanzer/CTW-adviser/issues/2">Issue #2</a></nav>
-<h1>Unit evidence inspection</h1>''' + preview_banner() + '''<p class="preview">Read-only inspection of the pinned CTW-data snapshot. Source commit and packet version appear with each unit. Conditional mechanics are evidence, not applied combat results.</p>
+.hero{border-left:5px solid #155a79}.tag{display:inline-block;background:#e5f1f3;color:#173a4c;border-radius:999px;padding:3px 10px;margin:3px 5px 3px 0;font-size:.85rem}
+.tag.partial{background:#fff0d2;color:#613b08}.stack{padding-left:20px}.stack li{margin:9px 0}.stack li,article,.key{overflow-wrap:anywhere}table{display:block;max-width:100%;overflow-x:auto}
+@media(max-width:620px){main{padding:14px}.card{padding:14px}.grid{display:block}.grid .card{margin:12px 0}input{width:100%;box-sizing:border-box}nav a{display:inline-block;margin:3px 8px 3px 0}}
+</style><main><nav><a href="/inspect">Unit evidence</a> · <a href="/ctw/find_units?name=">Find units</a> · <a href="/ctw/find_effects?name=">Find spells and abilities</a> · <a href="/ctw/find_characters?name=">Find characters</a> · <a href="/ctw">Source tables</a></nav>'''
+    if detail:
+        return shell + '<h1>Evidence inspection</h1>' + preview_banner() + content + '</main></html>'
+    return shell + '''<h1>Unit evidence inspection</h1>''' + preview_banner() + '''<p class="preview">Read-only inspection of the pinned CTW-data snapshot. Source commit and packet version appear with each unit. Conditional mechanics are evidence, not applied combat results.</p>
 <form action="/inspect"><input name="q" aria-label="Unit name or key" placeholder="Unit name or exact key" value="''' + escape(query) + '''"><button>Find unit</button></form>
 <p class="muted">Base profiles and supported mechanics from pinned CTW-data. Conditional effects remain separate; no combat outcome is calculated.</p>''' + content + '</main></html>'
 
@@ -119,6 +124,152 @@ def database_path(datasette):
     return Path(datasette.get_database('ctw').path)
 
 
+def detail_link(ref, label):
+    return '<a href="' + escape(link('/inspect/detail', ref=ref)) + '">' + escape(label) + '</a>'
+
+
+def origin_html(origins):
+    content = '<section class="card"><h3>Where this ability is linked</h3>'
+    for tag in origins['tags']:
+        label = {'unit': 'Unit', 'skill/trait': 'Skill / trait',
+                 'item': 'Item'}.get(tag['origin'], tag['origin'])
+        if tag['status'] == 'source_labeled_only':
+            label += ' - source label only'
+        elif tag['origin'] == 'skill/trait':
+            label += ' - verified skill link'
+        else:
+            label += ' - verified link'
+        content += '<span class="tag' + (' partial' if tag['status'] == 'source_labeled_only' else '') + '">' + escape(label) + '</span>'
+    if not origins['tags']:
+        content += '<span class="tag partial">No represented grant route</span>'
+    content += '<p>' + escape(origins['unknown']) + '</p><details><summary>What these labels mean and their source records</summary>'
+    content += '<p>' + escape(origins['note']) + '</p><ul class="stack">'
+    for tag in origins['tags']:
+        content += '<li><b>' + escape(tag['origin']) + '</b>: ' + escape(tag['route'])
+        content += ' (' + escape(tag['relation_count']) + ' relation records; source refs ' + escape(', '.join(tag['evidence_refs'])) + ')</li>'
+    content += '</ul></details></section>'
+    return content
+
+
+def effect_html(result, args):
+    effect = result['effect']
+    identity = effect['identity']
+    content = '<section class="card hero"><p class="muted">' + escape(identity['effect_kind'].replace('_', ' ')) + '</p>'
+    content += '<h2>' + escape(identity['name'] or identity['ability_key']) + '</h2><small class="key">' + escape(identity['ability_key']) + '</small>'
+    overview = effect['summary'].split('. ', 1)[0]
+    content += '<p>' + escape(overview) + ('' if overview.endswith('.') else '.') + '</p>'
+    if overview != effect['summary']:
+        content += '<details><summary>Full generated overview</summary><p>' + escape(effect['summary']) + '</p></details>'
+    content += '</section>'
+    content += origin_html(effect['origins'])
+    content += '<div class="grid"><section class="card"><h3>Activation and cost</h3>' + table(effect['activation']['values'])
+    content += '</section><section class="card"><h3>Targeting and range</h3>' + table(effect['targeting']['values'])
+    content += table({k: v['value'] for k, v in effect['distances'].items()}) + '</section></div>'
+    content += '<section class="card"><h3>Mechanics and payload</h3><p>' + escape(effect['mechanic']['summary']) + '</p>'
+    chains = effect['payload']['chains']
+    if chains:
+        content += '<h4>Payload paths</h4><ul class="stack">' + ''.join(
+            '<li><b>' + escape(chain['branch'].replace('_', ' ')) + ':</b> ' +
+            escape(' → '.join(chain['path'])) + '</li>' for chain in chains) + '</ul>'
+    else:
+        content += '<p>No payload chain in this summary; inspect the phase and effect records below for other mechanics.</p>'
+    if not effect['payload']['complete']:
+        content += '<p class="muted">Payload traversal is partial; inspect the source packet for omitted references.</p>'
+    conditions = effect['mechanic']['conditions']
+    active_conditions = {k: v for k, v in conditions.items() if v}
+    if active_conditions:
+        content += '<details><summary>Conditions and recipient restrictions</summary>' + raw(active_conditions) + '</details>'
+    if effect['mechanic']['phases'] or effect['mechanic']['effects'] or effect['summons']:
+        content += '<details><summary>Phases, effect records and summons</summary>' + raw({
+            'phases': effect['mechanic']['phases'], 'effects': effect['mechanic']['effects'],
+            'summons': effect['summons']}) + '</details>'
+    content += '</section>'
+    access = effect['access']
+    content += '<div class="grid"><section class="card"><h3>Direct unit links (' + escape(access['total']) + ')</h3>'
+    if access['links']:
+        content += '<ul class="stack">' + ''.join(
+            '<li><a href="' + escape(link('/inspect', unit=row['unit_key'])) + '">' +
+            escape(row['unit_name'] or row['unit_key']) + '</a><br><small class="key">' +
+            escape(row['unit_key']) + '; culture ' + escape(row['culture_key']) +
+            ('; requires effect enabling' if row['requires_effect_enabling'] else '') +
+            '</small></li>' for row in access['links']) + '</ul>'
+    else:
+        content += '<p>No direct unit link represented in this snapshot.</p>'
+    if access['cursor']:
+        content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=access['cursor'],
+                                          limit=args.get('limit', '64'))) + '">More direct unit links</a>'
+    content += '</section><section class="card"><h3>Character skill bindings (' + escape(access['characters']['total']) + ' characters)</h3>'
+    entries = access['characters']['entries']
+    if entries:
+        content += '<ul class="stack">'
+        for entry in entries:
+            enabling = [b for b in entry['bindings'] if b['role'] in ('enables', 'enables_overcast')]
+            content += '<li>' + detail_link(entry['detail_ref'], entry['character_name'] or entry['agent_subtype_key'])
+            content += '<br><small>' + escape(len(enabling)) + ' enabling skill bindings; ' + escape(
+                len(entry['bindings']) - len(enabling)) + ' other bindings</small>'
+            if enabling:
+                content += '<details><summary>Skill and rank evidence</summary><ul class="stack">' + ''.join(
+                    '<li>' + escape(b['skill_key']) + ' · rank ' + escape(b['skill_level']) +
+                    ' · ' + escape(b['role']) + '</li>' for b in enabling) + '</ul></details>'
+            content += '</li>'
+        content += '</ul>'
+        content += detail_link(access['characters']['detail_ref'], 'See all character bindings')
+    else:
+        content += '<p>No character skill binding shown on this page.</p>'
+    content += '</section></div>'
+    if effect['variants']:
+        content += '<section class="card"><h3>Related variants</h3><ul class="stack">'
+        for variant in effect['variants']:
+            ref = variant.get('detail_ref')
+            label = variant.get('name') or variant.get('ability_key') or variant.get('variant_key') or str(variant)
+            content += '<li>' + (detail_link(ref, label) if ref else escape(label)) + '</li>'
+        content += '</ul></section>'
+    content += '<section class="card"><h3>Coverage and source evidence</h3><p>' + escape(effect['interpretation']) + '</p>'
+    content += '<p>Other grant routes: ' + escape(', '.join(access['routes_not_imported'])) + '.</p>'
+    content += '<details><summary>Full source packet, parameters and provenance</summary>' + raw(result) + '</details></section>'
+    return content
+
+
+def character_html(result):
+    character = result['character']
+    content = '<section class="card hero"><p class="muted">Character unit · ' + escape(character['character_class']) + '</p>'
+    content += '<h2>' + escape(character['character_name'] or character['agent_subtype_key']) + '</h2>'
+    content += '<small class="key">' + escape(character['agent_subtype_key']) + '</small><p>' + escape(result['note']) + '</p></section>'
+    content += '<div class="grid"><section class="card"><h3>Unit forms</h3>'
+    if character['unit_forms']:
+        content += '<ul class="stack">' + ''.join(
+            '<li>' + ('<a href="' + escape(link('/inspect', unit=form['unit_key'])) + '">' +
+                      escape(form['unit_name'] or form['unit_key']) + '</a>' if form['unit_key'] else
+                      escape(form['main_unit_key'] or 'Unmapped form')) +
+            ' <small>' + escape(form['mapping']) + '; ' + escape(form['via']) + '</small></li>'
+            for form in character['unit_forms']) + '</ul>'
+    else:
+        content += '<p>No unit form is represented.</p>'
+    content += '</section><section class="card"><h3>Skill binding coverage</h3>' + table({
+        k: v for k, v in result['binding_page'].items() if k not in ('cursor', 'detail_ref')})
+    content += '</section></div><section class="card"><h3>Linked effects on this page</h3>'
+    if result['effects']:
+        for entry in result['effects']:
+            content += '<article><h4>' + (detail_link(entry['detail_ref'], entry['name'] or entry['ability_key'])
+                                          if entry['detail_ref'] else escape(entry['name'] or entry['ability_key'])) + '</h4>'
+            content += '<p class="muted">' + escape(entry['status']) + ' · ' + escape(', '.join(entry['roles'])) + '</p>'
+            content += '<ul class="stack">' + ''.join(
+                '<li>' + escape(b['skill_key']) + ' · rank ' + escape(b['skill_level']) +
+                ' · ' + escape(b['role']) + '</li>' for b in entry['bindings']) + '</ul></article>'
+    else:
+        content += '<p>No ability binding on this page.</p>'
+    if result['binding_page']['cursor']:
+        content += '<a href="' + escape(link('/inspect/detail', ref=result['binding_page']['detail_ref'],
+                                          cursor=result['binding_page']['cursor'],
+                                          limit=result['binding_page']['limit'])) + '">Continue bindings</a>'
+    content += '</section><section class="card"><h3>Other bindings and source evidence</h3>'
+    content += '<p>Other binding categories are not personal ability grants.</p>'
+    content += '<p>Unresolved grant routes: ' + escape(', '.join(result['routes_not_imported'])) + '.</p>'
+    content += '<details><summary>Other binding counts</summary>' + raw(result['other_bindings']) + '</details>'
+    content += '<details><summary>Full source packet and provenance</summary>' + raw(result) + '</details></section>'
+    return content
+
+
 async def inspect(request, datasette):
     args = dict(request.args); query = args.get('unit') or args.get('q', '')
     try:
@@ -156,21 +307,28 @@ async def detail(request, datasette):
             result = queries.get_detail(args.get('ref', ''), cursor=args.get('cursor'), limit=int(args.get('limit', '64')))
         if args.get('format') == 'json':
             return Response.json(result)
-        content = '<section class="card"><h2>Source evidence detail</h2>'
         if 'effect' in result:
-            # Issue #19: readable spell/activated-ability mechanics first; the
-            # full packet, including qualified unit access, stays below.
-            effect = result['effect']
-            content += '<p>' + escape(effect['summary']) + '</p><h3>Payload paths</h3><ul>' + ''.join(
-                '<li>' + escape(chain['branch'] + ': ' + ' -> '.join(chain['path'])) + '</li>'
-                for chain in effect['payload']['chains']) + '</ul>'
-            if effect['access']['cursor']:
-                content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=effect['access']['cursor'],
-                                                     limit=args.get('limit', '64'))) + '">More linked units</a>'
-        content += raw(result)
-        if result.get('cursor'):
-            content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=result['cursor'], limit=args.get('limit', '64'))) + '">Continue evidence graph</a>'
-        return Response.html(page(content + '</section>'))
+            content = effect_html(result, args)
+        elif 'character' in result:
+            content = character_html(result)
+        elif 'characters' in result:
+            data = result['characters']
+            content = '<section class="card hero"><h2>Character bindings</h2><p>' + escape(data['note']) + '</p>'
+            content += '<p>' + escape(data['total']) + ' characters linked to this ability.</p></section>'
+            content += '<section class="card"><ul class="stack">' + ''.join(
+                '<li>' + detail_link(row['detail_ref'], row['character_name'] or row['agent_subtype_key']) +
+                ' · ' + escape(len(row['bindings'])) + ' bindings</li>' for row in data['entries']) + '</ul>'
+            if data['cursor']:
+                content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=data['cursor'],
+                                                  limit=args.get('limit', '64'))) + '">More characters</a>'
+            content += '<details><summary>Full source packet</summary>' + raw(result) + '</details></section>'
+        else:
+            content = '<section class="card"><h2>Source evidence detail</h2>' + raw(result)
+            if result.get('cursor'):
+                content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=result['cursor'],
+                                                  limit=args.get('limit', '64'))) + '">Continue evidence graph</a>'
+            content += '</section>'
+        return Response.html(page(content, detail=True))
     except (ValueError, KeyError) as exc:
         return Response.html(page('<p>' + escape(exc) + '</p>'), status=400)
 

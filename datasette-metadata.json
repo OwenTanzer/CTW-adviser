@@ -96,8 +96,8 @@
         },
         "find_effects": {
           "title": "Find spells and activated abilities",
-          "description": "Search by part of a name, then open effect:<ability_key> at /inspect/detail for mechanics, payload paths and linked units.",
-          "sql": "select ability_key, name, effect_kind, source_type, keywords_json from effect_abilities where name like '%' || :name || '%' order by name, ability_key"
+          "description": "Search by part of a name. Origin evidence names direct unit and enabling skill links; item source labels do not establish a grant. Open an effect for mechanics, relationships and coverage.",
+          "sql": "select e.ability_key, e.name, e.effect_kind, e.source_type, trim(case when exists(select 1 from effect_access u where u.ability_key=e.ability_key) then 'Unit link; ' else '' end || case when exists(select 1 from effect_character_access s where s.ability_key=e.ability_key and s.status='activated_effect' and s.role in ('enables','enables_overcast')) then 'Skill link (conditional); ' else '' end || case when e.source_type='item' then 'Item source label (grant unverified); ' else '' end || 'Other routes unresolved') as origin_evidence, e.keywords_json from effect_abilities e where e.name like '%' || :name || '%' order by e.name, e.ability_key"
         },
         "find_characters": {
           "title": "Find characters",

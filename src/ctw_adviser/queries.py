@@ -836,9 +836,43 @@ class Queries:
         for relation, label in EFFECT_RELATION_LABELS.items():
             mechanic['summary'] = mechanic['summary'].replace('linked ' + relation, label)
         packet['effect']['summary'] = c.effect_summary(packet['effect'])
+        packet['effect']['origins'] = self.effect_origins(key, effect['source_type'], c)
         if include_diagnostics:
             packet['gaps'] = gaps
         return self.response_view(packet, include_provenance, include_diagnostics)
+
+    def effect_origins(self, key, source_type, packet):
+        """Evidence routes, never a claim that an effect is currently obtainable."""
+        unit = self.db.execute(
+            'SELECT count(*),min(link_record) FROM effect_access WHERE ability_key=?', (key,)).fetchone()
+        skill = self.db.execute(
+            "SELECT count(*),min(binding_record) FROM effect_character_access "
+            "WHERE ability_key=? AND status='activated_effect' "
+            "AND role IN ('enables','enables_overcast')", (key,)).fetchone()
+        tags = []
+        if unit[0]:
+            tags.append({'origin': 'unit', 'status': 'verified_relation',
+                         'route': 'direct unit ability link', 'relation_count': unit[0],
+                         'evidence_refs': [packet.evidence(unit[1])]})
+        if skill[0]:
+            tags.append({'origin': 'skill/trait', 'status': 'verified_skill_relation',
+                         'route': 'character skill enables or enables overcast',
+                         'relation_count': skill[0],
+                         'evidence_refs': [packet.evidence(skill[1])]})
+        if source_type == 'item':
+            definition = self.one('effect_abilities', 'ability_key', key)
+            tags.append({'origin': 'item', 'status': 'source_labeled_only',
+                         'route': 'ability definition source_type=item; no verified item grant',
+                         'relation_count': 0,
+                         'evidence_refs': [packet.evidence(definition['definition_record'])]})
+        return {'tags': tags, 'represented_grant_route': bool(unit[0] or skill[0]),
+                'coverage': 'partial',
+                'unknown': ('No represented unit or enabling skill route; item, trait and other grants '
+                            'remain unresolved.' if not unit[0] and not skill[0] else
+                            'Item, trait and other grant routes remain unresolved.'),
+                'note': ('Unit links and character skill bindings are conditional possibilities, '
+                         'not proof of campaign acquisition, selected skills or active effects. '
+                         'A character is a unit; skill/trait names the grant mechanism, not a fourth character origin.')}
 
     # -- Issue #19 increment 2: characters and skill/rank routes ------------
 

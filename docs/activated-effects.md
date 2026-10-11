@@ -187,3 +187,25 @@ evidence that they are unavailable.
 Still not established: item, trait and ancillary grants, mount unlocks,
 scripted forms, campaign legality and calculations (#20). Completing #19 does
 not close ONT-120.
+
+## Origin evidence in search and inspection
+
+`find_effects` now summarizes direct unit links, enabling character skill
+bindings, and source-labeled items. The assembled effect packet has an
+`origins` object with nonexclusive tags, route counts, sample source record
+references, and explicit partial coverage. A character is a unit; an enabling
+character skill is shown as the skill/trait mechanism, with the character and
+its unit forms linked separately. `modifies` and `disables` bindings do not
+establish an origin. Item `source_type` is only a native definition label:
+there is no verified item-to-ability grant in the retained inputs, and no
+trait-to-ability route. The UI marks such items as source-labeled only.
+
+On the pinned rebuilt snapshot, 578 effects have direct unit links and 621
+have enabling skill bindings; 314 have both. Their union is 885. The other
+999 have neither represented grant route, which leaves origin unknown rather
+than absent. The earlier 849 character-skill count includes modifier and
+disabler bindings and is not a count of grants.
+
+The inspection page presents grouped activation, targeting, payload and access
+sections, with linked units, characters and variants. Full native parameters,
+source evidence and provenance remain in the expandable source packet.
