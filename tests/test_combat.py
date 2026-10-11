@@ -524,6 +524,48 @@ class PinnedStoreTests(unittest.TestCase):
             self.assertGreater(assumed["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
             self.assertGreater(assumed["derived"]["ledgers"][1]["incoming_damage"]["direct"],
                                low["derived"]["ledgers"][1]["incoming_damage"]["direct"])
+            multifactor = evaluate_matchup(q, "Thunderers (Grudge-Rakers)", "Reiksguard")
+            self.assertEqual([multifactor["source_facts"][0]["ranged"][key] for key in
+                              ("projectiles_per_shot", "shots_per_volley", "burst_size")],
+                             [3, 2, 1])
+            self.assertIn("ranged.projectile_volley_burst",
+                          {item["source_path"] for item in multifactor["verdict"]["unresolved_inputs"]})
+            individual_cases = [evaluate_matchup(q, "Thunderers (Grudge-Rakers)", "Reiksguard",
+                                                 scenario={"sides": {"a": {"projectiles_per_cycle": n}}})
+                                for n in (1, 2, 3)]
+            self.assertTrue(all(case["verdict"]["status"] == "conditional" for case in individual_cases))
+            self.assertEqual([case["scenario_assumptions"]["sides"]["a"]["projectiles_per_cycle"]
+                              for case in individual_cases], [1, 2, 3])
+            self.assertEqual([case["derived"]["ledgers"][0]["shots_fired_per_shooter"]
+                              for case in individual_cases], [1, 1, 1])
+            self.assertLess(individual_cases[0]["derived"]["ledgers"][1]["incoming_damage"]["direct"],
+                            individual_cases[1]["derived"]["ledgers"][1]["incoming_damage"]["direct"])
+            self.assertLess(individual_cases[1]["derived"]["ledgers"][1]["incoming_damage"]["direct"],
+                            individual_cases[2]["derived"]["ledgers"][1]["incoming_damage"]["direct"])
+
+    def test_sentinel_flight_latency_sensitivity_and_model_version(self):
+        scenario = {"separation_metres": 200, "duration_seconds": 2,
+                    "sides": {"a": {"order": "hold", "fight": False},
+                              "b": {"order": "hold", "fight": False,
+                                    "first_shot_delay_seconds": 0}}}
+        with Queries(DB) as q:
+            immediate = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario=scenario)
+            self.assertEqual(immediate["model_version"], "combat-0.1.4")
+            self.assertEqual(immediate["source_facts"][1]["ranged"]["velocity"], -1)
+            self.assertEqual(immediate["verdict"]["represented_point_ordering"], "b")
+            self.assertGreater(immediate["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            cycle = immediate["scenario_assumptions"]["sides"]["b"]["cycle_seconds"]
+            self.assertGreater(cycle, scenario["duration_seconds"])
+            delayed_scenario = copy.deepcopy(scenario)
+            delayed_scenario["sides"]["b"]["flight_seconds"] = cycle
+            delayed = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults",
+                                       scenario=delayed_scenario)
+            self.assertEqual(delayed["model_version"], immediate["model_version"])
+            self.assertEqual(delayed["derived"]["ledgers"][1]["shots_fired_per_shooter"], 1)
+            self.assertEqual(delayed["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            self.assertEqual(delayed["verdict"]["represented_point_ordering"], "tie")
+            self.assertEqual(delayed["derived"]["event_mechanics"][1]["missile"]["flight_basis"],
+                             "scenario_flight_seconds")
 
     def test_component_target_class_and_targetability(self):
         with Queries(DB) as q:

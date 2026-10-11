@@ -13,7 +13,7 @@ import math
 from .model import ORDERS, _entry, _number
 from .queries import Queries
 
-MODEL_VERSION = "combat-0.1.3"
+MODEL_VERSION = "combat-0.1.4"
 SIDES = ("a", "b")
 FACING = {"front": 1.0, "side": 0.6, "rear": 0.3}
 
@@ -297,7 +297,7 @@ def _prepare(unit, side, setting):
             gaps.append("selected ranged attack has missing range or damage; shots omitted")
             attack = None
         elif setting["fire"] and setting["flight_seconds"] is None and (attack.get("velocity") is None or attack["velocity"] <= 0):
-            gaps.append("projectile velocity is missing or nonpositive; firing opportunities use an immediate-arrival approximation")
+            gaps.append("projectile velocity is missing or nonpositive; any firing opportunity uses an immediate-arrival approximation")
     if attack:
         counts = [attack.get(k) for k in ("projectiles_per_shot", "shots_per_volley", "burst_size")]
         if setting["projectiles_per_cycle"] is None and any(x != 1 for x in counts):
@@ -975,7 +975,7 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                  "When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.",
                                  "Unspecified active contacts use min(8, living primary bodies); firing entities use the attached component count.",
                                  "Direct and explosion are separate expected hit events; default splash reach is one entity per collision.",
-                                 "Positive listed velocity gives straight flight time from exact shot distance. Missing or nonpositive velocity uses an immediate-arrival firing-opportunity approximation unless flight_seconds is supplied; collision probability remains independent.",
+                                 "Positive listed velocity gives straight flight time from exact shot distance. Missing or nonpositive velocity uses an immediate-arrival firing-opportunity approximation unless flight_seconds is supplied; this is an earliest-arrival scenario, not measured flight time. Collision probability remains independent.",
                                  "Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.",
                                  "Barrier-before-entity-cap is the represented default, not a verified game damage order; the alternate order is tested.",
                                  "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",

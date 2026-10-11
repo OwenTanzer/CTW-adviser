@@ -91,7 +91,7 @@ TOOLS = [
           {"ref": STRING, "cursor": STRING, "limit": LIMIT}, ("ref",)),
     _tool("get_provenance", "Expand exact source record IDs returned in a packet (maximum 64 per call).",
           {"record_ids": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 64}}, ("record_ids",)),
-    _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Projectile speed is optional: missing/nonpositive source velocity uses a labeled immediate-arrival firing-opportunity approximation; flight_seconds can override it. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts without claiming exact engine cadence.",
+    _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Missing/nonpositive source velocity uses a labeled immediate-arrival approximation. If its damage is material, rerun with flight_seconds equal to that side's returned cycle_seconds as an illustrative delayed case; report both outcomes. bounds_cross does not cover flight timing. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts; compare multiple factors individually rather than multiplying them or claiming exact engine cadence.",
           {"unit_a": STRING, "unit_b": STRING, "subculture_a": STRING, "subculture_b": STRING,
            "scenario": SCENARIO}, ("unit_a", "unit_b")),
 ]

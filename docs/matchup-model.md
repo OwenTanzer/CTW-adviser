@@ -26,6 +26,11 @@ record.
 
 ## Scenario and result contract
 
+Calculator model `combat-0.1.4` uses the immediate-arrival firing-opportunity
+convention for missing or nonpositive source velocity. The changed model
+version distinguishes these projections from earlier zero-shot results under
+the same source packet and data commit.
+
 The `scenario` object supports `mode=custom_battle`,
 `baseline=unmodified_ultra_rank_0`, `separation_metres` (default 200),
 `duration_seconds` (120), `metres_per_second_per_speed_point` (1),
@@ -157,15 +162,25 @@ which flight basis applied and distinguish `shots_fired_per_shooter` and
 `discrete_firing_events` from collision-weighted expected damage. Check range
 entry, minimum range, first-shot delay, cycle, ammunition, firing entities,
 targetability and contact cessation before interpreting a zero ledger.
+If immediate-arrival damage is material, rerun with `flight_seconds` set to
+that side's `scenario_assumptions.sides.<side>.cycle_seconds`. This value comes
+from the source reload and declared cycle multiplier when available, or from
+an existing explicit cycle assumption; it is an illustrative delayed-arrival
+case, not a measured flight time or physical upper bound. Keep all other
+scenario inputs fixed. Report the nominal estimate and the conditional range
+of modeled damage and ordering across the two cases. `bounds_cross` covers
+collision/contact sensitivity, not flight timing, and cannot replace this
+rerun. No projectile-speed measurement is required from the user.
 When source projectile, volley or burst counts differ from one, inspect all
 three counts and run explicit `projectiles_per_cycle` cases informed by them.
 For one nontrivial count, compare one projectile per cycle with that sourced
-count; for multiple nontrivial counts, do not multiply them without a reviewed
-composition rule. Label each case as a scenario interpretation, not proven
-engine cadence; materially different volley or burst timing remains
-unsupported. If no defensible case captures a consequential nesting, leave
-the ranged schedule unresolved and say why. Do not ask the user for technical
-source fields or infer a count from card accuracy.
+count. For multiple nontrivial counts, compare one with each sourced factor
+individually; do not multiply them without a reviewed composition rule.
+Label each case as a scenario interpretation, not proven engine cadence;
+materially different volley or burst timing remains unsupported. If no
+defensible case captures a consequential nesting, leave the ranged schedule
+unresolved and say why. Do not ask the user for technical source fields or
+infer a count from card accuracy.
 Use the verdict and sensitivity as conditional projections, and report other
 unresolved inputs rather than filling them from projectile speed.
 
