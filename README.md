@@ -7,6 +7,10 @@ Current implementation: issue #2, phases 1-3 and local phase-5 packaging - pinne
 an offline STRICT SQLite snapshot builder, and indexed JSON evidence retrieval
 with unit resolution, inline passive explanations, projections and continuation.
 The combat evaluator is later work.
+The first downstream consumers are a local read-only MCP stdio query adapter and
+an explicitly illustrative movement-phase timing command. See
+[consumer increment](docs/consumer-increment.md) for commands and limits. The full
+matchup evaluator and hosted connector remain issues #5 and #3 respectively.
 Each base unit appears once, with list-valued faction names and linked,
 source-qualified availability records.
 

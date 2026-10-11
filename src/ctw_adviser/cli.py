@@ -7,6 +7,7 @@ from pathlib import Path
 from .build import build_snapshot
 from .store import inspect_snapshot
 from .queries import Queries, ResolutionError
+from .model import movement_phase
 
 
 def main():
@@ -17,6 +18,16 @@ def main():
     build.add_argument('--output', type=Path, required=True)
     inspect = commands.add_parser('inspect')
     inspect.add_argument('snapshot', type=Path)
+    movement = commands.add_parser('movement-phase', help='Illustrative straight-line contact and range-entry timing')
+    movement.add_argument('--db', type=Path, required=True)
+    movement.add_argument('unit_a')
+    movement.add_argument('unit_b')
+    movement.add_argument('--separation-metres', type=float, required=True)
+    movement.add_argument('--order-a', choices=('approach', 'hold', 'retreat'), default='approach')
+    movement.add_argument('--order-b', choices=('approach', 'hold', 'retreat'), default='approach')
+    movement.add_argument('--metres-per-second-per-speed-point', type=float, default=1.0)
+    movement.add_argument('--subculture-a')
+    movement.add_argument('--subculture-b')
     for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance'):
         query = commands.add_parser(command)
         query.add_argument('--db', type=Path, required=True)
@@ -40,6 +51,13 @@ def main():
             result = build_snapshot(args.ctw_root, args.output)
         elif args.command == 'inspect':
             result = inspect_snapshot(args.snapshot)
+        elif args.command == 'movement-phase':
+            with Queries(args.db) as queries:
+                result = movement_phase(queries, args.unit_a, args.unit_b,
+                                        separation_metres=args.separation_metres,
+                                        order_a=args.order_a, order_b=args.order_b,
+                                        metres_per_second_per_speed_point=args.metres_per_second_per_speed_point,
+                                        subculture_a=args.subculture_a, subculture_b=args.subculture_b)
         else:
             with Queries(args.db) as queries:
                 key = args.keys[0]
