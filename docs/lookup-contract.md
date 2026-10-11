@@ -1,9 +1,9 @@
-# Evidence packet contract 1.20.0
+# Evidence packet contract 1.19.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.20.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.19.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -964,12 +964,3 @@ root explosion mechanics, ground/flight speed, component health contributions
 and native primary-body firing arcs. Expanded provenance remains optional.
 Consumers must consult `ammunition_supply.assignment_status`; a normalized
 count on a conflicting attachment is not a resolved effective supply.
-
-## Packet 1.20.0: activated effect references (#19)
-
-Each `activated_options` entry adds `effect_kind` (`spell`, `activated_ability`
-or null for unresolved classifications) and concise derived `keywords`. Its
-`detail_ref` becomes `effect:<ability_key>`. Unit packets still never embed spell
-or ability payloads. The specialized effect packet, access links and payload
-paths are described in [activated effects](activated-effects.md). Legacy
-`option:` refs return an `effect_ref` pointer for classified activated options.

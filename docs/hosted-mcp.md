@@ -1,7 +1,8 @@
 # Hosted MCP service (issue #3)
 
-The same eight read-only tools served over stdio are available at `/mcp` using
-MCP Streamable HTTP protocol `2025-06-18`. The live endpoint is
+This checkout serves six read-only tools over stdio and `/mcp` using MCP
+Streamable HTTP protocol `2025-06-18`. The separately deployed live endpoint
+still exposes eight tools from the earlier release. Its URL is
 `https://ctw-adviser-mcp-production.up.railway.app/mcp`, with public,
 unauthenticated read-only access. ChatGPT CTW Advisor connector calls were
 verified on 2026-10-11; see [acceptance evidence](closure-3-6.md). The Railway
@@ -54,7 +55,7 @@ The server opens an already built SQLite artifact through `Queries` in
 `mode=ro` with `query_only=ON` and rejects unsupported schema, contract, source
 commit or snapshot ID at startup. The hosted source commit must be
 `595e22764b22e748afdbafafcb0a6258973e2451`, and the ID must match that
-commit, the supported contract hash and `store4`. This identity check does not
+commit, the supported contract hash and `store3`. This identity check does not
 replace the build manifest's file-integrity verification. Ordinary calls never
 fetch, rebuild or write source data. Request
 bodies are limited to 64 KiB, responses to 1 MiB, concurrent connections to
@@ -136,7 +137,7 @@ inspect integrity; then publish the image. Redeploy only after review, record
 deployment ID and require Railway `SUCCESS`, `/healthz`, and the remote SDK
 acceptance command above. Record returned source commit, base patch/build
 `9.0/25507028`, unit scale `ultra`, owner-specific supplemental patch/build,
-store schema 4, packet 1.20.0 and model version. On mismatch, stop rollout and
+store schema 3, packet 1.19.0 and model version. On mismatch, stop rollout and
 restore the previous successful deployment. A source refresh changes the lock,
 contract and verification evidence through its separate reviewed process.
 

@@ -721,7 +721,7 @@ class QueryTests(unittest.TestCase):
         a, b = 'Lothern Sea Guard', 'Blue Horrors of Tzeentch'
         packet = self.q.get_matchup_evidence(a, b)
         self.check(packet)
-        self.assertEqual(packet['schema_version'], '1.20.0')
+        self.assertEqual(packet['schema_version'], '1.19.0')
         self.assertEqual(packet['comparison']['unit_names'], [a, b])
         dimensions = {d['dimension']: d for d in packet['comparison']['dimensions']}
         self.assertEqual(set(dimensions), {'range', 'ammunition', 'attack_types', 'material_conditions'})
@@ -976,10 +976,7 @@ class QueryTests(unittest.TestCase):
         for option in unit['activated_options']:
             self.assertNotIn('effects', option)
             self.assertTrue(option['classification_evidence'])
-            # Packet 1.20.0 (#19): unit entries stay reference-only; detail
-            # expands into the specialized activated-effect lookup.
-            self.assertEqual(option['detail_ref'], 'effect:' + option['key'])
-            self.assertEqual(self.q.get_detail(option['detail_ref'])['effect']['identity']['ability_key'], option['key'])
+            self.assertEqual(self.q.get_detail(option['detail_ref'])['status'], 'deferred')
         with self.assertRaises(ValueError):
             self.q.get_passive_detail('wh2_main_unit_passive_martial_prowess', culture='invented_culture')
 
@@ -1280,9 +1277,7 @@ class QueryTests(unittest.TestCase):
             self.assertIn(wording, mechanic['summary'])
             self.assertTrue(mechanic['conditions']['recharges_when'])
             self.assertEqual(mechanic['conditions']['unresolved'], [])
-        # Activated roots (#19) also retain usage flags; this check covers passives.
-        for row in self.q.db.execute("SELECT special_ability,invalid_usage_flag FROM native_special_ability_to_invalid_usage_flags "
-                                     "JOIN ability_option_metadata ON ability_key=special_ability WHERE classification='core_passive'"):
+        for row in self.q.db.execute('SELECT special_ability,invalid_usage_flag FROM native_special_ability_to_invalid_usage_flags'):
             mechanic = self.q.get_passive_detail(row['special_ability'])['mechanic']
             self.assertEqual(mechanic['conditions']['unavailable_when'][0]['key'], row['invalid_usage_flag'])
             self.assertIn('Unavailable when:', mechanic['summary'])

@@ -36,15 +36,13 @@ def main():
     evaluate.add_argument('--scenario', help='JSON scenario object; defaults are illustrative, not calibrated')
     evaluate.add_argument('--subculture-a')
     evaluate.add_argument('--subculture-b')
-    for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance',
-                    'resolve-effect', 'effect', 'unit-effects'):
+    for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance'):
         query = commands.add_parser(command)
         query.add_argument('--db', type=Path, required=True)
         query.add_argument('keys', nargs='+' if command in ('matchup', 'provenance') else 1)
         query.add_argument('--subculture')
         query.add_argument('--subculture-b')
-        query.add_argument('--culture', default=None, help='Source-qualified culture for passive (default *) or effect detail')
-        query.add_argument('--unit', help='Restrict effect name resolution to effects linked to this unit')
+        query.add_argument('--culture', default='*', help='Source-qualified culture for passive detail')
         query.add_argument('--mode', choices=('combined', 'melee', 'missile'), default='combined')
         query.add_argument('--section', choices=('components', 'weapons', 'attributes', 'abilities', 'activated_options'))
         query.add_argument('--limit', type=int, default=32)
@@ -91,20 +89,10 @@ def main():
                 elif args.command == 'coverage':
                     result = queries.get_coverage_notes(key, **options)
                 elif args.command == 'passive':
-                    result = queries.get_passive_detail(key, culture=args.culture or '*', limit=args.limit, cursor=args.cursor,
+                    result = queries.get_passive_detail(key, culture=args.culture, limit=args.limit, cursor=args.cursor,
                                                         include_diagnostics=args.include_diagnostics,
                                                         include_provenance=args.include_provenance,
                                                         include_documentation=args.include_documentation, include_graph=args.include_graph)
-                elif args.command == 'resolve-effect':
-                    result = queries.resolve_effect(key, args.unit, args.subculture)
-                elif args.command == 'effect':
-                    result = queries.get_effect(key, unit=args.unit, subculture=args.subculture, culture=args.culture,
-                                                limit=args.limit, cursor=args.cursor,
-                                                include_diagnostics=args.include_diagnostics,
-                                                include_provenance=args.include_provenance)
-                elif args.command == 'unit-effects':
-                    result = queries.get_unit_effects(key, subculture=args.subculture,
-                                                      include_provenance=args.include_provenance)
                 elif args.command == 'detail':
                     result = queries.get_detail(key, limit=args.limit, cursor=args.cursor)
                 else:

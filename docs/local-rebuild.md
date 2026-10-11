@@ -53,7 +53,7 @@ original build environment or authenticate authorship.
 Use `query_snapshot.py passive --db work/adviser.sqlite --include-documentation
 KEY` to request the separately attributed research documentation. Default
 packets keep evidence IDs and compact explanation text; full provenance and
-documentation are opt-in. `docs/lookup-contract.md` defines packet 1.20.0,
+documentation are opt-in. `docs/lookup-contract.md` defines packet 1.19.0,
 semantic qualifications and the inspection site's collapsed source-documentation
 panel. The inspection deployment is a separate branch/service and must be
 checked against the merged artifact before claiming site parity.
