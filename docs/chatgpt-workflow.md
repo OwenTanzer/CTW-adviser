@@ -63,3 +63,20 @@ names in these four prompts are already explicit. Missing/ambiguous/stale-source
 protocol checks are separately recorded, not claimed as four user selections.
 Actual Claude account setup, tester onboarding and real Claude conversations
 remain issue #4. Predictions-versus-battles validation remains issue #5.
+
+## General roster and stat queries (#28)
+
+For enumeration or cross-unit filters, first call `discover_unit_fields`, then
+page categorical values for the intended roster/type. Use `search_units` with
+explicit AND/OR predicates, selected fields and variant/family mode. Follow
+every continuation before claiming an exhaustive list. Keep stats attached to
+matching variants when grouping mounts. Follow returned keys into the existing
+combat-profile/evidence workflow when needed. Do not infer unsupported special
+character status, convert native speed units silently, or apply conditional
+bonuses to base search values. [Query contract and examples](unit-search.md).
+
+These instructions apply only when the connector exposes the new tools. Until
+deployment and metadata refresh are verified, report the missing search
+capability; repeated guessed-name resolution cannot prove roster completeness.
+The installed skill must be synchronized at release; local protocol tests do
+not constitute an actual connected ChatGPT conversation.

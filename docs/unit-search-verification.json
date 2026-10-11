@@ -1,0 +1,116 @@
+{
+  "method": "20 warm calls per case; Python perf_counter; compact UTF-8 JSON bytes; OS cache not cleared. Local library, not hosted network latency.",
+  "cases": {
+    "high_elf_characters": {
+      "arguments": {
+        "filters": {
+          "and": [
+            {
+              "field": "subculture_key",
+              "op": "eq",
+              "value": "wh2_main_sc_hef_high_elves"
+            },
+            {
+              "field": "source_caste",
+              "op": "in",
+              "value": [
+                "lord",
+                "hero"
+              ]
+            }
+          ]
+        },
+        "limit": 100
+      },
+      "median_ms": 2.062,
+      "max_ms": 3.72,
+      "response_bytes": 26604,
+      "total_count": 126,
+      "count_unit": "profiles",
+      "total_matching_variants": 126,
+      "returned_count": 100,
+      "complete": false
+    },
+    "high_elf_families": {
+      "arguments": {
+        "filters": {
+          "and": [
+            {
+              "field": "subculture_key",
+              "op": "eq",
+              "value": "wh2_main_sc_hef_high_elves"
+            },
+            {
+              "field": "source_caste",
+              "op": "in",
+              "value": [
+                "lord",
+                "hero"
+              ]
+            }
+          ]
+        },
+        "mode": "families",
+        "limit": 100
+      },
+      "median_ms": 4.523,
+      "max_ms": 5.945,
+      "response_bytes": 35293,
+      "total_count": 35,
+      "count_unit": "mount_linked_families",
+      "total_matching_variants": 126,
+      "returned_count": 35,
+      "complete": true
+    },
+    "low_cost_ap_sort": {
+      "arguments": {
+        "filters": {
+          "field": "multiplayer_cost",
+          "op": "lte",
+          "value": 1000
+        },
+        "sort": [
+          {
+            "field": "weapon_ap_damage",
+            "direction": "desc"
+          }
+        ],
+        "fields": [
+          "multiplayer_cost",
+          "weapon_ap_damage"
+        ],
+        "limit": 50
+      },
+      "median_ms": 9.244,
+      "max_ms": 10.907,
+      "response_bytes": 15648,
+      "total_count": 1319,
+      "count_unit": "profiles",
+      "total_matching_variants": 1319,
+      "returned_count": 50,
+      "complete": false
+    },
+    "full_roster_first_page": {
+      "arguments": {
+        "limit": 100
+      },
+      "median_ms": 17.651,
+      "max_ms": 20.043,
+      "response_bytes": 27198,
+      "total_count": 2379,
+      "count_unit": "profiles",
+      "total_matching_variants": 2379,
+      "returned_count": 100,
+      "complete": false
+    }
+  },
+  "snapshot": {
+    "id": "595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4",
+    "schema_version": 4,
+    "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+    "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+    "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+    "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+    "coverage_json": "{\"activated_access\":\"unit ability links only; character skill/rank routes are not yet imported\",\"activated_payloads\":\"source graphs retained for every activated root; runtime execution unverified\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+  }
+}

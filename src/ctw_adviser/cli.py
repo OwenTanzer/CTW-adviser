@@ -36,6 +36,10 @@ def main():
     evaluate.add_argument('--scenario', help='JSON scenario object; defaults are illustrative, not calibrated')
     evaluate.add_argument('--subculture-a')
     evaluate.add_argument('--subculture-b')
+    for command in ('search-units', 'discover-unit-fields'):
+        query = commands.add_parser(command)
+        query.add_argument('--db', type=Path, required=True)
+        query.add_argument('--query', default='{}', help='JSON arguments matching the MCP tool')
     for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance',
                     'resolve-effect', 'effect', 'unit-effects'):
         query = commands.add_parser(command)
@@ -61,6 +65,15 @@ def main():
             result = build_snapshot(args.ctw_root, args.output)
         elif args.command == 'inspect':
             result = inspect_snapshot(args.snapshot)
+        elif args.command in ('search-units', 'discover-unit-fields'):
+            with Queries(args.db) as queries:
+                options = json.loads(args.query)
+                if not isinstance(options, dict):
+                    raise ValueError('query must be a JSON object')
+                from .mcp import call_tool
+                result = call_tool(queries, args.command.replace('-', '_'), options)['structuredContent']
+                if result['status'] != 'ok':
+                    print(json.dumps(result)); return 1
         elif args.command == 'movement-phase':
             with Queries(args.db) as queries:
                 result = movement_phase(queries, args.unit_a, args.unit_b,

@@ -77,3 +77,10 @@ inline evidence IDs and defer source/provenance dictionaries; use
 The recovery audit checks both views across all roster contexts against the
 published pre-repair baseline; its review-key inventory is checked in.
 
+
+## General unit search
+
+Use `discover_unit_fields` and `search_units` for roster enumeration, numeric
+filters, field comparisons and explicit mount grouping. The same query path is
+available via `discover-unit-fields` and `search-units` CLI commands. See the
+[query contract, examples and release gates](docs/unit-search.md).
