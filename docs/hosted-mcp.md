@@ -1,6 +1,6 @@
 # Hosted MCP service (issue #3)
 
-The same eight read-only tools served over stdio are available at `/mcp` using
+The same ten read-only tools served over stdio are available at `/mcp` using
 MCP Streamable HTTP protocol `2025-06-18`. The live endpoint is
 `https://ctw-adviser-mcp-production.up.railway.app/mcp`, with public,
 unauthenticated read-only access. ChatGPT CTW Advisor connector calls were
@@ -144,16 +144,18 @@ For ChatGPT Work,
 go to ChatGPT Plugins, select **+ → Add custom MCP server**, enter a name and
 description, and supply `https://ctw-adviser-mcp-production.up.railway.app/mcp` under Connection.
 Choose **No authentication**, review the risk warning, create the
-plugin, and inspect the eight discovered tools. Install it, start a new chat,
+plugin, and inspect the ten discovered tools. Install it, start a new chat,
 select the plugin with `@`, and run the exact-name, ambiguity and pair probes.
 Workspace policy can restrict custom servers. If tool metadata changes, refresh
 the connection and start a new chat before retesting. These steps follow the
 [OpenAI plugin connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt).
 Owen reported successful connector calls for all three parent fixtures and an
 extra pair on 2026-10-11. Independent connector receipts and CLI comparisons
-are recorded in [closure evidence](closure-3-6.md). The server exposes eight
-tools; this session’s connector exposes the six unit/evaluation tools required
-by this workflow. The two effect tools are outside this acceptance scope.
+are recorded in [closure evidence](closure-3-6.md). The server then exposed eight
+tools; that session’s connector exposed the six unit/evaluation tools required
+by this workflow. The two effect tools are outside this acceptance scope. Issue
+#28 adds `discover_unit_fields` and `search_units` ([unit search](unit-search.md)),
+for ten tools.
 Real Claude conversations and tester onboarding remain issue #4.
 
 For HTTP 429, honor Retry-After and pace calls. The 60-request process-wide

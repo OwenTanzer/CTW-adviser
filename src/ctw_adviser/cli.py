@@ -9,6 +9,7 @@ from .store import inspect_snapshot
 from .queries import Queries, ResolutionError
 from .model import movement_phase
 from .combat import evaluate_matchup
+from .unit_search import SearchError, UnitSearch
 
 
 def main():
@@ -36,6 +37,19 @@ def main():
     evaluate.add_argument('--scenario', help='JSON scenario object; defaults are illustrative, not calibrated')
     evaluate.add_argument('--subculture-a')
     evaluate.add_argument('--subculture-b')
+    fields = commands.add_parser('unit-fields', help='Describe searchable unit fields, or page one field categories')
+    fields.add_argument('--db', type=Path, required=True)
+    fields.add_argument('field', nargs='?')
+    fields.add_argument('--cursor')
+    fields.add_argument('--limit', type=int, default=64)
+    search = commands.add_parser('search-units', help='Structured unit search over the pinned baseline')
+    search.add_argument('--db', type=Path, required=True)
+    search.add_argument('--where', help='JSON condition or all/any group')
+    search.add_argument('--fields', help='JSON list of output field ids')
+    search.add_argument('--sort', help='JSON list of {field, direction}')
+    search.add_argument('--group-by', choices=('variant', 'mount_family'), default='variant')
+    search.add_argument('--limit', type=int, default=25)
+    search.add_argument('--cursor')
     for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance',
                     'resolve-effect', 'effect', 'unit-effects'):
         query = commands.add_parser(command)
@@ -68,6 +82,14 @@ def main():
                                         order_a=args.order_a, order_b=args.order_b,
                                         metres_per_second_per_speed_point=args.metres_per_second_per_speed_point,
                                         subculture_a=args.subculture_a, subculture_b=args.subculture_b)
+        elif args.command == 'unit-fields':
+            with Queries(args.db) as queries:
+                result = UnitSearch(queries).discover(args.field, cursor=args.cursor, limit=args.limit)
+        elif args.command == 'search-units':
+            with Queries(args.db) as queries:
+                decode = lambda value: json.loads(value) if value else None
+                result = UnitSearch(queries).search(decode(args.where), fields=decode(args.fields), sort=decode(args.sort),
+                                                    group_by=args.group_by, limit=args.limit, cursor=args.cursor)
         elif args.command == 'evaluate':
             with Queries(args.db) as queries:
                 result = evaluate_matchup(queries, args.unit_a, args.unit_b,
@@ -111,6 +133,9 @@ def main():
                     result = queries.get_provenance(args.keys)
     except ResolutionError as exc:
         print(json.dumps(exc.result, ensure_ascii=False))
+        return 2
+    except SearchError as exc:
+        print(json.dumps({'status': 'invalid_query', **exc.detail}, ensure_ascii=False))
         return 2
     except (ValueError, OSError, KeyError, sqlite3.Error) as exc:
         print(json.dumps({'status': 'failed', 'error': str(exc)}))

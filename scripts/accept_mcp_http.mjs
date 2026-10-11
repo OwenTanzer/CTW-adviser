@@ -19,7 +19,7 @@ try {
   assert.deepEqual(new Set(listed.tools.map(t => t.name)), new Set([
     'resolve_unit', 'get_unit_combat_profile', 'get_matchup_evidence',
     'resolve_effect', 'get_effect', 'get_detail', 'get_provenance',
-    'evaluate_single_unit_matchup'
+    'evaluate_single_unit_matchup', 'discover_unit_fields', 'search_units'
   ]));
   for (const tool of listed.tools) {
     assert.ok(tool.inputSchema && tool.outputSchema && tool.description);
@@ -49,6 +49,21 @@ try {
   const ref = profile.data.units[0].provenance_refs[0];
   assert.ok((await call('get_provenance', { record_ids: [ref] })).data.provenance[ref]);
   assert.equal((await call('get_detail', { ref: `record:${ref}`, limit: 1 })).status, 'ok');
+  const fields = await call('discover_unit_fields', {});
+  const subculture = fields.data.fields.find(f => f.id === 'subculture');
+  const hef = subculture.categories.find(c => c.label === 'High Elves').value;
+  const roster = await call('search_units', {
+    where: { all: [{ field: 'subculture', op: '=', value: hef }, { field: 'caste', op: 'in', value: ['lord', 'hero'] }] },
+    group_by: 'mount_family', limit: 100
+  });
+  assert.equal(roster.data.complete, true);
+  assert.ok(roster.data.matched_variants > 100);
+  const variant = roster.data.results[0].variants[0];
+  const followed = await call('get_unit_combat_profile', { unit_key: variant.unit_key, subculture: hef, section: 'attributes', limit: 1 });
+  assert.equal(followed.data.units[0].identity.unit_key, variant.unit_key);
+  const ambiguousField = await client.callTool({ name: 'search_units',
+    arguments: { where: { field: 'cost', op: '<=', value: 1000 } } });
+  assert.equal(ambiguousField.isError, true);
   const missing = await client.callTool({ name: 'get_unit_combat_profile',
     arguments: { unit_key: 'no-such-unit' } });
   assert.equal(missing.isError, true);
@@ -86,9 +101,9 @@ try {
   await client.close();
   reconnected = new Client({ name: 'ctw-adviser-reconnect', version: '1.0.0' });
   await reconnected.connect(new StreamableHTTPClientTransport(new URL(endpoint)));
-  assert.equal((await reconnected.listTools()).tools.length, 8);
+  assert.equal((await reconnected.listTools()).tools.length, 10);
   console.log(JSON.stringify({ status: 'passed', endpoint, protocol: '2025-06-18',
-    source_commit: exact.snapshot.source_commit, tools: listed.tools.map(t => t.name), pairs: 4,
+    source_commit: exact.snapshot.source_commit, tools: listed.tools.map(t => t.name), pairs: 4, unit_search: true,
     calculations: 4, errors: true, reconnect: true }));
 } finally {
   await reconnected?.close();
