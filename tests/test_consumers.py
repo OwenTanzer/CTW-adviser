@@ -7,6 +7,7 @@ from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,9 +37,8 @@ class RealConsumerTests(unittest.TestCase):
             self.assertEqual(base["snapshot"]["commit"], "595e22764b22e748afdbafafcb0a6258973e2451")
             self.assertEqual(base["sourced_inputs"][0]["native_speed"], q.get_unit_profile("Lothern Sea Guard")["units"][0]["movement"]["speed"])
             self.assertEqual(len(base["derived"]["range_entry"][0]["attacks"]), len(base["sourced_inputs"][0]["ranged_attacks"]))
-            path = ROOT / "work" / "consumer-mutated-test.sqlite"
-            try:
-                path.unlink(missing_ok=True)
+            with tempfile.TemporaryDirectory() as folder:
+                path = Path(folder) / "changed.sqlite"
                 with closing(sqlite3.connect(path)) as db:
                     q.db.backup(db)
                     db.execute("UPDATE unit_profiles SET speed=speed+1 WHERE unit_key=?",
@@ -52,8 +52,6 @@ class RealConsumerTests(unittest.TestCase):
                 self.assertLess(result["derived"]["contact"]["seconds"], base["derived"]["contact"]["seconds"])
                 self.assertNotEqual(result["sourced_inputs"][0]["ranged_attacks"][0]["range_metres"],
                                     base["sourced_inputs"][0]["ranged_attacks"][0]["range_metres"])
-            finally:
-                path.unlink(missing_ok=True)
 
     def test_orders_ambiguity_errors_and_cli(self):
         with Queries(DB) as q:
@@ -141,17 +139,24 @@ class RealConsumerTests(unittest.TestCase):
             {"jsonrpc":"2.0","method":"notifications/initialized"},
             {"jsonrpc":"2.0","id":2,"method":"tools/list"},
             {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_matchup_evidence",
-               "arguments":{"unit_a":"Bloodletters of Khorne","unit_b":"Kroxigor","limit":256}}},
+               "arguments":{"unit_a":"Lothern Sea Guard","unit_b":"Blue Horrors of Tzeentch","limit":256}}},
+            {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"resolve_unit",
+               "arguments":{"name_or_key":"不存在的单位"}}},
         ]
         env = dict(os.environ, PYTHONPATH=str(ROOT / "src"))
+        env.pop("PYTHONIOENCODING", None)
+        env["PYTHONUTF8"] = "0"  # Force the ordinary Windows pipe encoding path.
         run = subprocess.run([sys.executable, "-m", "ctw_adviser.mcp", "--db", str(DB)],
-                             input="".join(json.dumps(m) + "\n" for m in messages),
-                             capture_output=True, text=True, env=env, check=True)
-        responses = [json.loads(line) for line in run.stdout.splitlines()]
-        self.assertEqual([r["id"] for r in responses], [1, 2, 3])
+                             input="".join(json.dumps(m, ensure_ascii=False) + "\n" for m in messages).encode("utf-8"),
+                             capture_output=True, env=env, check=True)
+        wire = run.stdout.decode("utf-8", errors="strict")
+        self.assertIn("—", wire)
+        responses = [json.loads(line) for line in wire.splitlines()]
+        self.assertEqual([r["id"] for r in responses], [1, 2, 3, 4])
         self.assertEqual(responses[0]["result"]["protocolVersion"], "2025-06-18")
         self.assertEqual(responses[2]["result"]["structuredContent"]["data"]["units"][0]["identity"]["name"],
-                         "Bloodletters of Khorne")
+                         "Lothern Sea Guard")
+        self.assertEqual(responses[3]["result"]["structuredContent"]["data"]["query"], "不存在的单位")
 
 
 if __name__ == "__main__":

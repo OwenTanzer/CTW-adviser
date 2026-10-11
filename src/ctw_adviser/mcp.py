@@ -178,6 +178,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", required=True)
     args = parser.parse_args()
+    # MCP stdio is UTF-8 regardless of the Windows console/pipe code page.
+    sys.stdin.reconfigure(encoding="utf-8", errors="strict")
+    sys.stdout.reconfigure(encoding="utf-8", errors="strict", newline="\n")
     with Queries(args.db) as queries:
         serve(queries)
 
