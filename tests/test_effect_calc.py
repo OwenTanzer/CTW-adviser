@@ -262,6 +262,44 @@ class EffectDamageTests(unittest.TestCase):
                 ValueError, 'dangling_payload_reference'):
             self.run_case(COMET)
 
+    def test_external_detail_refs_are_not_damage_graph_roots(self):
+        cases = (
+            ('wh2_dlc12_army_abilities_warpstorm_doomrocket_upgraded',
+             'unit_abilities_tables.superseded_abilities_set'),
+            ('wh2_dlc15_army_abilities_azhags_big_waaagh',
+             'unit_special_abilities_tables.behaviour'),
+            ('wh3_dlc25_unit_formation_shieldwall',
+             'unit_special_abilities_tables.formation'),
+        )
+        for key, relation in cases:
+            with self.subTest(relation=relation):
+                result = self.run_case(key)
+                links = [item for item in result['unsupported_components']
+                         if item.get('relationship') == relation]
+                self.assertTrue(links)
+                packet = self.q.get_effect(key)
+                self.assertTrue(all(item['detail_ref'] in packet['detail_refs'] for item in links))
+        from unittest.mock import patch
+        key = cases[1][0]
+        packet = copy.deepcopy(self.q.get_effect(key, limit=256, include_diagnostics=True,
+                                                 include_provenance=True))
+        ref = next(e['node_ref'] for e in packet['effect']['mechanic']['effects']
+                   if e.get('relationship') == cases[1][1])
+        del packet['detail_refs'][ref]
+        with patch.object(self.q, 'get_effect', return_value=packet), self.assertRaisesRegex(
+                ValueError, 'dangling_payload_reference'):
+            self.run_case(key)
+
+    def test_missing_emitted_provenance_is_rejected(self):
+        from unittest.mock import patch
+        packet = copy.deepcopy(self.q.get_effect(COMET, limit=256, include_diagnostics=True,
+                                                 include_provenance=True))
+        projectile = next(n for n in packet['payload_graph']['nodes'] if n['kind'] == 'projectiles')
+        projectile['provenance_refs'].append('synthetic:missing')
+        with patch.object(self.q, 'get_effect', return_value=packet), self.assertRaisesRegex(
+                ValueError, 'missing provenance in calculation result'):
+            self.run_case(COMET)
+
 
     def test_end_to_end_from_unit_and_incompatible_evidence(self):
         option = next(o for o in self.q.get_unit_profile(TECLIS, limit=256)['units'][0]['activated_options']

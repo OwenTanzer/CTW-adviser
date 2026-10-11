@@ -25,7 +25,11 @@ The calculator walks the effect's payload graph from each casting root, per
 route. Multiplicity comes only from source counts: bombardment
 `num_projectiles`, shrapnel `amount` and `num_vortexes`.
 Dangling graph references fail with `dangling_payload_reference`; a missing
-linked node never silently lowers the total.
+linked node never silently lowers the total. Explicitly mapped external
+references for supersession, behavior and formation resolve through
+`detail_refs`, remain visible as unsupported components and are not treated as
+damage-graph roots. Every result citation must exist in the same-snapshot
+source packets' provenance maps before the result is returned.
 
 | Component | Per entity | Count | Totals |
 | --- | --- | --- | --- |
@@ -55,6 +59,9 @@ under `source_facts.intensity_settings`.
   cast (for example, a projectile and its explosion both naming one shrapnel
   record) is counted once. `totals.upper_all_routes_attempted_damage` adds every
   route, and `shared_definition_multiplicity` makes the status `partial`.
+- **External mechanics.** Supersession, behavior and formation detail links
+  remain in `unsupported_components` with their exact relationship and detail
+  reference; they do not imply a damage event.
 - **Healing, stat and attribute effects, and summons.** These are listed in
   `unsupported_components`. Buff/debuff engagement comparison is the next #20
   increment.
@@ -94,12 +101,14 @@ Unknown fields, out-of-range values and other barrier orders are rejected.
 
 ## Verification
 
-`tests/test_effect_calc.py` (15 tests, from source evidence and one synthetic corruption probe) covers:
+`tests/test_effect_calc.py` (17 tests, from source evidence and synthetic corruption probes) covers:
 
 - a spell chain recomputed through the shared relation (Comet)
 - a non-spell ability with a contact phase (Pyromaniac), including the source-implied schedule
 - Spirit Leech raw phase damage, cap enforcement and unresolved protection/intensity
 - a linked Comet explosion removed from a copied packet, which must be rejected
+- valid external supersession, behavior and formation links, plus a missing detail link
+- an injected nonexistent provenance ID, which must be rejected
 - zero-direct-damage transport (Hell Hammer)
 - overcast versus normal and the excluded miscast branch
 - shared shrapnel counted once with an upper bound (Dreaded Thirteenth)
@@ -111,6 +120,7 @@ Unknown fields, out-of-range values and other barrier orders are rejected.
 - library/CLI/MCP equality
 - resolvable cross-references and provenance
 
-The earlier full-inventory sweep needs refreshing after these phase changes.
-These regression checks are not live-battle observations;
-`empirical_calibration` is null.
+A fresh independent-style sweep on this exact evaluator tree completed all
+1,884 pinned effects against Lothern Sea Guard with zero errors: 216
+`calculated`, 493 `partial` and 1,175 `blocked`. These regression checks are
+not live-battle observations; `empirical_calibration` is null.

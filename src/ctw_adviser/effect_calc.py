@@ -18,6 +18,11 @@ from .queries import Queries, ResolutionError
 
 MODEL_VERSION = "effect-damage-0.1.0"
 MAX_ROUTE_DEPTH = 10
+EXTERNAL_DETAIL_RELATIONS = frozenset({
+    "unit_abilities_tables.superseded_abilities_set",
+    "unit_special_abilities_tables.behaviour",
+    "unit_special_abilities_tables.formation",
+})
 DEFAULTS = {
     "projectile_hit_probability": 0.5,
     "entities_per_explosion": 1.0,
@@ -89,13 +94,24 @@ def _routes(packet):
     """Root-to-leaf walk over the bounded payload graph with route multiplicity."""
     graph = packet["payload_graph"]
     nodes = {n["id"]: n for n in graph["nodes"]}
+    details = packet["detail_refs"]
     children = {}
     for edge in graph["edges"]:
         if edge["relationship"] != "phase_effect":
             children.setdefault(edge["from"], []).append(edge)
-    roots = [(e["relationship"], e["node_ref"]) for e in packet["effect"]["mechanic"]["effects"]
-             if e["kind"] == "payload_reference"]
-    missing = sorted({ref for _, ref in roots if ref not in nodes} |
+    roots, missing_roots = [], set()
+    for effect in packet["effect"]["mechanic"]["effects"]:
+        if effect["kind"] != "payload_reference":
+            continue
+        relation, ref = effect["relationship"], effect["node_ref"]
+        if relation in EXTERNAL_DETAIL_RELATIONS:
+            if ref not in details:
+                missing_roots.add(ref)
+        elif ref in nodes:
+            roots.append((relation, ref))
+        else:
+            missing_roots.add(ref)
+    missing = sorted(missing_roots |
                      {edge["to"] for edge in graph["edges"] if edge["to"] not in nodes} |
                      {edge["from"] for edge in graph["edges"] if edge["from"] not in nodes})
     if missing:
@@ -127,6 +143,20 @@ def _routes(packet):
     return events
 
 
+def _check_provenance_refs(value, available):
+    """Reject output citations absent from the two verified source packets."""
+    if isinstance(value, dict):
+        if "provenance_refs" in value:
+            refs = value["provenance_refs"]
+            if not isinstance(refs, list) or any(not isinstance(ref, str) or ref not in available for ref in refs):
+                raise ValueError("missing provenance in calculation result")
+        for nested in value.values():
+            _check_provenance_refs(nested, available)
+    elif isinstance(value, list):
+        for nested in value:
+            _check_provenance_refs(nested, available)
+
+
 def _damages_enemies(node):
     """True when a payload node carries nonzero damage that can reach enemies."""
     kind, n = node["kind"], node["native_parameters"]
@@ -154,8 +184,10 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
     resolution = queries.resolve_effect(effect)
     if resolution["status"] != "resolved":
         raise ResolutionError(resolution)
-    packet = queries.get_effect(resolution["resolved"]["ability_key"], limit=256, include_diagnostics=True)
-    target_packet = queries.get_unit_profile(target, subculture=target_subculture, limit=256, include_diagnostics=True)
+    packet = queries.get_effect(resolution["resolved"]["ability_key"], limit=256,
+                                include_diagnostics=True, include_provenance=True)
+    target_packet = queries.get_unit_profile(target, subculture=target_subculture, limit=256,
+                                             include_diagnostics=True, include_provenance=True)
     if packet["snapshot"]["commit"] != target_packet["snapshot"]["commit"]:
         raise ValueError("effect and target evidence come from different snapshots")
     unit = target_packet["units"][0]
@@ -383,6 +415,11 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
             unsupported.append({"kind": effect["kind"], "phase_ref": effect.get("phase_ref"),
                                 "reason": "Not target damage; buff/debuff and summon application are separate (#20 later increments).",
                                 "provenance_refs": effect["provenance_refs"]})
+        elif effect["kind"] == "payload_reference" and effect["relationship"] in EXTERNAL_DETAIL_RELATIONS:
+            unsupported.append({"kind": "external_detail_reference", "relationship": effect["relationship"],
+                                "detail_ref": effect["node_ref"],
+                                "reason": "A linked external mechanic, not a damage-graph root; not added to this cast's damage.",
+                                "provenance_refs": effect["provenance_refs"]})
 
     if not cfg["historical_relations_apply_to_patch_9"]:
         for c in components:
@@ -456,7 +493,7 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
         "The 8.1.1-era damage relation is used for the 9.0 baseline as in the #5 model.",
         "Failure branches are reported, not added; their recipients are unverified.",
     ]
-    return {
+    result = {
         "model_version": MODEL_VERSION, "source_packet_version": packet["schema_version"],
         "snapshot": {"commit": packet["snapshot"]["commit"], "serving_contract_sha256": queries.snapshot["contract_sha256"]},
         "status": status,
@@ -488,3 +525,5 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
         "unresolved_inputs": unresolved, "limitations": limitations,
         "empirical_calibration": None,
     }
+    _check_provenance_refs(result, set(packet["provenance"]) | set(target_packet["provenance"]))
+    return result
