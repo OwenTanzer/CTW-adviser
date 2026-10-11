@@ -6,7 +6,7 @@ owns rebuildable serving artifacts and, in later increments, matchup calculation
 Current implementation: issue #2, phases 1-3 and local phase-5 packaging - pinned contracts and fixtures,
 an offline STRICT SQLite snapshot builder, and indexed JSON evidence retrieval
 with unit resolution, inline passive explanations, projections and continuation.
-The combat evaluator is later work.
+The first conditional two-unit combat evaluator is in progress for issue #5.
 The first downstream consumers are a local read-only MCP stdio query adapter and
 an explicitly illustrative movement-phase timing command. See
 [consumer increment](docs/consumer-increment.md) for commands and limits. The full
@@ -41,6 +41,8 @@ See [source contract](docs/source-contract.md) and
 [lookup contract](docs/lookup-contract.md) for packet semantics and fixture rebuilds.
 See the [store contract](docs/store-contract.md) for build boundaries, source
 accounting, dependency selection and atomic installation.
+See [the first matchup model](docs/matchup-model.md) for the callable evaluator,
+scenario/result contract, assumptions, test commands and live-validation gap.
 See [local rebuild and measurements](docs/local-rebuild.md) for the reproducible
 SQLite artifact, SHA-256 manifest, verification and packet benchmark.
 
@@ -59,3 +61,4 @@ inline evidence IDs and defer source/provenance dictionaries; use
 `--include-provenance` to expand them or the `provenance` command to resolve IDs.
 The recovery audit checks both views across all roster contexts against the
 published pre-repair baseline; its review-key inventory is checked in.
+
