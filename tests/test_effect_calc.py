@@ -169,6 +169,11 @@ class EffectDamageTests(unittest.TestCase):
         self.assertEqual(leech['derived']['totals']['modeled_delivery_attempted_damage'], 0)
         self.assertEqual(leech['derived']['totals']['health_damage_capped'], 0)
         self.assertIn('phase_damage_delivery_unresolved', [u['code'] for u in leech['unresolved_inputs']])
+        resistant = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound', target='Bloodletters of Khorne')
+        self.assertEqual(resistant['derived']['totals']['attempted_damage'], 67 * 13)
+        self.assertEqual(resistant['status'], 'partial')
+        self.assertNotEqual(resistant['source_facts']['target_protection'], leech['source_facts']['target_protection'])
+        self.assertEqual(resistant['derived']['totals']['health_damage_capped'], 0)
         overridden = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound', scenario={'phase_damage_applications': 5})
         self.assertEqual(overridden['derived']['totals']['attempted_damage'], 67 * 5)
         capped = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound',
