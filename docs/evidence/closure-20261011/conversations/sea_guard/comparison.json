@@ -1,0 +1,44 @@
+[
+  {
+    "label": "front",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh2_main_hef_inf_lothern_sea_guard_1",
+      "wh3_main_tze_inf_blue_horrors_0",
+      "--scenario",
+      "{\"mode\": \"custom_battle\", \"baseline\": \"unmodified_ultra_rank_0\", \"duration_seconds\": 120, \"separation_metres\": 100, \"line_of_sight\": true, \"terrain_speed_factor\": 1, \"path_length_factor\": 1, \"sides\": {\"a\": {\"order\": \"hold\", \"facing\": \"front\", \"fire\": true, \"fight\": true}, \"b\": {\"order\": \"approach\", \"facing\": \"front\", \"fire\": true, \"fight\": true}}}"
+    ],
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "returncode": 0,
+    "exact_data_equality": true,
+    "differences": []
+  },
+  {
+    "label": "rear",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh2_main_hef_inf_lothern_sea_guard_1",
+      "wh3_main_tze_inf_blue_horrors_0",
+      "--scenario",
+      "{\"mode\": \"custom_battle\", \"baseline\": \"unmodified_ultra_rank_0\", \"duration_seconds\": 120, \"separation_metres\": 100, \"line_of_sight\": true, \"terrain_speed_factor\": 1, \"path_length_factor\": 1, \"sides\": {\"a\": {\"order\": \"hold\", \"facing\": \"rear\", \"fire\": true, \"fight\": true}, \"b\": {\"order\": \"approach\", \"facing\": \"front\", \"fire\": true, \"fight\": true}}}"
+    ],
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "returncode": 0,
+    "exact_data_equality": true,
+    "differences": []
+  }
+]

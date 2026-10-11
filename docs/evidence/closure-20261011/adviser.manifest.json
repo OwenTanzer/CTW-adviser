@@ -1,0 +1,76 @@
+{
+  "adviser_commit": "38affa2992696f284baf3ed6946d11a699163f43",
+  "adviser_worktree_dirty": false,
+  "artifact": {
+    "bytes": 86831104,
+    "file": "adviser.sqlite",
+    "sha256": "e0f18a10b3ef2cc7f290928a6026f0b31225b783d983e3dd263fd63f9b86b524"
+  },
+  "build_query_plans": {
+    "alias_key": [
+      "SEARCH a USING INDEX sqlite_autoindex_unit_aliases_1 (unit_key=?)",
+      "SEARCH p USING INDEX profile_identity (unit_key=?)"
+    ],
+    "effect_key": [
+      "SEARCH effect_abilities USING INDEX sqlite_autoindex_effect_abilities_1 (ability_key=?)"
+    ],
+    "effect_name": [
+      "SEARCH effect_abilities USING INDEX effect_abilities_name_nocase (name=?)"
+    ],
+    "effect_units": [
+      "SEARCH effect_access USING COVERING INDEX effect_access_ability (ability_key=?)"
+    ],
+    "effect_variant_reverse": [
+      "SEARCH effect_variants USING COVERING INDEX effect_variants_reverse (variant_key=?)"
+    ],
+    "relations": [
+      "SEARCH unit_records USING COVERING INDEX unit_records_key (unit_key=?)"
+    ],
+    "reverse_edge": [
+      "SEARCH relation_edges USING COVERING INDEX relation_edges_reverse (target_record=?)"
+    ],
+    "source_unit_name": [
+      "SEARCH unit_profiles USING INDEX unit_profiles_source_unit_name_nocase (source_unit_name=?)"
+    ],
+    "unit_effects": [
+      "SEARCH effect_access USING COVERING INDEX effect_access_unit (unit_key=?)"
+    ],
+    "unit_key": [
+      "SEARCH unit_profiles USING INDEX profile_identity (unit_key=?)"
+    ],
+    "unit_name": [
+      "SEARCH unit_profiles USING INDEX unit_profiles_unit_name_nocase (unit_name=?)"
+    ]
+  },
+  "build_seconds": 6.171375502999581,
+  "counts": {
+    "classifications": {
+      "activated_option": 1884,
+      "core_passive": 499
+    },
+    "roster_rows": 3181,
+    "source_unit_keys": 2409,
+    "unit_profiles": 2379
+  },
+  "format": "ctw-adviser-local-rebuild-manifest-v1",
+  "runtime": {
+    "machine": "x86_64",
+    "os": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "snapshot": {
+    "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+    "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+    "coverage_json": "{\"activated_access\":\"unit ability links only; character skill/rank routes are not yet imported\",\"activated_payloads\":\"source graphs retained for every activated root; runtime execution unverified\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}",
+    "id": "595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4",
+    "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+    "schema_version": 4,
+    "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451"
+  },
+  "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+  "source_contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+  "source_repository": "https://github.com/OwenTanzer/CTW-data",
+  "source_tree": "a682a56f25daca27ff08a9b4a506b4dbf0c42778"
+}

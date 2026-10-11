@@ -1,9 +1,11 @@
-# Hosted MCP transport candidate (issue #3)
+# Hosted MCP service (issue #3)
 
 The same eight read-only tools served over stdio are available at `/mcp` using
-MCP Streamable HTTP protocol `2025-06-18`. This is a deployable candidate, not a
-live endpoint or a completed ChatGPT Work connection. The existing Railway
-Datasette URL is only for human inspection.
+MCP Streamable HTTP protocol `2025-06-18`. The live endpoint is
+`https://ctw-adviser-mcp-production.up.railway.app/mcp`, with public,
+unauthenticated read-only access. ChatGPT CTW Advisor connector calls were
+verified on 2026-10-11; see [acceptance evidence](closure-3-6.md). The Railway
+Datasette URL remains human inspection only.
 
 ## Local build and acceptance
 
@@ -31,8 +33,8 @@ The Node SDK is a development-only test dependency in ignored `work/`; the serve
 uses Python's standard library. For a reviewed deployment replace the URL in
 `accept_mcp_http.mjs` with the final `https://.../mcp` endpoint. The same four
 pairs, ambiguity, paging, detail, provenance and four calculation
-checks then run remotely. The combat implementation from PR #16 is present in
-the branch base; deployment still needs the separate production review below.
+checks then run remotely. The hosted adapter delegates to the same combat library as the CLI.
+Keep live release verification separate from local test results.
 
 ## Wire and lifecycle
 
@@ -94,15 +96,17 @@ The inspected Railway project is **CTW Datasette**
 (`79823054-462e-4d00-b962-94ad526c4b4f`). Its existing inspection service,
 **ctw-datasette** (`892527d7-a069-4df0-835a-0d71b792f3f7`), is a successful
 inspection deployment at `https://ctw-datasette-production.up.railway.app`.
-It must stay an inspection app; that URL is not an MCP endpoint. The observed
-source is `OwenTanzer/CTW-adviser` branch `main`, with Railway config pointing
-to commit `f3dab8b346a348c0fb22d79e18bc7328b12f094c` at inspection time.
+It must stay an inspection app; that URL is not an MCP endpoint. The inspection service has its own release lifecycle; its historical source
+commit is not evidence of the MCP service version.
 
 The approved hosted target is a **separate** `ctw-adviser-mcp` service in the
 same project and production environment, with its own Railway HTTPS domain.
-An empty service (`ec9aff14-4f04-4386-a62b-d83657a0c927`) is configured
-with `Dockerfile.mcp` and `/healthz` with a 120-second timeout. It currently
-has no source, variables, domain or deployment.
+Service `ec9aff14-4f04-4386-a62b-d83657a0c927` uses `Dockerfile.mcp` and
+`/healthz`. On 2026-10-11, Railway reports deployment
+`5961fed3-5475-4ae9-8e06-59cf424f1004` SUCCESS (created 13:27:12 UTC),
+with HTTPS domain `ctw-adviser-mcp-production.up.railway.app` targeting port 8080.
+The deployment listing does not expose a source SHA for this redeploy; record
+the live protocol versions and equality evidence rather than inventing one.
 Railway's legacy `railway.toml` config path is unavailable to new services;
 the repository root file continues to belong to Datasette. Do not repurpose
 the Datasette service or point a client at it.
@@ -124,8 +128,7 @@ limits bound ordinary traffic; production may add platform edge controls after
 inspection. TLS must terminate at the platform HTTPS domain. No credential or
 permission expansion is included here.
 
-Do not attach a source, issue a domain or deploy until independent transport
-review and the integrated combat review pass. For each reviewed release: build
+The initial service is deployed. For each subsequent reviewed release: build
 the image at a reviewed adviser commit;
 download exactly the files in `source_lock.json` from the pinned CTW-data
 commit during image build; verify hashes and contract; build the SQLite file;
@@ -137,14 +140,22 @@ store schema 4, packet 1.20.0 and model version. On mismatch, stop rollout and
 restore the previous successful deployment. A source refresh changes the lock,
 contract and verification evidence through its separate reviewed process.
 
-For ChatGPT Work, once HTTPS, access policy and service are approved and live,
+For ChatGPT Work,
 go to ChatGPT Plugins, select **+ → Add custom MCP server**, enter a name and
-description, and supply the final `https://<domain>/mcp` URL under Connection.
-Choose the approved authentication mode, review the risk warning, create the
+description, and supply `https://ctw-adviser-mcp-production.up.railway.app/mcp` under Connection.
+Choose **No authentication**, review the risk warning, create the
 plugin, and inspect the eight discovered tools. Install it, start a new chat,
 select the plugin with `@`, and run the exact-name, ambiguity and pair probes.
 Workspace policy can restrict custom servers. If tool metadata changes, refresh
 the connection and start a new chat before retesting. These steps follow the
 [OpenAI plugin connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt).
-Client organization permissions and first conversation acceptance remain to be
-verified; no live ChatGPT connection is claimed here.
+Owen reported successful connector calls for all three parent fixtures and an
+extra pair on 2026-10-11. Independent connector receipts and CLI comparisons
+are recorded in [closure evidence](closure-3-6.md). The server exposes eight
+tools; this session’s connector exposes the six unit/evaluation tools required
+by this workflow. The two effect tools are outside this acceptance scope.
+Real Claude conversations and tester onboarding remain issue #4.
+
+For HTTP 429, honor Retry-After and pace calls. The 60-request process-wide
+minute budget is shared across clients; simultaneous acceptance suites can
+exhaust it without indicating a model or source defect.

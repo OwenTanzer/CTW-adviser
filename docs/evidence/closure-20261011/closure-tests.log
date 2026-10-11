@@ -1,0 +1,27 @@
+test_ambiguity_paging_detail_and_errors (tests.test_mcp_http.HTTPTransportTests.test_ambiguity_paging_detail_and_errors) ... ok
+test_completed_requests_release_all_connection_slots (tests.test_mcp_http.HTTPTransportTests.test_completed_requests_release_all_connection_slots) ... ok
+test_hosted_startup_rejects_forged_source_commit (tests.test_mcp_http.HTTPTransportTests.test_hosted_startup_rejects_forged_source_commit) ... ok
+test_lifecycle_discovery_and_calls (tests.test_mcp_http.HTTPTransportTests.test_lifecycle_discovery_and_calls) ... ok
+test_oversized_and_nonfinite_scenario_numbers_do_not_disconnect (tests.test_mcp_http.HTTPTransportTests.test_oversized_and_nonfinite_scenario_numbers_do_not_disconnect) ... ok
+test_rate_limit_includes_health (tests.test_mcp_http.HTTPTransportTests.test_rate_limit_includes_health) ... ok
+test_slow_body_has_absolute_deadline (tests.test_mcp_http.HTTPTransportTests.test_slow_body_has_absolute_deadline) ... ok
+test_transport_rejections_and_disconnect (tests.test_mcp_http.HTTPTransportTests.test_transport_rejections_and_disconnect) ... ok
+test_rolling_window_and_retry_delay (tests.test_mcp_http.RateLimitTests.test_rolling_window_and_retry_delay) ... ok
+test_ambiguity_and_invalid_bounds (tests.test_mcp_combat.CombatAdapterTests.test_ambiguity_and_invalid_bounds) ... ok
+test_discovery_delegation_and_version (tests.test_mcp_combat.CombatAdapterTests.test_discovery_delegation_and_version) ... ok
+test_numeric_scenario_boundary_is_shared_by_both_transports (tests.test_mcp_combat.CombatAdapterTests.test_numeric_scenario_boundary_is_shared_by_both_transports) ... ok
+test_scenario_schema_exposes_model_settings (tests.test_mcp_combat.CombatAdapterTests.test_scenario_schema_exposes_model_settings) ... ok
+test_barrier_order_and_indeterminate_result_are_preserved (tests.test_mcp_combat.RealCombatAdapterTests.test_barrier_order_and_indeterminate_result_are_preserved) ... ok
+test_library_and_mcp_result_agree (tests.test_mcp_combat.RealCombatAdapterTests.test_library_and_mcp_result_agree) ... ok
+test_missing_armour_structured_unknown_is_preserved (tests.test_mcp_combat.RealCombatAdapterTests.test_missing_armour_structured_unknown_is_preserved) ... ok
+test_entry_edges_and_monotonicity (tests.test_consumers.MovementArithmeticTests.test_entry_edges_and_monotonicity) ... ok
+test_four_pairs_and_ambiguous_mcp_name (tests.test_consumers.RealConsumerTests.test_four_pairs_and_ambiguous_mcp_name) ... ok
+test_mcp_protocol_discovery_pagination_detail_and_provenance (tests.test_consumers.RealConsumerTests.test_mcp_protocol_discovery_pagination_detail_and_provenance) ... ok
+test_mcp_stdio_process (tests.test_consumers.RealConsumerTests.test_mcp_stdio_process) ... ok
+test_model_reads_store_and_changes_with_store (tests.test_consumers.RealConsumerTests.test_model_reads_store_and_changes_with_store) ... ok
+test_orders_ambiguity_errors_and_cli (tests.test_consumers.RealConsumerTests.test_orders_ambiguity_errors_and_cli) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 3.093s
+
+OK

@@ -1,0 +1,476 @@
+[
+  {
+    "tool": "get_detail",
+    "arguments": {
+      "ref": "record:d56bb4dc1aae3feef5b2:161",
+      "limit": 10
+    },
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"status\": \"ok\", \"adapter_version\": \"0.1.0\", \"model_version\": null, \"snapshot\": {\"id\": \"595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4\", \"schema_version\": 4, \"source_commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"contract_sha256\": \"fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1\", \"baseline_json\": \"{\\\"build\\\":\\\"25507028\\\",\\\"context\\\":\\\"unmodified custom battle\\\",\\\"game\\\":\\\"warhammer_3\\\",\\\"patch\\\":\\\"9.0\\\",\\\"rank\\\":0,\\\"unit_scale\\\":\\\"ultra\\\"}\", \"owners_json\": \"{\\\"effect_semantics\\\":{\\\"build\\\":\\\"25546563\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1,\\\"scope\\\":\\\"native stat definitions only\\\"},\\\"shared_abilities\\\":{\\\"base_patch\\\":\\\"9.0\\\",\\\"build\\\":\\\"25546563\\\",\\\"coverage\\\":\\\"partial\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1},\\\"units\\\":{\\\"build\\\":\\\"25507028\\\",\\\"patch\\\":\\\"9.0\\\",\\\"schema\\\":4}}\", \"coverage_json\": \"{\\\"activated_access\\\":\\\"unit ability links only; character skill/rank routes are not yet imported\\\",\\\"activated_payloads\\\":\\\"source graphs retained for every activated root; runtime execution unverified\\\",\\\"packet_interface\\\":\\\"versioned read-only query packets implemented; downstream consumers are separate\\\",\\\"runtime\\\":\\\"unverified; engine behavior is not fully reconstructed\\\",\\\"semantic\\\":\\\"partial; raw conditions/effects retained without application\\\",\\\"structural\\\":\\\"validated selected records and dependency edges\\\"}\"}, \"data\": {\"schema_version\": \"1.20.0\", \"snapshot\": {\"commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"owners\": {\"effect_semantics\": {\"patch\": \"9.0.1\", \"build\": \"25546563\", \"schema\": 1}, \"shared_abilities\": {\"patch\": \"9.0.1\", \"build\": \"25546563\", \"schema\": 1}, \"units\": {\"patch\": \"9.0\", \"build\": \"25507028\", \"schema\": 4}}, \"baseline\": {\"context\": \"unmodified custom battle\", \"game\": \"warhammer_3\", \"rank\": 0, \"unit_scale\": \"ultra\"}, \"coverage\": {\"activated_access\": \"unit ability links only; character skill/rank routes are not yet imported\", \"activated_payloads\": \"source graphs retained for every activated root; runtime execution unverified\", \"runtime\": \"unverified; engine behavior is not fully reconstructed\", \"semantic\": \"partial; raw conditions/effects retained without application\", \"structural\": \"validated selected records and dependency edges\"}}, \"nodes\": [{\"id\": \"d56bb4dc1aae3feef5b2:161\", \"kind\": \"native_ability_phases\", \"key\": {\"id\": \"wh2_dlc11_unit_contact_monstrous_impact\"}, \"native_parameters\": {\"id\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"duration\": 10.0, \"effect_type\": \"negative\", \"requested_stance\": null, \"cant_move\": false, \"freeze_fatigue\": false, \"fatigue_change_ratio\": 0.0, \"inspiration_aura_range_mod\": 0.0, \"ability_recharge_change\": 0.0, \"hp_change_frequency\": 0.0, \"damage_amount\": 0, \"max_damaged_entities\": 0, \"resurrect\": false, \"mana_regen_mod\": 0.0, \"mana_max_depletion_mod\": 0.0, \"imbue_magical\": false, \"imbue_ignition\": 0, \"imbue_contact\": null, \"phase_display\": null, \"phase_audio\": null, \"is_hidden_in_ui\": false, \"affects_allies\": true, \"affects_enemies\": true, \"replenish_ammo\": 0.0, \"composite_scene_group\": null, \"spreading\": null, \"freeze_recharge\": false, \"heal_amount\": 0.0, \"barrier_heal_amount\": 0.0, \"remove_magical\": false, \"execute_ratio\": 0.0, \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv\", \"source_line\": 162, \"source_patch\": \"9.0.1\"}, \"provenance_refs\": [\"d56bb4dc1aae3feef5b2:161\"]}, {\"id\": \"5513bd8dbb859f88e746:193\", \"kind\": \"native_phase_stat_effects\", \"key\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_charge_speed\"}, \"native_parameters\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_charge_speed\", \"value\": 0.4, \"how\": \"mult\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\", \"source_line\": 194, \"source_patch\": \"9.0.1\"}, \"provenance_refs\": [\"5513bd8dbb859f88e746:193\"]}, {\"id\": \"5513bd8dbb859f88e746:194\", \"kind\": \"native_phase_stat_effects\", \"key\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_speed\"}, \"native_parameters\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_speed\", \"value\": 0.4, \"how\": \"mult\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\", \"source_line\": 195, \"source_patch\": \"9.0.1\"}, \"provenance_refs\": [\"5513bd8dbb859f88e746:194\"]}, {\"id\": \"e542d9ed28baf3fdb425:3\", \"kind\": \"native_modifiable_unit_stats\", \"key\": {\"stat_key\": \"scalar_charge_speed\"}, \"native_parameters\": {\"stat_key\": \"scalar_charge_speed\", \"localisation\": \"scalar_charge_speed\", \"source_path\": \"data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv\", \"source_line\": 4, \"source_patch\": \"9.0.1\"}, \"provenance_refs\": [\"e542d9ed28baf3fdb425:3\"]}, {\"id\": \"e542d9ed28baf3fdb425:18\", \"kind\": \"native_modifiable_unit_stats\", \"key\": {\"stat_key\": \"scalar_speed\"}, \"native_parameters\": {\"stat_key\": \"scalar_speed\", \"localisation\": \"scalar_speed\", \"source_path\": \"data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv\", \"source_line\": 19, \"source_patch\": \"9.0.1\"}, \"provenance_refs\": [\"e542d9ed28baf3fdb425:18\"]}], \"edges\": [{\"source_record\": \"5513bd8dbb859f88e746:193\", \"relation\": \"special_ability_phase_stat_effects_tables.phase\", \"target_key_json\": \"[\\\"wh2_dlc11_unit_contact_monstrous_impact\\\"]\", \"target_record\": \"d56bb4dc1aae3feef5b2:161\", \"status\": \"resolved\", \"edge_ordinal\": 0}, {\"source_record\": \"5513bd8dbb859f88e746:194\", \"relation\": \"special_ability_phase_stat_effects_tables.phase\", \"target_key_json\": \"[\\\"wh2_dlc11_unit_contact_monstrous_impact\\\"]\", \"target_record\": \"d56bb4dc1aae3feef5b2:161\", \"status\": \"resolved\", \"edge_ordinal\": 0}, {\"source_record\": \"5513bd8dbb859f88e746:193\", \"relation\": \"special_ability_phase_stat_effects_tables.stat\", \"target_key_json\": \"[\\\"scalar_charge_speed\\\"]\", \"target_record\": \"e542d9ed28baf3fdb425:3\", \"status\": \"resolved\", \"edge_ordinal\": 0}, {\"source_record\": \"5513bd8dbb859f88e746:194\", \"relation\": \"special_ability_phase_stat_effects_tables.stat\", \"target_key_json\": \"[\\\"scalar_speed\\\"]\", \"target_record\": \"e542d9ed28baf3fdb425:18\", \"status\": \"resolved\", \"edge_ordinal\": 0}], \"boundary_refs\": [], \"state\": \"complete\", \"cursor\": null, \"sources\": {\"s_d56bb4dc1aae\": {\"path\": \"data/unit_stats/abilities/tables/ability_phases.csv\", \"sha256\": \"cc4a090f13abfb62745008de5b949174ffde1464b62dc0eb94e2e7284da25081\", \"owner\": \"shared_abilities\"}, \"s_5513bd8dbb85\": {\"path\": \"data/unit_stats/abilities/tables/phase_stat_effects.csv\", \"sha256\": \"1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f\", \"owner\": \"shared_abilities\"}, \"s_e542d9ed28ba\": {\"path\": \"data/effect_semantics/tables/modifiable_unit_stats.csv\", \"sha256\": \"890a4ea1fe89445411f5c4d67598a498ee47368daf37afa1c39775e96f2181a0\", \"owner\": \"effect_semantics\"}}, \"provenance\": {\"d56bb4dc1aae3feef5b2:161\": {\"source_id\": \"s_d56bb4dc1aae\", \"logical_record\": 161, \"key\": {\"id\": \"wh2_dlc11_unit_contact_monstrous_impact\"}, \"source_line\": 162, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv\"}, \"5513bd8dbb859f88e746:193\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 193, \"key\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_charge_speed\"}, \"source_line\": 194, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}, \"5513bd8dbb859f88e746:194\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 194, \"key\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_speed\"}, \"source_line\": 195, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}, \"e542d9ed28baf3fdb425:3\": {\"source_id\": \"s_e542d9ed28ba\", \"logical_record\": 3, \"key\": {\"stat_key\": \"scalar_charge_speed\"}, \"source_line\": 4, \"source_patch\": \"9.0.1\", \"source_path\": \"data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv\"}, \"e542d9ed28baf3fdb425:18\": {\"source_id\": \"s_e542d9ed28ba\", \"logical_record\": 18, \"key\": {\"stat_key\": \"scalar_speed\"}, \"source_line\": 19, \"source_patch\": \"9.0.1\", \"source_path\": \"data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv\"}}}}"
+        }
+      ],
+      "structuredContent": {
+        "status": "ok",
+        "adapter_version": "0.1.0",
+        "model_version": null,
+        "snapshot": {
+          "id": "595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4",
+          "schema_version": 4,
+          "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+          "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+          "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+          "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+          "coverage_json": "{\"activated_access\":\"unit ability links only; character skill/rank routes are not yet imported\",\"activated_payloads\":\"source graphs retained for every activated root; runtime execution unverified\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+        },
+        "data": {
+          "schema_version": "1.20.0",
+          "snapshot": {
+            "commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+            "owners": {
+              "effect_semantics": {
+                "patch": "9.0.1",
+                "build": "25546563",
+                "schema": 1
+              },
+              "shared_abilities": {
+                "patch": "9.0.1",
+                "build": "25546563",
+                "schema": 1
+              },
+              "units": {
+                "patch": "9.0",
+                "build": "25507028",
+                "schema": 4
+              }
+            },
+            "baseline": {
+              "context": "unmodified custom battle",
+              "game": "warhammer_3",
+              "rank": 0,
+              "unit_scale": "ultra"
+            },
+            "coverage": {
+              "activated_access": "unit ability links only; character skill/rank routes are not yet imported",
+              "activated_payloads": "source graphs retained for every activated root; runtime execution unverified",
+              "runtime": "unverified; engine behavior is not fully reconstructed",
+              "semantic": "partial; raw conditions/effects retained without application",
+              "structural": "validated selected records and dependency edges"
+            }
+          },
+          "nodes": [
+            {
+              "id": "d56bb4dc1aae3feef5b2:161",
+              "kind": "native_ability_phases",
+              "key": {
+                "id": "wh2_dlc11_unit_contact_monstrous_impact"
+              },
+              "native_parameters": {
+                "id": "wh2_dlc11_unit_contact_monstrous_impact",
+                "duration": 10,
+                "effect_type": "negative",
+                "requested_stance": null,
+                "cant_move": false,
+                "freeze_fatigue": false,
+                "fatigue_change_ratio": 0,
+                "inspiration_aura_range_mod": 0,
+                "ability_recharge_change": 0,
+                "hp_change_frequency": 0,
+                "damage_amount": 0,
+                "max_damaged_entities": 0,
+                "resurrect": false,
+                "mana_regen_mod": 0,
+                "mana_max_depletion_mod": 0,
+                "imbue_magical": false,
+                "imbue_ignition": 0,
+                "imbue_contact": null,
+                "phase_display": null,
+                "phase_audio": null,
+                "is_hidden_in_ui": false,
+                "affects_allies": true,
+                "affects_enemies": true,
+                "replenish_ammo": 0,
+                "composite_scene_group": null,
+                "spreading": null,
+                "freeze_recharge": false,
+                "heal_amount": 0,
+                "barrier_heal_amount": 0,
+                "remove_magical": false,
+                "execute_ratio": 0,
+                "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv",
+                "source_line": 162,
+                "source_patch": "9.0.1"
+              },
+              "provenance_refs": [
+                "d56bb4dc1aae3feef5b2:161"
+              ]
+            },
+            {
+              "id": "5513bd8dbb859f88e746:193",
+              "kind": "native_phase_stat_effects",
+              "key": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_charge_speed"
+              },
+              "native_parameters": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_charge_speed",
+                "value": 0.4,
+                "how": "mult",
+                "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv",
+                "source_line": 194,
+                "source_patch": "9.0.1"
+              },
+              "provenance_refs": [
+                "5513bd8dbb859f88e746:193"
+              ]
+            },
+            {
+              "id": "5513bd8dbb859f88e746:194",
+              "kind": "native_phase_stat_effects",
+              "key": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_speed"
+              },
+              "native_parameters": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_speed",
+                "value": 0.4,
+                "how": "mult",
+                "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv",
+                "source_line": 195,
+                "source_patch": "9.0.1"
+              },
+              "provenance_refs": [
+                "5513bd8dbb859f88e746:194"
+              ]
+            },
+            {
+              "id": "e542d9ed28baf3fdb425:3",
+              "kind": "native_modifiable_unit_stats",
+              "key": {
+                "stat_key": "scalar_charge_speed"
+              },
+              "native_parameters": {
+                "stat_key": "scalar_charge_speed",
+                "localisation": "scalar_charge_speed",
+                "source_path": "data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv",
+                "source_line": 4,
+                "source_patch": "9.0.1"
+              },
+              "provenance_refs": [
+                "e542d9ed28baf3fdb425:3"
+              ]
+            },
+            {
+              "id": "e542d9ed28baf3fdb425:18",
+              "kind": "native_modifiable_unit_stats",
+              "key": {
+                "stat_key": "scalar_speed"
+              },
+              "native_parameters": {
+                "stat_key": "scalar_speed",
+                "localisation": "scalar_speed",
+                "source_path": "data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv",
+                "source_line": 19,
+                "source_patch": "9.0.1"
+              },
+              "provenance_refs": [
+                "e542d9ed28baf3fdb425:18"
+              ]
+            }
+          ],
+          "edges": [
+            {
+              "source_record": "5513bd8dbb859f88e746:193",
+              "relation": "special_ability_phase_stat_effects_tables.phase",
+              "target_key_json": "[\"wh2_dlc11_unit_contact_monstrous_impact\"]",
+              "target_record": "d56bb4dc1aae3feef5b2:161",
+              "status": "resolved",
+              "edge_ordinal": 0
+            },
+            {
+              "source_record": "5513bd8dbb859f88e746:194",
+              "relation": "special_ability_phase_stat_effects_tables.phase",
+              "target_key_json": "[\"wh2_dlc11_unit_contact_monstrous_impact\"]",
+              "target_record": "d56bb4dc1aae3feef5b2:161",
+              "status": "resolved",
+              "edge_ordinal": 0
+            },
+            {
+              "source_record": "5513bd8dbb859f88e746:193",
+              "relation": "special_ability_phase_stat_effects_tables.stat",
+              "target_key_json": "[\"scalar_charge_speed\"]",
+              "target_record": "e542d9ed28baf3fdb425:3",
+              "status": "resolved",
+              "edge_ordinal": 0
+            },
+            {
+              "source_record": "5513bd8dbb859f88e746:194",
+              "relation": "special_ability_phase_stat_effects_tables.stat",
+              "target_key_json": "[\"scalar_speed\"]",
+              "target_record": "e542d9ed28baf3fdb425:18",
+              "status": "resolved",
+              "edge_ordinal": 0
+            }
+          ],
+          "boundary_refs": [],
+          "state": "complete",
+          "cursor": null,
+          "sources": {
+            "s_d56bb4dc1aae": {
+              "path": "data/unit_stats/abilities/tables/ability_phases.csv",
+              "sha256": "cc4a090f13abfb62745008de5b949174ffde1464b62dc0eb94e2e7284da25081",
+              "owner": "shared_abilities"
+            },
+            "s_5513bd8dbb85": {
+              "path": "data/unit_stats/abilities/tables/phase_stat_effects.csv",
+              "sha256": "1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f",
+              "owner": "shared_abilities"
+            },
+            "s_e542d9ed28ba": {
+              "path": "data/effect_semantics/tables/modifiable_unit_stats.csv",
+              "sha256": "890a4ea1fe89445411f5c4d67598a498ee47368daf37afa1c39775e96f2181a0",
+              "owner": "effect_semantics"
+            }
+          },
+          "provenance": {
+            "d56bb4dc1aae3feef5b2:161": {
+              "source_id": "s_d56bb4dc1aae",
+              "logical_record": 161,
+              "key": {
+                "id": "wh2_dlc11_unit_contact_monstrous_impact"
+              },
+              "source_line": 162,
+              "source_patch": "9.0.1",
+              "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv"
+            },
+            "5513bd8dbb859f88e746:193": {
+              "source_id": "s_5513bd8dbb85",
+              "logical_record": 193,
+              "key": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_charge_speed"
+              },
+              "source_line": 194,
+              "source_patch": "9.0.1",
+              "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+            },
+            "5513bd8dbb859f88e746:194": {
+              "source_id": "s_5513bd8dbb85",
+              "logical_record": 194,
+              "key": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_speed"
+              },
+              "source_line": 195,
+              "source_patch": "9.0.1",
+              "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+            },
+            "e542d9ed28baf3fdb425:3": {
+              "source_id": "s_e542d9ed28ba",
+              "logical_record": 3,
+              "key": {
+                "stat_key": "scalar_charge_speed"
+              },
+              "source_line": 4,
+              "source_patch": "9.0.1",
+              "source_path": "data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv"
+            },
+            "e542d9ed28baf3fdb425:18": {
+              "source_id": "s_e542d9ed28ba",
+              "logical_record": 18,
+              "key": {
+                "stat_key": "scalar_speed"
+              },
+              "source_line": 19,
+              "source_patch": "9.0.1",
+              "source_path": "data/effect_semantics/source_exports/db/modifiable_unit_stats_tables/data__.tsv"
+            }
+          }
+        }
+      },
+      "isError": false
+    }
+  },
+  {
+    "tool": "get_provenance",
+    "arguments": {
+      "record_ids": [
+        "23de8daf4e757f0860fb:2240",
+        "23de8daf4e757f0860fb:2241",
+        "5513bd8dbb859f88e746:193",
+        "5513bd8dbb859f88e746:194"
+      ]
+    },
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"status\": \"ok\", \"adapter_version\": \"0.1.0\", \"model_version\": null, \"snapshot\": {\"id\": \"595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4\", \"schema_version\": 4, \"source_commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"contract_sha256\": \"fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1\", \"baseline_json\": \"{\\\"build\\\":\\\"25507028\\\",\\\"context\\\":\\\"unmodified custom battle\\\",\\\"game\\\":\\\"warhammer_3\\\",\\\"patch\\\":\\\"9.0\\\",\\\"rank\\\":0,\\\"unit_scale\\\":\\\"ultra\\\"}\", \"owners_json\": \"{\\\"effect_semantics\\\":{\\\"build\\\":\\\"25546563\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1,\\\"scope\\\":\\\"native stat definitions only\\\"},\\\"shared_abilities\\\":{\\\"base_patch\\\":\\\"9.0\\\",\\\"build\\\":\\\"25546563\\\",\\\"coverage\\\":\\\"partial\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1},\\\"units\\\":{\\\"build\\\":\\\"25507028\\\",\\\"patch\\\":\\\"9.0\\\",\\\"schema\\\":4}}\", \"coverage_json\": \"{\\\"activated_access\\\":\\\"unit ability links only; character skill/rank routes are not yet imported\\\",\\\"activated_payloads\\\":\\\"source graphs retained for every activated root; runtime execution unverified\\\",\\\"packet_interface\\\":\\\"versioned read-only query packets implemented; downstream consumers are separate\\\",\\\"runtime\\\":\\\"unverified; engine behavior is not fully reconstructed\\\",\\\"semantic\\\":\\\"partial; raw conditions/effects retained without application\\\",\\\"structural\\\":\\\"validated selected records and dependency edges\\\"}\"}, \"data\": {\"schema_version\": \"1.20.0\", \"snapshot\": {\"commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"owners\": {\"effect_semantics\": {\"patch\": \"9.0.1\", \"build\": \"25546563\", \"schema\": 1}, \"shared_abilities\": {\"patch\": \"9.0.1\", \"build\": \"25546563\", \"schema\": 1}, \"units\": {\"patch\": \"9.0\", \"build\": \"25507028\", \"schema\": 4}}, \"baseline\": {\"context\": \"unmodified custom battle\", \"game\": \"warhammer_3\", \"rank\": 0, \"unit_scale\": \"ultra\"}, \"coverage\": {\"activated_access\": \"unit ability links only; character skill/rank routes are not yet imported\", \"activated_payloads\": \"source graphs retained for every activated root; runtime execution unverified\", \"runtime\": \"unverified; engine behavior is not fully reconstructed\", \"semantic\": \"partial; raw conditions/effects retained without application\", \"structural\": \"validated selected records and dependency edges\"}}, \"records\": [{\"id\": \"23de8daf4e757f0860fb:2240\", \"source_file\": \"data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv\", \"logical_record\": 2240, \"native_key_json\": \"{\\\"battle_entity_key\\\":\\\"wh2_dlc11_cst_art_queen_bess\\\",\\\"component_count\\\":\\\"1\\\",\\\"component_role\\\":\\\"engine\\\",\\\"is_primary_health_pool\\\":\\\"true\\\",\\\"relationship_key\\\":\\\"wh2_dlc11_cst_art_queen_bess\\\",\\\"unit_key\\\":\\\"wh2_dlc11_cst_art_queen_bess\\\"}\", \"source_path\": null, \"source_line\": null, \"source_patch\": null, \"retention\": \"full\"}, {\"id\": \"23de8daf4e757f0860fb:2241\", \"source_file\": \"data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv\", \"logical_record\": 2241, \"native_key_json\": \"{\\\"battle_entity_key\\\":\\\"wh2_dlc16_infantry_zombie_blood_crew\\\",\\\"component_count\\\":\\\"47\\\",\\\"component_role\\\":\\\"crew_or_rider\\\",\\\"is_primary_health_pool\\\":\\\"false\\\",\\\"relationship_key\\\":\\\"\\\",\\\"unit_key\\\":\\\"wh2_dlc11_cst_art_queen_bess\\\"}\", \"source_path\": null, \"source_line\": null, \"source_patch\": null, \"retention\": \"full\"}, {\"id\": \"5513bd8dbb859f88e746:193\", \"source_file\": \"data/unit_stats/abilities/tables/phase_stat_effects.csv\", \"logical_record\": 193, \"native_key_json\": \"{\\\"phase\\\":\\\"wh2_dlc11_unit_contact_monstrous_impact\\\",\\\"stat\\\":\\\"scalar_charge_speed\\\"}\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\", \"source_line\": 194, \"source_patch\": \"9.0.1\", \"retention\": \"full\"}, {\"id\": \"5513bd8dbb859f88e746:194\", \"source_file\": \"data/unit_stats/abilities/tables/phase_stat_effects.csv\", \"logical_record\": 194, \"native_key_json\": \"{\\\"phase\\\":\\\"wh2_dlc11_unit_contact_monstrous_impact\\\",\\\"stat\\\":\\\"scalar_speed\\\"}\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\", \"source_line\": 195, \"source_patch\": \"9.0.1\", \"retention\": \"full\"}], \"sources\": {\"s_23de8daf4e75\": {\"path\": \"data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv\", \"sha256\": \"9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036\", \"owner\": \"units\"}, \"s_5513bd8dbb85\": {\"path\": \"data/unit_stats/abilities/tables/phase_stat_effects.csv\", \"sha256\": \"1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f\", \"owner\": \"shared_abilities\"}}, \"provenance\": {\"23de8daf4e757f0860fb:2240\": {\"source_id\": \"s_23de8daf4e75\", \"logical_record\": 2240, \"key\": {\"battle_entity_key\": \"wh2_dlc11_cst_art_queen_bess\", \"component_count\": \"1\", \"component_role\": \"engine\", \"is_primary_health_pool\": \"true\", \"relationship_key\": \"wh2_dlc11_cst_art_queen_bess\", \"unit_key\": \"wh2_dlc11_cst_art_queen_bess\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"23de8daf4e757f0860fb:2241\": {\"source_id\": \"s_23de8daf4e75\", \"logical_record\": 2241, \"key\": {\"battle_entity_key\": \"wh2_dlc16_infantry_zombie_blood_crew\", \"component_count\": \"47\", \"component_role\": \"crew_or_rider\", \"is_primary_health_pool\": \"false\", \"relationship_key\": \"\", \"unit_key\": \"wh2_dlc11_cst_art_queen_bess\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"5513bd8dbb859f88e746:193\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 193, \"key\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_charge_speed\"}, \"source_line\": 194, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}, \"5513bd8dbb859f88e746:194\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 194, \"key\": {\"phase\": \"wh2_dlc11_unit_contact_monstrous_impact\", \"stat\": \"scalar_speed\"}, \"source_line\": 195, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}}}}"
+        }
+      ],
+      "structuredContent": {
+        "status": "ok",
+        "adapter_version": "0.1.0",
+        "model_version": null,
+        "snapshot": {
+          "id": "595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4",
+          "schema_version": 4,
+          "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+          "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+          "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+          "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+          "coverage_json": "{\"activated_access\":\"unit ability links only; character skill/rank routes are not yet imported\",\"activated_payloads\":\"source graphs retained for every activated root; runtime execution unverified\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+        },
+        "data": {
+          "schema_version": "1.20.0",
+          "snapshot": {
+            "commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+            "owners": {
+              "effect_semantics": {
+                "patch": "9.0.1",
+                "build": "25546563",
+                "schema": 1
+              },
+              "shared_abilities": {
+                "patch": "9.0.1",
+                "build": "25546563",
+                "schema": 1
+              },
+              "units": {
+                "patch": "9.0",
+                "build": "25507028",
+                "schema": 4
+              }
+            },
+            "baseline": {
+              "context": "unmodified custom battle",
+              "game": "warhammer_3",
+              "rank": 0,
+              "unit_scale": "ultra"
+            },
+            "coverage": {
+              "activated_access": "unit ability links only; character skill/rank routes are not yet imported",
+              "activated_payloads": "source graphs retained for every activated root; runtime execution unverified",
+              "runtime": "unverified; engine behavior is not fully reconstructed",
+              "semantic": "partial; raw conditions/effects retained without application",
+              "structural": "validated selected records and dependency edges"
+            }
+          },
+          "records": [
+            {
+              "id": "23de8daf4e757f0860fb:2240",
+              "source_file": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+              "logical_record": 2240,
+              "native_key_json": "{\"battle_entity_key\":\"wh2_dlc11_cst_art_queen_bess\",\"component_count\":\"1\",\"component_role\":\"engine\",\"is_primary_health_pool\":\"true\",\"relationship_key\":\"wh2_dlc11_cst_art_queen_bess\",\"unit_key\":\"wh2_dlc11_cst_art_queen_bess\"}",
+              "source_path": null,
+              "source_line": null,
+              "source_patch": null,
+              "retention": "full"
+            },
+            {
+              "id": "23de8daf4e757f0860fb:2241",
+              "source_file": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+              "logical_record": 2241,
+              "native_key_json": "{\"battle_entity_key\":\"wh2_dlc16_infantry_zombie_blood_crew\",\"component_count\":\"47\",\"component_role\":\"crew_or_rider\",\"is_primary_health_pool\":\"false\",\"relationship_key\":\"\",\"unit_key\":\"wh2_dlc11_cst_art_queen_bess\"}",
+              "source_path": null,
+              "source_line": null,
+              "source_patch": null,
+              "retention": "full"
+            },
+            {
+              "id": "5513bd8dbb859f88e746:193",
+              "source_file": "data/unit_stats/abilities/tables/phase_stat_effects.csv",
+              "logical_record": 193,
+              "native_key_json": "{\"phase\":\"wh2_dlc11_unit_contact_monstrous_impact\",\"stat\":\"scalar_charge_speed\"}",
+              "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv",
+              "source_line": 194,
+              "source_patch": "9.0.1",
+              "retention": "full"
+            },
+            {
+              "id": "5513bd8dbb859f88e746:194",
+              "source_file": "data/unit_stats/abilities/tables/phase_stat_effects.csv",
+              "logical_record": 194,
+              "native_key_json": "{\"phase\":\"wh2_dlc11_unit_contact_monstrous_impact\",\"stat\":\"scalar_speed\"}",
+              "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv",
+              "source_line": 195,
+              "source_patch": "9.0.1",
+              "retention": "full"
+            }
+          ],
+          "sources": {
+            "s_23de8daf4e75": {
+              "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+              "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+              "owner": "units"
+            },
+            "s_5513bd8dbb85": {
+              "path": "data/unit_stats/abilities/tables/phase_stat_effects.csv",
+              "sha256": "1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f",
+              "owner": "shared_abilities"
+            }
+          },
+          "provenance": {
+            "23de8daf4e757f0860fb:2240": {
+              "source_id": "s_23de8daf4e75",
+              "logical_record": 2240,
+              "key": {
+                "battle_entity_key": "wh2_dlc11_cst_art_queen_bess",
+                "component_count": "1",
+                "component_role": "engine",
+                "is_primary_health_pool": "true",
+                "relationship_key": "wh2_dlc11_cst_art_queen_bess",
+                "unit_key": "wh2_dlc11_cst_art_queen_bess"
+              },
+              "source_line": null,
+              "source_patch": null,
+              "source_path": null
+            },
+            "23de8daf4e757f0860fb:2241": {
+              "source_id": "s_23de8daf4e75",
+              "logical_record": 2241,
+              "key": {
+                "battle_entity_key": "wh2_dlc16_infantry_zombie_blood_crew",
+                "component_count": "47",
+                "component_role": "crew_or_rider",
+                "is_primary_health_pool": "false",
+                "relationship_key": "",
+                "unit_key": "wh2_dlc11_cst_art_queen_bess"
+              },
+              "source_line": null,
+              "source_patch": null,
+              "source_path": null
+            },
+            "5513bd8dbb859f88e746:193": {
+              "source_id": "s_5513bd8dbb85",
+              "logical_record": 193,
+              "key": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_charge_speed"
+              },
+              "source_line": 194,
+              "source_patch": "9.0.1",
+              "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+            },
+            "5513bd8dbb859f88e746:194": {
+              "source_id": "s_5513bd8dbb85",
+              "logical_record": 194,
+              "key": {
+                "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+                "stat": "scalar_speed"
+              },
+              "source_line": 195,
+              "source_patch": "9.0.1",
+              "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+            }
+          }
+        }
+      },
+      "isError": false
+    }
+  }
+]

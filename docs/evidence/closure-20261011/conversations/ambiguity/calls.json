@@ -1,0 +1,151 @@
+[
+  {
+    "tool": "mcp__codex_apps__ctw_advisor_resolve_unit",
+    "arguments": {
+      "name_or_key": "Feral Manticore"
+    },
+    "result": {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"status\": \"ok\", \"adapter_version\": \"0.1.0\", \"model_version\": null, \"snapshot\": {\"id\": \"595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4\", \"schema_version\": 4, \"source_commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"contract_sha256\": \"fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1\", \"baseline_json\": \"{\\\"build\\\":\\\"25507028\\\",\\\"context\\\":\\\"unmodified custom battle\\\",\\\"game\\\":\\\"warhammer_3\\\",\\\"patch\\\":\\\"9.0\\\",\\\"rank\\\":0,\\\"unit_scale\\\":\\\"ultra\\\"}\", \"owners_json\": \"{\\\"effect_semantics\\\":{\\\"build\\\":\\\"25546563\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1,\\\"scope\\\":\\\"native stat definitions only\\\"},\\\"shared_abilities\\\":{\\\"base_patch\\\":\\\"9.0\\\",\\\"build\\\":\\\"25546563\\\",\\\"coverage\\\":\\\"partial\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1},\\\"units\\\":{\\\"build\\\":\\\"25507028\\\",\\\"patch\\\":\\\"9.0\\\",\\\"schema\\\":4}}\", \"coverage_json\": \"{\\\"activated_access\\\":\\\"unit ability links only; character skill/rank routes are not yet imported\\\",\\\"activated_payloads\\\":\\\"source graphs retained for every activated root; runtime execution unverified\\\",\\\"packet_interface\\\":\\\"versioned read-only query packets implemented; downstream consumers are separate\\\",\\\"runtime\\\":\\\"unverified; engine behavior is not fully reconstructed\\\",\\\"semantic\\\":\\\"partial; raw conditions/effects retained without application\\\",\\\"structural\\\":\\\"validated selected records and dependency edges\\\"}\"}, \"data\": {\"status\": \"ambiguous\", \"query\": \"Feral Manticore\", \"candidates\": [{\"unit_key\": \"wh2_dlc10_def_mon_feral_manticore_0\", \"profile_unit_key\": \"wh2_dlc10_def_mon_feral_manticore_0\", \"subculture_key\": \"wh2_main_sc_def_dark_elves\", \"name\": \"Feral Manticore\", \"source_unit_keys\": [\"wh2_dlc10_def_mon_feral_manticore_0\"], \"subcultures\": [\"wh2_main_sc_def_dark_elves\"]}, {\"unit_key\": \"wh2_dlc16_wef_mon_feral_manticore\", \"profile_unit_key\": \"wh2_dlc16_wef_mon_feral_manticore\", \"subculture_key\": \"wh_dlc05_sc_wef_wood_elves\", \"name\": \"Feral Manticore\", \"source_unit_keys\": [\"wh2_dlc16_wef_mon_feral_manticore\"], \"subcultures\": [\"wh_dlc05_sc_wef_wood_elves\"]}, {\"unit_key\": \"wh_dlc03_bst_feral_manticore\", \"profile_unit_key\": \"wh_dlc03_bst_feral_manticore\", \"subculture_key\": \"wh_dlc03_sc_bst_beastmen\", \"name\": \"Feral Manticore\", \"source_unit_keys\": [\"wh_dlc03_bst_feral_manticore\"], \"subcultures\": [\"wh_dlc03_sc_bst_beastmen\"]}, {\"unit_key\": \"wh_dlc08_nor_feral_manticore\", \"profile_unit_key\": \"wh_dlc08_nor_feral_manticore\", \"subculture_key\": \"wh_dlc08_sc_nor_norsca\", \"name\": \"Feral Manticore\", \"source_unit_keys\": [\"wh_dlc08_nor_feral_manticore\"], \"subcultures\": [\"wh_dlc08_sc_nor_norsca\"]}], \"resolved\": null}}"
+          }
+        ],
+        "structuredContent": {
+          "status": "ok",
+          "adapter_version": "0.1.0",
+          "model_version": null,
+          "snapshot": {
+            "id": "595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4",
+            "schema_version": 4,
+            "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+            "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+            "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+            "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+            "coverage_json": "{\"activated_access\":\"unit ability links only; character skill/rank routes are not yet imported\",\"activated_payloads\":\"source graphs retained for every activated root; runtime execution unverified\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+          },
+          "data": {
+            "status": "ambiguous",
+            "query": "Feral Manticore",
+            "candidates": [
+              {
+                "unit_key": "wh2_dlc10_def_mon_feral_manticore_0",
+                "profile_unit_key": "wh2_dlc10_def_mon_feral_manticore_0",
+                "subculture_key": "wh2_main_sc_def_dark_elves",
+                "name": "Feral Manticore",
+                "source_unit_keys": [
+                  "wh2_dlc10_def_mon_feral_manticore_0"
+                ],
+                "subcultures": [
+                  "wh2_main_sc_def_dark_elves"
+                ]
+              },
+              {
+                "unit_key": "wh2_dlc16_wef_mon_feral_manticore",
+                "profile_unit_key": "wh2_dlc16_wef_mon_feral_manticore",
+                "subculture_key": "wh_dlc05_sc_wef_wood_elves",
+                "name": "Feral Manticore",
+                "source_unit_keys": [
+                  "wh2_dlc16_wef_mon_feral_manticore"
+                ],
+                "subcultures": [
+                  "wh_dlc05_sc_wef_wood_elves"
+                ]
+              },
+              {
+                "unit_key": "wh_dlc03_bst_feral_manticore",
+                "profile_unit_key": "wh_dlc03_bst_feral_manticore",
+                "subculture_key": "wh_dlc03_sc_bst_beastmen",
+                "name": "Feral Manticore",
+                "source_unit_keys": [
+                  "wh_dlc03_bst_feral_manticore"
+                ],
+                "subcultures": [
+                  "wh_dlc03_sc_bst_beastmen"
+                ]
+              },
+              {
+                "unit_key": "wh_dlc08_nor_feral_manticore",
+                "profile_unit_key": "wh_dlc08_nor_feral_manticore",
+                "subculture_key": "wh_dlc08_sc_nor_norsca",
+                "name": "Feral Manticore",
+                "source_unit_keys": [
+                  "wh_dlc08_nor_feral_manticore"
+                ],
+                "subcultures": [
+                  "wh_dlc08_sc_nor_norsca"
+                ]
+              }
+            ],
+            "resolved": null
+          }
+        },
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "mcp__codex_apps__ctw_advisor_resolve_unit",
+    "arguments": {
+      "name_or_key": "Reiksguard"
+    },
+    "result": {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"status\": \"ok\", \"adapter_version\": \"0.1.0\", \"model_version\": null, \"snapshot\": {\"id\": \"595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4\", \"schema_version\": 4, \"source_commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"contract_sha256\": \"fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1\", \"baseline_json\": \"{\\\"build\\\":\\\"25507028\\\",\\\"context\\\":\\\"unmodified custom battle\\\",\\\"game\\\":\\\"warhammer_3\\\",\\\"patch\\\":\\\"9.0\\\",\\\"rank\\\":0,\\\"unit_scale\\\":\\\"ultra\\\"}\", \"owners_json\": \"{\\\"effect_semantics\\\":{\\\"build\\\":\\\"25546563\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1,\\\"scope\\\":\\\"native stat definitions only\\\"},\\\"shared_abilities\\\":{\\\"base_patch\\\":\\\"9.0\\\",\\\"build\\\":\\\"25546563\\\",\\\"coverage\\\":\\\"partial\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1},\\\"units\\\":{\\\"build\\\":\\\"25507028\\\",\\\"patch\\\":\\\"9.0\\\",\\\"schema\\\":4}}\", \"coverage_json\": \"{\\\"activated_access\\\":\\\"unit ability links only; character skill/rank routes are not yet imported\\\",\\\"activated_payloads\\\":\\\"source graphs retained for every activated root; runtime execution unverified\\\",\\\"packet_interface\\\":\\\"versioned read-only query packets implemented; downstream consumers are separate\\\",\\\"runtime\\\":\\\"unverified; engine behavior is not fully reconstructed\\\",\\\"semantic\\\":\\\"partial; raw conditions/effects retained without application\\\",\\\"structural\\\":\\\"validated selected records and dependency edges\\\"}\"}, \"data\": {\"status\": \"resolved\", \"query\": \"Reiksguard\", \"candidates\": [{\"unit_key\": \"wh_main_emp_cav_reiksguard\", \"profile_unit_key\": \"wh_main_emp_cav_reiksguard\", \"subculture_key\": \"wh_main_sc_emp_empire\", \"name\": \"Reiksguard\", \"source_unit_keys\": [\"wh_main_emp_cav_reiksguard\"], \"subcultures\": [\"wh_main_sc_emp_empire\"]}], \"resolved\": {\"unit_key\": \"wh_main_emp_cav_reiksguard\", \"profile_unit_key\": \"wh_main_emp_cav_reiksguard\", \"subculture_key\": \"wh_main_sc_emp_empire\", \"name\": \"Reiksguard\", \"source_unit_keys\": [\"wh_main_emp_cav_reiksguard\"], \"subcultures\": [\"wh_main_sc_emp_empire\"]}}}"
+          }
+        ],
+        "structuredContent": {
+          "status": "ok",
+          "adapter_version": "0.1.0",
+          "model_version": null,
+          "snapshot": {
+            "id": "595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4",
+            "schema_version": 4,
+            "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+            "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+            "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+            "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+            "coverage_json": "{\"activated_access\":\"unit ability links only; character skill/rank routes are not yet imported\",\"activated_payloads\":\"source graphs retained for every activated root; runtime execution unverified\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+          },
+          "data": {
+            "status": "resolved",
+            "query": "Reiksguard",
+            "candidates": [
+              {
+                "unit_key": "wh_main_emp_cav_reiksguard",
+                "profile_unit_key": "wh_main_emp_cav_reiksguard",
+                "subculture_key": "wh_main_sc_emp_empire",
+                "name": "Reiksguard",
+                "source_unit_keys": [
+                  "wh_main_emp_cav_reiksguard"
+                ],
+                "subcultures": [
+                  "wh_main_sc_emp_empire"
+                ]
+              }
+            ],
+            "resolved": {
+              "unit_key": "wh_main_emp_cav_reiksguard",
+              "profile_unit_key": "wh_main_emp_cav_reiksguard",
+              "subculture_key": "wh_main_sc_emp_empire",
+              "name": "Reiksguard",
+              "source_unit_keys": [
+                "wh_main_emp_cav_reiksguard"
+              ],
+              "subcultures": [
+                "wh_main_sc_emp_empire"
+              ]
+            }
+          }
+        },
+        "isError": false
+      }
+    }
+  }
+]
