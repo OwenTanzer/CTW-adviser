@@ -73,6 +73,17 @@ are tested at the four extreme corners; sampled one-parameter thresholds show
 changes that can flip the nominal ordering. These are sensitivity calculations,
 not confidence intervals. A crossing or major unresolved mechanic should be
 explained alongside the nominal side.
+`verdict.unresolved_inputs` contains structured records with `side`,
+`source_path`, `code` and affected `calculation`. An applicable null source
+value, unresolved supply or attack status, native flight sentinel without an
+override, or required scenario assumption makes the verdict indeterminate.
+`represented_point_ordering` and any partial ledgers then show only the
+calculation under the omitted-input fallback; they are not a favored verdict.
+If component health or count needed to construct a health pool is unknown,
+the projection is withheld and `derived.phase_timing`, `event_mechanics` and
+`ledgers` are null. Numeric zero remains known zero. Fields on disabled attack
+channels and movement speed for a holding unit do not create missing-input
+records. The source packet retains the original nulls.
 `verdict.barrier_damage_order_sensitivity` reports both orderings when a barrier
 is present. If their health, barrier or overkill ledgers differ, the default
 projection is indeterminate until the caller explicitly selects an order.
@@ -88,6 +99,10 @@ arriving impacts are processed before later firing opportunities. Flight time
 uses shot-time distance/listed velocity only when the source velocity is positive.
 A zero or negative native velocity is preserved as source evidence and produces
 no scheduled impact unless `flight_seconds` is supplied as a scenario assumption.
+Null range, minimum range, damage, ammunition supply or reload fields on an
+enabled attack do not silently establish zero damage or zero shots. Source
+armour, ward, resistance, shield, melee defence, spell tags and movement speed
+are checked when their calculation paths are enabled.
 The model selects a single default
 ranged attack and primary melee attack. Nontrivial projectile, volley and burst
 nesting requires `projectiles_per_cycle`; otherwise that attack is omitted with

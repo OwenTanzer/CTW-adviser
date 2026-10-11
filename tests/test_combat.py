@@ -183,6 +183,111 @@ class CombatTests(unittest.TestCase):
 
 @unittest.skipUnless(DB.exists(), "set CTW_ADVISER_DB to a built pinned snapshot")
 class PinnedStoreTests(unittest.TestCase):
+    def test_nullable_active_ranged_and_defence_inputs_gate_verdict(self):
+        scenario = {"separation_metres": 80, "duration_seconds": 60,
+                    "barrier_damage_order": "barrier_first",
+                    "sides": {"a": {"order": "hold"}, "b": {"order": "hold"}}}
+        cases = [
+            (1, ("passives", "protection", "armour"), "passives.protection.armour"),
+            (1, ("passives", "protection", "ward_save"), "passives.protection.ward_save"),
+            (1, ("passives", "protection", "physical_resistance"), "passives.protection.physical_resistance"),
+            (1, ("passives", "protection", "missile_resistance"), "passives.protection.missile_resistance"),
+            (1, ("passives", "protection", "shield_block_chance"), "passives.protection.shield_block_chance"),
+            (1, ("body", "barrier_health"), "body.barrier_health"),
+            (0, ("ranged", "range"), "ranged.range"),
+            (0, ("ranged", "minimum_range"), "ranged.minimum_range"),
+            (0, ("ranged", "base_damage"), "ranged.base_damage"),
+            (0, ("ranged", "ap_damage"), "ranged.ap_damage"),
+            (0, ("ranged", "reload_time"), "ranged.reload_time"),
+            (0, ("ranged", "projectiles_per_shot"), "ranged.projectiles_per_shot"),
+            (0, ("ranged", "velocity"), "ranged.velocity"),
+            (0, ("ranged", "ammunition_supply", "capacity"), "ranged.ammunition_supply.capacity"),
+            (0, ("ranged", "ammunition_supply", "unlimited"), "ranged.ammunition_supply.unlimited"),
+        ]
+        with Queries(DB) as q:
+            packet = q.get_matchup_evidence("Lothern Sea Guard (Shields)", "Blue Horrors of Tzeentch",
+                                            limit=256, include_diagnostics=True, include_provenance=True)
+            baseline = evaluate_matchup(SavedPacketQueries(packet, q.snapshot), "a", "b", scenario=scenario)
+            self.assertEqual(baseline["verdict"]["status"], "conditional")
+            self.assertFalse(baseline["verdict"]["unresolved_inputs"])
+            for side, path, expected in cases:
+                with self.subTest(path=path):
+                    changed = copy.deepcopy(packet)
+                    node = changed["units"][side]
+                    for key in path[:-1]:
+                        node = node[key]
+                    node[path[-1]] = None
+                    result = evaluate_matchup(SavedPacketQueries(changed, q.snapshot), "a", "b",
+                                              scenario=scenario)
+                    self.assertEqual(result["verdict"]["status"], "indeterminate")
+                    self.assertTrue(result["verdict"]["material_mechanic_unresolved"])
+                    self.assertIn(("a" if side == 0 else "b", expected),
+                                  {(item["side"], item["source_path"])
+                                   for item in result["verdict"]["unresolved_inputs"]})
+            disputed = copy.deepcopy(packet)
+            disputed["units"][0]["ranged"]["ammunition_supply"]["assignment_status"] = "source_disagreement"
+            result = evaluate_matchup(SavedPacketQueries(disputed, q.snapshot), "a", "b", scenario=scenario)
+            self.assertEqual(result["verdict"]["status"], "indeterminate")
+            self.assertIn("ranged.ammunition_supply.assignment_status",
+                          {item["source_path"] for item in result["verdict"]["unresolved_inputs"]})
+
+    def test_nullable_melee_timing_and_health_inputs_gate_without_crashing(self):
+        melee_scenario = {"separation_metres": 0, "duration_seconds": 2,
+                          "barrier_damage_order": "barrier_first",
+                          "sides": {"a": {"fire": False}, "b": {"fight": False, "fire": False}}}
+        with Queries(DB) as q:
+            packet = q.get_matchup_evidence("Lothern Sea Guard (Shields)", "Blue Horrors of Tzeentch",
+                                            limit=256, include_diagnostics=True, include_provenance=True)
+            for side, section, field in ((0, "melee", "attack"), (0, "melee", "base_damage"),
+                                         (0, "melee", "ap_damage"), (0, "melee", "attack_interval"),
+                                         (1, "melee", "defence")):
+                with self.subTest(field=field):
+                    changed = copy.deepcopy(packet)
+                    changed["units"][side][section][field] = None
+                    result = evaluate_matchup(SavedPacketQueries(changed, q.snapshot), "a", "b",
+                                              scenario=melee_scenario)
+                    self.assertEqual(result["verdict"]["status"], "indeterminate")
+                    self.assertIn(f"melee.{field}",
+                                  {item["source_path"] for item in result["verdict"]["unresolved_inputs"]})
+            missing_health = copy.deepcopy(packet)
+            missing_health["units"][1]["body"]["components"][0]["health_contribution"] = None
+            result = evaluate_matchup(SavedPacketQueries(missing_health, q.snapshot), "a", "b",
+                                      scenario=melee_scenario)
+            self.assertIsNone(result["derived"]["ledgers"])
+            self.assertEqual(result["verdict"]["status"], "indeterminate")
+            missing_speed = copy.deepcopy(packet)
+            missing_speed["units"][0]["movement"]["speed"] = None
+            result = evaluate_matchup(SavedPacketQueries(missing_speed, q.snapshot), "a", "b",
+                                      scenario={"separation_metres": 80, "duration_seconds": 2,
+                                                "barrier_damage_order": "barrier_first",
+                                                "sides": {"a": {"order": "approach"},
+                                                          "b": {"order": "hold"}}})
+            self.assertIn("movement.speed",
+                          {item["source_path"] for item in result["verdict"]["unresolved_inputs"]})
+
+    def test_known_zero_and_disabled_inputs_are_not_unknown(self):
+        with Queries(DB) as q:
+            packet = q.get_matchup_evidence("Lothern Sea Guard (Shields)", "Blue Horrors of Tzeentch",
+                                            limit=256, include_diagnostics=True, include_provenance=True)
+            scenario = {"separation_metres": 80, "barrier_damage_order": "barrier_first",
+                        "sides": {"a": {"order": "hold"}, "b": {"order": "hold"}}}
+            changed = copy.deepcopy(packet)
+            changed["units"][1]["passives"]["protection"]["armour"] = 0
+            changed["units"][0]["movement"]["speed"] = None
+            changed["units"][0]["ranged"]["ammunition"] = None  # Agreed supply capacity is authoritative.
+            result = evaluate_matchup(SavedPacketQueries(changed, q.snapshot), "a", "b",
+                                      scenario=scenario)
+            self.assertFalse(result["verdict"]["material_mechanic_unresolved"])
+            self.assertEqual(result["verdict"]["unresolved_inputs"], [])
+            changed["units"][0]["ranged"]["base_damage"] = None
+            changed["units"][1]["passives"]["protection"]["armour"] = None
+            scenario["sides"]["a"]["fire"] = False
+            scenario["sides"]["b"]["fire"] = False
+            disabled = evaluate_matchup(SavedPacketQueries(changed, q.snapshot), "a", "b",
+                                        scenario=scenario)
+            self.assertFalse(disabled["verdict"]["material_mechanic_unresolved"])
+            self.assertEqual(disabled["verdict"]["unresolved_inputs"], [])
+
     def test_spell_tagged_explosion_uses_sourced_spell_resistance(self):
         scenario = {"separation_metres": 100, "duration_seconds": 3,
                     "sides": {"a": {"order": "hold", "first_shot_delay_seconds": 0,
@@ -207,6 +312,29 @@ class PinnedStoreTests(unittest.TestCase):
         self.assertAlmostEqual(hit_with["per_unblocked_hit"], hit_without["per_unblocked_hit"] / 2)
         self.assertLess(with_resistance["derived"]["ledgers"][1]["incoming_damage"]["explosion"],
                         without_resistance["derived"]["ledgers"][1]["incoming_damage"]["explosion"])
+
+    def test_nullable_explosion_inputs_gate_without_crashing(self):
+        scenario = {"separation_metres": 100, "duration_seconds": 3,
+                    "sides": {"a": {"order": "hold", "first_shot_delay_seconds": 0,
+                                    "cycle_seconds": 20, "flight_seconds": 1, "fight": False},
+                              "b": {"order": "hold", "fire": False, "fight": False}}}
+        with Queries(DB) as q:
+            packet = q.get_matchup_evidence("wh3_dlc29_skv_art_plagueclaw_catapult_ror",
+                                            "Blessed Carnosaur", limit=256,
+                                            include_diagnostics=True, include_provenance=True)
+            for path in (("base_damage",), ("ap_damage",), ("native_parameters", "is_spell")):
+                with self.subTest(path=path):
+                    changed = copy.deepcopy(packet)
+                    node = changed["units"][0]["ranged"]["explosion"]
+                    for key in path[:-1]:
+                        node = node[key]
+                    node[path[-1]] = None
+                    result = evaluate_matchup(SavedPacketQueries(changed, q.snapshot), "a", "b",
+                                              scenario=scenario)
+                    self.assertEqual(result["verdict"]["status"], "indeterminate")
+                    self.assertTrue(result["verdict"]["unresolved_inputs"])
+                    self.assertIn("ranged.explosion." + ".".join(path),
+                                  {item["source_path"] for item in result["verdict"]["unresolved_inputs"]})
 
     def test_barrier_order_exposes_overkill_and_gates_default_verdict(self):
         scenario = {"separation_metres": 100, "duration_seconds": 2,

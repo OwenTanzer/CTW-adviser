@@ -13,7 +13,7 @@ import math
 from .model import ORDERS, _entry, _number
 from .queries import Queries
 
-MODEL_VERSION = "combat-0.1.2"
+MODEL_VERSION = "combat-0.1.3"
 SIDES = ("a", "b")
 FACING = {"front": 1.0, "side": 0.6, "rear": 0.3}
 
@@ -120,6 +120,46 @@ def _pool(unit, target_role):
                           "initial_entities": float(count), "hp_per_entity": float(hp / count),
                           "primary": bool(c.get("primary"))}
     return pools, selected["id"], selected
+
+
+def _primary_count(unit):
+    pools, _, _ = _pool(unit, "primary")
+    return next(p["initial_entities"] for p in pools.values() if p["primary"])
+
+
+def _issue(side, path, code, calculation):
+    return {"side": side, "source_path": path, "code": code, "calculation": calculation}
+
+
+def _core_unresolved(units, scenario):
+    """Health-pool inputs cannot be replaced with invented numeric defaults."""
+    issues = []
+    for i, unit in enumerate(units):
+        side = SIDES[i]
+        body = unit["body"]
+        components = body.get("components") or []
+        if not components:
+            for field in ("entity_count", "total_hp"):
+                if body.get(field) is None:
+                    issues.append(_issue(side, f"body.{field}", "missing_source_value", "health_pool"))
+        else:
+            eligible = [c for c in components if c.get("primary") or c.get("health_contribution", 0)]
+            target_role = scenario["sides"][side]["target_component_role"]
+            if target_role != "primary":
+                selected = next((c for c in components if c.get("role") == target_role), None)
+                if selected and selected not in eligible:
+                    issues.append(_issue(side, f"body.components.{target_role}.health_contribution",
+                                         "missing_source_value", "health_pool"))
+            if not any(c.get("primary") for c in eligible):
+                issues.append(_issue(side, "body.components.primary", "missing_source_value", "health_pool"))
+            for component in eligible:
+                for field, value in (("count", component.get("count")),
+                                     ("health_contribution", component.get(
+                                         "health_contribution", component.get("known_hp_total")))):
+                    if value is None or value <= 0:
+                        issues.append(_issue(side, f"body.components.{component['role']}.{field}",
+                                             "missing_or_invalid_source_value", "health_pool"))
+    return issues
 
 
 def _scenario(value):
@@ -244,7 +284,8 @@ def _prepare(unit, side, setting):
         gaps.append("multiple ranged attachments or variants exist; only one selected attack is evaluated, with simultaneous firing unresolved")
     if len(melee) > 1:
         gaps.append("multiple melee attachments exist; only the primary attack is evaluated")
-    if m and any(m.get(field) is None for field in ("attack", "base_damage", "ap_damage", "attack_interval")):
+    if m and (any(m.get(field) is None for field in ("attack", "base_damage", "ap_damage", "attack_interval"))
+              or m["attack_interval"] <= 0):
         gaps.append("primary melee attack has missing calculation fields; melee damage omitted")
         m = None
     if m and (m.get("max_splash_targets") or 1) > 1:
@@ -260,12 +301,12 @@ def _prepare(unit, side, setting):
             attack = None
     if attack:
         counts = [attack.get(k) for k in ("projectiles_per_shot", "shots_per_volley", "burst_size")]
-        if setting["projectiles_per_cycle"] is None and any(x not in (None, 1, 1.0) for x in counts):
-            gaps.append("projectile/volley/burst nesting unresolved; set projectiles_per_cycle")
+        if setting["projectiles_per_cycle"] is None and any(x != 1 for x in counts):
+            gaps.append("projectile/volley/burst nesting unresolved or count missing; set projectiles_per_cycle")
             attack = None
         elif setting["projectiles_per_cycle"] is None:
             setting["projectiles_per_cycle"] = 1.0
-        if attack and setting["cycle_seconds"] is None and attack.get("reload_time") is not None:
+        if attack and setting["cycle_seconds"] is None and (attack.get("reload_time") or 0) > 0:
             setting["cycle_seconds"] = 1.25 * _number(attack["reload_time"], "reload_time", positive=True)
             gaps.append("complete firing cycle assumes 1.25 times listed projectile reload; uncalibrated")
         supply = attack.get("ammunition_supply") if attack else None
@@ -411,7 +452,7 @@ def _run(states, scenario, timing):
                 hits = projectiles * cfg["collision_probability"] * (1 - direct["shield_block_probability"])
                 _apply(defender, "direct", hits, direct["per_unblocked_hit"], scenario["barrier_damage_order"])
             explosion = attack.get("explosion")
-            if explosion:
+            if explosion and explosion.get("base_damage") is not None and explosion.get("ap_damage") is not None:
                 ex = _damage_per_hit(explosion["base_damage"], explosion["ap_damage"], defender["unit"],
                                       _traits(attacker["unit"], explosion["id"]), "explosion", facing,
                                       defender["target_source"],
@@ -483,8 +524,11 @@ def _run(states, scenario, timing):
 
 def _timing(states, scenario):
     speed = [s["unit"]["movement"].get("speed") for s in states]
-    closing = None if None in speed else sum(ORDERS[scenario["sides"][SIDES[i]]["order"]] * speed[i]
-                                                  for i in range(2)) * scenario["metres_per_second_per_speed_point"] * scenario["terrain_speed_factor"] / scenario["path_length_factor"]
+    order = [ORDERS[scenario["sides"][SIDES[i]]["order"]] for i in range(2)]
+    closing = (None if any(speed[i] is None and order[i] != 0 for i in range(2)) else
+               sum(order[i] * (speed[i] if speed[i] is not None else 0) for i in range(2)) *
+               scenario["metres_per_second_per_speed_point"] * scenario["terrain_speed_factor"] /
+               scenario["path_length_factor"])
     distance = scenario["separation_metres"]
     def entry(threshold):
         return {"status": "unknown_input", "seconds": None} if closing is None or threshold is None else _entry(distance, threshold, closing)
@@ -492,6 +536,189 @@ def _timing(states, scenario):
             "range_entry": [entry(s["ranged"].get("range") if s["ranged"] else None) for s in states],
             "minimum_range": [s["ranged"].get("minimum_range") if s["ranged"] else None for s in states],
             "flight_speed": [s["ranged"].get("velocity") if s["ranged"] else None for s in states]}
+
+
+def _unresolved_inputs(units, scenario, timing):
+    """Record nullable source inputs used by enabled calculation paths.
+
+    Null is unknown, while numeric zero, false, known omission and disabled
+    channels retain their distinct meanings. These records, not prose gaps,
+    determine whether a projected ordering can be reported as a verdict.
+    """
+    issues = []
+    if not scenario["historical_relations_apply_to_patch_9"]:
+        return issues
+    seen = set()
+
+    def add(i, path, code, calculation):
+        key = (i, path, code, calculation)
+        if key not in seen:
+            seen.add(key)
+            issues.append(_issue(SIDES[i], path, code, calculation))
+
+    def require(i, path, value, calculation):
+        if value is None:
+            add(i, path, "missing_source_value", calculation)
+
+    contact = timing["contact"]["seconds"]
+    moving = scenario["separation_metres"] > 0 and any(
+        ORDERS[scenario["sides"][side]["order"]] != 0 for side in SIDES)
+    possible_contact = (contact is not None and contact < scenario["duration_seconds"] or
+                        contact is None and moving)
+    ranged = []
+    melee = []
+    fires = []
+    fights = []
+    for i, unit in enumerate(units):
+        cfg = scenario["sides"][SIDES[i]]
+        options = _attacks(unit, "ranged")
+        requested = cfg["ranged_attack_id"]
+        selected = (next((a for a in options if a["id"] == requested), None) if requested else
+                    next((a for a in options if a.get("is_default") and a.get("slot") == "primary"), None) or
+                    next((a for a in options if a.get("is_default")), None))
+        attack = _attacks(unit, "melee")
+        ranged.append(selected)
+        melee.append(attack[0] if attack else None)
+        can_fire = bool(cfg["fire"] and scenario["line_of_sight"] and
+                        scenario["separation_metres"] > 0 and
+                        (contact is None or contact > cfg["first_shot_delay_seconds"]) and
+                        cfg["first_shot_delay_seconds"] < scenario["duration_seconds"])
+        fires.append(can_fire)
+        fights.append(bool(cfg["fight"] and possible_contact))
+        if can_fire and (unit.get("ranged") or {}).get("status") == "unresolved":
+            add(i, "ranged.status", "unresolved_source_status", "ranged")
+        if can_fire and (unit.get("ranged") or {}).get("status") == "present" and selected is None:
+            add(i, "ranged.is_default", "unresolved_source_selection", "ranged")
+        if fights[i] and melee[i] is None and unit["coverage"].get("melee") == "unresolved":
+            add(i, "melee", "unresolved_source_status", "melee")
+
+    if moving and (any(fires) or any(fights)):
+        for i, unit in enumerate(units):
+            if (ORDERS[scenario["sides"][SIDES[i]]["order"]] != 0 and
+                    unit["movement"].get("speed") is None):
+                add(i, "movement.speed", "missing_source_value", "phase_timing")
+
+    for i, attack in enumerate(ranged):
+        if not fires[i] or attack is None:
+            continue
+        cfg = scenario["sides"][SIDES[i]]
+        for field in ("range", "minimum_range", "base_damage", "ap_damage"):
+            require(i, f"ranged.{field}", attack.get(field), "ranged")
+        for field in ("range", "minimum_range"):
+            if attack.get(field) is not None and attack[field] < 0:
+                add(i, f"ranged.{field}", "invalid_native_value", "ranged")
+        if cfg["flight_seconds"] is None and (attack.get("velocity") is None or attack["velocity"] <= 0):
+            add(i, "ranged.velocity", "missing_or_native_sentinel", "projectile_flight")
+        if cfg["cycle_seconds"] is None and (attack.get("reload_time") is None or attack["reload_time"] <= 0):
+            add(i, "ranged.reload_time", "missing_cycle_assumption", "ranged_schedule")
+        if cfg["projectiles_per_cycle"] is None:
+            counts = [attack.get(field) for field in ("projectiles_per_shot", "shots_per_volley", "burst_size")]
+            if any(count is None for count in counts):
+                for field in ("projectiles_per_shot", "shots_per_volley", "burst_size"):
+                    require(i, f"ranged.{field}", attack.get(field), "ranged_schedule")
+            elif any(count != 1 for count in counts):
+                add(i, "ranged.projectile_volley_burst", "requires_scenario_assumption", "ranged_schedule")
+        supply = attack.get("ammunition_supply")
+        if supply is None:
+            require(i, "ranged.ammunition", attack.get("ammunition"), "ranged_schedule")
+            if attack.get("ammunition") is not None and attack["ammunition"] < 0:
+                add(i, "ranged.ammunition", "invalid_native_value", "ranged_schedule")
+        else:
+            if supply.get("assignment_status") != "sources_agree":
+                add(i, "ranged.ammunition_supply.assignment_status", "unresolved_source_status", "ranged_schedule")
+            if supply.get("unlimited") is None:
+                add(i, "ranged.ammunition_supply.unlimited", "missing_source_value", "ranged_schedule")
+            elif supply["unlimited"] is False:
+                require(i, "ranged.ammunition_supply.capacity", supply.get("capacity"), "ranged_schedule")
+                if supply.get("capacity") is not None and supply["capacity"] < 0:
+                    add(i, "ranged.ammunition_supply.capacity", "invalid_native_value", "ranged_schedule")
+        explosion = attack.get("explosion")
+        if explosion:
+            for field in ("base_damage", "ap_damage"):
+                require(i, f"ranged.explosion.{field}", explosion.get(field), "explosion")
+
+    for i, attack in enumerate(melee):
+        if not fights[i] or attack is None:
+            continue
+        for field in ("attack", "base_damage", "ap_damage", "attack_interval"):
+            require(i, f"melee.{field}", attack.get(field), "melee")
+        if attack.get("attack_interval") is not None and attack["attack_interval"] <= 0:
+            add(i, "melee.attack_interval", "invalid_native_value", "melee")
+        if scenario["sides"][SIDES[i]]["charge_duration_seconds"] > 0:
+            require(i, "melee.charge_bonus", attack.get("charge_bonus"), "charge")
+        defence = melee[1 - i]
+        require(1 - i, "melee.defence", defence.get("defence") if defence else None, "melee_defence")
+
+    def defence_inputs(attacker_i, kind, attack, traits, *, spell_tag=None):
+        defender_i = 1 - attacker_i
+        defender = units[defender_i]
+        cfg = scenario["sides"][SIDES[defender_i]]
+        trait_path = {"missile": "ranged", "explosion": "explosion", "melee": "melee"}[kind]
+        if not traits:
+            add(attacker_i, f"passives.attack_traits.{trait_path}",
+                "missing_source_value", "damage_traits")
+        components = defender["body"].get("components") or []
+        component = (next((c for c in components if c.get("role") == cfg["target_component_role"]), None)
+                     if cfg["target_component_role"] != "primary" else
+                     next((c for c in components if c.get("primary")), None))
+        if component and component.get("targetable") is False:
+            return
+        if component and component.get("targetable") is None and not cfg["assume_targetable"]:
+            add(defender_i, f"body.components.{component['role']}.targetable",
+                "missing_source_value", "target_eligibility")
+        if component and not component.get("primary") and not cfg["assume_unit_protection_for_component"]:
+            add(defender_i, f"body.components.{component['role']}.protection",
+                "requires_scenario_assumption", "defence")
+        size = component.get("size") if component else defender["body"].get("size")
+        require(defender_i, "body.target_component.size", size, "size_bonus")
+        protection = defender["passives"]["protection"]
+        for field in ("armour", "ward_save", "barrier_health"):
+            value = defender["body"].get(field) if field == "barrier_health" else protection.get(field)
+            require(defender_i, f"body.{field}" if field == "barrier_health" else f"passives.protection.{field}",
+                    value, "defence")
+        magical = traits.get("magical")
+        if magical is None and protection.get("physical_resistance") != 0:
+            add(attacker_i, f"passives.attack_traits.{trait_path}.magical",
+                "missing_source_value", "resistance")
+        if magical is not True:
+            require(defender_i, "passives.protection.physical_resistance",
+                    protection.get("physical_resistance"), "resistance")
+        if kind == "missile":
+            require(defender_i, "passives.protection.missile_resistance",
+                    protection.get("missile_resistance"), "resistance")
+            if cfg["facing"] == "front":
+                require(defender_i, "passives.protection.shield_block_chance",
+                        protection.get("shield_block_chance"), "shield")
+        flaming = traits.get("flaming")
+        if flaming is None and protection.get("fire_resistance") != 0:
+            add(attacker_i, f"passives.attack_traits.{trait_path}.flaming",
+                "missing_source_value", "resistance")
+        if flaming is True:
+            require(defender_i, "passives.protection.fire_resistance",
+                    protection.get("fire_resistance"), "resistance")
+        if spell_tag is None and kind == "explosion" and protection.get("spell_resistance") != 0:
+            add(attacker_i, "ranged.explosion.native_parameters.is_spell",
+                "missing_source_value", "spell_resistance")
+        if spell_tag is True:
+            require(defender_i, "passives.protection.spell_resistance",
+                    protection.get("spell_resistance"), "spell_resistance")
+        classification = _target_class(defender, component)
+        bonus_field = {"infantry": "bonus_vs_infantry", "large": "bonus_vs_large"}.get(classification)
+        if bonus_field and kind != "explosion":
+            require(attacker_i, f"passives.attack_traits.{trait_path}.{bonus_field}",
+                    traits.get(bonus_field), "size_bonus")
+
+    for i in range(2):
+        if fires[i] and ranged[i]:
+            attack = ranged[i]
+            defence_inputs(i, "missile", attack, _traits(units[i], attack["id"]))
+            if attack.get("explosion"):
+                ex = attack["explosion"]
+                defence_inputs(i, "explosion", ex, _traits(units[i], ex["id"]),
+                               spell_tag=ex.get("native_parameters", {}).get("is_spell"))
+        if fights[i] and melee[i]:
+            defence_inputs(i, "melee", melee[i], _traits(units[i], melee[i]["id"]))
+    return issues
 
 
 def _summary(states, scenario):
@@ -556,7 +783,7 @@ def _mechanics(units, scenario):
                                                      defender, traits, "missile", facing, component) if target_supported else None,
                            "explosion": None}
                 ex = selected.get("explosion")
-                if ex:
+                if ex and ex.get("base_damage") is not None and ex.get("ap_damage") is not None:
                     missile["explosion"] = {"radius_source_metres": ex.get("radius"),
                                             "affected_entities_assumed": cfg["explosion_entities_per_collision"],
                                             "damage": _damage_per_hit(ex["base_damage"], ex["ap_damage"], defender,
@@ -576,7 +803,7 @@ def _mechanics(units, scenario):
             melee = {"attack_id": a["id"], "unmodified_hit_probability": hit if target_supported else None,
                      "target_combat_class": classification, "target_component_role": component["role"],
                      "targetability_source": component.get("targetable"), "target_supported": bool(target_supported),
-                     "target_facing": facing, "active_contacts_assumed": cfg["active_contacts"] if cfg["active_contacts"] is not None else min(8, attacker["body"]["entity_count"]),
+                     "target_facing": facing, "active_contacts_assumed": cfg["active_contacts"] if cfg["active_contacts"] is not None else min(8, _primary_count(attacker)),
                      "attack_interval_source_seconds": a.get("attack_interval"),
                      "charge_bonus_source": a.get("charge_bonus"),
                      "charge_decay_duration_assumed_seconds": cfg["charge_duration_seconds"],
@@ -623,8 +850,8 @@ def _sensitivity(units, scenario, nominal):
             current = scenario["sides"][side][field]
             if field == "active_contacts":
                 if current is None:
-                    current = min(8, units[SIDES.index(side)]["body"]["entity_count"])
-                high = units[SIDES.index(side)]["body"]["entity_count"]
+                    current = min(8, _primary_count(units[SIDES.index(side)]))
+                high = _primary_count(units[SIDES.index(side)])
             else:
                 high = 1.0
             def winner_at(value):
@@ -670,22 +897,31 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                           include_diagnostics=True, include_provenance=True)
     _validate_source(packet, sc)
     units = packet["units"]
-    timing, summary = _simulate(units, sc)
-    for row in summary:
-        row["stopping"]["contact_seconds"] = timing["contact"]["seconds"]
-    nominal = _winner(summary) if sc["historical_relations_apply_to_patch_9"] else "indeterminate"
+    unresolved_inputs = _core_unresolved(units, sc)
+    timing = None
+    summary = None
+    nominal = "indeterminate"
     corners = []
-    for pa, pb in ((0, 0), (0, 1), (1, 0), (1, 1)):
-        test = copy.deepcopy(sc)
-        test["sides"]["a"]["collision_probability"] = pa
-        test["sides"]["b"]["collision_probability"] = pb
-        _, rows = _simulate(units, test)
-        corners.append({"collision_probability_a": pa, "collision_probability_b": pb,
-                        "favored": _winner(rows), "effective_survivability_fraction": [r["effective_survivability_fraction"] for r in rows]})
-    sensitivity = _sensitivity(units, sc, nominal) if sc["historical_relations_apply_to_patch_9"] else []
+    sensitivity = []
     barrier_sensitivity = []
     barrier_material = False
-    if sc["historical_relations_apply_to_patch_9"] and any(u["body"].get("barrier_health") for u in units):
+    if not unresolved_inputs:
+        timing, summary = _simulate(units, sc)
+        unresolved_inputs = _unresolved_inputs(units, sc, timing)
+        for row in summary:
+            row["stopping"]["contact_seconds"] = timing["contact"]["seconds"]
+        nominal = _winner(summary) if sc["historical_relations_apply_to_patch_9"] else "indeterminate"
+        for pa, pb in ((0, 0), (0, 1), (1, 0), (1, 1)):
+            test = copy.deepcopy(sc)
+            test["sides"]["a"]["collision_probability"] = pa
+            test["sides"]["b"]["collision_probability"] = pb
+            _, rows = _simulate(units, test)
+            corners.append({"collision_probability_a": pa, "collision_probability_b": pb,
+                            "favored": _winner(rows), "effective_survivability_fraction":
+                            [r["effective_survivability_fraction"] for r in rows]})
+        sensitivity = _sensitivity(units, sc, nominal) if sc["historical_relations_apply_to_patch_9"] else []
+    if summary is not None and sc["historical_relations_apply_to_patch_9"] and any(
+            u["body"].get("barrier_health") for u in units):
         alternate = copy.deepcopy(sc)
         alternate["barrier_damage_order"] = ("entity_cap_first" if sc["barrier_damage_order"] == "barrier_first"
                                              else "barrier_first")
@@ -704,10 +940,11 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                 not math.isclose(summary[i]["incoming_damage"]["overkill"],
                                  alternate_rows[i]["incoming_damage"]["overkill"], abs_tol=1e-9)
                 for i in range(2))
-    gaps = [*summary[0]["coverage_gaps"], *summary[1]["coverage_gaps"]]
-    material_unresolved = any(any(marker in gap for marker in
-                                  ("damage omitted", "schedule impacts", "nesting unresolved",
-                                   "complete firing cycle unresolved")) for gap in gaps)
+    gaps = ([*summary[0]["coverage_gaps"], *summary[1]["coverage_gaps"]]
+            if summary is not None else ["health-pool inputs unresolved; calculation withheld"])
+    material_unresolved = bool(unresolved_inputs)
+    gaps.extend(f"unresolved input {item['side']}.{item['source_path']} "
+                f"({item['code']}) affects {item['calculation']}" for item in unresolved_inputs)
     if barrier_material and not sc["barrier_damage_order_explicit"]:
         material_unresolved = True
         gaps.append("barrier damage order changes the projection; supply barrier_damage_order for a conditional verdict")
@@ -745,7 +982,7 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                  "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",
                                  "Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled."],
             "derived": {"phase_timing": timing,
-                        "event_mechanics": _mechanics(units, sc) if sc["historical_relations_apply_to_patch_9"] else None,
+                        "event_mechanics": _mechanics(units, sc) if summary is not None and sc["historical_relations_apply_to_patch_9"] else None,
                         "ledgers": summary},
             "verdict": {"status": "conditional" if nominal not in ("tie", "indeterminate") and not material_unresolved else "indeterminate",
                         "nominal_favored": nominal if not material_unresolved else "indeterminate",
@@ -756,6 +993,7 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                         "bounds_cross": len({c["favored"] for c in corners}) > 1 or bool(sensitivity) or
                                         len({case["favored"] for case in barrier_sensitivity}) > 1,
                         "material_mechanic_unresolved": material_unresolved,
+                        "unresolved_inputs": unresolved_inputs,
                         "one_parameter_flip_thresholds": sensitivity,
                         "qualification": "Nominal result depends on uncalibrated firing/contact assumptions; routing is unknown."},
             "limitations": list(dict.fromkeys(gaps)),
