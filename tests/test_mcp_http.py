@@ -80,7 +80,7 @@ class HTTPTransportTests(unittest.TestCase):
         self.assertEqual(status, 202)
         status, listed = self.rpc("tools/list")
         self.assertEqual(status, 200)
-        self.assertEqual(len(listed["result"]["tools"]), 8)
+        self.assertEqual(len(listed["result"]["tools"]), 9)
         for tool in listed["result"]["tools"]:
             self.assertIn("inputSchema", tool)
             self.assertIn("outputSchema", tool)

@@ -40,6 +40,10 @@ python scripts/query_snapshot.py effect --db work/units.sqlite wh_main_spell_hea
 python scripts/query_snapshot.py unit-effects --db work/units.sqlite wh2_main_hef_cha_teclis_0
 ```
 
+Issue #20 increment A adds single-cast damage of a spell/ability against a unit:
+`python -m ctw_adviser.cli effect-damage --db work/units.sqlite EFFECT TARGET` (see
+[effect damage](docs/effect-damage.md)).
+
 See [activated effects](docs/activated-effects.md) for tables, packet sections,
 measurements and what remains for character skill/rank access.
 

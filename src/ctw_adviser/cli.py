@@ -9,6 +9,7 @@ from .store import inspect_snapshot
 from .queries import Queries, ResolutionError
 from .model import movement_phase
 from .combat import evaluate_matchup
+from .effect_calc import evaluate_effect_damage
 
 
 def main():
@@ -36,6 +37,14 @@ def main():
     evaluate.add_argument('--scenario', help='JSON scenario object; defaults are illustrative, not calibrated')
     evaluate.add_argument('--subculture-a')
     evaluate.add_argument('--subculture-b')
+    effect_damage = commands.add_parser('effect-damage', help='Expected single-cast damage of one spell/ability against one unit')
+    effect_damage.add_argument('--db', type=Path, required=True)
+    effect_damage.add_argument('effect')
+    effect_damage.add_argument('target')
+    effect_damage.add_argument('--scenario', help='JSON scenario object; every unsourced rate is an explicit assumption')
+    effect_damage.add_argument('--caster', help='Optional caster unit; checked against qualified source access links')
+    effect_damage.add_argument('--subculture')
+    effect_damage.add_argument('--target-subculture')
     for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance',
                     'resolve-effect', 'effect', 'unit-effects'):
         query = commands.add_parser(command)
@@ -73,6 +82,12 @@ def main():
                 result = evaluate_matchup(queries, args.unit_a, args.unit_b,
                                           scenario=json.loads(args.scenario) if args.scenario else None,
                                           subculture_a=args.subculture_a, subculture_b=args.subculture_b)
+        elif args.command == 'effect-damage':
+            with Queries(args.db) as queries:
+                result = evaluate_effect_damage(queries, args.effect, args.target,
+                                                scenario=json.loads(args.scenario) if args.scenario else None,
+                                                caster=args.caster, subculture=args.subculture,
+                                                target_subculture=args.target_subculture)
         else:
             with Queries(args.db) as queries:
                 key = args.keys[0]
