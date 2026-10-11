@@ -1,0 +1,11 @@
+file:///workspace/scratch/92f03c288c5f/CTW-adviser/work/mcp-client/node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js:378
+                throw new StreamableHTTPError(response.status, `Error POSTing to endpoint: ${this._unfollowedRedirect(response, this._url) ?? text}`);
+                      ^
+
+StreamableHTTPError: Streamable HTTP error: Error POSTing to endpoint: {"error":"request rate exceeded"}
+    at StreamableHTTPClientTransport.send (file:///workspace/scratch/92f03c288c5f/CTW-adviser/work/mcp-client/node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js:378:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 429
+}
+
+Node.js v24.19.0

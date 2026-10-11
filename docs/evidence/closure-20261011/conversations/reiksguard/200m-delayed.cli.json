@@ -1,0 +1,1488 @@
+{
+  "model_version": "combat-0.1.4",
+  "source_packet_version": "1.20.0",
+  "snapshot": {
+    "commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+    "owners": {
+      "effect_semantics": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      },
+      "shared_abilities": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      },
+      "units": {
+        "patch": "9.0",
+        "build": "25507028",
+        "schema": 4
+      }
+    },
+    "baseline": {
+      "context": "unmodified custom battle",
+      "game": "warhammer_3",
+      "rank": 0,
+      "unit_scale": "ultra"
+    },
+    "coverage": {
+      "activated_access": "unit ability links only; character skill/rank routes are not yet imported",
+      "activated_payloads": "source graphs retained for every activated root; runtime execution unverified",
+      "runtime": "unverified; engine behavior is not fully reconstructed",
+      "semantic": "partial; raw conditions/effects retained without application",
+      "structural": "validated selected records and dependency edges"
+    },
+    "serving_contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1"
+  },
+  "source_fingerprints": {
+    "s_02c68eb6531d": {
+      "path": "data/unit_stats/abilities/tables/projectile_homing_params.csv",
+      "sha256": "ef20e649def1e17810acacd1784f8c0a42a4ad0424cb269ed497060054737823",
+      "owner": "shared_abilities"
+    },
+    "s_0b15dd2090a7": {
+      "path": "data/unit_stats/normalized/empire__wh3__9.0__ultra.csv",
+      "sha256": "a3d661e99b393b02f96732c5646d59d9d370bc79f0b2527ae7d5a92845a945ac",
+      "owner": "units"
+    },
+    "s_15464982ee45": {
+      "path": "data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv",
+      "sha256": "40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab",
+      "owner": "units"
+    },
+    "s_159db7db7a79": {
+      "path": "data/unit_stats/abilities/tables/projectile_penetration_junctions.csv",
+      "sha256": "65f22c947131fd72deb691ebea631ac04eaecb47e24dc0cd0a112fb0fc08c9cf",
+      "owner": "shared_abilities"
+    },
+    "s_19f14f3f232f": {
+      "path": "data/unit_stats/normalized/greenskins__wh3__9.0__ultra.csv",
+      "sha256": "e6ee95fe10d840f8a37c5bfa1ab5ecc17ac9566dd527468f89c4c240ad4c6a91",
+      "owner": "units"
+    },
+    "s_23de8daf4e75": {
+      "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+      "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+      "owner": "units"
+    },
+    "s_2ed3f783ed26": {
+      "path": "data/unit_stats/source_exports/db/melee_weapons_tables/data__.tsv",
+      "sha256": "7f6921dda8cc528f9ae7e21f103d63344f9159e7362b84612792b7f1c34cd4b6",
+      "owner": "units"
+    },
+    "s_505888529780": {
+      "path": "data/unit_stats/source_exports/db/missile_weapons_tables/data__.tsv",
+      "sha256": "b7c04684367be642ae0e770921352841c006fe9ee6df682866129b9558e456ee",
+      "owner": "units"
+    },
+    "s_567e934ed6df": {
+      "path": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "sha256": "deca81795dd1af2a894406423779e4730e322d365ffd41150e34271d82410a38",
+      "owner": "units"
+    },
+    "s_5e78e24b332a": {
+      "path": "data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv",
+      "sha256": "8f1f18d37042a216284924094820ce57d26bd67212225cb9ac3921f6c4e8c7ae",
+      "owner": "units"
+    },
+    "s_7b179242cbee": {
+      "path": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "sha256": "831966e3ab48dd3660d2dcf232a8742d92643368433f90ddd7eec8017c83f42b",
+      "owner": "units"
+    },
+    "s_97efab76855a": {
+      "path": "data/unit_stats/abilities/payload_provenance.csv",
+      "sha256": "222cf412339f177ebcc07dc040b8bd3771df46408bd6e8bd827e81f2493fcb22",
+      "owner": "shared_abilities"
+    },
+    "s_9d85f8e27f99": {
+      "path": "data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv",
+      "sha256": "9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac",
+      "owner": "units"
+    },
+    "s_b90c197e7231": {
+      "path": "data/unit_stats/lookups/explosions__wh3__9.0.csv",
+      "sha256": "77239daf48b039e75e87e6b34ce5a0224388a9249ae3eb57c71dbcbf844edc91",
+      "owner": "units"
+    },
+    "s_d53bb00c3d74": {
+      "path": "data/unit_stats/source_exports/text/db/ui_unit_bullet_point_enums__.loc.tsv",
+      "sha256": "b48f34e77303db2ba9b62115a5d9ef0b51bfb56ab0ea74b4de8836f383028939",
+      "owner": "units"
+    },
+    "s_f4787b4b05a6": {
+      "path": "data/unit_stats/lookups/projectiles__wh3__9.0.csv",
+      "sha256": "a59f4b20c373e54f8a4fc22c58064d0c0c6c74d94b59893a3b037705a698a62d",
+      "owner": "units"
+    }
+  },
+  "source_provenance": {
+    "02c68eb6531d2db41c68:3": {
+      "source_id": "s_02c68eb6531d",
+      "logical_record": 3,
+      "key": {
+        "key": "homing_medium_artillery_glider"
+      },
+      "source_line": 4,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectile_homing_params_tables/data__.tsv"
+    },
+    "0b15dd2090a7a99b5fa6:126": {
+      "source_id": "s_0b15dd2090a7",
+      "logical_record": 126,
+      "key": {
+        "game": "warhammer_3",
+        "patch": "9.0",
+        "subculture_key": "wh_main_sc_emp_empire",
+        "unit_key": "wh_main_emp_cav_reiksguard",
+        "unit_scale": "ultra"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "15464982ee45f35d824d:11": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 11,
+      "key": {
+        "key": "unit_attributes_bullet_text_cant_run"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "15464982ee45f35d824d:39": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 39,
+      "key": {
+        "key": "unit_attributes_bullet_text_hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "159db7db7a79cbc0d9dd:11": {
+      "source_id": "s_159db7db7a79",
+      "logical_record": 11,
+      "key": {
+        "key": "medium"
+      },
+      "source_line": 12,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectile_penetration_junctions_tables/data__.tsv"
+    },
+    "19f14f3f232faf63e26f:61": {
+      "source_id": "s_19f14f3f232f",
+      "logical_record": 61,
+      "key": {
+        "game": "warhammer_3",
+        "patch": "9.0",
+        "subculture_key": "wh_main_sc_grn_greenskins",
+        "unit_key": "wh_main_grn_art_doom_diver_catapult",
+        "unit_scale": "ultra"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "23de8daf4e757f0860fb:1111": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 1111,
+      "key": {
+        "battle_entity_key": "wh_main_grn_art_doomdiver",
+        "component_count": "4",
+        "component_role": "engine",
+        "is_primary_health_pool": "true",
+        "relationship_key": "wh_main_grn_art_doom_diver_catapult",
+        "unit_key": "wh_main_grn_art_doom_diver_catapult"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "23de8daf4e757f0860fb:1112": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 1112,
+      "key": {
+        "battle_entity_key": "wh2_dlc16_grn_inf_goblin_crew_blood_dismembers",
+        "component_count": "40",
+        "component_role": "crew_or_rider",
+        "is_primary_health_pool": "false",
+        "relationship_key": "",
+        "unit_key": "wh_main_grn_art_doom_diver_catapult"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "23de8daf4e757f0860fb:912": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 912,
+      "key": {
+        "battle_entity_key": "wh_main_cavalry_slow_blood",
+        "component_count": "60",
+        "component_role": "mount",
+        "is_primary_health_pool": "true",
+        "relationship_key": "wh_main_emp_mnt_warhorse_reiksguard",
+        "unit_key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "2ed3f783ed26bfdde51a:1197": {
+      "source_id": "s_2ed3f783ed26",
+      "logical_record": 1197,
+      "key": {
+        "key": "wh_main_emp_lance_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "2ed3f783ed26bfdde51a:1242": {
+      "source_id": "s_2ed3f783ed26",
+      "logical_record": 1242,
+      "key": {
+        "key": "wh_main_sword_short"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5058885297801a8d403a:852": {
+      "source_id": "s_505888529780",
+      "logical_record": 852,
+      "key": {
+        "key": "wh_main_grn_doom_diver_catapult"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "567e934ed6df7cfa34a0:2475": {
+      "source_id": "s_567e934ed6df",
+      "logical_record": 2475,
+      "key": {
+        "key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "567e934ed6df7cfa34a0:2519": {
+      "source_id": "s_567e934ed6df",
+      "logical_record": 2519,
+      "key": {
+        "key": "wh_main_grn_art_doom_diver_catapult"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5e78e24b332add8fcb5e:1141": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 1141,
+      "key": {
+        "attack_type": "melee",
+        "component_role": "unit",
+        "melee_weapon_key": "wh_main_emp_lance_reiksguard",
+        "missile_weapon_key": "",
+        "projectile_key": "",
+        "slot": "primary",
+        "unit_key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5e78e24b332add8fcb5e:1357": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 1357,
+      "key": {
+        "attack_type": "melee",
+        "component_role": "unit",
+        "melee_weapon_key": "wh_main_sword_short",
+        "missile_weapon_key": "",
+        "projectile_key": "",
+        "slot": "primary",
+        "unit_key": "wh_main_grn_art_doom_diver_catapult"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5e78e24b332add8fcb5e:1358": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 1358,
+      "key": {
+        "attack_type": "missile",
+        "component_role": "engine",
+        "melee_weapon_key": "",
+        "missile_weapon_key": "wh_main_grn_doom_diver_catapult",
+        "projectile_key": "wh_grn_doomdiver_goblin",
+        "slot": "engine",
+        "unit_key": "wh_main_grn_art_doom_diver_catapult"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "7b179242cbee121c7c14:1177": {
+      "source_id": "s_7b179242cbee",
+      "logical_record": 1177,
+      "key": {
+        "key": "wh_main_cavalry_slow_blood"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "7b179242cbee121c7c14:1230": {
+      "source_id": "s_7b179242cbee",
+      "logical_record": 1230,
+      "key": {
+        "key": "wh_main_grn_art_doomdiver"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "97efab76855a57b3b0c5:1065": {
+      "source_id": "s_97efab76855a",
+      "logical_record": 1065,
+      "key": {
+        "key": "wh_main_grn_doomdiver_goblin_explosion",
+        "kind": "explosion"
+      },
+      "source_line": 399,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_explosions_tables/data__.tsv"
+    },
+    "97efab76855a57b3b0c5:723": {
+      "source_id": "s_97efab76855a",
+      "logical_record": 723,
+      "key": {
+        "key": "wh_grn_doomdiver_goblin",
+        "kind": "projectile"
+      },
+      "source_line": 1053,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_tables/data__.tsv"
+    },
+    "9d85f8e27f99c7a0ada2:2791": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 2791,
+      "key": {
+        "attribute_key": "hide_forest",
+        "unit_key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "9d85f8e27f99c7a0ada2:3326": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 3326,
+      "key": {
+        "attribute_key": "cant_run",
+        "unit_key": "wh_main_grn_art_doom_diver_catapult"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b90c197e7231bba870ce:305": {
+      "source_id": "s_b90c197e7231",
+      "logical_record": 305,
+      "key": {
+        "explosion_key": "wh_main_grn_doomdiver_goblin_explosion"
+      },
+      "source_line": 399,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_explosions_tables/data__.tsv",
+      "lineage_refs": [
+        "97efab76855a57b3b0c5:1065"
+      ]
+    },
+    "d53bb00c3d740abf5992:234": {
+      "source_id": "s_d53bb00c3d74",
+      "logical_record": 234,
+      "key": {
+        "key": "ui_unit_bullet_point_enums_tooltip_anti_large"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "d53bb00c3d740abf5992:273": {
+      "source_id": "s_d53bb00c3d74",
+      "logical_record": 273,
+      "key": {
+        "key": "ui_unit_bullet_point_enums_tooltip_charge_reflector_vs_large"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "f4787b4b05a6cee9d93c:723": {
+      "source_id": "s_f4787b4b05a6",
+      "logical_record": 723,
+      "key": {
+        "projectile_key": "wh_grn_doomdiver_goblin"
+      },
+      "source_line": 1053,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_tables/data__.tsv",
+      "lineage_refs": [
+        "97efab76855a57b3b0c5:723"
+      ]
+    }
+  },
+  "source_payload_graph": {
+    "nodes": [
+      {
+        "id": "attack_payload:melee:5e78e24b332add8fcb5e:1141",
+        "kind": "attack_payload",
+        "key": "melee:5e78e24b332add8fcb5e:1141",
+        "native_parameters": {},
+        "provenance_refs": [
+          "2ed3f783ed26bfdde51a:1197"
+        ]
+      },
+      {
+        "id": "attack_payload:melee:5e78e24b332add8fcb5e:1357",
+        "kind": "attack_payload",
+        "key": "melee:5e78e24b332add8fcb5e:1357",
+        "native_parameters": {},
+        "provenance_refs": [
+          "2ed3f783ed26bfdde51a:1242"
+        ]
+      },
+      {
+        "id": "attack_payload:explosion:5e78e24b332add8fcb5e:1358",
+        "kind": "attack_payload",
+        "key": "explosion:5e78e24b332add8fcb5e:1358",
+        "native_parameters": {},
+        "provenance_refs": [
+          "b90c197e7231bba870ce:305"
+        ]
+      },
+      {
+        "id": "attack_payload:ranged:5e78e24b332add8fcb5e:1358",
+        "kind": "attack_payload",
+        "key": "ranged:5e78e24b332add8fcb5e:1358",
+        "native_parameters": {},
+        "provenance_refs": [
+          "f4787b4b05a6cee9d93c:723"
+        ]
+      },
+      {
+        "id": "record:02c68eb6531d2db41c68:3",
+        "kind": "native_projectile_homing_params",
+        "key": "{\"key\":\"homing_medium_artillery_glider\"}",
+        "native_parameters": {
+          "key": "homing_medium_artillery_glider",
+          "lookahead_time": 0.3,
+          "max_target_angle_delta": 120.0,
+          "start_time": 4.0,
+          "steering_coefficient": 0.1
+        },
+        "provenance_refs": [
+          "02c68eb6531d2db41c68:3"
+        ]
+      },
+      {
+        "id": "record:159db7db7a79cbc0d9dd:11",
+        "kind": "native_projectile_penetration_junctions",
+        "key": "{\"key\":\"medium\"}",
+        "native_parameters": {
+          "key": "medium",
+          "description": "Stopped by Medium targets, slows as it passes through entities",
+          "entity_size_cap": "medium",
+          "max_penetration": 5
+        },
+        "provenance_refs": [
+          "159db7db7a79cbc0d9dd:11"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "attack_payload:ranged:5e78e24b332add8fcb5e:1358",
+        "to": "record:02c68eb6531d2db41c68:3",
+        "relationship": "data/unit_stats/lookups/projectiles__wh3__9.0.csv.homing_params",
+        "order": 0,
+        "provenance_refs": [
+          "f4787b4b05a6cee9d93c:723"
+        ]
+      },
+      {
+        "from": "attack_payload:ranged:5e78e24b332add8fcb5e:1358",
+        "to": "record:159db7db7a79cbc0d9dd:11",
+        "relationship": "data/unit_stats/lookups/projectiles__wh3__9.0.csv.projectile_penetration",
+        "order": 0,
+        "provenance_refs": [
+          "f4787b4b05a6cee9d93c:723"
+        ]
+      }
+    ]
+  },
+  "identities": [
+    {
+      "unit_key": "wh_main_emp_cav_reiksguard",
+      "profile_unit_key": "wh_main_emp_cav_reiksguard",
+      "unit_keys": [
+        "wh_main_emp_cav_reiksguard"
+      ],
+      "subculture_key": "wh_main_sc_emp_empire",
+      "faction_name": [
+        "Empire"
+      ],
+      "name": "Reiksguard",
+      "unit_type": "cavalry"
+    },
+    {
+      "unit_key": "wh_main_grn_art_doom_diver_catapult",
+      "profile_unit_key": "wh_main_grn_art_doom_diver_catapult",
+      "unit_keys": [
+        "wh_main_grn_art_doom_diver_catapult"
+      ],
+      "subculture_key": "wh_main_sc_grn_greenskins",
+      "faction_name": [
+        "Greenskins"
+      ],
+      "name": "Doom Diver Catapults",
+      "unit_type": "artillery"
+    }
+  ],
+  "source_facts": [
+    {
+      "identity": {
+        "unit_key": "wh_main_emp_cav_reiksguard",
+        "profile_unit_key": "wh_main_emp_cav_reiksguard",
+        "unit_keys": [
+          "wh_main_emp_cav_reiksguard"
+        ],
+        "subculture_key": "wh_main_sc_emp_empire",
+        "faction_name": [
+          "Empire"
+        ],
+        "name": "Reiksguard",
+        "unit_type": "cavalry"
+      },
+      "body": {
+        "entity_count": 60.0,
+        "hp_per_entity": 108.0,
+        "total_hp": 6480.0,
+        "barrier_health": 0.0,
+        "size": "medium",
+        "components": [
+          {
+            "id": "component:23de8daf4e757f0860fb:912",
+            "role": "mount",
+            "count": 60.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 100.0,
+            "known_hp_total": 6480.0,
+            "size": "medium",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:912"
+            ],
+            "health_contribution": 6480.0
+          }
+        ],
+        "target_classification": {
+          "combat_class": "large",
+          "status": "reviewed_mapping",
+          "summary": "Combat target class: large. Native body size remains medium. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:1177",
+            "d53bb00c3d740abf5992:234",
+            "d53bb00c3d740abf5992:273"
+          ]
+        },
+        "firing_arc": {
+          "primary_body_key": "wh_main_cavalry_slow_blood",
+          "native_fire_arc_close": 360.0,
+          "interpretation": "Native primary-body setting; weapon coverage and angular units are not established.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:1177"
+          ]
+        },
+        "health_aggregation": {
+          "rule": "primary_body_only",
+          "summary": "Unit health uses the primary bodies; secondary component totals are not additional health.",
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:2475"
+          ]
+        }
+      },
+      "movement": {
+        "speed": 7.8,
+        "mass": 1000.0,
+        "speed_basis": "primary_body_run_speed",
+        "primary_body_key": "wh_main_cavalry_slow_blood",
+        "ground_speed": 7.8,
+        "flight_speed": 0.0,
+        "provenance_refs": [
+          "7b179242cbee121c7c14:1177"
+        ]
+      },
+      "leadership": 75.0,
+      "melee": {
+        "id": "melee:5e78e24b332add8fcb5e:1141",
+        "weapon_key": "wh_main_emp_lance_reiksguard",
+        "component_ref": null,
+        "slot": "primary",
+        "attack": 34.0,
+        "defence": 31.0,
+        "charge_bonus": 62.0,
+        "base_damage": 28.0,
+        "ap_damage": 12.0,
+        "attack_interval": 5.1,
+        "max_splash_targets": 1.0,
+        "native_parameters": {
+          "weapon_length": 1.0,
+          "splash_attack_target_size": null,
+          "splash_attack_power_multiplier": 1.0,
+          "building_damage_multiplier": 0.5,
+          "contact_phase": null,
+          "collision_attack_max_targets": 0.0,
+          "collision_attack_max_targets_cooldown": 10.0,
+          "scaling_damage": null
+        },
+        "provenance_refs": [
+          "5e78e24b332add8fcb5e:1141",
+          "2ed3f783ed26bfdde51a:1197",
+          "0b15dd2090a7a99b5fa6:126"
+        ],
+        "detail_ref": "record:2ed3f783ed26bfdde51a:1197",
+        "parameter_explanations": {
+          "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+        },
+        "variants": []
+      },
+      "ranged": null,
+      "protection": {
+        "armour": 120.0,
+        "shield_block_chance": 30.0,
+        "physical_resistance": 0.0,
+        "missile_resistance": 0.0,
+        "spell_resistance": 0.0,
+        "fire_resistance": 0.0,
+        "ward_save": 0.0
+      },
+      "attack_traits": {
+        "melee": {
+          "scope": {
+            "attack_ref": "melee:5e78e24b332add8fcb5e:1141",
+            "component_ref": null
+          },
+          "bonus_vs_infantry": 0.0,
+          "bonus_vs_large": 0.0,
+          "magical": false,
+          "flaming": false,
+          "provenance_refs": [
+            "0b15dd2090a7a99b5fa6:126"
+          ]
+        },
+        "ranged": null,
+        "explosion": null,
+        "additional": []
+      },
+      "attributes": [
+        {
+          "key": "hide_forest",
+          "name": null,
+          "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+          "provenance_refs": [
+            "9d85f8e27f99c7a0ada2:2791",
+            "15464982ee45f35d824d:39"
+          ]
+        }
+      ],
+      "abilities": [],
+      "activated_options": [],
+      "coverage": {
+        "melee": "present",
+        "ranged": "known_none",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 1,
+            "offset": 0,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "complete",
+            "returned": 1,
+            "offset": 0,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 1,
+            "offset": 0,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "complete",
+            "returned": 0,
+            "offset": 0,
+            "total": 0,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "complete",
+            "returned": 0,
+            "offset": 0,
+            "total": 0,
+            "cursor": null
+          }
+        ],
+        "gaps": [],
+        "diagnostic_count": 0
+      }
+    },
+    {
+      "identity": {
+        "unit_key": "wh_main_grn_art_doom_diver_catapult",
+        "profile_unit_key": "wh_main_grn_art_doom_diver_catapult",
+        "unit_keys": [
+          "wh_main_grn_art_doom_diver_catapult"
+        ],
+        "subculture_key": "wh_main_sc_grn_greenskins",
+        "faction_name": [
+          "Greenskins"
+        ],
+        "name": "Doom Diver Catapults",
+        "unit_type": "artillery"
+      },
+      "body": {
+        "entity_count": 4.0,
+        "hp_per_entity": 478.0,
+        "total_hp": 4032.0,
+        "barrier_health": 0.0,
+        "size": "large",
+        "components": [
+          {
+            "id": "component:23de8daf4e757f0860fb:1112",
+            "role": "crew_or_rider",
+            "count": 40.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 45.0,
+            "known_hp_total": 2120.0,
+            "size": "small",
+            "targetable": null,
+            "primary": false,
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:1112"
+            ],
+            "health_contribution": 2120.0
+          },
+          {
+            "id": "component:23de8daf4e757f0860fb:1111",
+            "role": "engine",
+            "count": 4.0,
+            "hp_per_component": 433.0,
+            "bonus_hp_per_component": 45.0,
+            "known_hp_total": 1912.0,
+            "size": "large",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:1111"
+            ],
+            "health_contribution": 1912.0
+          }
+        ],
+        "target_classification": {
+          "combat_class": "large",
+          "status": "reviewed_mapping",
+          "summary": "Combat target class: large. Native body size remains large. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:1230",
+            "d53bb00c3d740abf5992:234",
+            "d53bb00c3d740abf5992:273"
+          ]
+        },
+        "firing_arc": {
+          "primary_body_key": "wh_main_grn_art_doomdiver",
+          "native_fire_arc_close": 50.0,
+          "interpretation": "Native primary-body setting; weapon coverage and angular units are not established.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:1230"
+          ]
+        },
+        "health_aggregation": {
+          "rule": "primary_and_separate_crew",
+          "summary": "Unit health includes primary artillery bodies and separate crew. Each primary body already includes one crew slot.",
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:2519"
+          ]
+        }
+      },
+      "movement": {
+        "speed": 2.0,
+        "mass": 2000.0,
+        "speed_basis": "primary_body_run_speed",
+        "primary_body_key": "wh_main_grn_art_doomdiver",
+        "ground_speed": 2.0,
+        "flight_speed": 0.0,
+        "provenance_refs": [
+          "7b179242cbee121c7c14:1230"
+        ]
+      },
+      "leadership": 40.0,
+      "melee": {
+        "id": "melee:5e78e24b332add8fcb5e:1357",
+        "weapon_key": "wh_main_sword_short",
+        "component_ref": null,
+        "slot": "primary",
+        "attack": 10.0,
+        "defence": 6.0,
+        "charge_bonus": 5.0,
+        "base_damage": 21.0,
+        "ap_damage": 3.0,
+        "attack_interval": 4.3,
+        "max_splash_targets": 1.0,
+        "native_parameters": {
+          "weapon_length": 0.0,
+          "splash_attack_target_size": null,
+          "splash_attack_power_multiplier": 1.0,
+          "building_damage_multiplier": 0.75,
+          "contact_phase": null,
+          "collision_attack_max_targets": 0.0,
+          "collision_attack_max_targets_cooldown": 10.0,
+          "scaling_damage": null
+        },
+        "provenance_refs": [
+          "5e78e24b332add8fcb5e:1357",
+          "2ed3f783ed26bfdde51a:1242",
+          "19f14f3f232faf63e26f:61"
+        ],
+        "detail_ref": "record:2ed3f783ed26bfdde51a:1242",
+        "parameter_explanations": {
+          "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+        },
+        "variants": []
+      },
+      "ranged": {
+        "id": "ranged:5e78e24b332add8fcb5e:1358",
+        "weapon_key": "wh_main_grn_doom_diver_catapult",
+        "projectile_key": "wh_grn_doomdiver_goblin",
+        "component_ref": "component:23de8daf4e757f0860fb:1111",
+        "slot": "engine",
+        "ammunition_pool": "primary",
+        "is_default": true,
+        "ammunition": 22.0,
+        "accuracy": 10.0,
+        "range": 400.0,
+        "minimum_range": 20.0,
+        "reload_time": 18.0,
+        "base_damage": 70.0,
+        "ap_damage": 170.0,
+        "projectiles_per_shot": 1.0,
+        "shots_per_volley": 1.0,
+        "burst_size": 1.0,
+        "burst_shot_delay": 0.0,
+        "velocity": -1.0,
+        "spread": 0.0,
+        "marksmanship_bonus": 10.0,
+        "calibration_distance": 300.0,
+        "calibration_area": 13.0,
+        "explosion": {
+          "id": "explosion:5e78e24b332add8fcb5e:1358",
+          "key": "wh_main_grn_doomdiver_goblin_explosion",
+          "base_damage": 40.0,
+          "ap_damage": 15.0,
+          "radius": 2.0,
+          "provenance_refs": [
+            "b90c197e7231bba870ce:305"
+          ],
+          "native_parameters": {
+            "game": "warhammer_3",
+            "patch": "9.0",
+            "explosion_key": "wh_main_grn_doomdiver_goblin_explosion",
+            "detonator_type": "percussive",
+            "detonation_type": "carcass",
+            "radius": 2.0,
+            "duration": 0.0,
+            "speed": 10.0,
+            "base_damage": 40.0,
+            "ap_damage": 15.0,
+            "force": 100.0,
+            "ignition_amount": 0.0,
+            "is_magical": false,
+            "affects_allies": true,
+            "contact_phase_effect": null,
+            "shrapnel_key": null,
+            "is_spell": false,
+            "fuse_distance_from_target": "0.0000",
+            "fuse_fixed_time": "-1.0000"
+          },
+          "detail_ref": "record:b90c197e7231bba870ce:305"
+        },
+        "native_parameters": {
+          "shot_type": "artillery_default",
+          "collision_radius": 1.0,
+          "mass": 80.0,
+          "gravity": 5.0,
+          "can_target_airborne": true,
+          "can_damage_allies": true,
+          "can_damage_buildings": true,
+          "building_damage_multiplier": 1.5,
+          "projectile_penetration": "medium",
+          "penetration_entity_size_cap": "medium",
+          "max_penetration": 5.0,
+          "expiry_range": 700.0,
+          "expire_on_impact": false,
+          "can_bounce": false,
+          "can_roll": false,
+          "homing_params": "homing_medium_artillery_glider",
+          "scaling_damage": null,
+          "contact_stat_effect": null,
+          "shrapnel_key": null,
+          "trajectory_sight": "fixed",
+          "max_elevation": "35",
+          "overhead_stat_effect": null,
+          "fixed_elevation": "35",
+          "spawned_vortex": null
+        },
+        "detail_ref": "record:f4787b4b05a6cee9d93c:723",
+        "provenance_refs": [
+          "5e78e24b332add8fcb5e:1358",
+          "f4787b4b05a6cee9d93c:723"
+        ],
+        "parameter_explanations": {
+          "trajectory": "Native trajectory mode and elevation settings; these alone do not establish line of sight, obstacle clearance or firing eligibility.",
+          "building_damage_multiplier": "Native projectile building-damage multiplier; does not override can_damage_buildings=false. Combined siege damage is not calculated."
+        },
+        "status": "present",
+        "variants": [],
+        "firing_policy": {
+          "precursor": false,
+          "summary": null,
+          "provenance_refs": [
+            "5058885297801a8d403a:852"
+          ]
+        },
+        "reload": {
+          "projectile_base_interval": 18.0,
+          "unit_reload_skill": 0,
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:2519"
+          ]
+        },
+        "ammunition_supply": {
+          "native_weapon_pool": "primary",
+          "native_primary_capacity": 22,
+          "native_secondary_capacity": 0,
+          "infinite_secondary": false,
+          "assignment_status": "sources_agree",
+          "effective_pool": "primary",
+          "capacity": 22,
+          "unlimited": false,
+          "qualification": null,
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:2519",
+            "5058885297801a8d403a:852"
+          ]
+        },
+        "entity_stat_overrides": []
+      },
+      "protection": {
+        "armour": 15.0,
+        "shield_block_chance": 0.0,
+        "physical_resistance": 0.0,
+        "missile_resistance": 0.0,
+        "spell_resistance": 0.0,
+        "fire_resistance": 0.0,
+        "ward_save": 0.0
+      },
+      "attack_traits": {
+        "melee": {
+          "scope": {
+            "attack_ref": "melee:5e78e24b332add8fcb5e:1357",
+            "component_ref": null
+          },
+          "bonus_vs_infantry": 0.0,
+          "bonus_vs_large": 0.0,
+          "magical": false,
+          "flaming": false,
+          "provenance_refs": [
+            "19f14f3f232faf63e26f:61"
+          ]
+        },
+        "ranged": {
+          "scope": {
+            "attack_ref": "ranged:5e78e24b332add8fcb5e:1358",
+            "component_ref": "component:23de8daf4e757f0860fb:1111"
+          },
+          "bonus_vs_infantry": 0.0,
+          "bonus_vs_large": 0.0,
+          "magical": false,
+          "flaming": false,
+          "provenance_refs": [
+            "f4787b4b05a6cee9d93c:723"
+          ]
+        },
+        "explosion": {
+          "scope": {
+            "attack_ref": "explosion:5e78e24b332add8fcb5e:1358",
+            "component_ref": "component:23de8daf4e757f0860fb:1111"
+          },
+          "bonus_vs_infantry": null,
+          "bonus_vs_large": null,
+          "magical": false,
+          "flaming": false,
+          "provenance_refs": [
+            "b90c197e7231bba870ce:305"
+          ]
+        },
+        "additional": []
+      },
+      "attributes": [
+        {
+          "key": "cant_run",
+          "name": null,
+          "summary": "Cannot Run||This unit cannot run and will only move at walking pace.",
+          "provenance_refs": [
+            "9d85f8e27f99c7a0ada2:3326",
+            "15464982ee45f35d824d:11"
+          ]
+        }
+      ],
+      "abilities": [],
+      "activated_options": [],
+      "coverage": {
+        "melee": "present",
+        "ranged": "present",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 2,
+            "offset": 0,
+            "total": 2,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "complete",
+            "returned": 2,
+            "offset": 0,
+            "total": 2,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 1,
+            "offset": 0,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "complete",
+            "returned": 0,
+            "offset": 0,
+            "total": 0,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "complete",
+            "returned": 0,
+            "offset": 0,
+            "total": 0,
+            "cursor": null
+          }
+        ],
+        "gaps": [
+          {
+            "code": "targetability_unknown",
+            "section": "components",
+            "summary": "Source does not establish secondary-component targetability.",
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:1112"
+            ]
+          },
+          {
+            "code": "targetability_unknown",
+            "section": "components",
+            "summary": "crew_or_rider: targetability unknown.",
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:1112"
+            ]
+          }
+        ],
+        "diagnostic_count": 2
+      }
+    }
+  ],
+  "scenario_assumptions": {
+    "mode": "custom_battle",
+    "baseline": "unmodified_ultra_rank_0",
+    "separation_metres": 200.0,
+    "duration_seconds": 120.0,
+    "metres_per_second_per_speed_point": 1.0,
+    "path_length_factor": 1.0,
+    "terrain_speed_factor": 1.0,
+    "line_of_sight": true,
+    "historical_relations_apply_to_patch_9": true,
+    "barrier_damage_order": "barrier_first",
+    "barrier_damage_order_explicit": false,
+    "sides": {
+      "a": {
+        "order": "approach",
+        "fire": true,
+        "fight": true,
+        "facing": "front",
+        "ranged_attack_id": null,
+        "collision_probability": 0.5,
+        "firing_entities": null,
+        "cycle_seconds": null,
+        "first_shot_delay_seconds": 1.0,
+        "projectiles_per_cycle": null,
+        "flight_seconds": null,
+        "explosion_entities_per_collision": 1.0,
+        "active_contacts": null,
+        "charge_duration_seconds": 0.0,
+        "target_component_role": "primary",
+        "assume_targetable": false,
+        "assume_unit_protection_for_component": false,
+        "combat_effective_fraction": 0.5
+      },
+      "b": {
+        "order": "hold",
+        "fire": true,
+        "fight": true,
+        "facing": "front",
+        "ranged_attack_id": null,
+        "collision_probability": 0.5,
+        "firing_entities": null,
+        "cycle_seconds": 22.5,
+        "first_shot_delay_seconds": 1.0,
+        "projectiles_per_cycle": 1.0,
+        "flight_seconds": 22.5,
+        "explosion_entities_per_collision": 1.0,
+        "active_contacts": null,
+        "charge_duration_seconds": 0.0,
+        "target_component_role": "primary",
+        "assume_targetable": false,
+        "assume_unit_protection_for_component": false,
+        "combat_effective_fraction": 0.5
+      }
+    }
+  },
+  "empirical_calibration": null,
+  "assumption_notes": [
+    "Speed scale, path factor and terrain factor are illustrative; no measured map coordinates or acceleration.",
+    "Default collision probability 0.5 is uncalibrated and is not the card accuracy value.",
+    "When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.",
+    "Unspecified active contacts use min(8, living primary bodies); firing entities use the attached component count.",
+    "Direct and explosion are separate expected hit events; default splash reach is one entity per collision.",
+    "Positive listed velocity gives straight flight time from exact shot distance. Missing or nonpositive velocity uses an immediate-arrival firing-opportunity approximation unless flight_seconds is supplied; this is an earliest-arrival scenario, not measured flight time. Collision probability remains independent.",
+    "Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.",
+    "Barrier-before-entity-cap is the represented default, not a verified game damage order; the alternate order is tested.",
+    "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",
+    "Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled."
+  ],
+  "derived": {
+    "phase_timing": {
+      "closing_speed_metres_per_second": 7.8,
+      "contact": {
+        "status": "reached_under_assumptions",
+        "seconds": 25.641025641025642
+      },
+      "range_entry": [
+        {
+          "status": "unknown_input",
+          "seconds": null
+        },
+        {
+          "status": "already_reached",
+          "seconds": 0.0
+        }
+      ],
+      "minimum_range": [
+        null,
+        20.0
+      ],
+      "flight_speed": [
+        null,
+        -1.0
+      ]
+    },
+    "event_mechanics": [
+      {
+        "side": "a",
+        "missile": null,
+        "melee": {
+          "attack_id": "melee:5e78e24b332add8fcb5e:1141",
+          "unmodified_hit_probability": 0.63,
+          "target_combat_class": "large",
+          "target_component_role": "engine",
+          "targetability_source": true,
+          "target_supported": true,
+          "target_facing": "front",
+          "active_contacts_assumed": 8,
+          "attack_interval_source_seconds": 5.1,
+          "charge_bonus_source": 62.0,
+          "charge_decay_duration_assumed_seconds": 0.0,
+          "per_hit": {
+            "per_unblocked_hit": 36.849999999999994,
+            "size_bonus_as_base": 0.0,
+            "armour_survival": 0.8875,
+            "resistance_points": 0,
+            "spell_resistance_applied": false,
+            "shield_block_probability": 0.0
+          }
+        }
+      },
+      {
+        "side": "b",
+        "missile": {
+          "attack_id": "ranged:5e78e24b332add8fcb5e:1358",
+          "collision_probability": 0.5,
+          "complete_cycle_seconds_assumed": 22.5,
+          "projectiles_per_cycle_assumed": 1.0,
+          "scheduled": true,
+          "flight_basis": "scenario_flight_seconds",
+          "direct": {
+            "per_unblocked_hit": 179.33333333333334,
+            "size_bonus_as_base": 0.0,
+            "armour_survival": 0.13333333333333333,
+            "resistance_points": 0,
+            "spell_resistance_applied": false,
+            "shield_block_probability": 0.3
+          },
+          "explosion": {
+            "radius_source_metres": 2.0,
+            "affected_entities_assumed": 1.0,
+            "damage": {
+              "per_unblocked_hit": 20.333333333333332,
+              "size_bonus_as_base": 0.0,
+              "armour_survival": 0.13333333333333333,
+              "resistance_points": 0,
+              "spell_resistance_applied": false,
+              "shield_block_probability": 0.0
+            }
+          }
+        },
+        "melee": {
+          "attack_id": "melee:5e78e24b332add8fcb5e:1357",
+          "unmodified_hit_probability": 0.13999999999999999,
+          "target_combat_class": "large",
+          "target_component_role": "mount",
+          "targetability_source": true,
+          "target_supported": true,
+          "target_facing": "front",
+          "active_contacts_assumed": 4.0,
+          "attack_interval_source_seconds": 4.3,
+          "charge_bonus_source": 5.0,
+          "charge_decay_duration_assumed_seconds": 0.0,
+          "per_hit": {
+            "per_unblocked_hit": 5.8,
+            "size_bonus_as_base": 0.0,
+            "armour_survival": 0.13333333333333333,
+            "resistance_points": 0,
+            "spell_resistance_applied": false,
+            "shield_block_probability": 0.0
+          }
+        }
+      }
+    ],
+    "ledgers": [
+      {
+        "unit_key": "wh_main_emp_cav_reiksguard",
+        "incoming_damage": {
+          "direct": 151.2,
+          "explosion": 40.666666666666664,
+          "melee": 25.197662492546208,
+          "overkill": 99.86666666666667,
+          "attempted_damage": 316.9309958258801,
+          "barrier_absorbed": 0.0
+        },
+        "remaining_health": 6262.935670840785,
+        "initial_health": 6480.0,
+        "remaining_health_fraction": 0.9665024183396274,
+        "remaining_barrier": 0.0,
+        "initial_barrier": 0.0,
+        "effective_survivability_fraction": 0.9665024183396274,
+        "components": [
+          {
+            "role": "mount",
+            "primary": true,
+            "remaining_health": 6262.935670840785,
+            "initial_health": 6480.0,
+            "estimated_living_entities": 58,
+            "initial_entities": 60.0
+          }
+        ],
+        "shots_fired_per_shooter": 0,
+        "discrete_firing_events": 0,
+        "stopping": {
+          "health_depleted_seconds": null,
+          "combat_ineffective_seconds": null,
+          "firing_ceased_seconds": null,
+          "contact_seconds": 25.641025641025642,
+          "routing": "unknown_no_morale_model",
+          "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+          "engine_disabled": "not_applicable",
+          "crew_firing_cessation": "not_applicable",
+          "ammunition_exhausted": false
+        },
+        "coverage_gaps": [
+          "active contacts default to min(8, living primary entities)"
+        ]
+      },
+      {
+        "unit_key": "wh_main_grn_art_doom_diver_catapult",
+        "incoming_damage": {
+          "direct": 0.0,
+          "explosion": 0.0,
+          "melee": 1912.0,
+          "overkill": 0.0,
+          "attempted_damage": 3436.2208144796423,
+          "barrier_absorbed": 0.0
+        },
+        "remaining_health": 2120.0,
+        "initial_health": 4032.0,
+        "remaining_health_fraction": 0.5257936507936508,
+        "remaining_barrier": 0.0,
+        "initial_barrier": 0.0,
+        "effective_survivability_fraction": 0.5257936507936508,
+        "components": [
+          {
+            "role": "crew_or_rider",
+            "primary": false,
+            "remaining_health": 2120.0,
+            "initial_health": 2120.0,
+            "estimated_living_entities": 40.0,
+            "initial_entities": 40.0
+          },
+          {
+            "role": "engine",
+            "primary": true,
+            "remaining_health": 0.0,
+            "initial_health": 1912.0,
+            "estimated_living_entities": 0,
+            "initial_entities": 4.0
+          }
+        ],
+        "shots_fired_per_shooter": 1,
+        "discrete_firing_events": 1,
+        "stopping": {
+          "health_depleted_seconds": null,
+          "combat_ineffective_seconds": 52.0,
+          "firing_ceased_seconds": 25.641025641025642,
+          "contact_seconds": 25.641025641025642,
+          "routing": "unknown_no_morale_model",
+          "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+          "engine_disabled": "unknown_no_component_disable_rule",
+          "crew_firing_cessation": "unknown_no_crew_threshold",
+          "ammunition_exhausted": false
+        },
+        "coverage_gaps": [
+          "complete firing cycle assumes 1.25 times listed projectile reload; uncalibrated",
+          "projectile flight duration supplied as a scenario assumption",
+          "splash reach assumes one entity per colliding projectile",
+          "active contacts default to min(8, living primary entities)"
+        ]
+      }
+    ]
+  },
+  "verdict": {
+    "status": "conditional",
+    "nominal_favored": "a",
+    "represented_point_ordering": "a",
+    "criterion": "remaining modeled health plus barrier fraction at horizon",
+    "collision_probability_corners": [
+      {
+        "collision_probability_a": 0,
+        "collision_probability_b": 0,
+        "favored": "a",
+        "effective_survivability_fraction": [
+          0.9961114718375698,
+          0.5257936507936508
+        ]
+      },
+      {
+        "collision_probability_a": 0,
+        "collision_probability_b": 1,
+        "favored": "a",
+        "effective_survivability_fraction": [
+          0.9368933648416851,
+          0.5257936507936508
+        ]
+      },
+      {
+        "collision_probability_a": 1,
+        "collision_probability_b": 0,
+        "favored": "a",
+        "effective_survivability_fraction": [
+          0.9961114718375698,
+          0.5257936507936508
+        ]
+      },
+      {
+        "collision_probability_a": 1,
+        "collision_probability_b": 1,
+        "favored": "a",
+        "effective_survivability_fraction": [
+          0.9368933648416851,
+          0.5257936507936508
+        ]
+      }
+    ],
+    "barrier_damage_order_sensitivity": [],
+    "bounds_cross": true,
+    "material_mechanic_unresolved": false,
+    "unresolved_inputs": [],
+    "one_parameter_flip_thresholds": [
+      {
+        "side": "a",
+        "parameter": "active_contacts",
+        "current": 8,
+        "approximate_flip_threshold": 0.3811454772949219,
+        "absolute_change": 7.618854522705078,
+        "method": "one-at-a-time sampled threshold; not a global minimum"
+      }
+    ],
+    "qualification": "Nominal result depends on uncalibrated firing/contact assumptions; routing is unknown."
+  },
+  "limitations": [
+    "active contacts default to min(8, living primary entities)",
+    "complete firing cycle assumes 1.25 times listed projectile reload; uncalibrated",
+    "projectile flight duration supplied as a scenario assumption",
+    "splash reach assumes one entity per colliding projectile",
+    "source coverage: targetability_unknown - Source does not establish secondary-component targetability.",
+    "source coverage: targetability_unknown - crew_or_rider: targetability unknown.",
+    "no routing or morale model",
+    "entity casualties use pooled expected damage, not hit allocation",
+    "shield facing and projectile block eligibility are simplified",
+    "passive and activated modifiers, penetration, collision attacks, shrapnel and special death behavior are not applied",
+    "8.1.1 relations are assumed applicable to 9.0; no live validation"
+  ],
+  "tactical_contingencies": [
+    "Distance, sight obstruction and terrain alter firing windows.",
+    "Facing can change shield blocking and melee defence.",
+    "Formation and interception change actual firing entities and active contacts.",
+    "Fatigue, charge disruption, passives and target selection require separate validation."
+  ]
+}

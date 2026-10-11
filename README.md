@@ -1,17 +1,20 @@
 # CTW-adviser
 
 General single-unit matchup adviser. CTW-data owns game facts; this repository
-owns rebuildable serving artifacts and, in later increments, matchup calculations.
+owns rebuildable serving artifacts, indexed evidence retrieval and the shared
+conditional combat calculator.
 
-Current implementation: issue #2, phases 1-3 and local phase-5 packaging - pinned contracts and fixtures,
-an offline STRICT SQLite snapshot builder, and indexed JSON evidence retrieval
-with unit resolution, inline passive explanations, projections and continuation.
-The first conditional two-unit combat evaluator is in progress for issue #5.
-The first downstream consumers are a local read-only MCP stdio query adapter and
-an explicitly illustrative movement-phase timing command. See
-[consumer increment](docs/consumer-increment.md) for commands and limits. The full
-matchup evaluator remains issue #5. A deployable Streamable HTTP transport
-candidate for issue #3 is described in [hosted MCP](docs/hosted-mcp.md).
+The read-only MCP service is live at
+`https://ctw-adviser-mcp-production.up.railway.app/mcp` and connected to ChatGPT
+as CTW Advisor. See [hosted MCP](docs/hosted-mcp.md) for local operation, public
+access policy, deployment and snapshot refresh. The evaluator (`combat-0.1.4`)
+is implemented; [issue #5](https://github.com/OwenTanzer/CTW-adviser/issues/5)
+remains open for predictions-versus-battles validation, not another backend.
+Use the [CTW matchup skill](skills/ctw-matchup/SKILL.md) and
+[setup and acceptance guide](docs/chatgpt-workflow.md) for tactical conversations.
+The [closure evidence](docs/closure-3-6.md) distinguishes connector/CLI
+reproducibility from game accuracy and Claude acceptance (issue #4).
+
 Each base unit appears once, with list-valued faction names and linked,
 source-qualified availability records.
 

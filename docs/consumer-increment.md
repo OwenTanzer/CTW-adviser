@@ -1,7 +1,10 @@
 # First query consumers for issues #3 and #5
 
-This increment closes the database dependency boundary in issue #2. It does not
-claim completion of the hosted MCP service or the full combat model.
+This document records the original movement-only consumer increment. The
+current hosted service and shared combat evaluator are implemented; see
+[hosted MCP](hosted-mcp.md), [matchup model](matchup-model.md), and
+[acceptance evidence](closure-3-6.md). Movement-only limitations below describe
+that command, not the full evaluator.
 
 ## Local MCP query path
 
@@ -16,7 +19,7 @@ On Windows PowerShell, set `$env:PYTHONPATH='src'` first. A client launches this
 process and sends newline-delimited UTF-8 JSON-RPC 2.0 over stdio. The server
 negotiates MCP protocol `2025-06-18`; `initialize`,
 `notifications/initialized`, `tools/list` and `tools/call` are implemented.
-The five read-only tools are `resolve_unit`, `get_unit_combat_profile`,
+The five original evidence tools are `resolve_unit`, `get_unit_combat_profile`,
 `get_matchup_evidence`, `get_detail` and `get_provenance`. The last two expand
 packet references; ordinary packets retain bounded sections and cursors.
 Discovery includes input/output JSON Schemas. Tool calls return both structured

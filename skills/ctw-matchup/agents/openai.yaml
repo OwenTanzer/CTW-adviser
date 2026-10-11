@@ -1,0 +1,4 @@
+interface:
+  display_name: "CTW Matchup"
+  short_description: "Evidence-based Total War matchup advice"
+  default_prompt: "Use $ctw-matchup to compare two units and explain the tactical tradeoffs."

@@ -1,0 +1,24 @@
+{
+  "mode": "custom_battle",
+  "baseline": "unmodified_ultra_rank_0",
+  "duration_seconds": 120,
+  "separation_metres": 200,
+  "line_of_sight": true,
+  "path_length_factor": 1,
+  "terrain_speed_factor": 1,
+  "sides": {
+    "a": {
+      "order": "approach",
+      "facing": "front",
+      "fire": true,
+      "fight": true
+    },
+    "b": {
+      "order": "hold",
+      "facing": "front",
+      "fire": true,
+      "fight": true,
+      "flight_seconds": 22.5
+    }
+  }
+}
