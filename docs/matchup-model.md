@@ -41,7 +41,8 @@ are caller assumptions, not observed coordinate conversion.
 `fight`, `facing` (front, side, rear), `collision_probability` (default 0.5),
 `firing_entities` (attached component count), `cycle_seconds` (illustrative
 default: listed projectile reload times 1.25), `first_shot_delay_seconds` (1),
-`flight_seconds` (optional measured or explicitly assumed flight duration),
+`flight_seconds` (optional measured or explicitly assumed flight duration;
+otherwise missing/nonpositive source velocity uses immediate arrival),
 `projectiles_per_cycle` (1 only when the source projectile, volley and burst
 counts are all one), `explosion_entities_per_collision` (1), `active_contacts`
 (default min(8, living primary bodies)), `charge_duration_seconds` (0),
@@ -75,8 +76,9 @@ not confidence intervals. A crossing or major unresolved mechanic should be
 explained alongside the nominal side.
 `verdict.unresolved_inputs` contains structured records with `side`,
 `source_path`, `code` and affected `calculation`. An applicable null source
-value, unresolved supply or attack status, native flight sentinel without an
-override, or required scenario assumption makes the verdict indeterminate.
+value, unresolved supply or attack status, or required scenario assumption
+makes the verdict indeterminate. Missing/nonpositive velocity alone does not
+withhold a verdict; its immediate-arrival approximation appears in limitations.
 `represented_point_ordering` and any partial ledgers then show only the
 calculation under the omitted-input fallback; they are not a favored verdict.
 If component health or count needed to construct a health pool is unknown,
@@ -97,8 +99,12 @@ Shots are discrete and limited by the selected attack's ammunition pool. Range,
 minimum range and living shooters are checked at the exact scheduled shot time;
 arriving impacts are processed before later firing opportunities. Flight time
 uses shot-time distance/listed velocity only when the source velocity is positive.
-A zero or negative native velocity is preserved as source evidence and produces
-no scheduled impact unless `flight_seconds` is supplied as a scenario assumption.
+Missing, zero or negative native velocity is preserved as source evidence and
+uses an immediate-arrival approximation at each valid firing opportunity.
+An explicit `flight_seconds` overrides either flight-time path. Collision
+probability remains an independent expected-hit assumption; a volley is a
+launch event, not a guaranteed hit. Firing stops at contact, while already
+launched projectiles may arrive afterward within the projection horizon.
 Null range, minimum range, damage, ammunition supply or reload fields on an
 enabled attack do not silently establish zero damage or zero shots. Source
 armour, ward, resistance, shield, melee defence, spell tags and movement speed
@@ -127,7 +133,7 @@ model's firing schedule. Engine disablement and crew-based firing cessation are
 unknown without a validated rule, even if a component reaches zero health.
 `bounds_cross` includes tested contact-count switches as well as collision
 probability corners; `one_parameter_flip_thresholds` identifies the sampled
-change. An unresolved targetability, component protection or flight path that
+change. An unresolved targetability or component protection that
 could change the outcome prevents a favored verdict.
 Daemonic source attributes distinguish rout inapplicability from unknown
 instability/death behavior. Other morale and special death effects are not
@@ -136,6 +142,32 @@ selection/distribution, penetration, shrapnel, other spell-specific behavior,
 terrain physics and actual projectile dispersion remain in `limitations` or
 source coverage. The native 9.0.1 ability payload extension remains evidence;
 it is not silently applied to 9.0 base profiles.
+
+## Standard calculator workflow
+
+Resolve both units, call `evaluate_single_unit_matchup` with the intended
+separation, orders and horizon, then inspect `source_facts`,
+`scenario_assumptions`, `derived.phase_timing`, `derived.ledgers`,
+`verdict.unresolved_inputs` and `limitations`. The caller need not know
+projectile speed. Positive source velocity schedules shot-time flight;
+missing or nonpositive velocity automatically uses the labeled
+firing-opportunity immediate-arrival approximation. Supply `flight_seconds`
+only when a measured or deliberately assumed duration is available. State
+which flight basis applied and distinguish `shots_fired_per_shooter` and
+`discrete_firing_events` from collision-weighted expected damage. Check range
+entry, minimum range, first-shot delay, cycle, ammunition, firing entities,
+targetability and contact cessation before interpreting a zero ledger.
+When source projectile, volley or burst counts differ from one, inspect all
+three counts and run explicit `projectiles_per_cycle` cases informed by them.
+For one nontrivial count, compare one projectile per cycle with that sourced
+count; for multiple nontrivial counts, do not multiply them without a reviewed
+composition rule. Label each case as a scenario interpretation, not proven
+engine cadence; materially different volley or burst timing remains
+unsupported. If no defensible case captures a consequential nesting, leave
+the ranged schedule unresolved and say why. Do not ask the user for technical
+source fields or infer a count from card accuracy.
+Use the verdict and sensitivity as conditional projections, and report other
+unresolved inputs rather than filling them from projectile speed.
 
 ## Verification and adding cases
 

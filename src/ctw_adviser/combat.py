@@ -296,9 +296,8 @@ def _prepare(unit, side, setting):
         if any(attack.get(field) is None for field in ("range", "base_damage", "ap_damage")):
             gaps.append("selected ranged attack has missing range or damage; shots omitted")
             attack = None
-        elif setting["flight_seconds"] is None and (attack.get("velocity") is None or attack["velocity"] <= 0):
-            gaps.append("projectile velocity is missing or a nonpositive native sentinel; supply flight_seconds to schedule impacts")
-            attack = None
+        elif setting["fire"] and setting["flight_seconds"] is None and (attack.get("velocity") is None or attack["velocity"] <= 0):
+            gaps.append("projectile velocity is missing or nonpositive; firing opportunities use an immediate-arrival approximation")
     if attack:
         counts = [attack.get(k) for k in ("projectiles_per_shot", "shots_per_volley", "burst_size")]
         if setting["projectiles_per_cycle"] is None and any(x != 1 for x in counts):
@@ -485,8 +484,8 @@ def _run(states, scenario, timing):
             shooters = cfg["firing_entities"] if cfg["firing_entities"] is not None else component["initial_entities"]
             shooters = min(shooters, _living(component))
             if shooters > 0 and (attack.get("minimum_range") or 0) <= distance <= attack["range"]:
-                flight = (cfg["flight_seconds"] if cfg["flight_seconds"] is not None
-                          else distance / attack["velocity"])
+                flight = (cfg["flight_seconds"] if cfg["flight_seconds"] is not None else
+                          distance / attack["velocity"] if (attack.get("velocity") or 0) > 0 else 0)
                 heapq.heappush(queue, (due + flight, i, shooters * cfg["projectiles_per_cycle"]))
                 state["shot_events"] += 1
                 state["shots_fired"] += 1
@@ -607,8 +606,6 @@ def _unresolved_inputs(units, scenario, timing):
         for field in ("range", "minimum_range"):
             if attack.get(field) is not None and attack[field] < 0:
                 add(i, f"ranged.{field}", "invalid_native_value", "ranged")
-        if cfg["flight_seconds"] is None and (attack.get("velocity") is None or attack["velocity"] <= 0):
-            add(i, "ranged.velocity", "missing_or_native_sentinel", "projectile_flight")
         if cfg["cycle_seconds"] is None and (attack.get("reload_time") is None or attack["reload_time"] <= 0):
             add(i, "ranged.reload_time", "missing_cycle_assumption", "ranged_schedule")
         if cfg["projectiles_per_cycle"] is None:
@@ -777,8 +774,10 @@ def _mechanics(units, scenario):
                 missile = {"attack_id": selected["id"], "collision_probability": cfg["collision_probability"],
                            "complete_cycle_seconds_assumed": cfg["cycle_seconds"],
                            "projectiles_per_cycle_assumed": cfg["projectiles_per_cycle"],
-                           "scheduled": bool(cfg["fire"] and cfg["cycle_seconds"] is not None and
-                                             (cfg["flight_seconds"] is not None or (selected.get("velocity") or 0) > 0)),
+                           "scheduled": bool(cfg["fire"] and cfg["cycle_seconds"] is not None),
+                           "flight_basis": ("scenario_flight_seconds" if cfg["flight_seconds"] is not None else
+                                            "source_velocity" if (selected.get("velocity") or 0) > 0 else
+                                            "firing_opportunity_immediate_arrival"),
                            "direct": _damage_per_hit(selected["base_damage"], selected["ap_damage"],
                                                      defender, traits, "missile", facing, component) if target_supported else None,
                            "explosion": None}
@@ -976,7 +975,7 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                  "When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.",
                                  "Unspecified active contacts use min(8, living primary bodies); firing entities use the attached component count.",
                                  "Direct and explosion are separate expected hit events; default splash reach is one entity per collision.",
-                                 "Positive listed velocity gives straight flight time from exact shot distance; nonpositive native sentinels require explicit flight_seconds.",
+                                 "Positive listed velocity gives straight flight time from exact shot distance. Missing or nonpositive velocity uses an immediate-arrival firing-opportunity approximation unless flight_seconds is supplied; collision probability remains independent.",
                                  "Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.",
                                  "Barrier-before-entity-cap is the represented default, not a verified game damage order; the alternate order is tested.",
                                  "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",
