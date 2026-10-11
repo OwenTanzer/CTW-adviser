@@ -884,18 +884,23 @@ def _sensitivity(units, scenario, nominal):
 
 
 def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: dict | None = None,
-                     subculture_a: str | None = None, subculture_b: str | None = None) -> dict:
+                     subculture_a: str | None = None, subculture_b: str | None = None,
+                     unit_modifier=None) -> dict:
     """Return JSON-safe evidence, assumptions, timing, two ledgers and sensitivity.
 
     The same function is the intended CLI and MCP adapter entry point. Ambiguous
     names propagate Queries.ResolutionError with candidates; callers must resolve.
+    ``unit_modifier`` (issue #20) receives deep copies of the two verified unit
+    packets and returns the units to calculate with; ``source_facts`` and
+    ``identities`` always report the unmodified packets.
     """
     sc = _scenario(scenario)
     packet = queries.get_matchup_evidence(unit_a, unit_b, subculture=subculture_a,
                                           subculture_b=subculture_b, limit=256,
                                           include_diagnostics=True, include_provenance=True)
     _validate_source(packet, sc)
-    units = packet["units"]
+    source_units = packet["units"]
+    units = source_units if unit_modifier is None else unit_modifier(copy.deepcopy(source_units))
     unresolved_inputs = _core_unresolved(units, sc)
     timing = None
     summary = None
@@ -961,14 +966,14 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
             "source_fingerprints": packet.get("sources", {}),
             "source_provenance": packet.get("provenance", {}),
             "source_payload_graph": packet.get("payload_graph", {}),
-            "identities": [u["identity"] for u in units],
+            "identities": [u["identity"] for u in source_units],
             "source_facts": [{"identity": u["identity"], "body": u["body"], "movement": u["movement"],
                               "leadership": u["leadership"], "melee": u["melee"], "ranged": u["ranged"],
                               "protection": u["passives"]["protection"], "attack_traits": u["passives"]["attack_traits"],
                               "attributes": u["passives"].get("attributes"),
                               "abilities": u["passives"].get("abilities"),
                               "activated_options": u.get("activated_options"),
-                              "coverage": u["coverage"]} for u in units],
+                              "coverage": u["coverage"]} for u in source_units],
             "scenario_assumptions": sc, "empirical_calibration": None,
             "assumption_notes": ["Speed scale, path factor and terrain factor are illustrative; no measured map coordinates or acceleration.",
                                  "Default collision probability 0.5 is uncalibrated and is not the card accuracy value.",

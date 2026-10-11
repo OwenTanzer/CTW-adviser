@@ -102,3 +102,72 @@ A sweep over all 1,884 effects against Lothern Sea Guard returned no errors:
 193 calculated, 320 partial, 796 ineligible recipient and 575 with no damage
 payload. Median 8 ms, maximum 40 ms, results at most 13 KB. These are
 regression checks, not live-battle observations; `empirical_calibration` is null.
+
+# Buff/debuff engagement comparison — issue #20, increment B
+
+`ctw_adviser.effect_engagement.evaluate_effect_engagement(queries, effect,
+unit_a, unit_b, *, recipient="a", relation="friendly", phase=None,
+scenario=None, caster=None, ...)` runs the same #5 `evaluate_matchup`
+engagement twice: without and with one effect phase applied to one side. It
+returns the deltas, the changed inputs and both full matchup results. Model
+version: `effect-engagement-0.1.0`. CLI: `effect-engagement`. MCP:
+`evaluate_effect_engagement`.
+
+```sh
+PYTHONPATH=src python -m ctw_adviser.cli effect-engagement --db work/adviser.sqlite \
+  wh2_main_spell_plague_wither "Lothern Sea Guard" "Bloodletters of Khorne" \
+  --recipient b --relation enemy \
+  --scenario '{"separation_metres":40,"sides":{"a":{"order":"hold"},"b":{"order":"approach"}}}'
+```
+
+**Shared baseline.** `evaluate_matchup` gained one optional `unit_modifier`
+hook. It receives deep copies of the two verified packets; `source_facts` and
+`identities` still report the unmodified packets. The unmodified run is
+byte-identical to a standalone #5 call with the same scenario, which is tested.
+Base profiles never change.
+
+**Applied modifiers.** Only phase stat effects that map to inputs the #5
+model reads are applied, using their native `add` or `mult` operation:
+
+- melee attack, defence, base/AP damage and charge bonus
+- speed
+- armour, physical, missile, magic and flame resistance, and ward (`stat_resistance_all`)
+- missile block chance
+- missile base/AP damage
+- melee bonus versus large or infantry
+
+Changed inputs are listed with before and after values. Morale, reload,
+accuracy and other stats, and healing, summons and attributes, are listed as
+unsupported. If nothing supported remains, the result is
+`blocked: no_supported_modifier`.
+
+**Recipients.** `relation=enemy` requires the phase link to target enemies and
+the casting to target enemies or ground. `friendly` requires a friends or self
+phase link. A self-only phase is flagged as an assumption that the recipient is
+the caster. A mismatch is `blocked: ineligible_recipient`. A supplied `caster`
+is checked against qualified access links.
+
+**Timing.** The effect is assumed active from the engagement start; cast timing,
+wind-up and refresh are not modeled. A phase shorter than the horizon gives two
+comparisons:
+
+- `active_window`: both runs truncated at phase expiry. This is the primary comparison.
+- `horizon`: the effect held for the whole horizon. This is an upper bound.
+
+A null or sentinel duration reports only the horizon bound, as `partial`.
+Intensity-scaled abilities use full listed values and are flagged. Stacking,
+replacement, recipient caps and area coverage are not modeled.
+
+Verified with `tests/test_effect_engagement.py` (9 tests, from source evidence):
+
+- Hand of Glory: a friendly spell attack buff lowers only the enemy's survivability
+- Wither: an enemy armour debuff, plus the ineligible-relation block
+- Shanty Verse: a non-spell defence buff
+- Wild Mantle of Ghorok: inverse effects (armour down, attack up) both reflected
+- Tomb King Rally: the morale-only block
+- active-window expiry, and a shared baseline identical to #5
+- a zero modifier giving zero delta
+- unchanged base profiles and input validation
+- library/CLI/MCP equality
+
+These are regression checks, not live observations.
