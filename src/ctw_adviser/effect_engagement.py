@@ -116,7 +116,7 @@ def _phase_choices(mechanic):
 def _recipient_check(casting, links, relation):
     flags = {k: any(link[k] for link in links) for k in ("target_self", "target_friends", "target_enemies")}
     if relation == "enemy":
-        ok = flags["target_enemies"] and bool(casting.get("target_enemies") or casting.get("target_ground"))
+        ok = flags["target_enemies"]
     else:
         ok = flags["target_friends"] or flags["target_self"]
     return ok, flags
@@ -208,9 +208,24 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
         if not ok:
             blocked.append({"code": "ineligible_recipient",
                             "detail": f"Phase recipients {recipient_flags} do not include a {relation} unit."})
+        if relation == "enemy" and ok and not (casting.get("target_enemies") or casting.get("target_ground")):
+            unresolved.append({"code": "outward_phase_geometry_unresolved",
+                               "detail": "An enemy-targeting phase radiates from a self/friendly cast; reach and coverage of this recipient are not modeled."})
         if relation == "friendly" and recipient_flags["target_self"] and not recipient_flags["target_friends"]:
-            unresolved.append({"code": "self_only_recipient",
-                               "detail": "The phase affects only the caster; the recipient side is assumed to be the caster unit."})
+            if caster is None:
+                blocked.append({"code": "self_only_caster_required",
+                                "detail": "Supply the caster identity to establish a self-only phase recipient."})
+            else:
+                caster_identity = queries.resolved(caster)
+                recipient_identity = queries.resolved(unit_a if recipient == "a" else unit_b,
+                                                       subculture_a if recipient == "a" else subculture_b)
+                same_profile = caster_identity["profile_unit_key"] == recipient_identity["profile_unit_key"]
+                same_context = (caster_identity["subculture_key"] is None or
+                                recipient_identity["subculture_key"] is None or
+                                caster_identity["subculture_key"] == recipient_identity["subculture_key"])
+                if not (same_profile and same_context):
+                    blocked.append({"code": "self_only_recipient_mismatch",
+                                    "detail": "The self-only phase recipient is not the resolved caster unit."})
         for e in selected["stats"]:
             token = _stat_token(e)
             if token in STAT_FIELDS and e["native_operation"] in OPERATIONS and e["value"] is not None:
@@ -246,7 +261,16 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
     scenario = dict(scenario or {})
     horizon = float(scenario.get("duration_seconds", 120))
     duration = selected["phase"]["duration"] if selected else None
-    window = {"phase_duration": duration, "horizon_seconds": horizon, "start_seconds": 0.0}
+    phase_order = selected["phase"]["order"] if selected else None
+    first_order = min((p["order"] for p in mechanic["phases"] if p["order"] is not None), default=None)
+    later_phase = phase_order is not None and first_order is not None and phase_order > first_order
+    window = {"phase_duration": duration, "horizon_seconds": horizon,
+              "start_seconds": None if later_phase else 0.0,
+              "phase_order": phase_order,
+              "comparison_origin": "selected_phase_onset" if later_phase else "activation_start_assumed"}
+    if later_phase:
+        unresolved.append({"code": "phase_start_unresolved",
+                           "detail": "The selected later-order phase has no source-established start time. Comparisons are conditional on that phase being active at the window origin."})
     if duration is None or duration <= 0:
         window["basis"] = "duration_unresolved"
         unresolved.append({"code": "duration_unresolved",

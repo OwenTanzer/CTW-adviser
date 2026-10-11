@@ -37,9 +37,9 @@ ASSUMPTION_NOTES = {
     "entities_per_explosion": "Target entities inside each explosion radius; geometry is not modeled.",
     "vortex_entities_per_application": "Target entities touched per vortex damage application; required for vortex totals.",
     "vortex_applications": "Damage applications per touched entity over the vortex lifetime; required for vortex totals.",
-    "contact_phase_ticks": "Contact-phase damage applications per affected entity; required for contact-phase totals.",
+    "contact_phase_ticks": "Contact-phase damage applications per affected entity; default is floor(duration / hp_change_frequency) when both source fields are positive. This is an unverified schedule.",
     "phase_damage_applications": "Applications of outward phase damage; default is the source-implied duration / hp_change_frequency, an unverified schedule.",
-    "phase_damage_entities": "Target entities damaged per application; default is max_damaged_entities, or every living entity when that is uncapped.",
+    "phase_damage_entities": "Target entities damaged per application; capped by source max_damaged_entities when positive. Default is that cap, or every living entity when uncapped.",
     "cast_distance_metres": "Caster-to-target distance used for the range check; omitted means range is not checked.",
 }
 FAILURE_SUFFIX = ".miscast_explosion"
@@ -94,7 +94,12 @@ def _routes(packet):
         if edge["relationship"] != "phase_effect":
             children.setdefault(edge["from"], []).append(edge)
     roots = [(e["relationship"], e["node_ref"]) for e in packet["effect"]["mechanic"]["effects"]
-             if e["kind"] == "payload_reference" and e["node_ref"] in nodes]
+             if e["kind"] == "payload_reference"]
+    missing = sorted({ref for _, ref in roots if ref not in nodes} |
+                     {edge["to"] for edge in graph["edges"] if edge["to"] not in nodes} |
+                     {edge["from"] for edge in graph["edges"] if edge["from"] not in nodes})
+    if missing:
+        raise ValueError("dangling_payload_reference: " + ", ".join(missing))
     events = []
 
     def walk(node_id, launched, branch, path, via):
@@ -293,22 +298,30 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
                              expected_damage=per["per_unblocked_hit"] * launched * count * touched * applications)
             components.append(entry)
         else:
+            frequency, duration = params.get("hp_change_frequency"), params.get("duration")
+            ticks, ticks_basis = cfg["contact_phase_ticks"], "scenario"
+            if ticks is None and frequency and frequency > 0 and duration and duration > 0:
+                ticks, ticks_basis = math.floor(duration / frequency), "source_implied_duration_over_frequency"
             entry = {**record, "channel": "contact_phase", "launched": launched,
                      "per_application_per_entity_raw": params.get("damage_amount"),
                      "max_damaged_entities": params.get("max_damaged_entities"),
+                     "applications": ticks, "applications_basis": ticks_basis,
                      "basis": "raw damage_amount; armour/resistance application is unresolved",
                      "expected_damage": None, "entities_affected": None}
-            if cfg["contact_phase_ticks"] is None:
+            if ticks is None:
                 issue("contact_phase_ticks_required",
-                      "Contact-phase tick count is not source-established; supply contact_phase_ticks.",
+                      "Duration or application interval is missing or a sentinel; supply contact_phase_ticks.",
                       "contact_phase", node["provenance_refs"])
             else:
                 entities = min(launched, living)
                 if (params.get("max_damaged_entities") or 0) > 0:
                     entities = min(entities, params["max_damaged_entities"])
                 entry.update(entities_affected=entities,
-                             expected_damage=params["damage_amount"] * entities * cfg["contact_phase_ticks"])
-                limitations.append(f"{record['key']}: contact-phase damage applied raw; protections unverified.")
+                             expected_damage=params["damage_amount"] * entities * ticks)
+                issue("contact_phase_delivery_unresolved",
+                      "Raw contact damage is estimated, but protections and tick timing have not been verified.",
+                      "contact_phase", node["provenance_refs"])
+                limitations.append(f"{record['key']}: contact-phase damage uses {ticks_basis} ticks; protections unverified, as is tick timing.")
             components.append(entry)
 
     # Damage carried directly by phase links (e.g. Spirit Leech) rather than a
@@ -343,6 +356,11 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
         entities = cfg["phase_damage_entities"]
         if entities is None:
             entities = cap if cap is not None and cap > 0 else living
+        elif cap is not None and cap > 0 and entities > cap:
+            issue("phase_damage_entity_cap", "Scenario entity count exceeds the sourced maximum; clamped to max_damaged_entities.",
+                  "phase_damage", effect["provenance_refs"])
+        if cap is not None and cap > 0:
+            entities = min(entities, cap)
         entities = min(entities, living)
         entry = {**record, "channel": "phase_damage", "launched": 1.0, "route_role": None,
                  "per_application_per_entity_raw": amount, "applications": applications, "applications_basis": basis,
@@ -350,8 +368,16 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
                  "basis": "raw damage_amount x entities x applications; armour/resistance application is unresolved",
                  "expected_damage": None if applications is None or amount is None else amount * entities * applications}
         components.append(entry)
+        issue("phase_damage_delivery_unresolved",
+              "Raw phase damage is estimated, but target protections and actual application timing have not been verified.",
+              "phase_damage", effect["provenance_refs"])
         limitations.append(f"{effect['phase_ref']}: outward phase damage applied raw over a "
                            f"{basis.replace('_', ' ')} schedule; protections and tick timing unverified.")
+    for effect in eff["mechanic"]["effects"]:
+        if effect.get("native_kind") == "intensity_settings" and any(c["channel"] == "phase_damage" for c in components):
+            issue("intensity_unresolved",
+                  "Source intensity settings may change listed phase damage; scaling is not modeled.",
+                  "phase_damage", effect["provenance_refs"])
     for effect in eff["mechanic"]["effects"]:
         if effect["kind"] in ("summon", "healing", "stat_modifier", "attribute_effect"):
             unsupported.append({"kind": effect["kind"], "phase_ref": effect.get("phase_ref"),
@@ -388,15 +414,19 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
     known = [c for c in components if c.get("expected_damage") is not None and c["route_role"] == "nominal"]
     upper_all_routes = sum(c["expected_damage"] for c in components if c.get("expected_damage") is not None)
     attempted = sum(c["expected_damage"] for c in known)
-    absorbed = min(barrier, attempted)
-    to_health = attempted - absorbed
+    raw_unresolved = sum(c["expected_damage"] for c in known if c["channel"] in ("contact_phase", "phase_damage"))
+    modeled_delivery = attempted - raw_unresolved
+    absorbed = min(barrier, modeled_delivery)
+    to_health = modeled_delivery - absorbed
     hp_entity = pool["hp_per_entity"]
     capped, overkill, lethal = 0.0, 0.0, 0.0
     for c in known:
+        if c["channel"] in ("contact_phase", "phase_damage"):
+            continue
         affected = c.get("entities_affected") or 0
         if affected <= 0 or not c["expected_damage"]:
             continue
-        share = c["expected_damage"] / attempted * to_health if attempted else 0.0
+        share = c["expected_damage"] / modeled_delivery * to_health if modeled_delivery else 0.0
         per_entity = share / affected
         if per_entity >= hp_entity:
             capped += hp_entity * affected
@@ -435,13 +465,20 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
                        "variants": eff["variants"], "target": unit["identity"]},
         "access": access, "range": range_check, "blocked": blocked,
         "source_facts": {"activation": eff["activation"]["values"], "targeting": targeting,
+                         "intensity_settings": [{"values": e["native_parameters"],
+                                                 "provenance_refs": e["provenance_refs"]}
+                                                for e in eff["mechanic"]["effects"]
+                                                if e.get("native_kind") == "intensity_settings"],
                          "target_protection": unit["passives"]["protection"],
                          "target_health": {"component": component.get("role"), "entities": living,
                                            "hp_per_entity": hp_entity, "health": pool["initial_hp"],
                                            "barrier": barrier}},
         "scenario_assumptions": {k: {"value": cfg[k], "note": ASSUMPTION_NOTES.get(k)} for k in DEFAULTS},
         "derived": {"components": components,
-                    "totals": {"attempted_damage": attempted, "barrier_absorbed": absorbed,
+                    "totals": {"attempted_damage": attempted,
+                               "raw_unresolved_attempted_damage": raw_unresolved,
+                               "modeled_delivery_attempted_damage": modeled_delivery,
+                               "barrier_absorbed": absorbed,
                                "health_damage_capped": capped, "overkill": overkill,
                                "fraction_of_health": capped / pool["initial_hp"] if pool["initial_hp"] else None,
                                "casualties": casualties, "upper_all_routes_attempted_damage": upper_all_routes,

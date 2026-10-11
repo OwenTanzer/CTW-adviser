@@ -24,6 +24,8 @@ WITHER = 'wh2_main_spell_plague_wither'                             # enemy spel
 SHANTY = 'wh2_dlc11_army_abilities_shanty_verse_1'                  # non-spell friendly: melee defence +20
 RALLY = 'wh2_dlc09_character_abilities_tomb_king_rally'             # morale only: not a model input
 MANTLE = 'wh2_dlc17_spell_wild_mantle_of_ghorok_upgraded'           # mixed: attack up, armour down
+AURA = 'wh2_dlc13_lord_abilities_aura_of_inertia'                   # self-cast, enemy phase debuff
+POTION = 'wh2_main_lord_abilities_potion_of_charoi'                 # self-only protection phase
 
 
 @unittest.skipUnless((SOURCE / 'data/unit_stats/dataset_manifest.json').exists() or os.environ.get('CTW_ADVISER_DB'),
@@ -72,6 +74,30 @@ class EffectEngagementTests(unittest.TestCase):
         wrong = self.run_case(WITHER, recipient='b', relation='friendly')
         self.assertEqual([b['code'] for b in wrong['blocked']], ['ineligible_recipient'])
         self.assertEqual(wrong['comparisons'], {})
+
+    def test_enemy_phase_can_radiate_from_self_cast(self):
+        result = self.run_case(AURA, recipient='b', relation='enemy')
+        self.assertNotEqual(result['status'], 'blocked')
+        self.assertTrue(result['recipient_flags']['target_enemies'])
+        self.assertIn('outward_phase_geometry_unresolved', [u['code'] for u in result['unresolved_inputs']])
+        self.assertTrue(result['modifiers']['changed_inputs'])
+
+    def test_self_only_phase_requires_matching_caster(self):
+        missing = self.run_case(POTION, recipient='a')
+        self.assertIn('self_only_caster_required', [b['code'] for b in missing['blocked']])
+        self.assertEqual(missing['comparisons'], {})
+        mismatch = self.run_case(POTION, recipient='a', caster='wh2_dlc15_hef_cha_teclis_2')
+        self.assertIn('self_only_recipient_mismatch', [b['code'] for b in mismatch['blocked']])
+        self.assertEqual(mismatch['comparisons'], {})
+        self.assertEqual(mismatch['modifiers']['changed_inputs'], [])
+
+    def test_later_stage_start_is_unresolved(self):
+        result = self.run_case('wh3_dlc23_hero_abilities_crooked_dice',
+                               phase='wh3_dlc23_hero_abilities_crooked_dice_iii', recipient='a')
+        self.assertEqual(result['window']['phase_order'], 3)
+        self.assertIsNone(result['window']['start_seconds'])
+        self.assertEqual(result['window']['comparison_origin'], 'selected_phase_onset')
+        self.assertIn('phase_start_unresolved', [u['code'] for u in result['unresolved_inputs']])
 
     def test_non_spell_ability_through_same_path(self):
         result = self.run_case(SHANTY, recipient='a')

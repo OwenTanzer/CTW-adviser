@@ -82,6 +82,14 @@ class EffectDamageTests(unittest.TestCase):
         self.assertTrue(all(c['expected_damage'] == c['per_application_per_entity_raw'] * c['entities_affected'] * 4
                             for c in contact))
         self.assertTrue(any('protections unverified' in item for item in result['limitations']))
+        implied = self.run_case(PYROMANIAC)
+        implied_phase = next(c for c in implied['derived']['components'] if c['channel'] == 'contact_phase')
+        self.assertEqual((implied_phase['applications'], implied_phase['applications_basis']),
+                         (12, 'source_implied_duration_over_frequency'))
+        self.assertEqual(implied_phase['expected_damage'], 5 * implied_phase['entities_affected'] * 12)
+        self.assertEqual(implied['status'], 'partial')
+        self.assertEqual(implied['derived']['totals']['raw_unresolved_attempted_damage'],
+                         implied_phase['expected_damage'])
 
     def test_zero_direct_damage_transport_still_delivers(self):
         result = self.run_case(HELL_HAMMER)
@@ -154,12 +162,28 @@ class EffectDamageTests(unittest.TestCase):
     def test_outward_phase_damage_and_self_damage_split(self):
         leech = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound')
         phase = next(c for c in leech['derived']['components'] if c['channel'] == 'phase_damage')
-        self.assertEqual(leech['status'], 'calculated')
+        self.assertEqual(leech['status'], 'partial')
         self.assertEqual((phase['per_application_per_entity_raw'], phase['applications'], phase['entities_affected']), (67, 13, 1))
         self.assertEqual(phase['applications_basis'], 'source_implied_duration_over_frequency')
         self.assertEqual(phase['expected_damage'], 67 * 13)
+        self.assertEqual(leech['derived']['totals']['modeled_delivery_attempted_damage'], 0)
+        self.assertEqual(leech['derived']['totals']['health_damage_capped'], 0)
+        self.assertIn('phase_damage_delivery_unresolved', [u['code'] for u in leech['unresolved_inputs']])
+        resistant = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound', target='Bloodletters of Khorne')
+        self.assertEqual(resistant['derived']['totals']['attempted_damage'], 67 * 13)
+        self.assertEqual(resistant['status'], 'partial')
+        self.assertNotEqual(resistant['source_facts']['target_protection'], leech['source_facts']['target_protection'])
+        self.assertEqual(resistant['derived']['totals']['health_damage_capped'], 0)
         overridden = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound', scenario={'phase_damage_applications': 5})
         self.assertEqual(overridden['derived']['totals']['attempted_damage'], 67 * 5)
+        capped = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound',
+                               scenario={'phase_damage_entities': 10})
+        self.assertEqual(capped['derived']['totals']['attempted_damage'], 67 * 13)
+        self.assertIn('phase_damage_entity_cap', [u['code'] for u in capped['unresolved_inputs']])
+        normal = self.run_case('wh_main_spell_death_spirit_leech')
+        self.assertEqual(normal['status'], 'partial')
+        self.assertEqual(normal['source_facts']['intensity_settings'][0]['values']['max_amount'], 2)
+        self.assertIn('intensity_unresolved', [u['code'] for u in normal['unresolved_inputs']])
         # Self-cast blast: outward vortex is target damage, the 50-damage self phase is not.
         cellular = self.run_case('wh2_dlc16_unit_abilities_cellular_instability',
                                  scenario={'vortex_entities_per_application': 5, 'vortex_applications': 1})
@@ -227,6 +251,16 @@ class EffectDamageTests(unittest.TestCase):
             provenance = self.q.get_provenance(component['provenance_refs'])
             self.assertEqual(len(provenance['records']), len(set(component['provenance_refs'])))
         self.assertEqual(result['snapshot']['commit'], self.q.snapshot['source_commit'])
+
+    def test_dangling_payload_link_is_rejected(self):
+        from unittest.mock import patch
+        packet = copy.deepcopy(self.q.get_effect(COMET, limit=256, include_diagnostics=True))
+        explosions = {n['id'] for n in packet['payload_graph']['nodes'] if n['kind'] == 'explosions'}
+        victim = next(edge['to'] for edge in packet['payload_graph']['edges'] if edge['to'] in explosions)
+        packet['payload_graph']['nodes'] = [n for n in packet['payload_graph']['nodes'] if n['id'] != victim]
+        with patch.object(self.q, 'get_effect', return_value=packet), self.assertRaisesRegex(
+                ValueError, 'dangling_payload_reference'):
+            self.run_case(COMET)
 
 
     def test_end_to_end_from_unit_and_incompatible_evidence(self):

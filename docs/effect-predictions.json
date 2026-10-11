@@ -45,6 +45,8 @@
       ],
       "attempted_damage": 806.4,
       "upper_all_routes": 806.4,
+      "raw_unresolved_attempted_damage": 0,
+      "modeled_delivery_attempted_damage": 806.4,
       "health_damage_capped": 102.0,
       "fraction_of_health": 0.016666666666666666,
       "casualties": {
@@ -85,6 +87,8 @@
       ],
       "attempted_damage": 878.4,
       "upper_all_routes": 878.4,
+      "raw_unresolved_attempted_damage": 0,
+      "modeled_delivery_attempted_damage": 878.4,
       "health_damage_capped": 102.0,
       "fraction_of_health": 0.016666666666666666,
       "casualties": {
@@ -136,6 +140,8 @@
       ],
       "attempted_damage": 367.2,
       "upper_all_routes": 367.2,
+      "raw_unresolved_attempted_damage": 0,
+      "modeled_delivery_attempted_damage": 367.2,
       "health_damage_capped": 312.8,
       "fraction_of_health": 0.051111111111111114,
       "casualties": {
@@ -211,6 +217,8 @@
       ],
       "attempted_damage": 966.0,
       "upper_all_routes": 1867.2,
+      "raw_unresolved_attempted_damage": 0,
+      "modeled_delivery_attempted_damage": 966.0,
       "health_damage_capped": 378.0,
       "fraction_of_health": 0.061764705882352944,
       "casualties": {
@@ -229,8 +237,10 @@
         "effect": "wh2_dlc09_spell_death_spirit_leech_bound",
         "target": "wh2_main_hef_inf_lothern_sea_guard_0"
       },
-      "status": "calculated",
-      "unresolved": [],
+      "status": "partial",
+      "unresolved": [
+        "phase_damage_delivery_unresolved"
+      ],
       "components": [
         {
           "channel": "phase_damage",
@@ -243,21 +253,61 @@
       ],
       "attempted_damage": 871,
       "upper_all_routes": 871,
-      "health_damage_capped": 68.0,
-      "fraction_of_health": 0.011111111111111112,
+      "raw_unresolved_attempted_damage": 871,
+      "modeled_delivery_attempted_damage": 0,
+      "health_damage_capped": 0.0,
+      "fraction_of_health": 0.0,
       "casualties": {
-        "lower": 1,
-        "expected_pooled": 1.0,
-        "upper": 1
+        "lower": 0,
+        "expected_pooled": 0.0,
+        "upper": 0
+      }
+    },
+    {
+      "inputs": {
+        "effect": "wh_main_spell_death_spirit_leech",
+        "target": "Lothern Sea Guard",
+        "scenario": {
+          "phase_damage_entities": 10
+        }
+      },
+      "resolved": {
+        "effect": "wh_main_spell_death_spirit_leech",
+        "target": "wh2_main_hef_inf_lothern_sea_guard_0"
+      },
+      "status": "partial",
+      "unresolved": [
+        "phase_damage_entity_cap",
+        "phase_damage_delivery_unresolved",
+        "intensity_unresolved"
+      ],
+      "components": [
+        {
+          "channel": "phase_damage",
+          "key": {
+            "id": "wh_main_spell_death_spirit_leech"
+          },
+          "route_role": "nominal",
+          "expected_damage": 871
+        }
+      ],
+      "attempted_damage": 871,
+      "upper_all_routes": 871,
+      "raw_unresolved_attempted_damage": 871,
+      "modeled_delivery_attempted_damage": 0,
+      "health_damage_capped": 0.0,
+      "fraction_of_health": 0.0,
+      "casualties": {
+        "lower": 0,
+        "expected_pooled": 0.0,
+        "upper": 0
       }
     },
     {
       "inputs": {
         "effect": "wh2_dlc11_character_abilities_pyromaniac",
         "target": "Lothern Sea Guard",
-        "scenario": {
-          "contact_phase_ticks": 4
-        }
+        "scenario": {}
       },
       "resolved": {
         "effect": "wh2_dlc11_character_abilities_pyromaniac",
@@ -265,6 +315,7 @@
       },
       "status": "partial",
       "unresolved": [
+        "contact_phase_delivery_unresolved",
         "shared_definition_multiplicity"
       ],
       "components": [
@@ -282,7 +333,7 @@
             "id": "wh2_dlc11_character_abilities_pyromaniac"
           },
           "route_role": "nominal",
-          "expected_damage": 20.0
+          "expected_damage": 60.0
         },
         {
           "channel": "explosion",
@@ -298,16 +349,18 @@
             "id": "wh2_dlc11_character_abilities_pyromaniac"
           },
           "route_role": "alternate_route",
-          "expected_damage": 20.0
+          "expected_damage": 60.0
         }
       ],
-      "attempted_damage": 49.15,
-      "upper_all_routes": 69.14999999999999,
-      "health_damage_capped": 49.150000000000006,
-      "fraction_of_health": 0.008031045751633988,
+      "attempted_damage": 89.14999999999999,
+      "upper_all_routes": 149.15,
+      "raw_unresolved_attempted_damage": 60.0,
+      "modeled_delivery_attempted_damage": 29.14999999999999,
+      "health_damage_capped": 29.15,
+      "fraction_of_health": 0.0047630718954248365,
       "casualties": {
         "lower": 0,
-        "expected_pooled": 0.7227941176470589,
+        "expected_pooled": 0.42867647058823527,
         "upper": 1
       }
     }
@@ -628,17 +681,17 @@
     "statuses": {
       "blocked:ineligible_recipient": 648,
       "blocked:no_damage_payload": 527,
-      "calculated": 326,
-      "partial": 383
+      "calculated": 216,
+      "partial": 493
     },
     "latency_ms": {
-      "median": 8.2,
-      "p95": 14.66,
-      "max": 39.86
+      "median": 26.91,
+      "p95": 34.07,
+      "max": 166.85
     },
     "bytes": {
-      "median": 5676,
-      "max": 12982
+      "median": 5964,
+      "max": 13207
     }
   },
   "engagement_sweep": {
@@ -661,19 +714,20 @@
     "checked": 829,
     "errors": [],
     "statuses": {
-      "blocked:ineligible_recipient": 40,
-      "blocked:no_supported_modifier": 100,
+      "blocked:ineligible_recipient": 2,
+      "blocked:no_supported_modifier": 84,
       "blocked:phase_selection_required": 25,
+      "blocked:self_only_caster_required": 221,
       "calculated": 94,
-      "partial": 570
+      "partial": 403
     },
     "latency_ms": {
-      "median": 666.54,
-      "p95": 807.77,
-      "max": 2227.86
+      "median": 2070.18,
+      "p95": 2599.64,
+      "max": 3270.89
     },
     "bytes": {
-      "median": 21147,
+      "median": 20587,
       "max": 24688
     }
   }

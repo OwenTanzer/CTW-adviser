@@ -24,20 +24,28 @@ CLI and MCP return identical structures for identical inputs, which is tested.
 The calculator walks the effect's payload graph from each casting root, per
 route. Multiplicity comes only from source counts: bombardment
 `num_projectiles`, shrapnel `amount` and `num_vortexes`.
+Dangling graph references fail with `dangling_payload_reference`; a missing
+linked node never silently lowers the total.
 
 | Component | Per entity | Count | Totals |
 | --- | --- | --- | --- |
 | Direct projectile | shared relation, missile kind (armour, AP, ward/physical/missile/fire/spell resistance, front shield) | launched × `projectile_hit_probability` × (1 − shield block); one entity per hit | calculated |
 | Explosion | shared relation, explosion kind | launched × `entities_per_explosion` | calculated |
 | Vortex | shared relation per application | `num_vortexes` × `vortex_entities_per_application` × `vortex_applications` | only when both counts are supplied; otherwise the per-application value is shown and the total is unresolved |
-| Damaging contact phase | raw `damage_amount` (protection application unresolved) | affected entities × `contact_phase_ticks`, capped by `max_damaged_entities` | only when ticks are supplied; flagged in limitations |
-| Outward phase damage (enemy-targeting phase link, e.g. Spirit Leech) | raw `damage_amount` (protection application unresolved) | `max_damaged_entities` (or every living entity if uncapped) × applications | default applications = source-implied duration ÷ `hp_change_frequency`, labeled unverified; overridable |
+| Damaging contact phase | raw `damage_amount` (protection application unresolved) | affected entities × ticks, capped by `max_damaged_entities` | source-implied `floor(duration / hp_change_frequency)` ticks when positive; scenario override; partial |
+| Outward enemy phase (for example Spirit Leech) | raw `damage_amount` (protection and intensity unresolved) | affected entities × applications, always capped by positive `max_damaged_entities` | source-implied `floor(duration / hp_change_frequency)` applications when positive; scenario override; partial |
 
 The spell-resistance flag comes from each payload's `is_spell` field. Magic and
 fire flags come from `is_magical` and `ignition_amount`. Totals apply the
 target barrier first (`barrier_first`), cap per-entity damage at entity health,
 and report overkill. Casualties are reported as a pooled expectation with whole-entity
-bounds that bracket it. They are not an individual hit allocation.
+bounds that bracket it. They are not an individual hit allocation. Contact and
+outward phase components contribute to `attempted_damage` as raw estimates,
+but are separated in `raw_unresolved_attempted_damage`; only
+`modeled_delivery_attempted_damage` is used for barrier, health and casualty
+results. Phase protection, actual tick timing and intensity scaling still need
+live validation. Source intensity settings and their references are preserved
+under `source_facts.intensity_settings`.
 
 ## What is not added to target damage
 
@@ -47,21 +55,19 @@ bounds that bracket it. They are not an individual hit allocation.
   cast (for example, a projectile and its explosion both naming one shrapnel
   record) is counted once. `totals.upper_all_routes_attempted_damage` adds every
   route, and `shared_definition_multiplicity` makes the status `partial`.
-- **Self and friendly-only damage.** Phases linked only to self or friends, and
-  contact phases with `affects_enemies=false` (for example the Warpbomb's
-  2,660-damage `kill_self` contact), are listed in `self_effects`.
 - **Healing, stat and attribute effects, and summons.** These are listed in
   `unsupported_components`. Buff/debuff engagement comparison is the next #20
   increment.
 
 ## Status and blocks
 
-`calculated` means every component was totalled. `partial` means at least one
-component or route needs a stated assumption, or the result has an upper bound.
+`calculated` means modeled damage components were totalled without unresolved
+delivery. `partial` includes raw phase estimates, unknown components and route
+ambiguity. Source-implied schedules are estimates, not measured game behavior.
 `blocked` means one of:
 
-- `ineligible_recipient`: the effect targets neither enemies nor ground (for
-  example the friendly-target Warpbomb, or self-only Potion of Charoi).
+- `ineligible_recipient`: neither the casting nor an outward phase or payload
+  can reach enemies (for example self-only Potion of Charoi).
 - `out_of_range` or `inside_min_range`: the supplied `cast_distance_metres` is
   checked against `target_intercept_range` and `min_range`, never projectile
   range or payload radius.
@@ -77,7 +83,8 @@ reported as `linked` or `not_established`. A link is not proof of acquisition.
 | `projectile_hit_probability` | 0.5 | uncalibrated, as in #5 |
 | `entities_per_explosion` | 1 | radius geometry is not modeled |
 | `vortex_entities_per_application`, `vortex_applications` | required | vortex totals |
-| `contact_phase_ticks` | required | contact-phase totals |
+| `contact_phase_ticks`, `phase_damage_applications` | source-implied schedule when duration and frequency are positive | raw phase totals; overrides do not establish game cadence |
+| `phase_damage_entities` | source cap, or living entities if uncapped | always clamped to a positive source cap |
 | `facing` | front | |
 | `target_component_role` | primary | |
 | `cast_distance_metres` | unchecked | range check |
@@ -87,10 +94,12 @@ Unknown fields, out-of-range values and other barrier orders are rejected.
 
 ## Verification
 
-`tests/test_effect_calc.py` (12 tests, from source evidence) covers:
+`tests/test_effect_calc.py` (15 tests, from source evidence and one synthetic corruption probe) covers:
 
 - a spell chain recomputed through the shared relation (Comet)
-- a non-spell ability with a contact phase (Pyromaniac)
+- a non-spell ability with a contact phase (Pyromaniac), including the source-implied schedule
+- Spirit Leech raw phase damage, cap enforcement and unresolved protection/intensity
+- a linked Comet explosion removed from a copied packet, which must be rejected
 - zero-direct-damage transport (Hell Hammer)
 - overcast versus normal and the excluded miscast branch
 - shared shrapnel counted once with an upper bound (Dreaded Thirteenth)
@@ -102,10 +111,9 @@ Unknown fields, out-of-range values and other barrier orders are rejected.
 - library/CLI/MCP equality
 - resolvable cross-references and provenance
 
-A sweep over all 1,884 effects against Lothern Sea Guard returned no errors:
-193 calculated, 320 partial, 796 ineligible recipient and 575 with no damage
-payload. Median 8 ms, maximum 40 ms, results at most 13 KB. These are
-regression checks, not live-battle observations; `empirical_calibration` is null.
+The refreshed full-inventory sweep and representative inputs are recorded in
+`effect-predictions.json` below. These regression checks are not live-battle
+observations; `empirical_calibration` is null.
 
 # Buff/debuff engagement comparison — issue #20, increment B
 
@@ -145,14 +153,18 @@ accuracy and other stats, and healing, summons and attributes, are listed as
 unsupported. If nothing supported remains, the result is
 `blocked: no_supported_modifier`.
 
-**Recipients.** `relation=enemy` requires the phase link to target enemies and
-the casting to target enemies or ground. `friendly` requires a friends or self
-phase link. A self-only phase is flagged as an assumption that the recipient is
-the caster. A mismatch is `blocked: ineligible_recipient`. A supplied `caster`
-is checked against qualified access links.
+**Recipients.** `relation=enemy` requires an enemy-targeting phase link;
+self/friendly cast selection can produce an outward aura. Its coverage is
+unverified. `friendly` requires a friends or self phase link. A self-only phase
+requires a supplied caster and matching resolved recipient identity;
+otherwise it is blocked. A supplied `caster` is checked against qualified
+access links.
 
 **Timing.** The effect is assumed active from the engagement start; cast timing,
-wind-up and refresh are not modeled. A phase shorter than the horizon gives two
+wind-up and refresh are not modeled. For a selected later-order phase, its
+source start time is unknown: `window.start_seconds` is null and comparisons
+are conditional on that phase being active at the selected window origin.
+A phase shorter than the horizon gives two
 comparisons:
 
 - `active_window`: both runs truncated at phase expiry. This is the primary comparison.
@@ -162,10 +174,13 @@ A null or sentinel duration reports only the horizon bound, as `partial`.
 Intensity-scaled abilities use full listed values and are flagged. Stacking,
 replacement, recipient caps and area coverage are not modeled.
 
-Verified with `tests/test_effect_engagement.py` (9 tests, from source evidence):
+Verified with `tests/test_effect_engagement.py` (18 tests, from source evidence):
 
 - Hand of Glory: a friendly spell attack buff lowers only the enemy's survivability
 - Wither: an enemy armour debuff, plus the ineligible-relation block
+- Aura of Inertia: an enemy phase from a self cast, with reach uncertainty
+- Potion of Charoi: a self-only phase cannot modify an unrelated unit
+- Crooked Dice phase III: later-stage start remains unresolved
 - Shanty Verse: a non-spell defence buff
 - Wild Mantle of Ghorok: inverse effects (armour down, attack up) both reflected
 - Tomb King Rally: the morale-only block
@@ -197,14 +212,16 @@ These are regression checks, not live observations.
 
 [Recorded predictions](effect-predictions.json) come from
 `scripts/record_effect_predictions.py`. They give exact inputs and key outputs
-for six damage and five engagement cases, plus sweeps of every effect through
-both paths with no errors:
+for seven damage and five engagement cases, plus sweeps of 1,884 damage effects
+and 829 stat-phase effects with no errors:
 
-- **Damage:** 326 calculated, 383 partial, 648 ineligible recipient, 527 no damage payload.
-- **Engagement**, over the 809 effects with stat phases: 108 calculated, 536
-  partial (mostly unsupported co-effects or intensity), 100 with no supported
-  modifier, 40 ineligible, 25 needing a phase choice.
-- **Latency:** damage median 8 ms; engagement median ~0.7 s, since it runs up to
-  four full #5 engagements with their sensitivity.
+- **Damage:** 216 calculated, 493 partial, 648 ineligible recipients and 527
+  without an outward damage payload.
+- **Engagement:** 94 calculated, 403 partial, 221 self-only phases blocked
+  without a verified caster, 84 without a supported modifier, 25 needing a
+  phase choice and 2 ineligible recipients. The sweep intentionally provides
+  no caster identity.
+- **Latency on this host:** damage median 27 ms; engagement median 2.07 s,
+  since it runs up to four full #5 engagements with their sensitivity.
 
 These are model predictions, not live observations.

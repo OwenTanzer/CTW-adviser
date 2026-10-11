@@ -30,7 +30,8 @@ DAMAGE_CASES = [
     ('wh3_dlc23_spell_bound_hell_hammer', {'vortex_entities_per_application': 4, 'vortex_applications': 2}),
     ('wh2_main_spell_grey_seer_the_dreaded_thirteenth_spell', {}),
     ('wh2_dlc09_spell_death_spirit_leech_bound', {}),
-    ('wh2_dlc11_character_abilities_pyromaniac', {'contact_phase_ticks': 4}),
+    ('wh_main_spell_death_spirit_leech', {'phase_damage_entities': 10}),
+    ('wh2_dlc11_character_abilities_pyromaniac', {}),
 ]
 ENGAGEMENT_CASES = [
     ('wh2_main_spell_high_magic_hand_of_glory', TARGET, OPPONENT, 'a', 'friendly'),
@@ -50,6 +51,8 @@ def damage_case(q, effect, scenario):
             'components': [{'channel': c['channel'], 'key': c['key'], 'route_role': c['route_role'],
                             'expected_damage': c['expected_damage']} for c in r['derived']['components']],
             'attempted_damage': t['attempted_damage'], 'upper_all_routes': t['upper_all_routes_attempted_damage'],
+            'raw_unresolved_attempted_damage': t['raw_unresolved_attempted_damage'],
+            'modeled_delivery_attempted_damage': t['modeled_delivery_attempted_damage'],
             'health_damage_capped': t['health_damage_capped'], 'fraction_of_health': t['fraction_of_health'],
             'casualties': {k: v for k, v in t['casualties'].items() if k != 'basis'}}
 
