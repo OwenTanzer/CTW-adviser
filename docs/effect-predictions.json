@@ -390,6 +390,8 @@
         "phase_duration": 29.0,
         "horizon_seconds": 120.0,
         "start_seconds": 0.0,
+        "phase_order": 1,
+        "comparison_origin": "activation_start_assumed",
         "basis": "active_window"
       },
       "changed_inputs": [
@@ -447,6 +449,8 @@
         "phase_duration": 50.0,
         "horizon_seconds": 120.0,
         "start_seconds": 0.0,
+        "phase_order": 1,
+        "comparison_origin": "activation_start_assumed",
         "basis": "active_window"
       },
       "changed_inputs": [
@@ -502,6 +506,8 @@
         "phase_duration": 30.0,
         "horizon_seconds": 120.0,
         "start_seconds": 0.0,
+        "phase_order": 1,
+        "comparison_origin": "activation_start_assumed",
         "basis": "active_window"
       },
       "changed_inputs": [
@@ -559,6 +565,8 @@
         "phase_duration": 52.0,
         "horizon_seconds": 120.0,
         "start_seconds": 0.0,
+        "phase_order": 1,
+        "comparison_origin": "activation_start_assumed",
         "basis": "active_window"
       },
       "changed_inputs": [
@@ -629,6 +637,8 @@
         "phase_duration": 28.0,
         "horizon_seconds": 120.0,
         "start_seconds": 0.0,
+        "phase_order": 1,
+        "comparison_origin": "activation_start_assumed",
         "basis": "active_window"
       },
       "changed_inputs": [
@@ -685,12 +695,12 @@
       "partial": 493
     },
     "latency_ms": {
-      "median": 26.91,
-      "p95": 34.07,
-      "max": 166.85
+      "median": 28.63,
+      "p95": 40.07,
+      "max": 159.27
     },
     "bytes": {
-      "median": 5964,
+      "median": 5978,
       "max": 13207
     }
   },
@@ -722,13 +732,13 @@
       "partial": 403
     },
     "latency_ms": {
-      "median": 2070.18,
-      "p95": 2599.64,
-      "max": 3270.89
+      "median": 2155.1,
+      "p95": 2750.7,
+      "max": 3114.73
     },
     "bytes": {
-      "median": 20587,
-      "max": 24688
+      "median": 20654,
+      "max": 24755
     }
   }
 }
