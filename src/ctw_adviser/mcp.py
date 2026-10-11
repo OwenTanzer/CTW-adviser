@@ -42,10 +42,13 @@ SIDE_SETTINGS = {"type": "object", "properties": {
     "cycle_seconds": {"type": "number", "minimum": 0.25},
     "first_shot_delay_seconds": {"type": "number", "minimum": 0},
     "projectiles_per_cycle": {"type": "number", "exclusiveMinimum": 0},
+    "flight_seconds": {"type": "number", "minimum": 0},
     "explosion_entities_per_collision": {"type": "number", "minimum": 0},
     "active_contacts": {"type": "number", "minimum": 0},
     "charge_duration_seconds": {"type": "number", "minimum": 0},
     "target_component_role": STRING,
+    "assume_targetable": {"type": "boolean"},
+    "assume_unit_protection_for_component": {"type": "boolean"},
     "combat_effective_fraction": {"type": "number", "minimum": 0, "maximum": 1},
 }, "additionalProperties": False}
 SCENARIO = {"type": "object", "description": "Conditional custom-battle assumptions; see docs/matchup-model.md. Duration is capped at 300 seconds for hosted calls.",
@@ -58,6 +61,7 @@ SCENARIO = {"type": "object", "description": "Conditional custom-battle assumpti
                            "terrain_speed_factor": {"type": "number", "exclusiveMinimum": 0},
                            "line_of_sight": {"type": "boolean"},
                            "historical_relations_apply_to_patch_9": {"type": "boolean"},
+                           "barrier_damage_order": {"type": "string", "enum": ["barrier_first", "entity_cap_first"]},
                            "sides": {"type": "object", "properties": {"a": SIDE_SETTINGS,
                                                                       "b": SIDE_SETTINGS},
                                      "additionalProperties": False}}, "additionalProperties": False}

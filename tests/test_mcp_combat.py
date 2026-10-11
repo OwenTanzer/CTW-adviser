@@ -57,6 +57,14 @@ class CombatAdapterTests(unittest.TestCase):
                 "arguments": {"unit_a": "Reiksguard", "unit_b": "Kroxigor", "scenario": scenario}}, 1)
             self.assertEqual(response["error"]["code"], -32602)
 
+    def test_scenario_schema_exposes_model_settings(self):
+        scenario = BY_NAME["evaluate_single_unit_matchup"]["inputSchema"]["properties"]["scenario"]
+        self.assertEqual(scenario["properties"]["barrier_damage_order"]["enum"],
+                         ["barrier_first", "entity_cap_first"])
+        side = scenario["properties"]["sides"]["properties"]["a"]["properties"]
+        for field in ("flight_seconds", "assume_targetable", "assume_unit_protection_for_component"):
+            self.assertIn(field, side)
+
 
 DB = Path(os.environ.get("CTW_ADVISER_DB", "work/adviser.sqlite"))
 
@@ -75,6 +83,28 @@ class RealCombatAdapterTests(unittest.TestCase):
                 "scenario": scenario})["structuredContent"]
         self.assertEqual(actual["data"], expected)
         self.assertEqual(actual["model_version"], expected["model_version"])
+
+    def test_barrier_order_and_indeterminate_result_are_preserved(self):
+        from ctw_adviser.combat import evaluate_matchup
+        base = {"separation_metres": 100, "duration_seconds": 2,
+                "sides": {"a": {"order": "hold", "first_shot_delay_seconds": 0,
+                                "cycle_seconds": 20, "collision_probability": 1, "fight": False},
+                          "b": {"order": "hold", "fire": False, "fight": False}}}
+        with Queries(DB) as queries:
+            for scenario in (base, dict(base, barrier_damage_order="entity_cap_first")):
+                with self.subTest(barrier_damage_order=scenario.get("barrier_damage_order")):
+                    direct = evaluate_matchup(queries, "Queen Bess", "Blue Horrors of Tzeentch",
+                                              scenario=scenario)
+                    payload = call_tool(queries, "evaluate_single_unit_matchup", {
+                        "unit_a": "Queen Bess", "unit_b": "Blue Horrors of Tzeentch",
+                        "scenario": scenario})["structuredContent"]
+                    self.assertEqual(payload["data"], direct)
+                    self.assertEqual(payload["model_version"], direct["model_version"])
+                    if "barrier_damage_order" not in scenario:
+                        self.assertEqual(payload["data"]["verdict"]["status"], "indeterminate")
+                        self.assertTrue(payload["data"]["verdict"]["material_mechanic_unresolved"])
+                    else:
+                        self.assertFalse(payload["data"]["verdict"]["material_mechanic_unresolved"])
 
 
 if __name__ == "__main__":

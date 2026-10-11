@@ -30,7 +30,7 @@ On PowerShell use `$env:PYTHONPATH='src'` instead of `PYTHONPATH=src`.
 The Node SDK is a development-only test dependency in ignored `work/`; the server
 uses Python's standard library. For a reviewed deployment replace the URL in
 `accept_mcp_http.mjs` with the final `https://.../mcp` endpoint. The same four
-pairs, ambiguity, paging, detail, provenance and four conditional calculation
+pairs, ambiguity, paging, detail, provenance and four calculation
 checks then run remotely. This integration branch requires the independently
 reviewed combat implementation from PR #16 before deployment.
 
@@ -72,7 +72,8 @@ non-loopback binding requires explicit `--allow-public`. Never put a token or
 user input in the URL. The app writes no request bodies or conversation logs.
 
 Every tool response carries adapter version, source snapshot and a separate
-model version field (null for evidence tools, `combat-0.1.0` for the evaluator).
+model version field (null for evidence tools, the combat library's reported
+version for the evaluator).
 `evaluate_single_unit_matchup` delegates unchanged scenario arguments to
 `combat.evaluate_matchup` and wraps its source facts, assumptions, two ledgers,
 conditional verdict, sensitivity and limitations as structured content. Names
