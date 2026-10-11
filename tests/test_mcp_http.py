@@ -63,6 +63,7 @@ class HTTPTransportTests(unittest.TestCase):
         for tool in listed["result"]["tools"]:
             self.assertIn("inputSchema", tool)
             self.assertIn("outputSchema", tool)
+            self.assertTrue(tool["annotations"]["readOnlyHint"])
         status, resolved = self.rpc("tools/call", {"name": "resolve_unit",
             "arguments": {"name_or_key": "Lothern Sea Guard"}})
         self.assertEqual(status, 200)

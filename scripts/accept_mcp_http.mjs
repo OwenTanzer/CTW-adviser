@@ -21,6 +21,7 @@ try {
   ]));
   for (const tool of listed.tools) {
     assert.ok(tool.inputSchema && tool.outputSchema && tool.description);
+    assert.equal(tool.annotations?.readOnlyHint, true);
   }
   const call = async (name, args) => (await client.callTool({ name, arguments: args })).structuredContent;
   const exact = await call('resolve_unit', { name_or_key: 'Lothern Sea Guard' });

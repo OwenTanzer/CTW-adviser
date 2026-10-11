@@ -107,8 +107,13 @@ restore the previous successful deployment. A source refresh changes the lock,
 contract and verification evidence through its separate reviewed process.
 
 For ChatGPT Work, once HTTPS, access policy and service are approved and live,
-add a custom MCP connector using the final `https://<domain>/mcp` URL; select
-the access mode matching the approved policy, then inspect the five discovered
-tools and run the same exact-name, ambiguity and pair probes in a real chat.
+go to ChatGPT Plugins, select **+ → Add custom MCP server**, enter a name and
+description, and supply the final `https://<domain>/mcp` URL under Connection.
+Choose the approved authentication mode, review the risk warning, create the
+plugin, and inspect the five discovered tools. Install it, start a new chat,
+select the plugin with `@`, and run the exact-name, ambiguity and pair probes.
+Workspace policy can restrict custom servers. If tool metadata changes, refresh
+the connection and start a new chat before retesting. These steps follow the
+[OpenAI plugin connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt).
 Client organization permissions and first conversation acceptance remain to be
 verified; no live ChatGPT connection is claimed here.

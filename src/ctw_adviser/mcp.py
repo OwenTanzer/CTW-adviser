@@ -18,6 +18,8 @@ SERVER_VERSION = "0.1.0"
 
 def _tool(name, description, properties, required=()):
     return {"name": name, "description": description,
+            "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                            "openWorldHint": False},
             "inputSchema": {"type": "object", "properties": properties,
                             "required": list(required), "additionalProperties": False},
             "outputSchema": {"type": "object", "properties": {
