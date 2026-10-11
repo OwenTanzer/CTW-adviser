@@ -18,7 +18,7 @@ try {
   const listed = await client.listTools();
   assert.deepEqual(new Set(listed.tools.map(t => t.name)), new Set([
     'resolve_unit', 'get_unit_combat_profile', 'get_matchup_evidence',
-    'get_detail', 'get_provenance'
+    'get_detail', 'get_provenance', 'evaluate_single_unit_matchup'
   ]));
   for (const tool of listed.tools) {
     assert.ok(tool.inputSchema && tool.outputSchema && tool.description);
@@ -57,13 +57,29 @@ try {
     assert.equal(pair.data.units.length, 2);
     assert.equal(pair.data.snapshot.commit, exact.snapshot.source_commit);
   }
+  for (const [unit_a, unit_b] of [
+    ['Reiksguard', 'Doom Diver Catapults'],
+    ['Lothern Sea Guard (Shields)', 'Blue Horrors of Tzeentch'],
+    ['Bloodletters of Khorne', 'Kroxigor'],
+    ['Queen Bess', 'Reiksguard']
+  ]) {
+    const modeled = await call('evaluate_single_unit_matchup', { unit_a, unit_b });
+    assert.equal(modeled.model_version, modeled.data.model_version);
+    assert.equal(modeled.data.derived.ledgers.length, 2);
+    assert.equal(modeled.data.snapshot.commit, exact.snapshot.source_commit);
+    assert.equal(modeled.data.empirical_calibration, null);
+    assert.ok(modeled.data.limitations.length > 0);
+  }
+  const invalidScenario = await client.callTool({ name: 'evaluate_single_unit_matchup',
+    arguments: { unit_a: 'Reiksguard', unit_b: 'Kroxigor', scenario: { baseline: 'campaign' } } });
+  assert.equal(invalidScenario.isError, true);
   await client.close();
   reconnected = new Client({ name: 'ctw-adviser-reconnect', version: '1.0.0' });
   await reconnected.connect(new StreamableHTTPClientTransport(new URL(endpoint)));
-  assert.equal((await reconnected.listTools()).tools.length, 5);
+  assert.equal((await reconnected.listTools()).tools.length, 6);
   console.log(JSON.stringify({ status: 'passed', endpoint, protocol: '2025-06-18',
     source_commit: exact.snapshot.source_commit, tools: listed.tools.map(t => t.name), pairs: 4,
-    errors: true, reconnect: true }));
+    calculations: 4, errors: true, reconnect: true }));
 } finally {
   await reconnected?.close();
   await client.close();
