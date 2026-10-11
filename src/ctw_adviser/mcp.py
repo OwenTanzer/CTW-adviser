@@ -18,12 +18,14 @@ SERVER_VERSION = "0.1.0"
 
 def _tool(name, description, properties, required=()):
     return {"name": name, "description": description,
+            "annotations": {"readOnlyHint": True, "destructiveHint": False,
+                            "openWorldHint": False},
             "inputSchema": {"type": "object", "properties": properties,
                             "required": list(required), "additionalProperties": False},
             "outputSchema": {"type": "object", "properties": {
                 "status": {"type": "string"}, "snapshot": {"type": "object"},
                 "adapter_version": {"type": "string"},
-                "model_version": {"type": "null"},
+                "model_version": {"type": ["string", "null"]},
                 "data": {"type": "object"}},
                 "required": ["status", "adapter_version", "model_version", "snapshot", "data"]}}
 
@@ -124,6 +126,27 @@ def _response(message_id, *, result=None, error=None):
     return response
 
 
+def dispatch_method(queries, method, params, message_id):
+    """Shared tool dispatcher for stdio and stateless HTTP transports.
+
+    Future calculation tools belong in TOOLS and call_tool; neither transport
+    implements calculations or its own tool routing.
+    """
+    if method == "ping":
+        return _response(message_id, result={})
+    if method == "tools/list":
+        return _response(message_id, result={"tools": TOOLS})
+    if method == "tools/call":
+        if not isinstance(params, dict) or not isinstance(params.get("name"), str) or params["name"] not in BY_NAME:
+            return _response(message_id, error={"code": -32602, "message": "unknown tool"})
+        try:
+            result = call_tool(queries, params["name"], params.get("arguments", {}))
+            return _response(message_id, result=result)
+        except ValueError as exc:
+            return _response(message_id, error={"code": -32602, "message": str(exc)})
+    return _response(message_id, error={"code": -32601, "message": "method not found"})
+
+
 def serve(queries, input_stream=None, output_stream=None):
     input_stream = input_stream or sys.stdin
     output_stream = output_stream or sys.stdout
@@ -151,23 +174,11 @@ def serve(queries, input_stream=None, output_stream=None):
                         "capabilities": {"tools": {}},
                         "serverInfo": {"name": "ctw-adviser", "version": SERVER_VERSION}})
             elif method == "ping" and initialized:
-                response = _response(message_id, result={})
+                response = dispatch_method(queries, method, request.get("params"), message_id)
             elif not ready:
                 response = _response(message_id, error={"code": -32000, "message": "initialize first"})
-            elif method == "tools/list":
-                response = _response(message_id, result={"tools": TOOLS})
-            elif method == "tools/call":
-                params = request.get("params")
-                if not isinstance(params, dict) or not isinstance(params.get("name"), str) or params["name"] not in BY_NAME:
-                    response = _response(message_id, error={"code": -32602, "message": "unknown tool"})
-                else:
-                    try:
-                        result = call_tool(queries, params["name"], params.get("arguments", {}))
-                        response = _response(message_id, result=result)
-                    except ValueError as exc:
-                        response = _response(message_id, error={"code": -32602, "message": str(exc)})
             else:
-                response = _response(message_id, error={"code": -32601, "message": "method not found"})
+                response = dispatch_method(queries, method, request.get("params"), message_id)
         except (ValueError, json.JSONDecodeError):
             response = _response(None, error={"code": -32700, "message": "invalid JSON-RPC message"})
         output_stream.write(json.dumps(response, ensure_ascii=False, allow_nan=False, separators=(",", ":")) + "\n")

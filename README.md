@@ -10,7 +10,8 @@ The combat evaluator is later work.
 The first downstream consumers are a local read-only MCP stdio query adapter and
 an explicitly illustrative movement-phase timing command. See
 [consumer increment](docs/consumer-increment.md) for commands and limits. The full
-matchup evaluator and hosted connector remain issues #5 and #3 respectively.
+matchup evaluator remains issue #5. A deployable Streamable HTTP transport
+candidate for issue #3 is described in [hosted MCP](docs/hosted-mcp.md).
 Each base unit appears once, with list-valued faction names and linked,
 source-qualified availability records.
 
