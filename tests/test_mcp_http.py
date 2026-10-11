@@ -1,13 +1,19 @@
 """HTTP transport contract; set CTW_ADVISER_DB to a pinned built snapshot."""
 
 import http.client
+from contextlib import closing
 import json
 import os
+import shutil
 import socket
+import sqlite3
 from pathlib import Path
 import sys
+import tempfile
 import threading
+import time
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
@@ -146,6 +152,31 @@ class HTTPTransportTests(unittest.TestCase):
             self.assertEqual(self.request("GET", "/healthz")[0], 200)
         finally:
             self.server.rate_limiter = previous
+
+    def test_slow_body_has_absolute_deadline(self):
+        with patch("ctw_adviser.mcp_http.BODY_READ_SECONDS", 0.25):
+            with socket.create_connection(("127.0.0.1", self.server.server_port), timeout=2) as sock:
+                sock.settimeout(2)
+                sock.sendall(b"POST /mcp HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\n"
+                             b"Accept: application/json, text/event-stream\r\nContent-Length: 20\r\n\r\n{")
+                time.sleep(0.12)
+                sock.sendall(b" ")
+                time.sleep(0.3)
+                self.assertIn(b"408 Request Timeout", sock.recv(4096))
+
+    def test_hosted_startup_rejects_forged_source_commit(self):
+        with tempfile.TemporaryDirectory() as folder:
+            forged = Path(folder) / "forged.sqlite"
+            shutil.copyfile(DB, forged)
+            with closing(sqlite3.connect(forged)) as db, db:
+                db.execute("UPDATE snapshot SET source_commit=?", ("0" * 40,))
+            with self.assertRaisesRegex(ValueError, "pinned CTW-data snapshot"):
+                make_handler(str(forged), frozenset())
+            with closing(sqlite3.connect(forged)) as db, db:
+                db.execute("UPDATE snapshot SET source_commit=?, id=?",
+                           ("595e22764b22e748afdbafafcb0a6258973e2451", "forged-store3"))
+            with self.assertRaisesRegex(ValueError, "pinned CTW-data snapshot"):
+                make_handler(str(forged), frozenset())
 
 
 if __name__ == "__main__":
