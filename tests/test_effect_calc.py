@@ -133,11 +133,15 @@ class EffectDamageTests(unittest.TestCase):
                                2 * supplied['derived']['totals']['attempted_damage'])
 
     def test_recipient_and_range_blocks(self):
-        for effect in (POTION, WARPBOMB):
-            result = self.run_case(effect)
-            self.assertEqual(result['status'], 'blocked', effect)
-            self.assertEqual([b['code'] for b in result['blocked']], ['ineligible_recipient'])
-            self.assertEqual(result['derived']['totals']['attempted_damage'], 0)
+        result = self.run_case(POTION)
+        self.assertEqual(result['status'], 'blocked')
+        self.assertEqual([b['code'] for b in result['blocked']], ['ineligible_recipient'])
+        self.assertEqual(result['derived']['totals']['attempted_damage'], 0)
+        # Warpbomb is friendly-cast; its contact phase sets affects_enemies=false,
+        # so that 2660-damage phase is never counted against an enemy target.
+        warpbomb = self.run_case(WARPBOMB)
+        self.assertIn({'id': 'wh2_main_unit_contact_kill_self'}, [x['key'] for x in warpbomb['self_effects']])
+        self.assertNotIn({'id': 'wh2_main_unit_contact_kill_self'}, [c['key'] for c in warpbomb['derived']['components']])
         self.assertTrue(any(u['kind'] in ('healing', 'stat_modifier') for u in self.run_case(POTION)['unsupported_components']))
         intercept = self.q.get_effect(COMET)['effect']['distances']['target_intercept_range']['value']
         inside = self.run_case(COMET, scenario={'cast_distance_metres': intercept})
@@ -146,6 +150,22 @@ class EffectDamageTests(unittest.TestCase):
         self.assertEqual(beyond['status'], 'blocked')
         self.assertEqual(beyond['range']['status'], 'beyond_target_intercept_range')
         self.assertTrue(all(c['expected_damage'] is None for c in beyond['derived']['components']))
+
+    def test_outward_phase_damage_and_self_damage_split(self):
+        leech = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound')
+        phase = next(c for c in leech['derived']['components'] if c['channel'] == 'phase_damage')
+        self.assertEqual(leech['status'], 'calculated')
+        self.assertEqual((phase['per_application_per_entity_raw'], phase['applications'], phase['entities_affected']), (67, 13, 1))
+        self.assertEqual(phase['applications_basis'], 'source_implied_duration_over_frequency')
+        self.assertEqual(phase['expected_damage'], 67 * 13)
+        overridden = self.run_case('wh2_dlc09_spell_death_spirit_leech_bound', scenario={'phase_damage_applications': 5})
+        self.assertEqual(overridden['derived']['totals']['attempted_damage'], 67 * 5)
+        # Self-cast blast: outward vortex is target damage, the 50-damage self phase is not.
+        cellular = self.run_case('wh2_dlc16_unit_abilities_cellular_instability',
+                                 scenario={'vortex_entities_per_application': 5, 'vortex_applications': 1})
+        self.assertEqual([x['damage_amount'] for x in cellular['self_effects']], [50])
+        self.assertEqual({c['channel'] for c in cellular['derived']['components']}, {'vortex'})
+        self.assertTrue(any('self/friendly-cast' in item for item in cellular['limitations']))
 
     def test_caster_access_is_qualified(self):
         linked = self.run_case('Bound Fiery Convocation', caster=TECLIS,
