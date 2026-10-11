@@ -80,8 +80,11 @@ source is `OwenTanzer/CTW-adviser` branch `main`, with Railway config pointing
 to commit `f3dab8b346a348c0fb22d79e18bc7328b12f094c` at inspection time.
 
 The preferred hosted target is a **separate** `ctw-adviser-mcp` service in the
-same project and production environment, with its own Railway HTTPS domain,
-using `Dockerfile.mcp` and `railway.mcp.toml`. It needs an explicit decision
+same project and production environment, with its own Railway HTTPS domain.
+Set `RAILWAY_DOCKERFILE_PATH=Dockerfile.mcp` on that service, and set its
+health-check path to `/healthz` with a 120-second timeout in service settings.
+Railway's legacy `railway.toml` config path is unavailable to new services;
+the repository root file continues to belong to Datasette. This target needs an explicit decision
 because another Railway service may incur cost. An alternative is a separately
 approved host with HTTPS termination that runs this same image and `/mcp`
 path. Do not repurpose the Datasette service or point a client at it. No

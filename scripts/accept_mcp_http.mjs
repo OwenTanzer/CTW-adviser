@@ -11,6 +11,7 @@ const { StreamableHTTPClientTransport } = await import(pathToFileURL(resolve(sdk
 const endpoint = process.argv[2] ?? 'http://127.0.0.1:8080/mcp';
 const client = new Client({ name: 'ctw-adviser-acceptance', version: '1.0.0' });
 const transport = new StreamableHTTPClientTransport(new URL(endpoint));
+let reconnected;
 
 try {
   await client.connect(transport);
@@ -41,6 +42,11 @@ try {
   const ref = profile.data.units[0].provenance_refs[0];
   assert.ok((await call('get_provenance', { record_ids: [ref] })).data.provenance[ref]);
   assert.equal((await call('get_detail', { ref: `record:${ref}`, limit: 1 })).status, 'ok');
+  const missing = await client.callTool({ name: 'get_unit_combat_profile',
+    arguments: { unit_key: 'no-such-unit' } });
+  assert.equal(missing.isError, true);
+  await assert.rejects(() => client.callTool({ name: 'resolve_unit',
+    arguments: { name_or_key: 'Teclis', limit: 2 } }));
   for (const [unit_a, unit_b] of [
     ['Reiksguard', 'Doom Diver Catapults'],
     ['Lothern Sea Guard', 'Blue Horrors of Tzeentch'],
@@ -51,8 +57,14 @@ try {
     assert.equal(pair.data.units.length, 2);
     assert.equal(pair.data.snapshot.commit, exact.snapshot.source_commit);
   }
+  await client.close();
+  reconnected = new Client({ name: 'ctw-adviser-reconnect', version: '1.0.0' });
+  await reconnected.connect(new StreamableHTTPClientTransport(new URL(endpoint)));
+  assert.equal((await reconnected.listTools()).tools.length, 5);
   console.log(JSON.stringify({ status: 'passed', endpoint, protocol: '2025-06-18',
-    source_commit: exact.snapshot.source_commit, tools: listed.tools.map(t => t.name), pairs: 4 }));
+    source_commit: exact.snapshot.source_commit, tools: listed.tools.map(t => t.name), pairs: 4,
+    errors: true, reconnect: true }));
 } finally {
+  await reconnected?.close();
   await client.close();
 }
