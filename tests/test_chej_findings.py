@@ -1,5 +1,6 @@
 """Named source-backed acceptance cases for the broader unit findings."""
 import copy
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -46,8 +47,8 @@ class ChejFindings(unittest.TestCase):
    self.assertIs(a['ammunition_supply']['unlimited'],False)
  def test_conflicting_pool_stays_unresolved(self):
   damaged=Path(self.temp.name)/'pool-conflict.sqlite'
-  with sqlite3.connect(damaged) as out:self.q.db.backup(out)
-  with sqlite3.connect(damaged) as db:
+  with closing(sqlite3.connect(damaged)) as out:self.q.db.backup(out)
+  with closing(sqlite3.connect(damaged)) as db, db:
    db.execute("UPDATE missile_weapons SET use_secondary_ammo_pool=1 WHERE key='wh3_dlc27_hef_sea_guard_bow_anti_infantry'")
   with Queries(damaged) as q:
    r=q.get_unit_profile('wh2_main_hef_inf_lothern_sea_guard_0')['units'][0]['ranged']
@@ -113,8 +114,8 @@ class ChejFindings(unittest.TestCase):
     with self.assertRaises(ValueError):packet_checks(damaged,self.q.get_provenance)
  def test_audit_fails_missing_native_movement(self):
   damaged=Path(self.temp.name)/'missing-speed.sqlite'
-  with sqlite3.connect(damaged) as out:self.q.db.backup(out)
-  with sqlite3.connect(damaged) as db:
+  with closing(sqlite3.connect(damaged)) as out:self.q.db.backup(out)
+  with closing(sqlite3.connect(damaged)) as db, db:
    db.execute("UPDATE battle_entities SET run_speed=NULL WHERE key=(SELECT source_battle_entity_key FROM unit_profiles WHERE unit_key='wh2_main_hef_inf_lothern_sea_guard_0')")
   result=audit(damaged)
   self.assertIn('missing_movement',acceptance_errors(result))

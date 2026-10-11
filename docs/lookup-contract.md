@@ -599,8 +599,10 @@ python scripts/query_snapshot.py passive --db work/units.sqlite --include-docume
 ```
 
 The optional `explanation_documentation` object links here and distinguishes the
-reviewed interpretation from pinned source facts. The inspection site exposes the
-same documentation through a collapsed panel. The two excluded records receive
+reviewed interpretation from pinned source facts. The separate
+`inspection/datasette` branch renders supporting documentation in a collapsed
+panel; live deployment parity with this packet version requires its own check.
+The two excluded records receive
 neither a revised explanation nor that documentation attachment.
 
 ### Murderous Prowess indicator consolidation

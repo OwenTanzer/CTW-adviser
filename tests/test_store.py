@@ -24,7 +24,7 @@ class StoreContractTests(unittest.TestCase):
 
     def test_equal_stats_with_different_abilities_do_not_consolidate(self):
         from ctw_adviser.build import profile_equivalence_groups
-        with sqlite3.connect(':memory:') as db:
+        with closing(sqlite3.connect(':memory:')) as db, db:
             db.executescript('CREATE TABLE unit_profiles(record_id,unit_key,source_main_unit_key,faction_name,armour); '
                              'CREATE TABLE unit_abilities(record_id,unit_key,ability_key,culture_key); '
                              'CREATE TABLE unit_mount_variants(base_unit_key,mounted_unit_key,icon_name);')
@@ -77,13 +77,13 @@ class PinnedStoreTests(unittest.TestCase):
 
     def test_incompatible_contract_fails_at_open(self):
         older = self.directory / 'different-contract.sqlite'
-        with sqlite3.connect(self.output) as source, sqlite3.connect(older) as target:
+        with closing(sqlite3.connect(self.output)) as source, closing(sqlite3.connect(older)) as target, target:
             source.backup(target)
             target.execute("UPDATE snapshot SET contract_sha256=?", ('0' * 64,))
         with self.assertRaisesRegex(ValueError, 'rebuild from pinned sources'):
             open_snapshot(older)
         obsolete = self.directory / 'obsolete-schema.sqlite'
-        with sqlite3.connect(obsolete) as db:
+        with closing(sqlite3.connect(obsolete)) as db, db:
             db.execute('CREATE TABLE snapshot(schema_version INTEGER)')
             db.execute('INSERT INTO snapshot VALUES(2)')
         with self.assertRaisesRegex(ValueError, 'rebuild from pinned sources'):
