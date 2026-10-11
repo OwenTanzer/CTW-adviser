@@ -82,6 +82,20 @@ General NOT is intentionally unavailable; use explicit negative operators.
 
 ## Semantics and boundaries
 
+`speed` is native ground `run_speed`; it is neither displayed unit-card speed
+nor flight speed. Native `source_caste` and coarse `tactical_category` can include
+monstrous or unconventional units under infantry. Search offers no certified
+ordinary humanoid infantry classification. Specify the intended scope before
+deriving an infantry comparison. For Pareto comparisons performed after search,
+state the tie rule; treating exact four-value ties as distinct competitors changes
+the surviving set. Pareto ranking is client analysis, not a search operation.
+
+Imported `multiplayer_cost` is a base source value. Roster membership and cost
+do not certify custom-battle selectability or a fully equipped lord/hero price.
+Keep conditional passive effects separate from base search values, and resolve
+overlapping protection sources and effect-enabling conditions before stating a
+combined total.
+
 The pinned source has 104 profiles whose display labels contain untranslated
 `{{tr:...}}` tokens. Search preserves those values and their stable keys; it does
 not guess replacement names. This is a source-label coverage limit, independent

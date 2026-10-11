@@ -73,7 +73,9 @@ every continuation before claiming an exhaustive list. Keep stats attached to
 matching variants when grouping mounts. Follow returned keys into the existing
 combat-profile/evidence workflow when needed. Do not infer unsupported special
 character status, convert native speed units silently, or apply conditional
-bonuses to base search values. [Query contract and examples](unit-search.md).
+bonuses to base search values. Confirm infantry scope and tie handling for
+derived comparisons; qualify imported costs and roster memberships before
+claiming a selectable loadout. [Query contract and examples](unit-search.md).
 
 These instructions apply only when the connector exposes the new tools. Until
 deployment and metadata refresh are verified, report the missing search

@@ -17,8 +17,10 @@ LIMITATIONS = [
     'Complete only within the imported snapshot, not all game or campaign availability.',
     'Some source labels contain unresolved localization tokens ({{tr:...}}); keys and numeric facts remain sourced, and replacement names are not guessed.',
     'Lord/hero uses native source_caste; legendary/special-character status is not classified.',
+    'Infantry fields follow source or coarse body-plan taxonomy; ordinary humanoid infantry is not separately classified.',
     'Family means connected explicit mount links plus deduplicated aliases; unrelated forms are not inferred.',
     'Stats are unmodified custom-battle, ultra, rank 0; conditional effects are not applied.',
+    'Speed is native ground run_speed, not unit-card or flight speed. Imported cost and roster membership do not establish custom-battle selectability or equipped character price.',
     'Weapon stats describe the sourced primary melee weapon or selected default projectile, not all attacks.',
 ]
 FIELDS = {}
@@ -59,7 +61,7 @@ for name, units, meaning in [
     ('weapon_base_damage', 'melee_damage_per_hit', 'Primary melee weapon base damage; not all weapon attachments.'),
     ('weapon_ap_damage', 'melee_damage_per_hit', 'Primary melee weapon armour-piercing damage per hit.'),
     ('charge_bonus', 'combat_rating', 'Base charge bonus, not an applied temporary bonus.'),
-    ('multiplayer_cost', 'multiplayer_gold', 'Native custom-battle multiplayer cost.'),
+    ('multiplayer_cost', 'multiplayer_gold', 'Imported base custom-battle multiplayer cost; not an equipped character price or proof of selectability.'),
     ('campaign_recruit_cost', 'campaign_gold', 'Base campaign recruitment cost; no campaign modifiers.'),
     ('campaign_upkeep', 'campaign_gold_per_turn', 'Base campaign upkeep per turn.'),
     ('range', 'metres', 'Selected default projectile effective range; other weapons may differ.'),
