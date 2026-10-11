@@ -30,7 +30,9 @@ The `scenario` object supports `mode=custom_battle`,
 `baseline=unmodified_ultra_rank_0`, `separation_metres` (default 200),
 `duration_seconds` (120), `metres_per_second_per_speed_point` (1),
 `path_length_factor` (1), `terrain_speed_factor` (1), `line_of_sight` (true),
-and `historical_relations_apply_to_patch_9` (true). The last flag explicitly
+`barrier_damage_order` (`barrier_first` or `entity_cap_first`; represented
+default `barrier_first`), and `historical_relations_apply_to_patch_9` (true).
+The last flag explicitly
 accepts the working 8.1.1 combat equations for this 9.0 projection; false
 suppresses damage and yields an indeterminate verdict. Terrain and speed factors
 are caller assumptions, not observed coordinate conversion.
@@ -53,6 +55,9 @@ Unknown fields or incompatible baselines fail visibly. The 0.5 collision
 probability, cycle multiplier, firing/contact counts and speed conversion are
 uncalibrated model inputs. Card accuracy is never used as collision probability;
 listed reload is never treated as the complete firing cycle.
+When listed reload is absent, no firing cycle is derived and shots are withheld
+unless the caller supplies `cycle_seconds`; an applicable missing cycle makes
+the verdict indeterminate.
 
 The response separates `snapshot` (including the serving contract hash),
 `source_fingerprints`, `source_provenance`, `source_payload_graph` and `source_facts` from
@@ -68,6 +73,11 @@ are tested at the four extreme corners; sampled one-parameter thresholds show
 changes that can flip the nominal ordering. These are sensitivity calculations,
 not confidence intervals. A crossing or major unresolved mechanic should be
 explained alongside the nominal side.
+`verdict.barrier_damage_order_sensitivity` reports both orderings when a barrier
+is present. If their health, barrier or overkill ledgers differ, the default
+projection is indeterminate until the caller explicitly selects an order.
+Explicit selection makes the result conditional; neither order is established
+as observed game behavior.
 
 ## Calculation boundary
 
@@ -83,11 +93,17 @@ ranged attack and primary melee attack. Nontrivial projectile, volley and burst
 nesting requires `projectiles_per_cycle`; otherwise that attack is omitted with
 a gap. Damage first resolves armour, AP, applicable ordinary resistances and
 front-facing shield probability for a direct projectile. Separate explosion
-events use an assumed affected-entity count. Barriers absorb expected damage
-before health. The historical melee relation supplies hit probability, facing
-defence factor, size bonus and charge decay. Active contacts and living primary
-bodies limit melee volume. Expected per-hit damage is capped by health per
-entity, with overkill reported. Casualties are estimated from pooled health;
+events use an assumed affected-entity count. A sourced explosion `is_spell=true`
+adds target spell resistance under the declared historical damage relation.
+Barriers absorb expected damage before health. `barrier_first` absorbs attempted
+damage before the per-entity health cap; `entity_cap_first` caps each expected
+hit before barrier absorption. Their different barrier use and overkill are
+reported. The historical melee relation supplies hit probability, facing
+defence factor, size bonus and charge decay. The integration splits at the end
+of a charge window, including windows shorter than one second. Active contacts
+and living primary bodies limit melee volume. Expected per-hit damage after
+the selected barrier order is capped by health per entity, with overkill
+reported. Casualties are estimated from pooled health;
 they do not reconstruct individual hit allocation or animation schedules.
 
 Health depletion, component casualties, combat-effectiveness threshold,
@@ -101,7 +117,7 @@ could change the outcome prevents a favored verdict.
 Daemonic source attributes distinguish rout inapplicability from unknown
 instability/death behavior. Other morale and special death effects are not
 projected. Passives, activated effects, fatigue, collision attacks, splash
-selection/distribution, penetration, shrapnel, spell-specific resistance,
+selection/distribution, penetration, shrapnel, other spell-specific behavior,
 terrain physics and actual projectile dispersion remain in `limitations` or
 source coverage. The native 9.0.1 ability payload extension remains evidence;
 it is not silently applied to 9.0 base profiles.

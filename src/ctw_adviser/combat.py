@@ -13,7 +13,7 @@ import math
 from .model import ORDERS, _entry, _number
 from .queries import Queries
 
-MODEL_VERSION = "combat-0.1.1"
+MODEL_VERSION = "combat-0.1.2"
 SIDES = ("a", "b")
 FACING = {"front": 1.0, "side": 0.6, "rear": 0.3}
 
@@ -63,7 +63,7 @@ def _target_class(target, component=None):
             "medium": "large", "large": "large", "very_large": "large"}.get(component.get("size"))
 
 
-def _damage_per_hit(base, ap, target, traits, kind, facing, target_component=None):
+def _damage_per_hit(base, ap, target, traits, kind, facing, target_component=None, *, spell=False):
     base = _number(base, "base_damage")
     ap = _number(ap, "ap_damage")
     classification = _target_class(target, target_component)
@@ -83,6 +83,8 @@ def _damage_per_hit(base, ap, target, traits, kind, facing, target_component=Non
         resist += protection.get("missile_resistance") or 0
     if traits.get("flaming"):
         resist += protection.get("fire_resistance") or 0
+    if spell:
+        resist += protection.get("spell_resistance") or 0
     resist = min(90.0, max(-100.0, resist))
     damage = ((base + bonus) * _armour_survival(armour) + ap) * (1 - resist / 100)
     shield = 0.0
@@ -90,6 +92,7 @@ def _damage_per_hit(base, ap, target, traits, kind, facing, target_component=Non
         shield = _fraction((protection.get("shield_block_chance") or 0) / 100, "shield_block_chance")
     return {"per_unblocked_hit": damage, "size_bonus_as_base": bonus,
             "armour_survival": _armour_survival(armour), "resistance_points": resist,
+            "spell_resistance_applied": bool(spell),
             "shield_block_probability": shield}
 
 
@@ -126,7 +129,7 @@ def _scenario(value):
         raise ValueError("scenario must be an object")
     allowed = {"mode", "baseline", "separation_metres", "duration_seconds", "metres_per_second_per_speed_point",
                "path_length_factor", "terrain_speed_factor", "line_of_sight", "sides",
-               "historical_relations_apply_to_patch_9"}
+               "historical_relations_apply_to_patch_9", "barrier_damage_order"}
     if set(value) - allowed:
         raise ValueError("unsupported scenario fields: " + ", ".join(sorted(set(value) - allowed)))
     sides = value.get("sides", {})
@@ -142,6 +145,8 @@ def _scenario(value):
         "terrain_speed_factor": _setting(value, "terrain_speed_factor", 1, "terrain_speed_factor", positive=True),
         "line_of_sight": value.get("line_of_sight", True),
         "historical_relations_apply_to_patch_9": value.get("historical_relations_apply_to_patch_9", True),
+        "barrier_damage_order": value.get("barrier_damage_order", "barrier_first"),
+        "barrier_damage_order_explicit": "barrier_damage_order" in value,
         "sides": {},
     }
     if normalized["mode"] != "custom_battle" or normalized["baseline"] != "unmodified_ultra_rank_0":
@@ -149,6 +154,8 @@ def _scenario(value):
     for key in ("line_of_sight", "historical_relations_apply_to_patch_9"):
         if type(normalized[key]) is not bool:
             raise ValueError(f"{key} must be boolean")
+    if normalized["barrier_damage_order"] not in ("barrier_first", "entity_cap_first"):
+        raise ValueError("barrier_damage_order must be barrier_first or entity_cap_first")
     allowed_side = {"order", "fire", "fight", "facing", "ranged_attack_id", "collision_probability", "firing_entities",
                     "cycle_seconds", "first_shot_delay_seconds", "projectiles_per_cycle", "explosion_entities_per_collision",
                     "active_contacts", "charge_duration_seconds", "target_component_role", "combat_effective_fraction",
@@ -286,19 +293,27 @@ def _living(pool):
     return min(pool["initial_entities"], math.ceil(max(0, pool["remaining_hp"]) / pool["hp_per_entity"]))
 
 
-def _apply(state, channel, attempts, damage):
+def _apply(state, channel, attempts, damage, barrier_order):
     if attempts <= 0 or damage is None:
         return
     pool = state["pools"][state["target"]]
     nominal = attempts * damage
-    capped = attempts * min(damage, pool["hp_per_entity"])
     state["ledger"]["attempted_damage"] += nominal
-    state["ledger"]["overkill"] += nominal - capped
-    absorbed = min(state["remaining_barrier"], capped)
+    if barrier_order == "barrier_first":
+        absorbed = min(state["remaining_barrier"], nominal)
+        # Spread barrier absorption over expected hits before the per-entity
+        # health cap. This is an explicit scenario ordering, not a game claim.
+        unabsorbed = nominal - absorbed
+        capped = min(unabsorbed, attempts * pool["hp_per_entity"])
+        state["ledger"]["overkill"] += unabsorbed - capped
+    else:
+        capped = attempts * min(damage, pool["hp_per_entity"])
+        state["ledger"]["overkill"] += nominal - capped
+        absorbed = min(state["remaining_barrier"], capped)
+        capped -= absorbed
     state["remaining_barrier"] -= absorbed
     state["ledger"].setdefault("barrier_absorbed", 0.0)
     state["ledger"]["barrier_absorbed"] += absorbed
-    capped -= absorbed
     actual = min(pool["remaining_hp"], capped)
     pool["remaining_hp"] -= actual
     state["ledger"][channel] += actual
@@ -342,8 +357,6 @@ def _run(states, scenario, timing):
         if contact is None or end <= contact or end <= start:
             return
         start = max(start, contact)
-        dt = end - start
-        midpoint = (start + end) / 2
         events = []
         for i, attacker in enumerate(states):
             cfg = scenario["sides"][SIDES[i]]
@@ -359,22 +372,28 @@ def _run(states, scenario, timing):
             classification = _target_class(defender["unit"], defender["target_source"])
             bonus_field = {"infantry": "bonus_vs_infantry", "large": "bonus_vs_large"}.get(classification)
             bonus = traits.get(bonus_field, 0) or 0
-            decay = cfg["charge_duration_seconds"]
-            elapsed = max(0.0, midpoint - contact)
-            charge_fraction = min(1.0, max(0.0, 1 - elapsed / decay)) if decay else 0.0
-            charge = (attack.get("charge_bonus") or 0) * charge_fraction
             facing = scenario["sides"][SIDES[1 - i]]["facing"]
             defence = (defender["melee"] or {}).get("defence") or 0
-            hit = min(.90, max(.08, .35 + ((attack["attack"] + bonus + charge -
-                                         defence * FACING[facing]) / 100)))
-            damage = _damage_per_hit(attack["base_damage"] + charge, attack["ap_damage"],
-                                     defender["unit"], traits, "melee", facing, defender["target_source"])
-            if damage and attack.get("attack_interval"):
-                events.append((1 - i, contacts * dt / attack["attack_interval"] * hit,
-                               damage["per_unblocked_hit"]))
+            decay = cfg["charge_duration_seconds"]
+            split = contact + decay if decay else None
+            boundaries = [start, end]
+            if split is not None and start < split < end:
+                boundaries.insert(1, split)
+            for left, right in zip(boundaries, boundaries[1:]):
+                midpoint = (left + right) / 2
+                elapsed = max(0.0, midpoint - contact)
+                charge_fraction = min(1.0, max(0.0, 1 - elapsed / decay)) if decay else 0.0
+                charge = (attack.get("charge_bonus") or 0) * charge_fraction
+                hit = min(.90, max(.08, .35 + ((attack["attack"] + bonus + charge -
+                                             defence * FACING[facing]) / 100)))
+                damage = _damage_per_hit(attack["base_damage"] + charge, attack["ap_damage"],
+                                         defender["unit"], traits, "melee", facing, defender["target_source"])
+                if damage and attack.get("attack_interval"):
+                    events.append((1 - i, contacts * (right - left) / attack["attack_interval"] * hit,
+                                   damage["per_unblocked_hit"]))
         # Both directions use the same pre-segment living counts.
         for target, hits, damage in events:
-            _apply(states[target], "melee", hits, damage)
+            _apply(states[target], "melee", hits, damage, scenario["barrier_damage_order"])
 
     def impacts_due(t):
         while queue and queue[0][0] <= t + epsilon:
@@ -390,15 +409,17 @@ def _run(states, scenario, timing):
                                      traits, "missile", facing, defender["target_source"])
             if direct:
                 hits = projectiles * cfg["collision_probability"] * (1 - direct["shield_block_probability"])
-                _apply(defender, "direct", hits, direct["per_unblocked_hit"])
+                _apply(defender, "direct", hits, direct["per_unblocked_hit"], scenario["barrier_damage_order"])
             explosion = attack.get("explosion")
             if explosion:
                 ex = _damage_per_hit(explosion["base_damage"], explosion["ap_damage"], defender["unit"],
                                       _traits(attacker["unit"], explosion["id"]), "explosion", facing,
-                                      defender["target_source"])
+                                      defender["target_source"],
+                                      spell=explosion.get("native_parameters", {}).get("is_spell") is True)
                 if ex:
                     _apply(defender, "explosion", projectiles * cfg["collision_probability"] *
-                           cfg["explosion_entities_per_collision"], ex["per_unblocked_hit"])
+                           cfg["explosion_entities_per_collision"], ex["per_unblocked_hit"],
+                           scenario["barrier_damage_order"])
             update_stops(t)
 
     def shots_due(t):
@@ -529,7 +550,7 @@ def _mechanics(units, scenario):
                 missile = {"attack_id": selected["id"], "collision_probability": cfg["collision_probability"],
                            "complete_cycle_seconds_assumed": cfg["cycle_seconds"],
                            "projectiles_per_cycle_assumed": cfg["projectiles_per_cycle"],
-                           "scheduled": bool(cfg["fire"] and
+                           "scheduled": bool(cfg["fire"] and cfg["cycle_seconds"] is not None and
                                              (cfg["flight_seconds"] is not None or (selected.get("velocity") or 0) > 0)),
                            "direct": _damage_per_hit(selected["base_damage"], selected["ap_damage"],
                                                      defender, traits, "missile", facing, component) if target_supported else None,
@@ -540,7 +561,8 @@ def _mechanics(units, scenario):
                                             "affected_entities_assumed": cfg["explosion_entities_per_collision"],
                                             "damage": _damage_per_hit(ex["base_damage"], ex["ap_damage"], defender,
                                                                       _traits(attacker, ex["id"]), "explosion", facing,
-                                                                      component) if target_supported else None}
+                                                                      component, spell=ex.get("native_parameters", {}).get("is_spell") is True)
+                                            if target_supported else None}
         melee = None
         attack = _attacks(attacker, "melee")
         defending_attack = _attacks(defender, "melee")
@@ -571,8 +593,8 @@ def _simulate(units, scenario):
     for i, state in enumerate(states):
         cfg = scenario["sides"][SIDES[i]]
         attack = state["ranged"]
-        if attack and cfg["cycle_seconds"] is None:
-            state["gaps"].append("effective complete firing cycle not supplied; no shots scheduled")
+        if attack and cfg["fire"] and scenario["line_of_sight"] and cfg["cycle_seconds"] is None:
+            state["gaps"].append("complete firing cycle unresolved; no shots scheduled")
         if attack and cfg["flight_seconds"] is not None:
             state["gaps"].append("projectile flight duration supplied as a scenario assumption")
         if attack and attack.get("explosion") and cfg["explosion_entities_per_collision"] == 1:
@@ -661,9 +683,34 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
         corners.append({"collision_probability_a": pa, "collision_probability_b": pb,
                         "favored": _winner(rows), "effective_survivability_fraction": [r["effective_survivability_fraction"] for r in rows]})
     sensitivity = _sensitivity(units, sc, nominal) if sc["historical_relations_apply_to_patch_9"] else []
+    barrier_sensitivity = []
+    barrier_material = False
+    if sc["historical_relations_apply_to_patch_9"] and any(u["body"].get("barrier_health") for u in units):
+        alternate = copy.deepcopy(sc)
+        alternate["barrier_damage_order"] = ("entity_cap_first" if sc["barrier_damage_order"] == "barrier_first"
+                                             else "barrier_first")
+        _, alternate_rows = _simulate(units, alternate)
+        for order, rows in ((sc["barrier_damage_order"], summary),
+                            (alternate["barrier_damage_order"], alternate_rows)):
+            barrier_sensitivity.append({"barrier_damage_order": order, "favored": _winner(rows),
+                                        "effective_survivability_fraction":
+                                        [r["effective_survivability_fraction"] for r in rows],
+                                        "barrier_absorbed":
+                                        [r["incoming_damage"].get("barrier_absorbed", 0.0) for r in rows],
+                                        "overkill": [r["incoming_damage"]["overkill"] for r in rows]})
+        barrier_material = any(
+            not math.isclose(summary[i][field], alternate_rows[i][field], abs_tol=1e-9)
+            for i in range(2) for field in ("remaining_health", "remaining_barrier")) or any(
+                not math.isclose(summary[i]["incoming_damage"]["overkill"],
+                                 alternate_rows[i]["incoming_damage"]["overkill"], abs_tol=1e-9)
+                for i in range(2))
     gaps = [*summary[0]["coverage_gaps"], *summary[1]["coverage_gaps"]]
     material_unresolved = any(any(marker in gap for marker in
-                                  ("damage omitted", "schedule impacts", "nesting unresolved")) for gap in gaps)
+                                  ("damage omitted", "schedule impacts", "nesting unresolved",
+                                   "complete firing cycle unresolved")) for gap in gaps)
+    if barrier_material and not sc["barrier_damage_order_explicit"]:
+        material_unresolved = True
+        gaps.append("barrier damage order changes the projection; supply barrier_damage_order for a conditional verdict")
     gaps.extend("source coverage: " + g["code"] + " - " + g["summary"] for u in units for g in u["coverage"].get("gaps", []))
     gaps += ["no routing or morale model",
              "entity casualties use pooled expected damage, not hit allocation", "shield facing and projectile block eligibility are simplified",
@@ -671,7 +718,7 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
     if sc["historical_relations_apply_to_patch_9"]:
         gaps.append("8.1.1 relations are assumed applicable to 9.0; no live validation")
     if any(u["body"].get("barrier_health") for u in units):
-        gaps.append("barrier absorbs damage first; recharge and barrier-specific rules are unmodeled")
+        gaps.append("barrier damage order is a scenario assumption; recharge and barrier-specific rules are unmodeled")
     return {"model_version": MODEL_VERSION, "source_packet_version": packet["schema_version"],
             "snapshot": {**packet["snapshot"],
                          "serving_contract_sha256": getattr(queries, "snapshot", {}).get("contract_sha256")},
@@ -694,6 +741,8 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                  "Direct and explosion are separate expected hit events; default splash reach is one entity per collision.",
                                  "Positive listed velocity gives straight flight time from exact shot distance; nonpositive native sentinels require explicit flight_seconds.",
                                  "Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.",
+                                 "Barrier-before-entity-cap is the represented default, not a verified game damage order; the alternate order is tested.",
+                                 "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",
                                  "Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled."],
             "derived": {"phase_timing": timing,
                         "event_mechanics": _mechanics(units, sc) if sc["historical_relations_apply_to_patch_9"] else None,
@@ -703,7 +752,9 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                         "represented_point_ordering": nominal,
                         "criterion": "remaining modeled health plus barrier fraction at horizon",
                         "collision_probability_corners": corners,
-                        "bounds_cross": len({c["favored"] for c in corners}) > 1 or bool(sensitivity),
+                        "barrier_damage_order_sensitivity": barrier_sensitivity,
+                        "bounds_cross": len({c["favored"] for c in corners}) > 1 or bool(sensitivity) or
+                                        len({case["favored"] for case in barrier_sensitivity}) > 1,
                         "material_mechanic_unresolved": material_unresolved,
                         "one_parameter_flip_thresholds": sensitivity,
                         "qualification": "Nominal result depends on uncalibrated firing/contact assumptions; routing is unknown."},

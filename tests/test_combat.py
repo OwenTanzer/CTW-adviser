@@ -38,6 +38,15 @@ class PacketQueries:
         return a
 
 
+class SavedPacketQueries:
+    def __init__(self, packet, snapshot):
+        self.packet = packet
+        self.snapshot = snapshot
+
+    def get_matchup_evidence(self, *_args, **_kwargs):
+        return copy.deepcopy(self.packet)
+
+
 class CombatTests(unittest.TestCase):
     def test_armour_integral_and_attack_type(self):
         self.assertEqual(_armour_survival(0), 1)
@@ -142,9 +151,83 @@ class CombatTests(unittest.TestCase):
         self.assertLess(result["derived"]["ledgers"][0]["stopping"]["health_depleted_seconds"], .5)
         self.assertEqual(result["derived"]["ledgers"][1]["shots_fired_per_shooter"], 2)
 
+    def test_missing_reload_gates_verdict_until_cycle_is_assumed(self):
+        q = PacketQueries()
+        scenario = {"separation_metres": 100}
+        baseline = evaluate_matchup(q, "a", "b", scenario=scenario)
+        self.assertGreater(baseline["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+        q.mutate = lambda p: p["units"][0]["ranged"].__setitem__("reload_time", None)
+        missing = evaluate_matchup(q, "a", "b", scenario=scenario)
+        self.assertEqual(missing["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+        self.assertTrue(missing["verdict"]["material_mechanic_unresolved"])
+        self.assertEqual(missing["verdict"]["nominal_favored"], "indeterminate")
+        self.assertIn("complete firing cycle unresolved", " ".join(missing["limitations"]))
+        supplied = evaluate_matchup(q, "a", "b", scenario={
+            **scenario, "sides": {"a": {"cycle_seconds": 13.75}}})
+        self.assertGreater(supplied["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+        self.assertNotIn("complete firing cycle unresolved", " ".join(supplied["limitations"]))
+
+    def test_short_charge_window_is_integrated_before_decay(self):
+        q = PacketQueries("wargor", "kroxigor")
+        damage = []
+        for seconds in (0, .1, .4):
+            result = evaluate_matchup(q, "a", "b", scenario={
+                "separation_metres": 0, "duration_seconds": 1,
+                "sides": {"a": {"charge_duration_seconds": seconds, "fire": False,
+                                "active_contacts": 1},
+                          "b": {"fight": False, "fire": False}}})
+            damage.append(result["derived"]["ledgers"][1]["incoming_damage"]["melee"])
+        self.assertLess(damage[0], damage[1])
+        self.assertLess(damage[1], damage[2])
+
 
 @unittest.skipUnless(DB.exists(), "set CTW_ADVISER_DB to a built pinned snapshot")
 class PinnedStoreTests(unittest.TestCase):
+    def test_spell_tagged_explosion_uses_sourced_spell_resistance(self):
+        scenario = {"separation_metres": 100, "duration_seconds": 3,
+                    "sides": {"a": {"order": "hold", "first_shot_delay_seconds": 0,
+                                    "cycle_seconds": 20, "collision_probability": 1,
+                                    "flight_seconds": 1, "fight": False},
+                              "b": {"order": "hold", "fire": False, "fight": False}}}
+        with Queries(DB) as q:
+            packet = q.get_matchup_evidence("wh3_dlc29_skv_art_plagueclaw_catapult_ror",
+                                            "Blessed Carnosaur", limit=256,
+                                            include_diagnostics=True, include_provenance=True)
+            self.assertIs(packet["units"][0]["ranged"]["explosion"]["native_parameters"]["is_spell"], True)
+            self.assertEqual(packet["units"][1]["passives"]["protection"]["spell_resistance"], 50)
+            with_resistance = evaluate_matchup(
+                SavedPacketQueries(packet, q.snapshot), "a", "b", scenario=scenario)
+            packet["units"][1]["passives"]["protection"]["spell_resistance"] = 0
+            without_resistance = evaluate_matchup(
+                SavedPacketQueries(packet, q.snapshot), "a", "b", scenario=scenario)
+        hit_with = with_resistance["derived"]["event_mechanics"][0]["missile"]["explosion"]["damage"]
+        hit_without = without_resistance["derived"]["event_mechanics"][0]["missile"]["explosion"]["damage"]
+        self.assertTrue(hit_with["spell_resistance_applied"])
+        self.assertEqual(hit_with["resistance_points"], 50)
+        self.assertAlmostEqual(hit_with["per_unblocked_hit"], hit_without["per_unblocked_hit"] / 2)
+        self.assertLess(with_resistance["derived"]["ledgers"][1]["incoming_damage"]["explosion"],
+                        without_resistance["derived"]["ledgers"][1]["incoming_damage"]["explosion"])
+
+    def test_barrier_order_exposes_overkill_and_gates_default_verdict(self):
+        scenario = {"separation_metres": 100, "duration_seconds": 2,
+                    "sides": {"a": {"order": "hold", "first_shot_delay_seconds": 0,
+                                    "cycle_seconds": 20, "collision_probability": 1, "fight": False},
+                              "b": {"order": "hold", "fire": False, "fight": False}}}
+        with Queries(DB) as q:
+            default = evaluate_matchup(q, "Queen Bess", "Blue Horrors of Tzeentch", scenario=scenario)
+            scenario["barrier_damage_order"] = "entity_cap_first"
+            cap_first = evaluate_matchup(q, "Queen Bess", "Blue Horrors of Tzeentch", scenario=scenario)
+        self.assertEqual(default["verdict"]["status"], "indeterminate")
+        self.assertTrue(default["verdict"]["material_mechanic_unresolved"])
+        self.assertEqual(default["scenario_assumptions"]["barrier_damage_order"], "barrier_first")
+        self.assertFalse(default["scenario_assumptions"]["barrier_damage_order_explicit"])
+        self.assertEqual(default["derived"]["ledgers"][1]["incoming_damage"]["overkill"], 0)
+        self.assertGreater(cap_first["derived"]["ledgers"][1]["incoming_damage"]["overkill"], 200)
+        self.assertLess(cap_first["derived"]["ledgers"][1]["incoming_damage"]["barrier_absorbed"],
+                        default["derived"]["ledgers"][1]["incoming_damage"]["barrier_absorbed"])
+        self.assertEqual(len(default["verdict"]["barrier_damage_order_sensitivity"]), 2)
+        self.assertFalse(cap_first["verdict"]["material_mechanic_unresolved"])
+
     def test_named_and_outside_pairs_via_queries(self):
         pairs = [("Reiksguard", "Doom Diver Catapults"),
                  ("Lothern Sea Guard (Shields)", "Blue Horrors of Tzeentch"),
