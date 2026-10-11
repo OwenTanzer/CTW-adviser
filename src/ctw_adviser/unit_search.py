@@ -253,7 +253,7 @@ def discover_unit_fields(q, field=None, cursor=None, limit=50):
         items = [dict(name=name, type=s['type'], units=s['units'], meaning=s['meaning'],
                       multivalued=bool(s['relation']), operators=operators(s), sortable=not bool(s['relation']),
                       field_comparison=s['type'] == 'number' and not s['relation'],
-                      categorical=s['categorical'], nullable=True,
+                      categorical=s['categorical'], nullable=name not in ('unit_key', 'unit_name', 'source_unit_name', 'is_mounted'),
                       source_mapping=('existential distinct membership' if s['relation'] else s['expression'])) for name, s in FIELDS.items()]
     page = items[offset:offset + limit]
     return dict(schema_version=VERSION, snapshot=q.snapshot, baseline=json.loads(q.snapshot['baseline_json']), field=field, items=page,

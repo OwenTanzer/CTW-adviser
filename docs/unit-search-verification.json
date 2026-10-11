@@ -22,9 +22,9 @@
         },
         "limit": 100
       },
-      "median_ms": 2.062,
-      "max_ms": 3.72,
-      "response_bytes": 26604,
+      "median_ms": 2.238,
+      "max_ms": 3.825,
+      "response_bytes": 26436,
       "total_count": 126,
       "count_unit": "profiles",
       "total_matching_variants": 126,
@@ -53,9 +53,9 @@
         "mode": "families",
         "limit": 100
       },
-      "median_ms": 4.523,
-      "max_ms": 5.945,
-      "response_bytes": 35293,
+      "median_ms": 4.725,
+      "max_ms": 5.607,
+      "response_bytes": 35125,
       "total_count": 35,
       "count_unit": "mount_linked_families",
       "total_matching_variants": 126,
@@ -81,9 +81,9 @@
         ],
         "limit": 50
       },
-      "median_ms": 9.244,
-      "max_ms": 10.907,
-      "response_bytes": 15648,
+      "median_ms": 10.031,
+      "max_ms": 11.536,
+      "response_bytes": 15480,
       "total_count": 1319,
       "count_unit": "profiles",
       "total_matching_variants": 1319,
@@ -94,9 +94,9 @@
       "arguments": {
         "limit": 100
       },
-      "median_ms": 17.651,
-      "max_ms": 20.043,
-      "response_bytes": 27198,
+      "median_ms": 18.446,
+      "max_ms": 23.237,
+      "response_bytes": 27030,
       "total_count": 2379,
       "count_unit": "profiles",
       "total_matching_variants": 2379,
@@ -105,12 +105,12 @@
     }
   },
   "snapshot": {
-    "id": "595e22764b22e748afdbafafcb0a6258973e2451:fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1:store4",
-    "schema_version": 4,
+    "id": "595e22764b22e748afdbafafcb0a6258973e2451:81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16:store3",
+    "schema_version": 3,
     "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
-    "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1",
+    "contract_sha256": "81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16",
     "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
     "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
-    "coverage_json": "{\"activated_access\":\"unit ability links only; character skill/rank routes are not yet imported\",\"activated_payloads\":\"source graphs retained for every activated root; runtime execution unverified\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+    "coverage_json": "{\"activated_payloads\":\"deferred\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
   }
 }

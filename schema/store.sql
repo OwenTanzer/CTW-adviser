@@ -1,6 +1,6 @@
 PRAGMA foreign_keys = ON;
 CREATE TABLE snapshot (
-  id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL CHECK(schema_version=4),
+  id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL CHECK(schema_version=3),
   source_commit TEXT NOT NULL, contract_sha256 TEXT NOT NULL,
   baseline_json TEXT NOT NULL CHECK(json_valid(baseline_json)),
   owners_json TEXT NOT NULL CHECK(json_valid(owners_json)),
@@ -68,34 +68,3 @@ CREATE TABLE record_lineage (
   lineage_record TEXT NOT NULL REFERENCES record_provenance(id),
   PRIMARY KEY(record_id,lineage_record)
 ) STRICT;
--- Issue #19: spells and activated abilities. Distinct linked tables; detailed
--- payloads stay in the shared native ability/payload tables, never unit rows.
-CREATE TABLE effect_abilities (
-  ability_key TEXT PRIMARY KEY, snapshot_id TEXT NOT NULL REFERENCES snapshot(id),
-  effect_kind TEXT NOT NULL CHECK(effect_kind IN ('spell','activated_ability')),
-  kind_basis TEXT NOT NULL, source_type TEXT, ability_type TEXT, name TEXT,
-  definition_record TEXT NOT NULL REFERENCES record_provenance(id),
-  casting_record TEXT NOT NULL REFERENCES record_provenance(id),
-  keywords_json TEXT NOT NULL CHECK(json_valid(keywords_json) AND json_type(keywords_json)='array')
-) STRICT;
-CREATE INDEX effect_abilities_name_nocase ON effect_abilities(name COLLATE NOCASE);
-CREATE TABLE effect_variants (
-  ability_key TEXT NOT NULL REFERENCES effect_abilities(ability_key),
-  relation TEXT NOT NULL CHECK(relation IN ('overcast_option','supersedes')),
-  variant_key TEXT NOT NULL, variant_ability TEXT REFERENCES effect_abilities(ability_key),
-  status TEXT NOT NULL CHECK(status IN ('resolved','not_activated','missing')),
-  source_record TEXT NOT NULL REFERENCES record_provenance(id),
-  PRIMARY KEY(ability_key,relation,variant_key),
-  CHECK((status='resolved') = (variant_ability IS NOT NULL))
-) STRICT;
-CREATE INDEX effect_variants_reverse ON effect_variants(variant_key,relation,ability_key);
-CREATE TABLE effect_access (
-  link_record TEXT PRIMARY KEY REFERENCES record_provenance(id),
-  unit_key TEXT NOT NULL REFERENCES unit_identity(unit_key),
-  ability_key TEXT NOT NULL REFERENCES effect_abilities(ability_key),
-  culture_key TEXT, route TEXT NOT NULL CHECK(route IN ('unit_ability_link')),
-  requires_effect_enabling INTEGER CHECK(requires_effect_enabling IN (0,1)),
-  qualification TEXT NOT NULL
-) STRICT;
-CREATE INDEX effect_access_unit ON effect_access(unit_key,ability_key);
-CREATE INDEX effect_access_ability ON effect_access(ability_key,unit_key);

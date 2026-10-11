@@ -76,7 +76,7 @@ nonempty matches, exclusions and exact boundary values.
 The filter language supports `and`/`or` objects containing child predicates;
 leaves have `field`, `op`, and `value` or compatible numeric `value_field`.
 Operators are `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `not_in`, `between`
-(inclusive), `contains` (literal case-insensitive substring), `is_null` and
+(inclusive), `contains` (literal substring, ASCII case folding), `is_null` and
 `is_not_null`. Null checks take no value. Equality/category keys are exact.
 General NOT is intentionally unavailable; use explicit negative operators.
 
@@ -143,8 +143,8 @@ all existing four pair/four calculation checks.
 
 Local measurements are in [unit-search-verification.json](unit-search-verification.json):
 20 warm calls per case, compact UTF-8 bytes, no cleared OS cache or hosted
-network latency claim. Representative medians were 2.1 ms for High Elf
-characters, 4.5 ms grouped, 9.2 ms cost/damage sort and 17.7 ms full-roster first
+network latency claim. Representative medians were 2.2 ms for High Elf
+characters, 4.7 ms grouped, 10.0 ms cost/damage sort and 18.4 ms full-roster first
 page. Responses were approximately 15–35 KB for those selected pages.
 
 ## Release gates
@@ -157,3 +157,22 @@ compare exact source identity sets to this acceptance. Synchronize the installed
 CTW Matchup skill with the canonical workflow instructions once the tools are
 live; Claude consumes the same discovery/search path. Keep #28 open until these
 live gates are verified. No source pin or import-contract update is required.
+
+### Main-branch reconciliation, 11 October 2026
+
+During implementation, main advanced to `fd370a37afeecff3c91bc57f25ded2ca50fb7c78`
+via PR #29, reverting the separate activated-effects increment for combined
+review. This search branch incorporates that change and preserves its removal:
+store 3 / import contract 2, six existing tools plus the two new search tools.
+The database was rebuilt from the unchanged source pin, then protocol acceptance
+and regression checks rerun. Earlier store-4 test receipts are historical, not
+the final branch baseline. Live deployment and installed instructions remain
+separate release gates.
+
+Final reconciled local acceptance: **198 tests passed, zero failures/errors/skips**
+(`CTW_TEST_DB=work/adviser.sqlite python -m unittest discover -s tests -v`).
+Official SDK local HTTP acceptance passed with all eight tools, 35 family
+results/126 variants across two pages, profile follow-through, four evidence
+pairs, four combat evaluations, error handling and reconnect. Both new CLI
+commands passed on the rebuilt store-3 artifact. This supersedes the earlier
+210-test store-4 run. No hosted deployment or connected-chat acceptance claimed.

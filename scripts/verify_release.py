@@ -29,8 +29,7 @@ TOP_KEYS = {'format', 'adviser_commit', 'adviser_worktree_dirty',
 SNAPSHOT_KEYS = {'id', 'schema_version', 'source_commit', 'contract_sha256',
                  'baseline_json', 'owners_json', 'coverage_json'}
 PLAN_KEYS = {'unit_key', 'unit_name', 'source_unit_name', 'alias_key',
-             'relations', 'reverse_edge', 'effect_key', 'effect_name',
-             'unit_effects', 'effect_units', 'effect_variant_reverse'}
+             'relations', 'reverse_edge'}
 
 
 def sha256(path):
@@ -117,8 +116,8 @@ def validate_manifest(data, *, expected_adviser_commit=None):
     string(runtime['processor'], 'runtime.processor', allow_empty=True)
 
     snapshot = fields(data['snapshot'], 'snapshot', SNAPSHOT_KEYS)
-    integer(snapshot['schema_version'], 'snapshot.schema_version', minimum=4)
-    if snapshot['schema_version'] != 4:
+    integer(snapshot['schema_version'], 'snapshot.schema_version', minimum=3)
+    if snapshot['schema_version'] != 3:
         raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
     string(snapshot['id'], 'snapshot.id')
     string(snapshot['source_commit'], 'snapshot.source_commit', SHA40)
@@ -157,7 +156,7 @@ def validate_manifest(data, *, expected_adviser_commit=None):
         snapshot['contract_sha256'] != lock['contract_sha256'] or
         snapshot['source_commit'] != lock['source_commit']):
         raise ValueError('manifest snapshot source or import contract differs from source lock')
-    if snapshot['id'] != f"{lock['source_commit']}:{lock['contract_sha256']}:store4":
+    if snapshot['id'] != f"{lock['source_commit']}:{lock['contract_sha256']}:store3":
         raise ValueError('manifest snapshot ID differs from pinned identity')
     if baseline != contract['baseline'] or owners != lock['owners']:
         raise ValueError('manifest baseline or source owners differ from pin')
