@@ -15,6 +15,7 @@ import sqlite3
 VERSION = 'unit-search-1.0.0'
 LIMITATIONS = [
     'Complete only within the imported snapshot, not all game or campaign availability.',
+    'Some source labels contain unresolved localization tokens ({{tr:...}}); keys and numeric facts remain sourced, and replacement names are not guessed.',
     'Lord/hero uses native source_caste; legendary/special-character status is not classified.',
     'Family means connected explicit mount links plus deduplicated aliases; unrelated forms are not inferred.',
     'Stats are unmodified custom-battle, ultra, rank 0; conditional effects are not applied.',
@@ -32,7 +33,7 @@ def field(name, kind, units, meaning, expression=None, relation=None, category=F
 for name, meaning in {
     'unit_key': 'Canonical deduplicated profile key; resolves in existing tools.',
     'unit_name': 'Qualified display label including represented mount variants.',
-    'source_unit_name': 'Original localized source label; not a family identifier.',
+    'source_unit_name': 'Original source label; may contain unresolved localization tokens. Not a family identifier.',
     'source_caste': 'Native main-unit caste; lord/hero are source classifications, not legendary status.',
     'tactical_category': 'Canonical coarse tactical body plan, including infantry and character.',
     'source_unit_class': 'Native class retained for provenance; use tactical_category for body plan.',

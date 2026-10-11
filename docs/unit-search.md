@@ -82,6 +82,11 @@ General NOT is intentionally unavailable; use explicit negative operators.
 
 ## Semantics and boundaries
 
+The pinned source has 104 profiles whose display labels contain untranslated
+`{{tr:...}}` tokens. Search preserves those values and their stable keys; it does
+not guess replacement names. This is a source-label coverage limit, independent
+of roster completeness and numeric filtering.
+
 - Numeric ordinary predicates exclude NULL, including `ne` and `not_in`.
   Zero remains zero. No missingness-to-zero conversion occurs.
 - Multivalued roster/attribute fields return distinct sorted lists. Positive

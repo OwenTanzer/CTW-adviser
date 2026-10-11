@@ -1,8 +1,10 @@
 # Hosted MCP service (issue #3)
 
-This checkout serves six read-only tools over stdio and `/mcp` using MCP
+This checkout serves eight read-only tools over stdio and `/mcp` using MCP
 Streamable HTTP protocol `2025-06-18`. The separately deployed live endpoint
-still exposes eight tools from the earlier release. Its URL is
+still exposes eight tools from the earlier release: its effect tools are absent
+from this checkout, while this checkout adds field discovery and unit search.
+Equal tool counts do not establish the same capabilities. Its URL is
 `https://ctw-adviser-mcp-production.up.railway.app/mcp`, with public,
 unauthenticated read-only access. ChatGPT CTW Advisor connector calls were
 verified on 2026-10-11; see [acceptance evidence](closure-3-6.md). The Railway
