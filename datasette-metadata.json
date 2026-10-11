@@ -1,6 +1,6 @@
 {
   "title": "CTW-adviser · pinned unit evidence inspection",
-  "description": "Read-only inspection of the pinned CTW-data snapshot, including versioned 1.19.0 packets, qualified mechanics and opt-in source documentation. Source and packet versions are shown in each unit view.",
+  "description": "Read-only inspection of the pinned CTW-data snapshot, including versioned 1.21.0 packets, spell/activated-ability retrieval, qualified mechanics and opt-in source documentation. Source and packet versions are shown in each unit view.",
   "source": "CTW-data pinned source",
   "source_url": "https://github.com/OwenTanzer/CTW-data/tree/595e22764b22e748afdbafafcb0a6258973e2451",
   "databases": {
@@ -35,6 +35,57 @@
         },
         "source_files": {
           "description": "Locked source paths and byte hashes used to build this snapshot."
+        },
+        "effect_abilities": {
+          "description": "Issue #19: every source-classified spell and activated ability, with stable keys, effect kind (spell = source_type spell/bound), concise derived keywords and definition/casting records. Detailed mechanics stay in the shared native tables.",
+          "label_column": "name",
+          "facets": [
+            "effect_kind",
+            "source_type"
+          ]
+        },
+        "effect_variants": {
+          "description": "Overcast (overpower_option) and supersession relations between effect identities; status keeps missing or non-activated targets explicit.",
+          "facets": [
+            "relation",
+            "status"
+          ]
+        },
+        "effect_access": {
+          "description": "Qualified unit <-> effect links from source unit ability links (culture and effect enabling retained). Not proof of campaign acquisition or of an active effect. Character skill routes are in effect_character_access.",
+          "facets": [
+            "route",
+            "culture_key"
+          ]
+        },
+        "magic_characters": {
+          "description": "550 indexed characters from CTW-data data/magic (agent subtype, name, class, caster flag).",
+          "label_column": "character_name",
+          "facets": [
+            "character_class",
+            "is_caster"
+          ]
+        },
+        "character_unit_forms": {
+          "description": "Character -> battlefield unit forms by exact main-unit key; unmapped forms stay explicit.",
+          "facets": [
+            "via_kind",
+            "mapping"
+          ]
+        },
+        "effect_character_access": {
+          "description": "Ability-targeted skill bindings: exact skill/rank, role (enables, enables_overcast, disables, modifies) and status. Conditional possibilities, not selected skills or legality.",
+          "facets": [
+            "role",
+            "status"
+          ]
+        },
+        "magic_skill_bindings": {
+          "description": "All derived skill-effect bindings, including group, phase, unit-set, army and context modifiers that never grant individual spells.",
+          "facets": [
+            "target_kind",
+            "bonus_value_id"
+          ]
         }
       },
       "queries": {
@@ -42,9 +93,19 @@
           "title": "Find units by name",
           "description": "Search by part of a name. Click a unit name to inspect assembled attributes, passive effects, conditions, attacks and provenance.",
           "sql": "select unit_key, unit_name, unit_keys, faction_name, tactical_category, entity_count, total_hp, armour, melee_attack, melee_defence, weapon_base_damage, weapon_ap_damage, speed, multiplayer_cost from unit_profiles where unit_name like '%' || :name || '%' order by unit_name, unit_key"
+        },
+        "find_effects": {
+          "title": "Find spells and activated abilities",
+          "description": "Search by part of a name, then open effect:<ability_key> at /inspect/detail for mechanics, payload paths and linked units.",
+          "sql": "select ability_key, name, effect_kind, source_type, keywords_json from effect_abilities where name like '%' || :name || '%' order by name, ability_key"
+        },
+        "find_characters": {
+          "title": "Find characters",
+          "description": "Search by part of a name, then open character:<agent_subtype_key> at /inspect/detail.",
+          "sql": "select agent_subtype_key, character_name, character_class, is_caster, relation_count from magic_characters where character_name like '%' || :name || '%' order by character_name"
         }
       }
     }
   },
-  "description_html": "<p><a href=\"/inspect\">Open assembled unit evidence</a> · <a href=\"/inspect?unit=wh2_main_lzd_mon_kroxigors\">Inspect Kroxigor</a> · <a href=\"https://github.com/OwenTanzer/CTW-adviser/issues/2\">Issue #2 progress and limitations</a></p>"
+  "description_html": "<p><a href=\"/inspect\">Open assembled unit evidence</a> · <a href=\"/inspect?unit=wh2_main_lzd_mon_kroxigors\">Inspect Kroxigor</a> · <a href=\"https://github.com/OwenTanzer/CTW-adviser/issues/2\">Issue #2 progress and limitations</a> · <a href=\"/inspect/detail?ref=effect:wh_main_spell_heavens_comet_of_casandora\">Inspect Comet of Casandora</a> · <a href=\"https://github.com/OwenTanzer/CTW-adviser/issues/19\">Issue #19</a></p>"
 }

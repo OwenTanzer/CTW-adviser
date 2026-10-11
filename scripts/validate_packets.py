@@ -14,7 +14,7 @@ import re
 ROOT=Path(__file__).resolve().parents[1]
 ANNOTATIONS={'$schema','$id','title','description','$defs'}
 KEYWORDS={'$ref','type','properties','required','additionalProperties','items','minItems','minimum','minLength','pattern','enum','const','oneOf','anyOf','allOf','if','then','else'}
-CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0'}
+CURRENT_VERSIONS={'1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0','1.20.0','1.21.0'}
 
 def check_schema(s):
     if not isinstance(s,dict):raise ValueError('only object schemas supported')
@@ -73,8 +73,10 @@ def validate(value,s,root,path='$'):
     if typ in ('integer','number') and 'minimum' in s and value<s['minimum']:raise ValueError(path+': below minimum')
 
 def packet_checks(p, provenance_resolver=None):
+    if 'effect' in p:
+        return effect_packet_checks(p, provenance_resolver)
     if p.get('provenance_mode') == 'deferred':
-        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0') or p['sources'] or p['provenance']:
+        if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0','1.20.0','1.21.0') or p['sources'] or p['provenance']:
             raise ValueError('invalid deferred evidence envelope')
         if provenance_resolver is None:
             raise ValueError('deferred evidence requires a snapshot-bound provenance resolver')
@@ -138,7 +140,7 @@ def packet_checks(p, provenance_resolver=None):
             if s['state']=='partial' and (s['cursor'] is None or (s['total'] is not None and s['total']<=s['returned']+offset)):raise ValueError('partial section needs overflow/cursor')
             if gaps is not None and s['state'] in ('unresolved','omitted') and not any(g['section']==s['name'] for g in gaps):raise ValueError('unqualified unresolved/omitted section')
         if gaps is not None and status in ('unresolved','omitted') and not any(g['section']=='ranged' for g in gaps):raise ValueError('missing ranged gap')
-        if p['schema_version'] in ('1.16.0','1.17.0','1.18.0','1.19.0'):
+        if p['schema_version'] in ('1.16.0','1.17.0','1.18.0','1.19.0','1.20.0','1.21.0'):
             body=u['body'];movement=u['movement']
             if movement['speed']!=movement['ground_speed']:
                 raise ValueError('movement speed differs from primary-body run speed')
@@ -172,7 +174,7 @@ def packet_checks(p, provenance_resolver=None):
                     expected_pool=None if disagreement else native
                     if supply['assignment_status']!=expected_status or supply['effective_pool']!=expected_pool:
                         raise ValueError('ammunition supply status conflicts with retained pools')
-                    if p['schema_version'] in ('1.17.0','1.18.0','1.19.0'):
+                    if p['schema_version'] in ('1.17.0','1.18.0','1.19.0','1.20.0','1.21.0'):
                         capacity=supply['native_'+expected_pool+'_capacity'] if expected_pool else None
                         unlimited=(supply['infinite_secondary'] if expected_pool=='secondary' else False) if expected_pool else None
                         if supply['capacity']!=capacity or supply['unlimited'] is not unlimited:
@@ -229,7 +231,7 @@ def packet_checks(p, provenance_resolver=None):
         if any(s['returned']!=actual[s['name']] for s in sections):raise ValueError('returned count differs from packet')
     comparison=p.get('comparison')
     if comparison is not None:
-        if (p['schema_version']!='1.19.0' or len(p['units'])!=2 or p['mode']!='combined' or
+        if (p['schema_version'] not in ('1.19.0','1.20.0','1.21.0') or len(p['units'])!=2 or p['mode']!='combined' or
                 comparison['unit_names']!=[u['identity']['name'] or u['identity']['unit_key'] for u in p['units']] or
                 [d['dimension'] for d in comparison['dimensions']]!=
                 ['range','ammunition','attack_types','material_conditions']):
@@ -253,6 +255,66 @@ def packet_checks(p, provenance_resolver=None):
         for m in u['passives']['abilities']:
             for effect in m['effects']:
                 if effect['kind']=='payload_reference' and effect['node_ref'] not in nodes and effect['node_ref'] not in details:raise ValueError('dangling payload reference')
+
+def effect_packet_checks(p, provenance_resolver=None):
+    """Validate references and pagination in a specialized effect packet."""
+    if p['provenance_mode']=='deferred':
+        if p['sources'] or p['provenance'] or provenance_resolver is None:
+            raise ValueError('invalid deferred effect evidence envelope')
+        refs=set()
+        def collect(value):
+            if isinstance(value,dict):
+                for key,item in value.items():
+                    if key in ('provenance_refs','classification_evidence'):refs.update(item)
+                    else:collect(item)
+            elif isinstance(value,list):
+                for item in value:collect(item)
+        collect(p)
+        evidence={'sources':{},'provenance':{}}
+        ids=sorted(refs)
+        for start in range(0,len(ids),256):
+            chunk=provenance_resolver(ids[start:start+256])
+            if any(chunk['snapshot'].get(k)!=p['snapshot'].get(k) for k in ('commit','owners','baseline')):
+                raise ValueError('effect provenance belongs to a different snapshot')
+            for field in evidence:evidence[field].update(chunk[field])
+        if not refs <= evidence['provenance'].keys():raise ValueError('unresolved deferred effect evidence')
+        p={**p,**evidence}
+    sources=p['sources'];evidence=p['provenance'];details=p['detail_refs']
+    for record in evidence.values():
+        if record['source_id'] not in sources or any(r not in evidence for r in record.get('lineage_refs',[])):
+            raise ValueError('dangling effect source or lineage')
+    if any(source['owner'] not in p['snapshot']['owners'] for source in sources.values()):
+        raise ValueError('dangling effect owner')
+    def walk(value):
+        if isinstance(value,dict):
+            for key,item in value.items():
+                if key in ('provenance_refs','classification_evidence') and any(r not in evidence for r in item):
+                    raise ValueError('dangling effect evidence')
+                if key=='detail_ref' and item is not None and item not in details:
+                    raise ValueError('dangling effect detail reference')
+                walk(item)
+        elif isinstance(value,list):
+            for item in value:walk(item)
+    walk(p)
+    access=p['effect']['access']
+    if (access['returned']!=len(access['links']) or access['returned']+access['offset']>access['total'] or
+            (access['cursor'] is None)!=(access['returned']+access['offset']==access['total'])):
+        raise ValueError('effect access pagination mismatch')
+    characters=access['characters']
+    if (characters['returned']!=len(characters['entries']) or characters['returned']+characters['offset']>characters['total'] or
+            (characters['cursor'] is None)!=(characters['returned']+characters['offset']==characters['total'])):
+        raise ValueError('effect character pagination mismatch')
+    keys=[e['agent_subtype_key'] for e in characters['entries']]
+    if keys!=sorted(set(keys)):raise ValueError('duplicate or unordered effect character entries')
+    if 'gaps' in p and p['diagnostic_count']!=len(p['gaps']):
+        raise ValueError('effect diagnostic count mismatch')
+    graph=p['payload_graph'];nodes={n['id'] for n in graph['nodes']}
+    if len(nodes)!=len(graph['nodes']) or any(
+            edge['from'] not in nodes or edge['to'] not in nodes for edge in graph['edges']):
+        raise ValueError('dangling effect graph edge')
+    for item in p['effect']['mechanic']['effects']:
+        if item['kind']=='payload_reference' and item['node_ref'] not in nodes and item['node_ref'] not in details:
+            raise ValueError('dangling effect payload reference')
 
 def pointer(p,path):
     for part in path.strip('/').split('/'):

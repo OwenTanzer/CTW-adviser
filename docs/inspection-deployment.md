@@ -20,24 +20,36 @@ datasette serve -i work/ctw.sqlite --metadata datasette-metadata.json \
 ```
 
 Check `/ctw.json`, `/inspect?q=Teclis`, and a Celestial Hurricanum unit view.
-The HTML should show the locked source commit and packet 1.19.0, with
+The HTML should show the locked source commit and packet 1.21.0, with
 “Supporting source documentation” closed by default. The JSON view should
 have `provenance_mode: deferred` and empty `sources`/`provenance`; requesting
 `provenance=1` should expand those dictionaries. Check ambiguous and unknown
 names as well as a source-evidence detail link.
 
-## Railway synchronization
+## PR #23 inspection preview
 
 The existing target is project **CTW Datasette**, production environment,
 service **ctw-datasette**, at
 `https://ctw-datasette-production.up.railway.app`. Its currently connected
-source is the historical `inspection/datasette` branch. After this candidate
-has been independently reviewed and merged, connect **that reviewed commit**
-of `OwenTanzer/CTW-adviser` to the same service. The root `Dockerfile` and
-`railway.toml` provide the builder, health check, and launch command. Do not
-create another service or database. Record the new deployment ID and require
-Railway `SUCCESS` plus live packet/source/version checks before calling the
-site synchronized.
+source is the historical `inspection/datasette` branch. For a pre-merge review,
+build this same service from an exact **unmerged PR #23 commit**. Do not change
+the separate MCP service. The root `Dockerfile` and `railway.toml` provide the
+builder, health check, and launch command; do not create another service or
+database.
+
+The `/inspect` and detail pages must display **PR #23 preview — unmerged** and
+the full adviser commit SHA. A GitHub-triggered build on
+`issue-19/character-access` uses Railway's `RAILWAY_GIT_BRANCH` and
+`RAILWAY_GIT_COMMIT_SHA`; a manually pinned build must set `CTW_PREVIEW_PR=23`
+and `CTW_ADVISER_COMMIT` to the exact 40-character commit SHA. A preview with a
+missing, invalid or conflicting SHA fails startup. Match the visible adviser
+SHA to the deployment source commit. The CTW-data source SHA and packet version
+are separate identities and must also match the reviewed candidate.
+
+Record the deployment ID and require Railway `SUCCESS`, `/ctw.json`, the
+visible preview label and SHA, packet 1.21.0, store schema 4, and representative
+character/effect and provenance checks before inviting hands-on inspection.
+After review and merge, make a separate decision about the site's final source.
 
 For rollback, redeploy the last known successful deployment of this same
 service and environment, then repeat the live checks. Reconnect the intended

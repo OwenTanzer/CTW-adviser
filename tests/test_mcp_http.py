@@ -80,7 +80,7 @@ class HTTPTransportTests(unittest.TestCase):
         self.assertEqual(status, 202)
         status, listed = self.rpc("tools/list")
         self.assertEqual(status, 200)
-        self.assertEqual(len(listed["result"]["tools"]), 6)
+        self.assertEqual(len(listed["result"]["tools"]), 9)
         for tool in listed["result"]["tools"]:
             self.assertIn("inputSchema", tool)
             self.assertIn("outputSchema", tool)
@@ -223,7 +223,7 @@ class HTTPTransportTests(unittest.TestCase):
                 make_handler(str(forged), frozenset())
             with closing(sqlite3.connect(forged)) as db, db:
                 db.execute("UPDATE snapshot SET source_commit=?, id=?",
-                           ("595e22764b22e748afdbafafcb0a6258973e2451", "forged-store3"))
+                           ("595e22764b22e748afdbafafcb0a6258973e2451", "forged-store4"))
             with self.assertRaisesRegex(ValueError, "pinned CTW-data snapshot"):
                 make_handler(str(forged), frozenset())
 

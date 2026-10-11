@@ -1,6 +1,6 @@
 # Hosted MCP service (issue #3)
 
-This checkout serves six read-only tools over stdio and `/mcp` using MCP
+This branch serves nine read-only tools over stdio and `/mcp` using MCP
 Streamable HTTP protocol `2025-06-18`. The separately deployed live endpoint
 still exposes eight tools from the earlier release. Its URL is
 `https://ctw-adviser-mcp-production.up.railway.app/mcp`, with public,
@@ -137,7 +137,7 @@ inspect integrity; then publish the image. Redeploy only after review, record
 deployment ID and require Railway `SUCCESS`, `/healthz`, and the remote SDK
 acceptance command above. Record returned source commit, base patch/build
 `9.0/25507028`, unit scale `ultra`, owner-specific supplemental patch/build,
-store schema 3, packet 1.19.0 and model version. On mismatch, stop rollout and
+store schema 4, packet 1.21.0 and model version. On mismatch, stop rollout and
 restore the previous successful deployment. A source refresh changes the lock,
 contract and verification evidence through its separate reviewed process.
 
@@ -152,7 +152,7 @@ the connection and start a new chat before retesting. These steps follow the
 [OpenAI plugin connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt).
 Owen reported successful connector calls for all three parent fixtures and an
 extra pair on 2026-10-11. Independent connector receipts and CLI comparisons
-are recorded in [closure evidence](closure-3-6.md). The server exposes eight
+are recorded in [closure evidence](closure-3-6.md). The deployed server exposes eight
 tools; this session’s connector exposes the six unit/evaluation tools required
 by this workflow. The two effect tools are outside this acceptance scope.
 Real Claude conversations and tester onboarding remain issue #4.
