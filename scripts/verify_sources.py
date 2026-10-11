@@ -84,6 +84,11 @@ def verify(root: Path, lock: dict, contract: dict) -> dict:
     if lock["contract_sha256"] != hashlib.sha256(
             json.dumps(contract, sort_keys=True, separators=(",", ":")).encode()).hexdigest():
         errors.append("import contract differs from locked contract")
+    locked_paths = {entry["path"] for entry in lock["files"]}
+    contract_paths = ({gate["path"] for gate in contract["metadata_gates"]}
+                      | {dataset["path"] for dataset in contract["datasets"]})
+    for path in sorted(contract_paths - locked_paths):
+        errors.append(f"contract path not locked: {path}")
     for entry in lock["files"]:
         try:
             data = safe_path(root, entry["path"]).read_bytes()

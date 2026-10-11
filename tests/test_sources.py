@@ -66,6 +66,13 @@ class SourceContractTests(unittest.TestCase):
         self.path.unlink()
         self.assertEqual(v.verify(self.root,lock,contract)['status'],'failed')
 
+    def test_contract_input_must_be_locked_even_when_present(self):
+        lock,contract=self.fixture()
+        lock['files'].clear()
+        result=v.verify(self.root,lock,contract)
+        self.assertEqual(result['status'],'failed')
+        self.assertIn('contract path not locked: sample.csv',result['errors'])
+
     def test_corrupt_source_rejected_existing_artifact_unchanged(self):
         lock,contract=self.fixture()
         artifact=self.root/'adviser.sqlite';artifact.write_bytes(b'prior artifact sentinel')

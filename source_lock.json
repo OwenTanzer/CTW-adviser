@@ -116,6 +116,18 @@
       "git_blob_sha": "d243a0a68f596e3b060ddc3c61eaa0819e34ba6c"
     },
     {
+      "path": "data/magic/coverage.json",
+      "bytes": 1911,
+      "sha256": "96bd6b15c22878e3f99826aa276ad403515ea84531de9a182d13658a0f986b80",
+      "git_blob_sha": "e2235f8498c88a022ccc0f75f306cac51faf99ac"
+    },
+    {
+      "path": "data/magic/dataset_manifest.json",
+      "bytes": 448,
+      "sha256": "9d4da046d8acd103549b9d769c30a2ab2cf067ef782059570ebce970ba2b9e39",
+      "git_blob_sha": "7181855b27a1411ed229e02e104f655ad8b3d571"
+    },
+    {
       "path": "data/magic/input_lock.json",
       "bytes": 117819,
       "sha256": "f77060104023d99b7587e72fbde55a4c67f02b7ae2be5a49bcb2a80fa9bec16c",
