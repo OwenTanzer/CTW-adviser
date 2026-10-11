@@ -15,7 +15,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 sys.path.insert(0, str(ROOT / 'scripts'))
-from ctw_adviser.build import build_snapshot, validate_effects
+from ctw_adviser.build import DEFINITION, build_snapshot, load_records, validate_effects
 from ctw_adviser.mcp import dispatch_method
 from ctw_adviser.queries import Queries, ResolutionError
 from ctw_adviser.store import open_snapshot
@@ -40,6 +40,7 @@ class EffectTests(unittest.TestCase):
     def setUpClass(cls):
         cls.temp = tempfile.TemporaryDirectory()
         cls.output = Path(cls.temp.name) / 'units.sqlite'
+        cls.source_definitions = {row['key'] for _, row in load_records(SOURCE, {'path': DEFINITION}).values()}
         build_snapshot(SOURCE, cls.output)
         cls.q = Queries(cls.output)
         cls.schema = json.loads((ROOT / 'schema/evidence_packet.schema.json').read_text())
@@ -567,18 +568,18 @@ class EffectTests(unittest.TestCase):
         from ctw_adviser.build import validate_character_access
         dropped = self.tamper("DELETE FROM effect_character_access WHERE rowid IN (SELECT rowid FROM effect_character_access LIMIT 1)")
         with closing(sqlite3.connect(dropped)) as tampered, self.assertRaisesRegex(ValueError, 'reconciliation'):
-            validate_character_access(tampered)
+            validate_character_access(tampered, self.source_definitions)
         crossed = self.tamper(f"UPDATE effect_character_access SET ability_key='{BOUND}' WHERE rowid IN "
                               f"(SELECT rowid FROM effect_character_access WHERE ability_key='{COMET}' LIMIT 1)")
         with closing(sqlite3.connect(crossed)) as tampered, self.assertRaisesRegex(ValueError, 'crossed'):
-            validate_character_access(tampered)
+            validate_character_access(tampered, self.source_definitions)
         detached = self.tamper("UPDATE effect_character_access SET binding_record="
                                "(SELECT record_id FROM unit_profiles LIMIT 1) WHERE rowid IN "
                                "(SELECT rowid FROM effect_character_access LIMIT 1)")
         with closing(sqlite3.connect(detached)) as tampered:
             self.assertTrue(tampered.execute('PRAGMA foreign_key_check').fetchall())
             with self.assertRaisesRegex(ValueError, 'crossed'):
-                validate_character_access(tampered)
+                validate_character_access(tampered, self.source_definitions)
         for assignment in ("skill_level=999", "skill_key='invented_skill'",
                            "node_set_key='invented_nodes'", "bonus_value_id='invented_bonus'",
                            "role='disables'", f"effect_ability='{BOUND}'"):
@@ -587,11 +588,11 @@ class EffectTests(unittest.TestCase):
                     " WHERE rowid IN (SELECT rowid FROM effect_character_access WHERE role='enables' "
                     'AND status=\'activated_effect\' LIMIT 1)')
                 with closing(sqlite3.connect(changed)) as tampered, self.assertRaisesRegex(ValueError, 'crossed'):
-                    validate_character_access(tampered)
+                    validate_character_access(tampered, self.source_definitions)
         drift = self.tamper("DELETE FROM magic_skill_bindings WHERE rowid IN (SELECT rowid FROM magic_skill_bindings "
                             "WHERE target_kind!='ability' LIMIT 1)")
         with closing(sqlite3.connect(drift)) as tampered, self.assertRaisesRegex(ValueError, 'count drift'):
-            validate_character_access(tampered)
+            validate_character_access(tampered, self.source_definitions)
         for sql, params in (('SELECT * FROM effect_character_access WHERE ability_key=?', (COMET,)),
                             ('SELECT * FROM effect_character_access WHERE agent_subtype_key=?', ('x',)),
                             ('SELECT * FROM character_unit_forms WHERE unit_key=?', (TECLIS,)),
@@ -615,7 +616,25 @@ class EffectTests(unittest.TestCase):
                     f"WHERE a.status='{actual_status}' LIMIT 1)")
                 with closing(sqlite3.connect(changed)) as tampered:
                     with self.assertRaisesRegex(ValueError, 'crossed'):
-                        validate_character_access(tampered)
+                        validate_character_access(tampered, self.source_definitions)
+
+    def test_unretained_source_definition_cannot_be_reported_missing(self):
+        from ctw_adviser.build import validate_character_access
+        db = self.q.db
+        known = db.execute(
+            "SELECT a.binding_record,a.ability_key FROM effect_character_access a "
+            "LEFT JOIN native_ability_definitions d ON d.key=a.ability_key "
+            "WHERE a.status='not_activated' AND d.key IS NULL ORDER BY a.binding_record LIMIT 1").fetchone()
+        self.assertIsNotNone(known)
+        self.assertIn(known[1], self.source_definitions)
+        changed = self.tamper(
+            "UPDATE effect_character_access SET status='missing_definition' WHERE binding_record=("
+            "SELECT a.binding_record FROM effect_character_access a "
+            "LEFT JOIN native_ability_definitions d ON d.key=a.ability_key "
+            "WHERE a.status='not_activated' AND d.key IS NULL ORDER BY a.binding_record LIMIT 1)")
+        with closing(sqlite3.connect(changed)) as tampered:
+            with self.assertRaisesRegex(ValueError, 'availability status'):
+                validate_character_access(tampered, self.source_definitions)
 
 
 if __name__ == '__main__':

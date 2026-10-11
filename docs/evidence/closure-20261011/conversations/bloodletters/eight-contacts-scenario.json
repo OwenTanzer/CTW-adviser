@@ -1,0 +1,29 @@
+{
+  "mode": "custom_battle",
+  "baseline": "unmodified_ultra_rank_0",
+  "duration_seconds": 120,
+  "separation_metres": 20,
+  "line_of_sight": true,
+  "terrain_speed_factor": 1,
+  "path_length_factor": 1,
+  "metres_per_second_per_speed_point": 1,
+  "historical_relations_apply_to_patch_9": true,
+  "sides": {
+    "a": {
+      "order": "approach",
+      "facing": "front",
+      "fire": true,
+      "fight": true,
+      "active_contacts": 8,
+      "charge_duration_seconds": 0
+    },
+    "b": {
+      "order": "approach",
+      "facing": "front",
+      "fire": true,
+      "fight": true,
+      "active_contacts": 8,
+      "charge_duration_seconds": 0
+    }
+  }
+}

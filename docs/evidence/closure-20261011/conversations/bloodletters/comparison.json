@@ -1,0 +1,2032 @@
+[
+  {
+    "call_index": 5,
+    "case": "eight-contacts",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh3_main_kho_inf_bloodletters_0",
+      "wh2_main_lzd_mon_kroxigors",
+      "--scenario",
+      "{\"mode\": \"custom_battle\", \"baseline\": \"unmodified_ultra_rank_0\", \"duration_seconds\": 120, \"separation_metres\": 20, \"line_of_sight\": true, \"terrain_speed_factor\": 1, \"path_length_factor\": 1, \"metres_per_second_per_speed_point\": 1, \"historical_relations_apply_to_patch_9\": true, \"sides\": {\"a\": {\"order\": \"approach\", \"facing\": \"front\", \"fire\": true, \"fight\": true, \"active_contacts\": 8, \"charge_duration_seconds\": 0}, \"b\": {\"order\": \"approach\", \"facing\": \"front\", \"fire\": true, \"fight\": true, \"active_contacts\": 8, \"charge_duration_seconds\": 0}}}"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "exact_data_equal": true,
+    "structured_content_exact_value_equal": true,
+    "raw_content_exact_value_equal": true,
+    "raw_content_type_sensitive_equal": true,
+    "structured_number_type_differences": [
+      {
+        "path": "$.derived.event_mechanics[0].melee.active_contacts_assumed",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_decay_duration_assumed_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_bonus_source",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.size_bonus_as_base",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.shield_block_probability",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.active_contacts_assumed",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_decay_duration_assumed_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_bonus_source",
+        "connector": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.size_bonus_as_base",
+        "connector": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.resistance_points",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.shield_block_probability",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].stopping.combat_ineffective_seconds",
+        "connector": 47,
+        "cli": 47.0
+      },
+      {
+        "path": "$.derived.ledgers[0].stopping.health_depleted_seconds",
+        "connector": 91,
+        "cli": 91.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_entities",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].remaining_health",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_health",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.derived.ledgers[0].effective_survivability_fraction",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_health",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_health_fraction",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_health",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.barrier_absorbed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.explosion",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.melee",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.direct",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_entities",
+        "connector": 16,
+        "cli": 16.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_health",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_health",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.barrier_absorbed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.overkill",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.explosion",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.direct",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.hp_per_entity",
+        "connector": 80,
+        "cli": 80.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].bonus_hp_per_component",
+        "connector": 72,
+        "cli": 72.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].health_contribution",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].hp_per_component",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].known_hp_total",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].count",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].body.total_hp",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.source_facts[0].body.firing_arc.native_fire_arc_close",
+        "connector": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.barrier_health",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.entity_count",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].movement.mass",
+        "connector": 125,
+        "cli": 125.0
+      },
+      {
+        "path": "$.source_facts[0].movement.flight_speed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.shield_block_chance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.fire_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.armour",
+        "connector": 35,
+        "cli": 35.0
+      },
+      {
+        "path": "$.source_facts[0].protection.spell_resistance",
+        "connector": 35,
+        "cli": 35.0
+      },
+      {
+        "path": "$.source_facts[0].protection.missile_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.physical_resistance",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[0].protection.ward_save",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].leadership",
+        "connector": 75,
+        "cli": 75.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].effects[0].native_parameters.hp_change_frequency",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.target_intercept_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].effects[0].native_parameters.hp_change_frequency",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.target_intercept_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.base_damage",
+        "connector": 11,
+        "cli": 11.0
+      },
+      {
+        "path": "$.source_facts[0].melee.charge_bonus",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[0].melee.ap_damage",
+        "connector": 23,
+        "cli": 23.0
+      },
+      {
+        "path": "$.source_facts[0].melee.defence",
+        "connector": 26,
+        "cli": 26.0
+      },
+      {
+        "path": "$.source_facts[0].melee.max_splash_targets",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.attack",
+        "connector": 34,
+        "cli": 34.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.splash_attack_power_multiplier",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.weapon_length",
+        "connector": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_infantry",
+        "connector": 9,
+        "cli": 9.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_large",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.hp_per_entity",
+        "connector": 510,
+        "cli": 510.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].bonus_hp_per_component",
+        "connector": 502,
+        "cli": 502.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].health_contribution",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].hp_per_component",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].known_hp_total",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].count",
+        "connector": 16,
+        "cli": 16.0
+      },
+      {
+        "path": "$.source_facts[1].body.total_hp",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.source_facts[1].body.firing_arc.native_fire_arc_close",
+        "connector": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[1].body.barrier_health",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.entity_count",
+        "connector": 16,
+        "cli": 16.0
+      },
+      {
+        "path": "$.source_facts[1].movement.mass",
+        "connector": 1400,
+        "cli": 1400.0
+      },
+      {
+        "path": "$.source_facts[1].movement.flight_speed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.shield_block_chance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.fire_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.armour",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[1].protection.spell_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.missile_resistance",
+        "connector": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].protection.physical_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.ward_save",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].leadership",
+        "connector": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].effects[1].value",
+        "connector": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].effects[2].value",
+        "connector": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.target_intercept_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.recharge_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].effects[1].value",
+        "connector": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.target_intercept_range",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.active_time",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.recharge_time",
+        "connector": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].duration",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.target_intercept_range",
+        "connector": 35,
+        "cli": 35.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.base_damage",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[1].melee.charge_bonus",
+        "connector": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.source_facts[1].melee.ap_damage",
+        "connector": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].melee.defence",
+        "connector": 32,
+        "cli": 32.0
+      },
+      {
+        "path": "$.source_facts[1].melee.max_splash_targets",
+        "connector": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].melee.attack",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.splash_attack_power_multiplier",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.weapon_length",
+        "connector": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_infantry",
+        "connector": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_large",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.path_length_factor",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.metres_per_second_per_speed_point",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.active_contacts",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.charge_duration_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.first_shot_delay_seconds",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.explosion_entities_per_collision",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.active_contacts",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.charge_duration_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.first_shot_delay_seconds",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.explosion_entities_per_collision",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.separation_metres",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.scenario_assumptions.duration_seconds",
+        "connector": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.scenario_assumptions.terrain_speed_factor",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.verdict.collision_probability_corners[0].effective_survivability_fraction[0]",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.verdict.collision_probability_corners[1].effective_survivability_fraction[0]",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.verdict.collision_probability_corners[2].effective_survivability_fraction[0]",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.verdict.collision_probability_corners[3].effective_survivability_fraction[0]",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.verdict.one_parameter_flip_thresholds[0].current",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.verdict.one_parameter_flip_thresholds[1].current",
+        "connector": 8,
+        "cli": 8.0
+      }
+    ],
+    "differences": []
+  },
+  {
+    "call_index": 6,
+    "case": "four-kroxigor-contacts",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh3_main_kho_inf_bloodletters_0",
+      "wh2_main_lzd_mon_kroxigors",
+      "--scenario",
+      "{\"mode\": \"custom_battle\", \"baseline\": \"unmodified_ultra_rank_0\", \"duration_seconds\": 120, \"separation_metres\": 20, \"line_of_sight\": true, \"terrain_speed_factor\": 1, \"path_length_factor\": 1, \"metres_per_second_per_speed_point\": 1, \"historical_relations_apply_to_patch_9\": true, \"sides\": {\"a\": {\"order\": \"approach\", \"facing\": \"front\", \"fire\": true, \"fight\": true, \"active_contacts\": 8, \"charge_duration_seconds\": 0}, \"b\": {\"order\": \"approach\", \"facing\": \"front\", \"fire\": true, \"fight\": true, \"active_contacts\": 4, \"charge_duration_seconds\": 0}}}"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "exact_data_equal": true,
+    "structured_content_exact_value_equal": true,
+    "raw_content_exact_value_equal": true,
+    "raw_content_type_sensitive_equal": true,
+    "structured_number_type_differences": [
+      {
+        "path": "$.derived.event_mechanics[0].melee.active_contacts_assumed",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_decay_duration_assumed_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_bonus_source",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.size_bonus_as_base",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.shield_block_probability",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.active_contacts_assumed",
+        "connector": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_decay_duration_assumed_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_bonus_source",
+        "connector": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.size_bonus_as_base",
+        "connector": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.resistance_points",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.shield_block_probability",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].stopping.combat_ineffective_seconds",
+        "connector": 91,
+        "cli": 91.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_entities",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_health",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_health",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.barrier_absorbed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.explosion",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.direct",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_entities",
+        "connector": 16,
+        "cli": 16.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_health",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_health",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_barrier",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.barrier_absorbed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.overkill",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.explosion",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.direct",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.hp_per_entity",
+        "connector": 80,
+        "cli": 80.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].bonus_hp_per_component",
+        "connector": 72,
+        "cli": 72.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].health_contribution",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].hp_per_component",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].known_hp_total",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].count",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].body.total_hp",
+        "connector": 8000,
+        "cli": 8000.0
+      },
+      {
+        "path": "$.source_facts[0].body.firing_arc.native_fire_arc_close",
+        "connector": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.barrier_health",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.entity_count",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].movement.mass",
+        "connector": 125,
+        "cli": 125.0
+      },
+      {
+        "path": "$.source_facts[0].movement.flight_speed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.shield_block_chance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.fire_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.armour",
+        "connector": 35,
+        "cli": 35.0
+      },
+      {
+        "path": "$.source_facts[0].protection.spell_resistance",
+        "connector": 35,
+        "cli": 35.0
+      },
+      {
+        "path": "$.source_facts[0].protection.missile_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.physical_resistance",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[0].protection.ward_save",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].leadership",
+        "connector": 75,
+        "cli": 75.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].effects[0].native_parameters.hp_change_frequency",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.target_intercept_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].native_parameters.recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[0].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].effects[0].native_parameters.hp_change_frequency",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.target_intercept_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].native_parameters.recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].abilities[1].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.base_damage",
+        "connector": 11,
+        "cli": 11.0
+      },
+      {
+        "path": "$.source_facts[0].melee.charge_bonus",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[0].melee.ap_damage",
+        "connector": 23,
+        "cli": 23.0
+      },
+      {
+        "path": "$.source_facts[0].melee.defence",
+        "connector": 26,
+        "cli": 26.0
+      },
+      {
+        "path": "$.source_facts[0].melee.max_splash_targets",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.attack",
+        "connector": 34,
+        "cli": 34.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.splash_attack_power_multiplier",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.weapon_length",
+        "connector": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_infantry",
+        "connector": 9,
+        "cli": 9.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_large",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.hp_per_entity",
+        "connector": 510,
+        "cli": 510.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].bonus_hp_per_component",
+        "connector": 502,
+        "cli": 502.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].health_contribution",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].hp_per_component",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].known_hp_total",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].count",
+        "connector": 16,
+        "cli": 16.0
+      },
+      {
+        "path": "$.source_facts[1].body.total_hp",
+        "connector": 8160,
+        "cli": 8160.0
+      },
+      {
+        "path": "$.source_facts[1].body.firing_arc.native_fire_arc_close",
+        "connector": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[1].body.barrier_health",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.entity_count",
+        "connector": 16,
+        "cli": 16.0
+      },
+      {
+        "path": "$.source_facts[1].movement.mass",
+        "connector": 1400,
+        "cli": 1400.0
+      },
+      {
+        "path": "$.source_facts[1].movement.flight_speed",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.shield_block_chance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.fire_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.armour",
+        "connector": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[1].protection.spell_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.missile_resistance",
+        "connector": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].protection.physical_resistance",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.ward_save",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].leadership",
+        "connector": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].effects[1].value",
+        "connector": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].effects[2].value",
+        "connector": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.target_intercept_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].native_parameters.recharge_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[0].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].effects[1].value",
+        "connector": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.target_intercept_range",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.active_time",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].native_parameters.recharge_time",
+        "connector": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].duration",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[1].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.initial_recharge",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.target_intercept_range",
+        "connector": 35,
+        "cli": 35.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.effect_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.active_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.wind_up_time",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.shared_recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.min_range",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].native_parameters.recharge_time",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].duration",
+        "connector": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.ability_recharge_change",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.mana_regen_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.mana_max_depletion_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.fatigue_change_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.inspiration_aura_range_mod",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.replenish_ammo",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].abilities[2].phases[0].lifecycle.execute_ratio",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.base_damage",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[1].melee.charge_bonus",
+        "connector": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.source_facts[1].melee.ap_damage",
+        "connector": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].melee.defence",
+        "connector": 32,
+        "cli": 32.0
+      },
+      {
+        "path": "$.source_facts[1].melee.max_splash_targets",
+        "connector": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].melee.attack",
+        "connector": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.splash_attack_power_multiplier",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.weapon_length",
+        "connector": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "connector": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_infantry",
+        "connector": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_large",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.path_length_factor",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.metres_per_second_per_speed_point",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.active_contacts",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.charge_duration_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.first_shot_delay_seconds",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.explosion_entities_per_collision",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.active_contacts",
+        "connector": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.charge_duration_seconds",
+        "connector": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.first_shot_delay_seconds",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.explosion_entities_per_collision",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.separation_metres",
+        "connector": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.scenario_assumptions.duration_seconds",
+        "connector": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.scenario_assumptions.terrain_speed_factor",
+        "connector": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.verdict.one_parameter_flip_thresholds[0].current",
+        "connector": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.verdict.one_parameter_flip_thresholds[1].current",
+        "connector": 4,
+        "cli": 4.0
+      }
+    ],
+    "differences": []
+  }
+]

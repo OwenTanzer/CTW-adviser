@@ -373,9 +373,10 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
             import_payload_lineage(db, source_root)
             import_localization(db, source_root, lock, options)
             import_effects(db, snapshot_id, options)
-            import_character_access(db, source_root, lock, {r['key'] for _, r in records[DEFINITION].values()})
+            source_definitions = {r['key'] for _, r in records[DEFINITION].values()}
+            import_character_access(db, source_root, lock, source_definitions)
             record_semantic_gaps(db)
-            validate_candidate(db, specs, records, selected, options)
+            validate_candidate(db, specs, records, selected, options, source_definitions)
             db.commit()
             db.execute('ANALYZE')
             db.commit()
@@ -618,7 +619,7 @@ def import_character_access(db, root, lock, source_definitions):
                     BINDING_ROLES.get(bonus, 'modifies'), bonus, skill, level, node_set, status))
 
 
-def validate_character_access(db):
+def validate_character_access(db, source_definitions):
     if db.execute("SELECT count(*) FROM magic_skill_bindings WHERE target_kind='ability'").fetchone()[0] != \
             db.execute('SELECT count(*) FROM effect_character_access').fetchone()[0]:
         raise ValueError('character access reconciliation failure')
@@ -636,7 +637,6 @@ def validate_character_access(db):
     crossed = db.execute('SELECT a.binding_record FROM effect_character_access a '
                          'LEFT JOIN magic_skill_bindings b ON b.record_id=a.binding_record '
                          'LEFT JOIN effect_abilities e ON e.ability_key=a.ability_key '
-                         'LEFT JOIN native_ability_definitions d ON d.key=a.ability_key '
                          "WHERE b.record_id IS NULL OR b.target_kind IS NOT 'ability' "
                          'OR b.target_key IS NOT a.ability_key '
                          'OR b.ability_key IS NOT a.ability_key '
@@ -648,13 +648,19 @@ def validate_character_access(db):
                          "OR a.role IS NOT CASE b.bonus_value_id WHEN 'enable' THEN 'enables' "
                          "WHEN 'enable_overchage' THEN 'enables_overcast' "
                          "WHEN 'disable' THEN 'disables' ELSE 'modifies' END "
-                         'OR a.effect_ability IS NOT e.ability_key '
-                         "OR (e.ability_key IS NOT NULL AND a.status IS NOT 'activated_effect') "
-                         "OR (e.ability_key IS NULL AND a.status IS 'activated_effect') "
-                         "OR (e.ability_key IS NULL AND d.key IS NOT NULL "
-                         "AND a.status IS NOT 'not_activated') LIMIT 1").fetchone()
+                         'OR a.effect_ability IS NOT e.ability_key LIMIT 1').fetchone()
     if crossed:
         raise ValueError('crossed character access identity or source binding: ' + crossed[0])
+    # Retained native definitions are deliberately narrower than the locked
+    # source inventory. Check every status against that full inventory so a
+    # source-known passive cannot be mislabeled as a missing definition.
+    for binding, ability, status, effect in db.execute(
+            'SELECT a.binding_record,a.ability_key,a.status,e.ability_key '
+            'FROM effect_character_access a LEFT JOIN effect_abilities e ON e.ability_key=a.ability_key'):
+        expected = ('activated_effect' if effect is not None else
+                    'not_activated' if ability in source_definitions else 'missing_definition')
+        if status != expected:
+            raise ValueError('crossed character access availability status: ' + binding)
 
 
 # Payload fields whose retained value must appear as a relation edge (resolved
@@ -900,7 +906,7 @@ def qualify_mount_names(db):
                    (label, key))
 
 
-def validate_candidate(db, specs, records, selected, options):
+def validate_candidate(db, specs, records, selected, options, source_definitions):
     if db.execute('PRAGMA integrity_check').fetchone() != ('ok',):
         raise ValueError('candidate integrity failure')
     if db.execute('PRAGMA foreign_key_check').fetchall():
@@ -929,7 +935,7 @@ def validate_candidate(db, specs, records, selected, options):
     db.execute('CREATE UNIQUE INDEX roster_identity ON unit_availability(subculture_key,unit_key)')
     validate_effects(db, options)
     validate_payload_edges(db)
-    validate_character_access(db)
+    validate_character_access(db, source_definitions)
 
 
 def report_candidate(db):

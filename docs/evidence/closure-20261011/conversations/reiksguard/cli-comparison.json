@@ -1,0 +1,3306 @@
+[
+  {
+    "label": "200m",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh_main_emp_cav_reiksguard",
+      "wh_main_grn_art_doom_diver_catapult",
+      "--scenario",
+      "{\"mode\":\"custom_battle\",\"baseline\":\"unmodified_ultra_rank_0\",\"duration_seconds\":120,\"separation_metres\":200,\"line_of_sight\":true,\"path_length_factor\":1,\"terrain_speed_factor\":1,\"sides\":{\"a\":{\"order\":\"approach\",\"facing\":\"front\",\"fire\":true,\"fight\":true},\"b\":{\"order\":\"hold\",\"facing\":\"front\",\"fire\":true,\"fight\":true}}}"
+    ],
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "returncode": 0,
+    "stderr": "",
+    "data_exact_equal": true,
+    "structured_transport_numeric_representation_differences": [
+      {
+        "path": "$.source_facts[0].leadership",
+        "hosted": 75,
+        "cli": 75.0
+      },
+      {
+        "path": "$.source_facts[0].protection.shield_block_chance",
+        "hosted": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[0].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.armour",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.source_facts[0].melee.defence",
+        "hosted": 31,
+        "cli": 31.0
+      },
+      {
+        "path": "$.source_facts[0].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.ap_damage",
+        "hosted": 12,
+        "cli": 12.0
+      },
+      {
+        "path": "$.source_facts[0].melee.charge_bonus",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.source_facts[0].melee.base_damage",
+        "hosted": 28,
+        "cli": 28.0
+      },
+      {
+        "path": "$.source_facts[0].melee.attack",
+        "hosted": 34,
+        "cli": 34.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.weapon_length",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.mass",
+        "hosted": 1000,
+        "cli": 1000.0
+      },
+      {
+        "path": "$.source_facts[0].body.hp_per_entity",
+        "hosted": 108,
+        "cli": 108.0
+      },
+      {
+        "path": "$.source_facts[0].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].health_contribution",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].known_hp_total",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].bonus_hp_per_component",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].body.entity_count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.firing_arc.native_fire_arc_close",
+        "hosted": 360,
+        "cli": 360.0
+      },
+      {
+        "path": "$.source_facts[0].body.total_hp",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[1].leadership",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].protection.shield_block_chance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.armour",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.shots_per_volley",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload.projectile_base_interval",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_size",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ammunition",
+        "hosted": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.range",
+        "hosted": 400,
+        "cli": 400.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.marksmanship_bonus",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.base_damage",
+        "hosted": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.gravity",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.collision_radius",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.max_penetration",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.expiry_range",
+        "hosted": 700,
+        "cli": 700.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.mass",
+        "hosted": 80,
+        "cli": 80.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.force",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.speed",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.duration",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ignition_amount",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_area",
+        "hosted": 13,
+        "cli": 13.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.velocity",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload_time",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.minimum_range",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.projectiles_per_shot",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_distance",
+        "hosted": 300,
+        "cli": 300.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ap_damage",
+        "hosted": 170,
+        "cli": 170.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.spread",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_shot_delay",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.accuracy",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.defence",
+        "hosted": 6,
+        "cli": 6.0
+      },
+      {
+        "path": "$.source_facts[1].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.ap_damage",
+        "hosted": 3,
+        "cli": 3.0
+      },
+      {
+        "path": "$.source_facts[1].melee.charge_bonus",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].melee.base_damage",
+        "hosted": 21,
+        "cli": 21.0
+      },
+      {
+        "path": "$.source_facts[1].melee.attack",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.weapon_length",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.mass",
+        "hosted": 2000,
+        "cli": 2000.0
+      },
+      {
+        "path": "$.source_facts[1].movement.ground_speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].body.hp_per_entity",
+        "hosted": 478,
+        "cli": 478.0
+      },
+      {
+        "path": "$.source_facts[1].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].health_contribution",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].known_hp_total",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].count",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].health_contribution",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].known_hp_total",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].hp_per_component",
+        "hosted": 433,
+        "cli": 433.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.entity_count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.firing_arc.native_fire_arc_close",
+        "hosted": 50,
+        "cli": 50.0
+      },
+      {
+        "path": "$.source_facts[1].body.total_hp",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.scenario_assumptions.path_length_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.terrain_speed_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.duration_seconds",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.projectiles_per_cycle",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.separation_metres",
+        "hosted": 200,
+        "cli": 200.0
+      },
+      {
+        "path": "$.scenario_assumptions.metres_per_second_per_speed_point",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_bonus_source",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_bonus_source",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.active_contacts_assumed",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.direct.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.projectiles_per_cycle_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.radius_source_metres",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.affected_entities_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_entities",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].estimated_living_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].remaining_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_entities",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_health",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].stopping.combat_ineffective_seconds",
+        "hosted": 52,
+        "cli": 52.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_health",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.direct",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.overkill",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.melee",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.explosion",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.phase_timing.minimum_range[1]",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.derived.phase_timing.flight_speed[1]",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.derived.phase_timing.range_entry[1].seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.start_time",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.max_target_angle_delta",
+        "hosted": 120,
+        "cli": 120.0
+      }
+    ],
+    "raw_content_data_equal": true,
+    "raw_content_canonical_json_exact_equal": true,
+    "differences": []
+  },
+  {
+    "label": "100m",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh_main_emp_cav_reiksguard",
+      "wh_main_grn_art_doom_diver_catapult",
+      "--scenario",
+      "{\"mode\":\"custom_battle\",\"baseline\":\"unmodified_ultra_rank_0\",\"duration_seconds\":120,\"separation_metres\":100,\"line_of_sight\":true,\"path_length_factor\":1,\"terrain_speed_factor\":1,\"sides\":{\"a\":{\"order\":\"approach\",\"facing\":\"front\",\"fire\":true,\"fight\":true},\"b\":{\"order\":\"hold\",\"facing\":\"front\",\"fire\":true,\"fight\":true}}}"
+    ],
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "returncode": 0,
+    "stderr": "",
+    "data_exact_equal": true,
+    "structured_transport_numeric_representation_differences": [
+      {
+        "path": "$.source_facts[0].leadership",
+        "hosted": 75,
+        "cli": 75.0
+      },
+      {
+        "path": "$.source_facts[0].protection.shield_block_chance",
+        "hosted": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[0].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.armour",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.source_facts[0].melee.defence",
+        "hosted": 31,
+        "cli": 31.0
+      },
+      {
+        "path": "$.source_facts[0].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.ap_damage",
+        "hosted": 12,
+        "cli": 12.0
+      },
+      {
+        "path": "$.source_facts[0].melee.charge_bonus",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.source_facts[0].melee.base_damage",
+        "hosted": 28,
+        "cli": 28.0
+      },
+      {
+        "path": "$.source_facts[0].melee.attack",
+        "hosted": 34,
+        "cli": 34.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.weapon_length",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.mass",
+        "hosted": 1000,
+        "cli": 1000.0
+      },
+      {
+        "path": "$.source_facts[0].body.hp_per_entity",
+        "hosted": 108,
+        "cli": 108.0
+      },
+      {
+        "path": "$.source_facts[0].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].health_contribution",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].known_hp_total",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].bonus_hp_per_component",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].body.entity_count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.firing_arc.native_fire_arc_close",
+        "hosted": 360,
+        "cli": 360.0
+      },
+      {
+        "path": "$.source_facts[0].body.total_hp",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[1].leadership",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].protection.shield_block_chance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.armour",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.shots_per_volley",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload.projectile_base_interval",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_size",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ammunition",
+        "hosted": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.range",
+        "hosted": 400,
+        "cli": 400.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.marksmanship_bonus",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.base_damage",
+        "hosted": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.gravity",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.collision_radius",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.max_penetration",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.expiry_range",
+        "hosted": 700,
+        "cli": 700.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.mass",
+        "hosted": 80,
+        "cli": 80.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.force",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.speed",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.duration",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ignition_amount",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_area",
+        "hosted": 13,
+        "cli": 13.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.velocity",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload_time",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.minimum_range",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.projectiles_per_shot",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_distance",
+        "hosted": 300,
+        "cli": 300.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ap_damage",
+        "hosted": 170,
+        "cli": 170.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.spread",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_shot_delay",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.accuracy",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.defence",
+        "hosted": 6,
+        "cli": 6.0
+      },
+      {
+        "path": "$.source_facts[1].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.ap_damage",
+        "hosted": 3,
+        "cli": 3.0
+      },
+      {
+        "path": "$.source_facts[1].melee.charge_bonus",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].melee.base_damage",
+        "hosted": 21,
+        "cli": 21.0
+      },
+      {
+        "path": "$.source_facts[1].melee.attack",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.weapon_length",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.mass",
+        "hosted": 2000,
+        "cli": 2000.0
+      },
+      {
+        "path": "$.source_facts[1].movement.ground_speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].body.hp_per_entity",
+        "hosted": 478,
+        "cli": 478.0
+      },
+      {
+        "path": "$.source_facts[1].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].health_contribution",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].known_hp_total",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].count",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].health_contribution",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].known_hp_total",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].hp_per_component",
+        "hosted": 433,
+        "cli": 433.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.entity_count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.firing_arc.native_fire_arc_close",
+        "hosted": 50,
+        "cli": 50.0
+      },
+      {
+        "path": "$.source_facts[1].body.total_hp",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.scenario_assumptions.path_length_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.terrain_speed_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.duration_seconds",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.projectiles_per_cycle",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.separation_metres",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.scenario_assumptions.metres_per_second_per_speed_point",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_bonus_source",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_bonus_source",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.active_contacts_assumed",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.direct.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.projectiles_per_cycle_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.radius_source_metres",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.affected_entities_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_entities",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].estimated_living_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].remaining_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_entities",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_health",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].stopping.combat_ineffective_seconds",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_health",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.direct",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.overkill",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.melee",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.explosion",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.phase_timing.minimum_range[1]",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.derived.phase_timing.flight_speed[1]",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.derived.phase_timing.range_entry[1].seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.start_time",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.max_target_angle_delta",
+        "hosted": 120,
+        "cli": 120.0
+      }
+    ],
+    "raw_content_data_equal": true,
+    "raw_content_canonical_json_exact_equal": true,
+    "differences": []
+  },
+  {
+    "label": "200m-delayed",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh_main_emp_cav_reiksguard",
+      "wh_main_grn_art_doom_diver_catapult",
+      "--scenario",
+      "{\"mode\":\"custom_battle\",\"baseline\":\"unmodified_ultra_rank_0\",\"duration_seconds\":120,\"separation_metres\":200,\"line_of_sight\":true,\"path_length_factor\":1,\"terrain_speed_factor\":1,\"sides\":{\"a\":{\"order\":\"approach\",\"facing\":\"front\",\"fire\":true,\"fight\":true},\"b\":{\"order\":\"hold\",\"facing\":\"front\",\"fire\":true,\"fight\":true,\"flight_seconds\":22.5}}}"
+    ],
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "returncode": 0,
+    "stderr": "",
+    "data_exact_equal": true,
+    "structured_transport_numeric_representation_differences": [
+      {
+        "path": "$.source_facts[0].leadership",
+        "hosted": 75,
+        "cli": 75.0
+      },
+      {
+        "path": "$.source_facts[0].protection.shield_block_chance",
+        "hosted": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[0].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.armour",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.source_facts[0].melee.defence",
+        "hosted": 31,
+        "cli": 31.0
+      },
+      {
+        "path": "$.source_facts[0].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.ap_damage",
+        "hosted": 12,
+        "cli": 12.0
+      },
+      {
+        "path": "$.source_facts[0].melee.charge_bonus",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.source_facts[0].melee.base_damage",
+        "hosted": 28,
+        "cli": 28.0
+      },
+      {
+        "path": "$.source_facts[0].melee.attack",
+        "hosted": 34,
+        "cli": 34.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.weapon_length",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.mass",
+        "hosted": 1000,
+        "cli": 1000.0
+      },
+      {
+        "path": "$.source_facts[0].body.hp_per_entity",
+        "hosted": 108,
+        "cli": 108.0
+      },
+      {
+        "path": "$.source_facts[0].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].health_contribution",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].known_hp_total",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].bonus_hp_per_component",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].body.entity_count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.firing_arc.native_fire_arc_close",
+        "hosted": 360,
+        "cli": 360.0
+      },
+      {
+        "path": "$.source_facts[0].body.total_hp",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[1].leadership",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].protection.shield_block_chance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.armour",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.shots_per_volley",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload.projectile_base_interval",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_size",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ammunition",
+        "hosted": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.range",
+        "hosted": 400,
+        "cli": 400.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.marksmanship_bonus",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.base_damage",
+        "hosted": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.gravity",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.collision_radius",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.max_penetration",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.expiry_range",
+        "hosted": 700,
+        "cli": 700.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.mass",
+        "hosted": 80,
+        "cli": 80.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.force",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.speed",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.duration",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ignition_amount",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_area",
+        "hosted": 13,
+        "cli": 13.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.velocity",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload_time",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.minimum_range",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.projectiles_per_shot",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_distance",
+        "hosted": 300,
+        "cli": 300.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ap_damage",
+        "hosted": 170,
+        "cli": 170.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.spread",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_shot_delay",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.accuracy",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.defence",
+        "hosted": 6,
+        "cli": 6.0
+      },
+      {
+        "path": "$.source_facts[1].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.ap_damage",
+        "hosted": 3,
+        "cli": 3.0
+      },
+      {
+        "path": "$.source_facts[1].melee.charge_bonus",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].melee.base_damage",
+        "hosted": 21,
+        "cli": 21.0
+      },
+      {
+        "path": "$.source_facts[1].melee.attack",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.weapon_length",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.mass",
+        "hosted": 2000,
+        "cli": 2000.0
+      },
+      {
+        "path": "$.source_facts[1].movement.ground_speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].body.hp_per_entity",
+        "hosted": 478,
+        "cli": 478.0
+      },
+      {
+        "path": "$.source_facts[1].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].health_contribution",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].known_hp_total",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].count",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].health_contribution",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].known_hp_total",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].hp_per_component",
+        "hosted": 433,
+        "cli": 433.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.entity_count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.firing_arc.native_fire_arc_close",
+        "hosted": 50,
+        "cli": 50.0
+      },
+      {
+        "path": "$.source_facts[1].body.total_hp",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.scenario_assumptions.path_length_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.terrain_speed_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.duration_seconds",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.projectiles_per_cycle",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.separation_metres",
+        "hosted": 200,
+        "cli": 200.0
+      },
+      {
+        "path": "$.scenario_assumptions.metres_per_second_per_speed_point",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_bonus_source",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_bonus_source",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.active_contacts_assumed",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.direct.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.projectiles_per_cycle_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.radius_source_metres",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.affected_entities_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_entities",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].estimated_living_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].remaining_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_entities",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_health",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].stopping.combat_ineffective_seconds",
+        "hosted": 52,
+        "cli": 52.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_health",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.direct",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.overkill",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.melee",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.explosion",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.phase_timing.minimum_range[1]",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.derived.phase_timing.flight_speed[1]",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.derived.phase_timing.range_entry[1].seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.start_time",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.max_target_angle_delta",
+        "hosted": 120,
+        "cli": 120.0
+      }
+    ],
+    "raw_content_data_equal": true,
+    "raw_content_canonical_json_exact_equal": true,
+    "differences": []
+  },
+  {
+    "label": "100m-delayed",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh_main_emp_cav_reiksguard",
+      "wh_main_grn_art_doom_diver_catapult",
+      "--scenario",
+      "{\"mode\":\"custom_battle\",\"baseline\":\"unmodified_ultra_rank_0\",\"duration_seconds\":120,\"separation_metres\":100,\"line_of_sight\":true,\"path_length_factor\":1,\"terrain_speed_factor\":1,\"sides\":{\"a\":{\"order\":\"approach\",\"facing\":\"front\",\"fire\":true,\"fight\":true},\"b\":{\"order\":\"hold\",\"facing\":\"front\",\"fire\":true,\"fight\":true,\"flight_seconds\":22.5}}}"
+    ],
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "returncode": 0,
+    "stderr": "",
+    "data_exact_equal": true,
+    "structured_transport_numeric_representation_differences": [
+      {
+        "path": "$.source_facts[0].leadership",
+        "hosted": 75,
+        "cli": 75.0
+      },
+      {
+        "path": "$.source_facts[0].protection.shield_block_chance",
+        "hosted": 30,
+        "cli": 30.0
+      },
+      {
+        "path": "$.source_facts[0].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].protection.armour",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.source_facts[0].melee.defence",
+        "hosted": 31,
+        "cli": 31.0
+      },
+      {
+        "path": "$.source_facts[0].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.ap_damage",
+        "hosted": 12,
+        "cli": 12.0
+      },
+      {
+        "path": "$.source_facts[0].melee.charge_bonus",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.source_facts[0].melee.base_damage",
+        "hosted": 28,
+        "cli": 28.0
+      },
+      {
+        "path": "$.source_facts[0].melee.attack",
+        "hosted": 34,
+        "cli": 34.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].melee.native_parameters.weapon_length",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].movement.mass",
+        "hosted": 1000,
+        "cli": 1000.0
+      },
+      {
+        "path": "$.source_facts[0].body.hp_per_entity",
+        "hosted": 108,
+        "cli": 108.0
+      },
+      {
+        "path": "$.source_facts[0].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].health_contribution",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].known_hp_total",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[0].body.components[0].bonus_hp_per_component",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[0].body.entity_count",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.source_facts[0].body.firing_arc.native_fire_arc_close",
+        "hosted": 360,
+        "cli": 360.0
+      },
+      {
+        "path": "$.source_facts[0].body.total_hp",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.source_facts[1].leadership",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].protection.shield_block_chance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.spell_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.physical_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.ward_save",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.fire_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.missile_resistance",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].protection.armour",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.shots_per_volley",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload.projectile_base_interval",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_size",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ammunition",
+        "hosted": 22,
+        "cli": 22.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.range",
+        "hosted": 400,
+        "cli": 400.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.marksmanship_bonus",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.base_damage",
+        "hosted": 70,
+        "cli": 70.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.gravity",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.collision_radius",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.max_penetration",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.expiry_range",
+        "hosted": 700,
+        "cli": 700.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.native_parameters.mass",
+        "hosted": 80,
+        "cli": 80.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.force",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.speed",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.duration",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.base_damage",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.radius",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.native_parameters.ignition_amount",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.explosion.ap_damage",
+        "hosted": 15,
+        "cli": 15.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_area",
+        "hosted": 13,
+        "cli": 13.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.velocity",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.reload_time",
+        "hosted": 18,
+        "cli": 18.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.minimum_range",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.projectiles_per_shot",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.calibration_distance",
+        "hosted": 300,
+        "cli": 300.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.ap_damage",
+        "hosted": 170,
+        "cli": 170.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.spread",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.burst_shot_delay",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].ranged.accuracy",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.defence",
+        "hosted": 6,
+        "cli": 6.0
+      },
+      {
+        "path": "$.source_facts[1].melee.max_splash_targets",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.ap_damage",
+        "hosted": 3,
+        "cli": 3.0
+      },
+      {
+        "path": "$.source_facts[1].melee.charge_bonus",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.source_facts[1].melee.base_damage",
+        "hosted": 21,
+        "cli": 21.0
+      },
+      {
+        "path": "$.source_facts[1].melee.attack",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.collision_attack_max_targets_cooldown",
+        "hosted": 10,
+        "cli": 10.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.splash_attack_power_multiplier",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.source_facts[1].melee.native_parameters.weapon_length",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.ranged.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_large",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].attack_traits.melee.bonus_vs_infantry",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].movement.flight_speed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].movement.mass",
+        "hosted": 2000,
+        "cli": 2000.0
+      },
+      {
+        "path": "$.source_facts[1].movement.ground_speed",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.source_facts[1].body.hp_per_entity",
+        "hosted": 478,
+        "cli": 478.0
+      },
+      {
+        "path": "$.source_facts[1].body.barrier_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].health_contribution",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].known_hp_total",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].count",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].hp_per_component",
+        "hosted": 8,
+        "cli": 8.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[0].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].health_contribution",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].known_hp_total",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].hp_per_component",
+        "hosted": 433,
+        "cli": 433.0
+      },
+      {
+        "path": "$.source_facts[1].body.components[1].bonus_hp_per_component",
+        "hosted": 45,
+        "cli": 45.0
+      },
+      {
+        "path": "$.source_facts[1].body.entity_count",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_facts[1].body.firing_arc.native_fire_arc_close",
+        "hosted": 50,
+        "cli": 50.0
+      },
+      {
+        "path": "$.source_facts[1].body.total_hp",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.scenario_assumptions.path_length_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.terrain_speed_factor",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.duration_seconds",
+        "hosted": 120,
+        "cli": 120.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.a.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.explosion_entities_per_collision",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.first_shot_delay_seconds",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.charge_duration_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.scenario_assumptions.sides.b.projectiles_per_cycle",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.scenario_assumptions.separation_metres",
+        "hosted": 100,
+        "cli": 100.0
+      },
+      {
+        "path": "$.scenario_assumptions.metres_per_second_per_speed_point",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_bonus_source",
+        "hosted": 62,
+        "cli": 62.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[0].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_bonus_source",
+        "hosted": 5,
+        "cli": 5.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.per_hit.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.active_contacts_assumed",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].melee.charge_decay_duration_assumed_seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.direct.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.projectiles_per_cycle_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.radius_source_metres",
+        "hosted": 2,
+        "cli": 2.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.shield_block_probability",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.damage.size_bonus_as_base",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.event_mechanics[1].missile.explosion.affected_entities_assumed",
+        "hosted": 1,
+        "cli": 1.0
+      },
+      {
+        "path": "$.derived.ledgers[0].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_entities",
+        "hosted": 60,
+        "cli": 60.0
+      },
+      {
+        "path": "$.derived.ledgers[0].components[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].initial_health",
+        "hosted": 6480,
+        "cli": 6480.0
+      },
+      {
+        "path": "$.derived.ledgers[0].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_barrier",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].estimated_living_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].remaining_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_entities",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[0].initial_health",
+        "hosted": 2120,
+        "cli": 2120.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].remaining_health",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_entities",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.derived.ledgers[1].components[1].initial_health",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].stopping.combat_ineffective_seconds",
+        "hosted": 40,
+        "cli": 40.0
+      },
+      {
+        "path": "$.derived.ledgers[1].initial_health",
+        "hosted": 4032,
+        "cli": 4032.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.barrier_absorbed",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.direct",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.overkill",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.melee",
+        "hosted": 1912,
+        "cli": 1912.0
+      },
+      {
+        "path": "$.derived.ledgers[1].incoming_damage.explosion",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.derived.phase_timing.minimum_range[1]",
+        "hosted": 20,
+        "cli": 20.0
+      },
+      {
+        "path": "$.derived.phase_timing.flight_speed[1]",
+        "hosted": -1,
+        "cli": -1.0
+      },
+      {
+        "path": "$.derived.phase_timing.range_entry[1].seconds",
+        "hosted": 0,
+        "cli": 0.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.start_time",
+        "hosted": 4,
+        "cli": 4.0
+      },
+      {
+        "path": "$.source_payload_graph.nodes[4].native_parameters.max_target_angle_delta",
+        "hosted": 120,
+        "cli": 120.0
+      }
+    ],
+    "raw_content_data_equal": true,
+    "raw_content_canonical_json_exact_equal": true,
+    "differences": []
+  }
+]

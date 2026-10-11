@@ -1,0 +1,2466 @@
+{
+  "model_version": "combat-0.1.4",
+  "source_packet_version": "1.20.0",
+  "snapshot": {
+    "commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+    "owners": {
+      "effect_semantics": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      },
+      "shared_abilities": {
+        "patch": "9.0.1",
+        "build": "25546563",
+        "schema": 1
+      },
+      "units": {
+        "patch": "9.0",
+        "build": "25507028",
+        "schema": 4
+      }
+    },
+    "baseline": {
+      "context": "unmodified custom battle",
+      "game": "warhammer_3",
+      "rank": 0,
+      "unit_scale": "ultra"
+    },
+    "coverage": {
+      "activated_access": "unit ability links only; character skill/rank routes are not yet imported",
+      "activated_payloads": "source graphs retained for every activated root; runtime execution unverified",
+      "runtime": "unverified; engine behavior is not fully reconstructed",
+      "semantic": "partial; raw conditions/effects retained without application",
+      "structural": "validated selected records and dependency edges"
+    },
+    "serving_contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1"
+  },
+  "source_fingerprints": {
+    "s_05412a0a8b98": {
+      "path": "data/unit_stats/abilities/tables/ability_casting.csv",
+      "sha256": "9ec08ddc3ddb7bde9cacb4e50823940c97bcdedfad16f8901f7fe66edc80143d",
+      "owner": "shared_abilities"
+    },
+    "s_0b15dd2090a7": {
+      "path": "data/unit_stats/normalized/empire__wh3__9.0__ultra.csv",
+      "sha256": "a3d661e99b393b02f96732c5646d59d9d370bc79f0b2527ae7d5a92845a945ac",
+      "owner": "units"
+    },
+    "s_15464982ee45": {
+      "path": "data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv",
+      "sha256": "40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab",
+      "owner": "units"
+    },
+    "s_159db7db7a79": {
+      "path": "data/unit_stats/abilities/tables/projectile_penetration_junctions.csv",
+      "sha256": "65f22c947131fd72deb691ebea631ac04eaecb47e24dc0cd0a112fb0fc08c9cf",
+      "owner": "shared_abilities"
+    },
+    "s_23de8daf4e75": {
+      "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+      "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+      "owner": "units"
+    },
+    "s_2ed3f783ed26": {
+      "path": "data/unit_stats/source_exports/db/melee_weapons_tables/data__.tsv",
+      "sha256": "7f6921dda8cc528f9ae7e21f103d63344f9159e7362b84612792b7f1c34cd4b6",
+      "owner": "units"
+    },
+    "s_32babbd7b0ea": {
+      "path": "data/unit_stats/abilities/tables/special_ability_to_auto_deactivate_flags.csv",
+      "sha256": "89db18866a1c7b54c6cf0d7bca7682a3ec23b6fba6e271a391e875fbb2ad638e",
+      "owner": "shared_abilities"
+    },
+    "s_505888529780": {
+      "path": "data/unit_stats/source_exports/db/missile_weapons_tables/data__.tsv",
+      "sha256": "b7c04684367be642ae0e770921352841c006fe9ee6df682866129b9558e456ee",
+      "owner": "units"
+    },
+    "s_5513bd8dbb85": {
+      "path": "data/unit_stats/abilities/tables/phase_stat_effects.csv",
+      "sha256": "1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f",
+      "owner": "shared_abilities"
+    },
+    "s_567e934ed6df": {
+      "path": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+      "sha256": "deca81795dd1af2a894406423779e4730e322d365ffd41150e34271d82410a38",
+      "owner": "units"
+    },
+    "s_5e78e24b332a": {
+      "path": "data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv",
+      "sha256": "8f1f18d37042a216284924094820ce57d26bd67212225cb9ac3921f6c4e8c7ae",
+      "owner": "units"
+    },
+    "s_69a2a77f6deb": {
+      "path": "data/unit_stats/abilities/tables/ability_definitions.csv",
+      "sha256": "8535065555857989be3fd6c10c9f04fdcb9fd7ad9d390d6c0dec7da246d5c318",
+      "owner": "shared_abilities"
+    },
+    "s_7b179242cbee": {
+      "path": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+      "sha256": "831966e3ab48dd3660d2dcf232a8742d92643368433f90ddd7eec8017c83f42b",
+      "owner": "units"
+    },
+    "s_8c245bd0b3f0": {
+      "path": "data/unit_stats/normalized/undead_legions__wh3__9.0__ultra.csv",
+      "sha256": "9ca9eb03fe1ec2acc3fb61658c607003a02f9f42443c9d4b922b8a340d58142a",
+      "owner": "units"
+    },
+    "s_97efab76855a": {
+      "path": "data/unit_stats/abilities/payload_provenance.csv",
+      "sha256": "222cf412339f177ebcc07dc040b8bd3771df46408bd6e8bd827e81f2493fcb22",
+      "owner": "shared_abilities"
+    },
+    "s_9d85f8e27f99": {
+      "path": "data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv",
+      "sha256": "9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac",
+      "owner": "units"
+    },
+    "s_b15247192383": {
+      "path": "data/unit_stats/source_exports/text/db/unit_abilities__.loc.tsv",
+      "sha256": "2b807e5332383eabf4370c84310af4b896bfea436e14e4a8377a5cc344aca3a9",
+      "owner": "units"
+    },
+    "s_b3620445ce0f": {
+      "path": "data/unit_stats/source_exports/text/db/special_ability_invalid_usage_flags__.loc.tsv",
+      "sha256": "cbdb36a9b57fb51c40e9b8b404c36c04d7419db2af64c9b337298c6065b1c232",
+      "owner": "units"
+    },
+    "s_b90c197e7231": {
+      "path": "data/unit_stats/lookups/explosions__wh3__9.0.csv",
+      "sha256": "77239daf48b039e75e87e6b34ce5a0224388a9249ae3eb57c71dbcbf844edc91",
+      "owner": "units"
+    },
+    "s_c79a63825141": {
+      "path": "data/unit_stats/abilities/tables/ability_phase_links.csv",
+      "sha256": "73c101b5e00eb2656ba8906c210f02ea2d1acbaadc5a58260a1f1f2ed9529816",
+      "owner": "shared_abilities"
+    },
+    "s_cb3a51dedbb2": {
+      "path": "data/unit_stats/lookups/unit_abilities__wh3__9.0__ultra.csv",
+      "sha256": "9377e967b64ca76fa0a7aabcf49bf86fd8260a915f13bda1f947f4ed0626ec9c",
+      "owner": "units"
+    },
+    "s_d53bb00c3d74": {
+      "path": "data/unit_stats/source_exports/text/db/ui_unit_bullet_point_enums__.loc.tsv",
+      "sha256": "b48f34e77303db2ba9b62115a5d9ef0b51bfb56ab0ea74b4de8836f383028939",
+      "owner": "units"
+    },
+    "s_d56bb4dc1aae": {
+      "path": "data/unit_stats/abilities/tables/ability_phases.csv",
+      "sha256": "cc4a090f13abfb62745008de5b949174ffde1464b62dc0eb94e2e7284da25081",
+      "owner": "shared_abilities"
+    },
+    "s_f4787b4b05a6": {
+      "path": "data/unit_stats/lookups/projectiles__wh3__9.0.csv",
+      "sha256": "a59f4b20c373e54f8a4fc22c58064d0c0c6c74d94b59893a3b037705a698a62d",
+      "owner": "units"
+    }
+  },
+  "source_provenance": {
+    "05412a0a8b985eef08d7:204": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 204,
+      "key": {
+        "key": "wh2_dlc11_unit_passive_extra_powder"
+      },
+      "source_line": 205,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/unit_special_abilities_tables/data__.tsv"
+    },
+    "05412a0a8b985eef08d7:3133": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 3133,
+      "key": {
+        "key": "wh_main_unit_passive_unstable"
+      },
+      "source_line": 3134,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/unit_special_abilities_tables/data__.tsv"
+    },
+    "05412a0a8b985eef08d7:3134": {
+      "source_id": "s_05412a0a8b98",
+      "logical_record": 3134,
+      "key": {
+        "key": "wh_main_unit_passive_unstable_mark_ii"
+      },
+      "source_line": 3135,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/unit_special_abilities_tables/data__.tsv"
+    },
+    "0b15dd2090a7a99b5fa6:126": {
+      "source_id": "s_0b15dd2090a7",
+      "logical_record": 126,
+      "key": {
+        "game": "warhammer_3",
+        "patch": "9.0",
+        "subculture_key": "wh_main_sc_emp_empire",
+        "unit_key": "wh_main_emp_cav_reiksguard",
+        "unit_scale": "ultra"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "15464982ee45f35d824d:11": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 11,
+      "key": {
+        "key": "unit_attributes_bullet_text_cant_run"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "15464982ee45f35d824d:12": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 12,
+      "key": {
+        "key": "unit_attributes_bullet_text_causes_fear"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "15464982ee45f35d824d:39": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 39,
+      "key": {
+        "key": "unit_attributes_bullet_text_hide_forest"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "15464982ee45f35d824d:82": {
+      "source_id": "s_15464982ee45",
+      "logical_record": 82,
+      "key": {
+        "key": "unit_attributes_bullet_text_undead"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "159db7db7a79cbc0d9dd:8": {
+      "source_id": "s_159db7db7a79",
+      "logical_record": 8,
+      "key": {
+        "key": "low"
+      },
+      "source_line": 9,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectile_penetration_junctions_tables/data__.tsv"
+    },
+    "23de8daf4e757f0860fb:2240": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 2240,
+      "key": {
+        "battle_entity_key": "wh2_dlc11_cst_art_queen_bess",
+        "component_count": "1",
+        "component_role": "engine",
+        "is_primary_health_pool": "true",
+        "relationship_key": "wh2_dlc11_cst_art_queen_bess",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "23de8daf4e757f0860fb:2241": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 2241,
+      "key": {
+        "battle_entity_key": "wh2_dlc16_infantry_zombie_blood_crew",
+        "component_count": "47",
+        "component_role": "crew_or_rider",
+        "is_primary_health_pool": "false",
+        "relationship_key": "",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "23de8daf4e757f0860fb:912": {
+      "source_id": "s_23de8daf4e75",
+      "logical_record": 912,
+      "key": {
+        "battle_entity_key": "wh_main_cavalry_slow_blood",
+        "component_count": "60",
+        "component_role": "mount",
+        "is_primary_health_pool": "true",
+        "relationship_key": "wh_main_emp_mnt_warhorse_reiksguard",
+        "unit_key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "2ed3f783ed26bfdde51a:1197": {
+      "source_id": "s_2ed3f783ed26",
+      "logical_record": 1197,
+      "key": {
+        "key": "wh_main_emp_lance_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "2ed3f783ed26bfdde51a:76": {
+      "source_id": "s_2ed3f783ed26",
+      "logical_record": 76,
+      "key": {
+        "key": "wh2_dlc11_cst_dual_sword"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "32babbd7b0ea3ed79a68:37": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 37,
+      "key": {
+        "deactivate_flag": "have_ammo_below_threshold",
+        "special_ability": "wh2_dlc11_unit_passive_extra_powder"
+      },
+      "source_line": 38,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv"
+    },
+    "32babbd7b0ea3ed79a68:565": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 565,
+      "key": {
+        "deactivate_flag": "morale_is_higher_than_shattered",
+        "special_ability": "wh_main_unit_passive_unstable_mark_ii"
+      },
+      "source_line": 566,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv"
+    },
+    "32babbd7b0ea3ed79a68:566": {
+      "source_id": "s_32babbd7b0ea",
+      "logical_record": 566,
+      "key": {
+        "deactivate_flag": "morale_is_higher_than_broken",
+        "special_ability": "wh_main_unit_passive_unstable"
+      },
+      "source_line": 567,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv"
+    },
+    "5058885297801a8d403a:42": {
+      "source_id": "s_505888529780",
+      "logical_record": 42,
+      "key": {
+        "key": "wh2_dlc11_cst_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5513bd8dbb859f88e746:193": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 193,
+      "key": {
+        "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+        "stat": "scalar_charge_speed"
+      },
+      "source_line": 194,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+    },
+    "5513bd8dbb859f88e746:194": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 194,
+      "key": {
+        "phase": "wh2_dlc11_unit_contact_monstrous_impact",
+        "stat": "scalar_speed"
+      },
+      "source_line": 195,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+    },
+    "5513bd8dbb859f88e746:195": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 195,
+      "key": {
+        "phase": "wh2_dlc11_unit_passive_extra_powder",
+        "stat": "scalar_missile_damage_ap"
+      },
+      "source_line": 196,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+    },
+    "5513bd8dbb859f88e746:196": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 196,
+      "key": {
+        "phase": "wh2_dlc11_unit_passive_extra_powder",
+        "stat": "scalar_missile_damage_base"
+      },
+      "source_line": 197,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+    },
+    "5513bd8dbb859f88e746:197": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 197,
+      "key": {
+        "phase": "wh2_dlc11_unit_passive_extra_powder",
+        "stat": "scalar_missile_explosion_damage_ap"
+      },
+      "source_line": 198,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+    },
+    "5513bd8dbb859f88e746:198": {
+      "source_id": "s_5513bd8dbb85",
+      "logical_record": 198,
+      "key": {
+        "phase": "wh2_dlc11_unit_passive_extra_powder",
+        "stat": "scalar_missile_explosion_damage_base"
+      },
+      "source_line": 199,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+    },
+    "567e934ed6df7cfa34a0:174": {
+      "source_id": "s_567e934ed6df",
+      "logical_record": 174,
+      "key": {
+        "key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "567e934ed6df7cfa34a0:2475": {
+      "source_id": "s_567e934ed6df",
+      "logical_record": 2475,
+      "key": {
+        "key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5e78e24b332add8fcb5e:1141": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 1141,
+      "key": {
+        "attack_type": "melee",
+        "component_role": "unit",
+        "melee_weapon_key": "wh_main_emp_lance_reiksguard",
+        "missile_weapon_key": "",
+        "projectile_key": "",
+        "slot": "primary",
+        "unit_key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5e78e24b332add8fcb5e:2682": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 2682,
+      "key": {
+        "attack_type": "melee",
+        "component_role": "unit",
+        "melee_weapon_key": "wh2_dlc11_cst_dual_sword",
+        "missile_weapon_key": "",
+        "projectile_key": "",
+        "slot": "primary",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "5e78e24b332add8fcb5e:2683": {
+      "source_id": "s_5e78e24b332a",
+      "logical_record": 2683,
+      "key": {
+        "attack_type": "missile",
+        "component_role": "engine",
+        "melee_weapon_key": "",
+        "missile_weapon_key": "wh2_dlc11_cst_queen_bess",
+        "projectile_key": "wh2_dlc11_cst_queen_bess",
+        "slot": "engine",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "69a2a77f6deb5608cc87:205": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 205,
+      "key": {
+        "key": "wh2_dlc11_unit_passive_extra_powder"
+      },
+      "source_line": 206,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/unit_abilities_tables/data__.tsv"
+    },
+    "69a2a77f6deb5608cc87:3139": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 3139,
+      "key": {
+        "key": "wh_main_unit_passive_unstable"
+      },
+      "source_line": 3140,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/unit_abilities_tables/data__.tsv"
+    },
+    "69a2a77f6deb5608cc87:3140": {
+      "source_id": "s_69a2a77f6deb",
+      "logical_record": 3140,
+      "key": {
+        "key": "wh_main_unit_passive_unstable_mark_ii"
+      },
+      "source_line": 3141,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/unit_abilities_tables/data__.tsv"
+    },
+    "7b179242cbee121c7c14:1177": {
+      "source_id": "s_7b179242cbee",
+      "logical_record": 1177,
+      "key": {
+        "key": "wh_main_cavalry_slow_blood"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "7b179242cbee121c7c14:84": {
+      "source_id": "s_7b179242cbee",
+      "logical_record": 84,
+      "key": {
+        "key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "8c245bd0b3f0441684d6:53": {
+      "source_id": "s_8c245bd0b3f0",
+      "logical_record": 53,
+      "key": {
+        "game": "warhammer_3",
+        "patch": "9.0",
+        "subculture_key": "wh3_dlc29_sc_nag_undead_legions",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess",
+        "unit_scale": "ultra"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "97efab76855a57b3b0c5:41": {
+      "source_id": "s_97efab76855a",
+      "logical_record": 41,
+      "key": {
+        "key": "wh2_dlc11_cst_queen_bess",
+        "kind": "projectile"
+      },
+      "source_line": 47,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_tables/data__.tsv"
+    },
+    "97efab76855a57b3b0c5:783": {
+      "source_id": "s_97efab76855a",
+      "logical_record": 783,
+      "key": {
+        "key": "wh2_dlc11_cst_queen_bess",
+        "kind": "explosion"
+      },
+      "source_line": 32,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_explosions_tables/data__.tsv"
+    },
+    "9d85f8e27f99c7a0ada2:2791": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 2791,
+      "key": {
+        "attribute_key": "hide_forest",
+        "unit_key": "wh_main_emp_cav_reiksguard"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "9d85f8e27f99c7a0ada2:6596": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 6596,
+      "key": {
+        "attribute_key": "cant_run",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "9d85f8e27f99c7a0ada2:6597": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 6597,
+      "key": {
+        "attribute_key": "causes_fear",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "9d85f8e27f99c7a0ada2:6598": {
+      "source_id": "s_9d85f8e27f99",
+      "logical_record": 6598,
+      "key": {
+        "attribute_key": "undead",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b152471923832465081f:206": {
+      "source_id": "s_b15247192383",
+      "logical_record": 206,
+      "key": {
+        "key": "unit_abilities_onscreen_name_wh2_dlc11_unit_passive_extra_powder"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b152471923832465081f:3140": {
+      "source_id": "s_b15247192383",
+      "logical_record": 3140,
+      "key": {
+        "key": "unit_abilities_onscreen_name_wh_main_unit_passive_unstable"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b152471923832465081f:3141": {
+      "source_id": "s_b15247192383",
+      "logical_record": 3141,
+      "key": {
+        "key": "unit_abilities_onscreen_name_wh_main_unit_passive_unstable_mark_ii"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b3620445ce0f95efd2a1:100": {
+      "source_id": "s_b3620445ce0f",
+      "logical_record": 100,
+      "key": {
+        "key": "special_ability_invalid_usage_flags_alt_description_morale_is_higher_than_shattered"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b3620445ce0f95efd2a1:65": {
+      "source_id": "s_b3620445ce0f",
+      "logical_record": 65,
+      "key": {
+        "key": "special_ability_invalid_usage_flags_alt_description_have_ammo_below_threshold"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b3620445ce0f95efd2a1:98": {
+      "source_id": "s_b3620445ce0f",
+      "logical_record": 98,
+      "key": {
+        "key": "special_ability_invalid_usage_flags_alt_description_morale_is_higher_than_broken"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "b90c197e7231bba870ce:23": {
+      "source_id": "s_b90c197e7231",
+      "logical_record": 23,
+      "key": {
+        "explosion_key": "wh2_dlc11_cst_queen_bess"
+      },
+      "source_line": 32,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_explosions_tables/data__.tsv",
+      "lineage_refs": [
+        "97efab76855a57b3b0c5:783"
+      ]
+    },
+    "c79a638251410aaad17e:163": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 163,
+      "key": {
+        "order": "1",
+        "special_ability": "wh2_dlc11_unit_passive_extra_powder",
+        "target_enemies": "false",
+        "target_friends": "false",
+        "target_self": "true"
+      },
+      "source_line": 164,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_special_ability_phase_junctions_tables/data__.tsv"
+    },
+    "c79a638251410aaad17e:2693": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 2693,
+      "key": {
+        "order": "1",
+        "special_ability": "wh_main_unit_passive_unstable",
+        "target_enemies": "false",
+        "target_friends": "false",
+        "target_self": "true"
+      },
+      "source_line": 2694,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_special_ability_phase_junctions_tables/data__.tsv"
+    },
+    "c79a638251410aaad17e:2694": {
+      "source_id": "s_c79a63825141",
+      "logical_record": 2694,
+      "key": {
+        "order": "1",
+        "special_ability": "wh_main_unit_passive_unstable_mark_ii",
+        "target_enemies": "false",
+        "target_friends": "false",
+        "target_self": "true"
+      },
+      "source_line": 2695,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_special_ability_phase_junctions_tables/data__.tsv"
+    },
+    "cb3a51dedbb2920f9bb2:6361": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 6361,
+      "key": {
+        "ability_key": "wh2_dlc11_unit_passive_extra_powder",
+        "culture_key": "*",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "cb3a51dedbb2920f9bb2:6362": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 6362,
+      "key": {
+        "ability_key": "wh_main_unit_passive_unstable",
+        "culture_key": "*",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "cb3a51dedbb2920f9bb2:6363": {
+      "source_id": "s_cb3a51dedbb2",
+      "logical_record": 6363,
+      "key": {
+        "ability_key": "wh_main_unit_passive_unstable_mark_ii",
+        "culture_key": "*",
+        "unit_key": "wh2_dlc11_cst_art_queen_bess"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "d53bb00c3d740abf5992:234": {
+      "source_id": "s_d53bb00c3d74",
+      "logical_record": 234,
+      "key": {
+        "key": "ui_unit_bullet_point_enums_tooltip_anti_large"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "d53bb00c3d740abf5992:273": {
+      "source_id": "s_d53bb00c3d74",
+      "logical_record": 273,
+      "key": {
+        "key": "ui_unit_bullet_point_enums_tooltip_charge_reflector_vs_large"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "d53bb00c3d740abf5992:319": {
+      "source_id": "s_d53bb00c3d74",
+      "logical_record": 319,
+      "key": {
+        "key": "ui_unit_bullet_point_enums_tooltip_flaming_attacks"
+      },
+      "source_line": null,
+      "source_patch": null,
+      "source_path": null
+    },
+    "d56bb4dc1aae3feef5b2:161": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 161,
+      "key": {
+        "id": "wh2_dlc11_unit_contact_monstrous_impact"
+      },
+      "source_line": 162,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv"
+    },
+    "d56bb4dc1aae3feef5b2:163": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 163,
+      "key": {
+        "id": "wh2_dlc11_unit_passive_extra_powder"
+      },
+      "source_line": 164,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv"
+    },
+    "d56bb4dc1aae3feef5b2:2493": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 2493,
+      "key": {
+        "id": "wh_main_unit_passive_unstable"
+      },
+      "source_line": 2494,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv"
+    },
+    "d56bb4dc1aae3feef5b2:2494": {
+      "source_id": "s_d56bb4dc1aae",
+      "logical_record": 2494,
+      "key": {
+        "id": "wh_main_unit_passive_unstable_mark_ii"
+      },
+      "source_line": 2495,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv"
+    },
+    "f4787b4b05a6cee9d93c:41": {
+      "source_id": "s_f4787b4b05a6",
+      "logical_record": 41,
+      "key": {
+        "projectile_key": "wh2_dlc11_cst_queen_bess"
+      },
+      "source_line": 47,
+      "source_patch": "9.0.1",
+      "source_path": "data/unit_stats/source_exports/db/projectiles_tables/data__.tsv",
+      "lineage_refs": [
+        "97efab76855a57b3b0c5:41"
+      ]
+    }
+  },
+  "source_payload_graph": {
+    "nodes": [
+      {
+        "id": "attack_payload:melee:5e78e24b332add8fcb5e:2682",
+        "kind": "attack_payload",
+        "key": "melee:5e78e24b332add8fcb5e:2682",
+        "native_parameters": {},
+        "provenance_refs": [
+          "2ed3f783ed26bfdde51a:76"
+        ]
+      },
+      {
+        "id": "attack_payload:explosion:5e78e24b332add8fcb5e:2683",
+        "kind": "attack_payload",
+        "key": "explosion:5e78e24b332add8fcb5e:2683",
+        "native_parameters": {},
+        "provenance_refs": [
+          "b90c197e7231bba870ce:23"
+        ]
+      },
+      {
+        "id": "record:d56bb4dc1aae3feef5b2:161",
+        "kind": "native_ability_phases",
+        "key": "{\"id\":\"wh2_dlc11_unit_contact_monstrous_impact\"}",
+        "native_parameters": {
+          "duration": 10.0,
+          "effect_type": "negative",
+          "requested_stance": null,
+          "cant_move": false,
+          "freeze_fatigue": false,
+          "fatigue_change_ratio": 0.0,
+          "inspiration_aura_range_mod": 0.0,
+          "ability_recharge_change": 0.0,
+          "hp_change_frequency": 0.0,
+          "damage_amount": 0,
+          "max_damaged_entities": 0,
+          "resurrect": false,
+          "mana_regen_mod": 0.0,
+          "mana_max_depletion_mod": 0.0,
+          "imbue_magical": false,
+          "imbue_ignition": 0,
+          "imbue_contact": null,
+          "affects_allies": true,
+          "affects_enemies": true,
+          "replenish_ammo": 0.0,
+          "spreading": null,
+          "freeze_recharge": false,
+          "heal_amount": 0.0,
+          "barrier_heal_amount": 0.0,
+          "remove_magical": false,
+          "execute_ratio": 0.0
+        },
+        "provenance_refs": [
+          "d56bb4dc1aae3feef5b2:161"
+        ]
+      },
+      {
+        "id": "record:5513bd8dbb859f88e746:193",
+        "kind": "native_phase_stat_effects",
+        "key": "wh2_dlc11_unit_contact_monstrous_impact",
+        "native_parameters": {
+          "stat": "scalar_charge_speed",
+          "value": 0.4,
+          "how": "mult"
+        },
+        "provenance_refs": [
+          "5513bd8dbb859f88e746:193"
+        ]
+      },
+      {
+        "id": "record:5513bd8dbb859f88e746:194",
+        "kind": "native_phase_stat_effects",
+        "key": "wh2_dlc11_unit_contact_monstrous_impact",
+        "native_parameters": {
+          "stat": "scalar_speed",
+          "value": 0.4,
+          "how": "mult"
+        },
+        "provenance_refs": [
+          "5513bd8dbb859f88e746:194"
+        ]
+      },
+      {
+        "id": "attack_payload:ranged:5e78e24b332add8fcb5e:2683",
+        "kind": "attack_payload",
+        "key": "ranged:5e78e24b332add8fcb5e:2683",
+        "native_parameters": {},
+        "provenance_refs": [
+          "f4787b4b05a6cee9d93c:41"
+        ]
+      },
+      {
+        "id": "record:159db7db7a79cbc0d9dd:8",
+        "kind": "native_projectile_penetration_junctions",
+        "key": "{\"key\":\"low\"}",
+        "native_parameters": {
+          "key": "low",
+          "description": "Stopped by Small targets, slows as it passes through entities",
+          "entity_size_cap": "small",
+          "max_penetration": 2
+        },
+        "provenance_refs": [
+          "159db7db7a79cbc0d9dd:8"
+        ]
+      },
+      {
+        "id": "attack_payload:melee:5e78e24b332add8fcb5e:1141",
+        "kind": "attack_payload",
+        "key": "melee:5e78e24b332add8fcb5e:1141",
+        "native_parameters": {},
+        "provenance_refs": [
+          "2ed3f783ed26bfdde51a:1197"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "attack_payload:explosion:5e78e24b332add8fcb5e:2683",
+        "to": "record:d56bb4dc1aae3feef5b2:161",
+        "relationship": "data/unit_stats/lookups/explosions__wh3__9.0.csv.contact_phase_effect",
+        "order": 0,
+        "provenance_refs": [
+          "b90c197e7231bba870ce:23"
+        ]
+      },
+      {
+        "from": "record:d56bb4dc1aae3feef5b2:161",
+        "to": "record:5513bd8dbb859f88e746:193",
+        "relationship": "phase_effect",
+        "order": null,
+        "provenance_refs": [
+          "5513bd8dbb859f88e746:193"
+        ]
+      },
+      {
+        "from": "record:d56bb4dc1aae3feef5b2:161",
+        "to": "record:5513bd8dbb859f88e746:194",
+        "relationship": "phase_effect",
+        "order": null,
+        "provenance_refs": [
+          "5513bd8dbb859f88e746:194"
+        ]
+      },
+      {
+        "from": "attack_payload:ranged:5e78e24b332add8fcb5e:2683",
+        "to": "record:d56bb4dc1aae3feef5b2:161",
+        "relationship": "data/unit_stats/lookups/projectiles__wh3__9.0.csv.contact_stat_effect",
+        "order": 0,
+        "provenance_refs": [
+          "f4787b4b05a6cee9d93c:41"
+        ]
+      },
+      {
+        "from": "attack_payload:ranged:5e78e24b332add8fcb5e:2683",
+        "to": "record:159db7db7a79cbc0d9dd:8",
+        "relationship": "data/unit_stats/lookups/projectiles__wh3__9.0.csv.projectile_penetration",
+        "order": 0,
+        "provenance_refs": [
+          "f4787b4b05a6cee9d93c:41"
+        ]
+      }
+    ]
+  },
+  "identities": [
+    {
+      "unit_key": "wh2_dlc11_cst_art_queen_bess",
+      "profile_unit_key": "wh2_dlc11_cst_art_queen_bess",
+      "unit_keys": [
+        "wh2_dlc11_cst_art_queen_bess"
+      ],
+      "subculture_key": null,
+      "faction_name": [
+        "Undead Legions",
+        "Vampire Coast"
+      ],
+      "name": "Queen Bess",
+      "unit_type": "artillery"
+    },
+    {
+      "unit_key": "wh_main_emp_cav_reiksguard",
+      "profile_unit_key": "wh_main_emp_cav_reiksguard",
+      "unit_keys": [
+        "wh_main_emp_cav_reiksguard"
+      ],
+      "subculture_key": "wh_main_sc_emp_empire",
+      "faction_name": [
+        "Empire"
+      ],
+      "name": "Reiksguard",
+      "unit_type": "cavalry"
+    }
+  ],
+  "source_facts": [
+    {
+      "identity": {
+        "unit_key": "wh2_dlc11_cst_art_queen_bess",
+        "profile_unit_key": "wh2_dlc11_cst_art_queen_bess",
+        "unit_keys": [
+          "wh2_dlc11_cst_art_queen_bess"
+        ],
+        "subculture_key": null,
+        "faction_name": [
+          "Undead Legions",
+          "Vampire Coast"
+        ],
+        "name": "Queen Bess",
+        "unit_type": "artillery"
+      },
+      "body": {
+        "entity_count": 1.0,
+        "hp_per_entity": 2600.0,
+        "total_hp": 7300.0,
+        "barrier_health": 0.0,
+        "size": "large",
+        "components": [
+          {
+            "id": "component:23de8daf4e757f0860fb:2241",
+            "role": "crew_or_rider",
+            "count": 47.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 92.0,
+            "known_hp_total": 4700.0,
+            "size": "small",
+            "targetable": null,
+            "primary": false,
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:2241"
+            ],
+            "health_contribution": 4700.0
+          },
+          {
+            "id": "component:23de8daf4e757f0860fb:2240",
+            "role": "engine",
+            "count": 1.0,
+            "hp_per_component": 2508.0,
+            "bonus_hp_per_component": 92.0,
+            "known_hp_total": 2600.0,
+            "size": "large",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:2240"
+            ],
+            "health_contribution": 2600.0
+          }
+        ],
+        "target_classification": {
+          "combat_class": "large",
+          "status": "reviewed_mapping",
+          "summary": "Combat target class: large. Native body size remains large. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:84",
+            "d53bb00c3d740abf5992:234",
+            "d53bb00c3d740abf5992:273"
+          ]
+        },
+        "firing_arc": {
+          "primary_body_key": "wh2_dlc11_cst_art_queen_bess",
+          "native_fire_arc_close": 45.0,
+          "interpretation": "Native primary-body setting; weapon coverage and angular units are not established.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:84"
+          ]
+        },
+        "health_aggregation": {
+          "rule": "primary_and_separate_crew",
+          "summary": "Unit health includes primary artillery bodies and separate crew. Each primary body already includes one crew slot.",
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:174"
+          ]
+        }
+      },
+      "movement": {
+        "speed": 2.0,
+        "mass": 2000.0,
+        "speed_basis": "primary_body_run_speed",
+        "primary_body_key": "wh2_dlc11_cst_art_queen_bess",
+        "ground_speed": 2.0,
+        "flight_speed": 0.0,
+        "provenance_refs": [
+          "7b179242cbee121c7c14:84"
+        ]
+      },
+      "leadership": 40.0,
+      "melee": {
+        "id": "melee:5e78e24b332add8fcb5e:2682",
+        "weapon_key": "wh2_dlc11_cst_dual_sword",
+        "component_ref": null,
+        "slot": "primary",
+        "attack": 14.0,
+        "defence": 9.0,
+        "charge_bonus": 5.0,
+        "base_damage": 22.0,
+        "ap_damage": 7.0,
+        "attack_interval": 4.3,
+        "max_splash_targets": 1.0,
+        "native_parameters": {
+          "weapon_length": 1.0,
+          "splash_attack_target_size": null,
+          "splash_attack_power_multiplier": 1.0,
+          "building_damage_multiplier": 0.75,
+          "contact_phase": null,
+          "collision_attack_max_targets": 0.0,
+          "collision_attack_max_targets_cooldown": 10.0,
+          "scaling_damage": null
+        },
+        "provenance_refs": [
+          "5e78e24b332add8fcb5e:2682",
+          "2ed3f783ed26bfdde51a:76",
+          "8c245bd0b3f0441684d6:53"
+        ],
+        "detail_ref": "record:2ed3f783ed26bfdde51a:76",
+        "parameter_explanations": {
+          "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+        },
+        "variants": []
+      },
+      "ranged": {
+        "id": "ranged:5e78e24b332add8fcb5e:2683",
+        "weapon_key": "wh2_dlc11_cst_queen_bess",
+        "projectile_key": "wh2_dlc11_cst_queen_bess",
+        "component_ref": "component:23de8daf4e757f0860fb:2240",
+        "slot": "engine",
+        "ammunition_pool": "primary",
+        "is_default": true,
+        "ammunition": 16.0,
+        "accuracy": 10.0,
+        "range": 450.0,
+        "minimum_range": 50.0,
+        "reload_time": 18.0,
+        "base_damage": 72.0,
+        "ap_damage": 262.0,
+        "projectiles_per_shot": 1.0,
+        "shots_per_volley": 1.0,
+        "burst_size": 1.0,
+        "burst_shot_delay": 0.0,
+        "velocity": 120.0,
+        "spread": 0.0,
+        "marksmanship_bonus": 30.0,
+        "calibration_distance": 275.0,
+        "calibration_area": 70.0,
+        "explosion": {
+          "id": "explosion:5e78e24b332add8fcb5e:2683",
+          "key": "wh2_dlc11_cst_queen_bess",
+          "base_damage": 15.0,
+          "ap_damage": 75.0,
+          "radius": 12.0,
+          "provenance_refs": [
+            "b90c197e7231bba870ce:23"
+          ],
+          "native_parameters": {
+            "game": "warhammer_3",
+            "patch": "9.0",
+            "explosion_key": "wh2_dlc11_cst_queen_bess",
+            "detonator_type": "percussive",
+            "detonation_type": "shockwave",
+            "radius": 12.0,
+            "duration": 0.0,
+            "speed": 12.0,
+            "base_damage": 15.0,
+            "ap_damage": 75.0,
+            "force": 450.0,
+            "ignition_amount": 10.0,
+            "is_magical": false,
+            "affects_allies": true,
+            "contact_phase_effect": "wh2_dlc11_unit_contact_monstrous_impact",
+            "shrapnel_key": null,
+            "is_spell": false,
+            "fuse_distance_from_target": "0.0000",
+            "fuse_fixed_time": "-1.0000"
+          },
+          "detail_ref": "record:b90c197e7231bba870ce:23"
+        },
+        "native_parameters": {
+          "shot_type": "artillery_explosive",
+          "collision_radius": 0.16,
+          "mass": 350.0,
+          "gravity": -1.0,
+          "can_target_airborne": true,
+          "can_damage_allies": true,
+          "can_damage_buildings": true,
+          "building_damage_multiplier": 2.0,
+          "projectile_penetration": "low",
+          "penetration_entity_size_cap": "small",
+          "max_penetration": 2.0,
+          "expiry_range": 700.0,
+          "expire_on_impact": false,
+          "can_bounce": false,
+          "can_roll": false,
+          "homing_params": null,
+          "scaling_damage": null,
+          "contact_stat_effect": "wh2_dlc11_unit_contact_monstrous_impact",
+          "shrapnel_key": null,
+          "trajectory_sight": "fixed",
+          "max_elevation": "60",
+          "overhead_stat_effect": null,
+          "fixed_elevation": "50",
+          "spawned_vortex": null
+        },
+        "detail_ref": "record:f4787b4b05a6cee9d93c:41",
+        "provenance_refs": [
+          "5e78e24b332add8fcb5e:2683",
+          "f4787b4b05a6cee9d93c:41"
+        ],
+        "parameter_explanations": {
+          "trajectory": "Native trajectory mode and elevation settings; these alone do not establish line of sight, obstacle clearance or firing eligibility.",
+          "building_damage_multiplier": "Native projectile building-damage multiplier; does not override can_damage_buildings=false. Combined siege damage is not calculated."
+        },
+        "status": "present",
+        "variants": [],
+        "firing_policy": {
+          "precursor": false,
+          "summary": null,
+          "provenance_refs": [
+            "5058885297801a8d403a:42"
+          ]
+        },
+        "reload": {
+          "projectile_base_interval": 18.0,
+          "unit_reload_skill": 0,
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:174"
+          ]
+        },
+        "ammunition_supply": {
+          "native_weapon_pool": "primary",
+          "native_primary_capacity": 16,
+          "native_secondary_capacity": 0,
+          "infinite_secondary": false,
+          "assignment_status": "sources_agree",
+          "effective_pool": "primary",
+          "capacity": 16,
+          "unlimited": false,
+          "qualification": null,
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:174",
+            "5058885297801a8d403a:42"
+          ]
+        },
+        "entity_stat_overrides": []
+      },
+      "protection": {
+        "armour": 30.0,
+        "shield_block_chance": 0.0,
+        "physical_resistance": 0.0,
+        "missile_resistance": 0.0,
+        "spell_resistance": 0.0,
+        "fire_resistance": 0.0,
+        "ward_save": 0.0
+      },
+      "attack_traits": {
+        "melee": {
+          "scope": {
+            "attack_ref": "melee:5e78e24b332add8fcb5e:2682",
+            "component_ref": null
+          },
+          "bonus_vs_infantry": 0.0,
+          "bonus_vs_large": 0.0,
+          "magical": false,
+          "flaming": false,
+          "provenance_refs": [
+            "8c245bd0b3f0441684d6:53"
+          ]
+        },
+        "ranged": {
+          "scope": {
+            "attack_ref": "ranged:5e78e24b332add8fcb5e:2683",
+            "component_ref": "component:23de8daf4e757f0860fb:2240"
+          },
+          "bonus_vs_infantry": 0.0,
+          "bonus_vs_large": 0.0,
+          "magical": false,
+          "flaming": true,
+          "provenance_refs": [
+            "f4787b4b05a6cee9d93c:41"
+          ]
+        },
+        "explosion": {
+          "scope": {
+            "attack_ref": "explosion:5e78e24b332add8fcb5e:2683",
+            "component_ref": "component:23de8daf4e757f0860fb:2240"
+          },
+          "bonus_vs_infantry": null,
+          "bonus_vs_large": null,
+          "magical": false,
+          "flaming": true,
+          "provenance_refs": [
+            "b90c197e7231bba870ce:23"
+          ]
+        },
+        "additional": []
+      },
+      "attributes": [
+        {
+          "key": "cant_run",
+          "name": null,
+          "summary": "Cannot Run||This unit cannot run and will only move at walking pace.",
+          "provenance_refs": [
+            "9d85f8e27f99c7a0ada2:6596",
+            "15464982ee45f35d824d:11"
+          ]
+        },
+        {
+          "key": "causes_fear",
+          "name": null,
+          "summary": "Causes Fear||This unit frightens all enemy units, reducing their leadership when nearby. It is also immune to fear. Fear penalties do not stack.",
+          "provenance_refs": [
+            "9d85f8e27f99c7a0ada2:6597",
+            "15464982ee45f35d824d:12"
+          ]
+        },
+        {
+          "key": "undead",
+          "name": null,
+          "summary": "{{tr:wh2_dlc09_undead_description}}",
+          "provenance_refs": [
+            "9d85f8e27f99c7a0ada2:6598",
+            "15464982ee45f35d824d:82"
+          ]
+        }
+      ],
+      "abilities": [
+        {
+          "key": "wh2_dlc11_unit_passive_extra_powder",
+          "name": "Black Powder Aplenty",
+          "culture_key": "*",
+          "requires_effect_enabling": false,
+          "classification_evidence": [
+            "69a2a77f6deb5608cc87:205",
+            "05412a0a8b985eef08d7:204"
+          ],
+          "summary": "While active \u2014 Affects the bearer: Armour-piercing missile damage x1.3; Base missile damage x1.3; Armour-piercing missile explosion damage x1.3; Base missile explosion damage x1.3. Deactivates when: ammunition below 80% (threshold inferred from source UI wording).",
+          "native_parameters": {
+            "active_time": -1.0,
+            "recharge_time": -1.0,
+            "num_uses": -1,
+            "effect_range": 0.0,
+            "affect_self": true,
+            "num_effected_friendly_units": 0,
+            "num_effected_enemy_units": 0,
+            "update_targets_every_frame": true,
+            "initial_recharge": -1.0,
+            "activated_projectile": null,
+            "target_friends": false,
+            "target_enemies": false,
+            "target_ground": false,
+            "target_intercept_range": 0.0,
+            "always_affect_self": false,
+            "only_affect_target": false,
+            "wind_up_time": 0.0,
+            "bombardment": null,
+            "spawned_unit": null,
+            "min_range": 0.0,
+            "vortex": null,
+            "spawn_type": null,
+            "target_self": false,
+            "update_phase_by_ability_duration": false,
+            "spawn_is_transformation": false,
+            "spawn_is_decoy": false,
+            "only_affect_owned_units": false,
+            "formation": null,
+            "behaviour": null,
+            "spawn_shares_health_and_fatigue": false,
+            "shared_recharge_time": -1.0,
+            "intensity_based_activation": false,
+            "mom_vortex_key": null
+          },
+          "conditions": {
+            "activates_when": [],
+            "deactivates_when": [
+              {
+                "key": "have_ammo_below_threshold",
+                "summary": "ammunition below 80% (threshold inferred from source UI wording)",
+                "provenance_refs": [
+                  "32babbd7b0ea3ed79a68:37",
+                  "b3620445ce0f95efd2a1:65"
+                ]
+              }
+            ],
+            "recipient_requirements": [],
+            "recharges_when": [],
+            "unavailable_when": [],
+            "invalid_targets": [],
+            "unresolved": []
+          },
+          "phases": [
+            {
+              "key": "wh2_dlc11_unit_passive_extra_powder",
+              "order": 1,
+              "target_self": true,
+              "target_friends": false,
+              "target_enemies": false,
+              "duration": -1.0,
+              "lifecycle": {
+                "effect_type": "positive",
+                "requested_stance": null,
+                "cant_move": false,
+                "freeze_fatigue": false,
+                "fatigue_change_ratio": 0.0,
+                "inspiration_aura_range_mod": 0.0,
+                "ability_recharge_change": 0.0,
+                "mana_regen_mod": 0.0,
+                "mana_max_depletion_mod": 0.0,
+                "imbue_magical": false,
+                "imbue_ignition": 0,
+                "imbue_contact": null,
+                "affects_allies": true,
+                "affects_enemies": true,
+                "replenish_ammo": 0.0,
+                "spreading": null,
+                "freeze_recharge": false,
+                "remove_magical": false,
+                "execute_ratio": 0.0
+              },
+              "provenance_refs": [
+                "c79a638251410aaad17e:163",
+                "d56bb4dc1aae3feef5b2:163"
+              ]
+            }
+          ],
+          "effects": [
+            {
+              "kind": "stat_modifier",
+              "phase_ref": "wh2_dlc11_unit_passive_extra_powder",
+              "stat": "scalar_missile_damage_ap",
+              "operation": "multiply",
+              "native_operation": "mult",
+              "value": 1.3,
+              "provenance_refs": [
+                "5513bd8dbb859f88e746:195"
+              ]
+            },
+            {
+              "kind": "stat_modifier",
+              "phase_ref": "wh2_dlc11_unit_passive_extra_powder",
+              "stat": "scalar_missile_damage_base",
+              "operation": "multiply",
+              "native_operation": "mult",
+              "value": 1.3,
+              "provenance_refs": [
+                "5513bd8dbb859f88e746:196"
+              ]
+            },
+            {
+              "kind": "stat_modifier",
+              "phase_ref": "wh2_dlc11_unit_passive_extra_powder",
+              "stat": "scalar_missile_explosion_damage_ap",
+              "operation": "multiply",
+              "native_operation": "mult",
+              "value": 1.3,
+              "provenance_refs": [
+                "5513bd8dbb859f88e746:197"
+              ]
+            },
+            {
+              "kind": "stat_modifier",
+              "phase_ref": "wh2_dlc11_unit_passive_extra_powder",
+              "stat": "scalar_missile_explosion_damage_base",
+              "operation": "multiply",
+              "native_operation": "mult",
+              "value": 1.3,
+              "provenance_refs": [
+                "5513bd8dbb859f88e746:198"
+              ]
+            }
+          ],
+          "provenance_refs": [
+            "cb3a51dedbb2920f9bb2:6361",
+            "69a2a77f6deb5608cc87:205",
+            "05412a0a8b985eef08d7:204",
+            "b152471923832465081f:206"
+          ],
+          "detail_ref": "record:69a2a77f6deb5608cc87:205",
+          "spreadings": []
+        },
+        {
+          "key": "wh_main_unit_passive_unstable",
+          "name": "Crumbling",
+          "culture_key": "*",
+          "requires_effect_enabling": false,
+          "classification_evidence": [
+            "69a2a77f6deb5608cc87:3139",
+            "05412a0a8b985eef08d7:3133"
+          ],
+          "summary": "While active \u2014 Affects the bearer: Damage: 28 per entity per application; application interval: 1.0 seconds; maximum affected entities per application: 1. Effect: linked unit_special_abilities_tables.behaviour. Deactivates when: morale is higher than broken.",
+          "native_parameters": {
+            "active_time": -1.0,
+            "recharge_time": -1.0,
+            "num_uses": -1,
+            "effect_range": 0.0,
+            "affect_self": true,
+            "num_effected_friendly_units": 0,
+            "num_effected_enemy_units": 0,
+            "update_targets_every_frame": false,
+            "initial_recharge": -1.0,
+            "activated_projectile": null,
+            "target_friends": false,
+            "target_enemies": false,
+            "target_ground": false,
+            "target_intercept_range": 0.0,
+            "always_affect_self": false,
+            "only_affect_target": false,
+            "wind_up_time": 0.0,
+            "bombardment": null,
+            "spawned_unit": null,
+            "min_range": 0.0,
+            "vortex": null,
+            "spawn_type": null,
+            "target_self": false,
+            "update_phase_by_ability_duration": false,
+            "spawn_is_transformation": false,
+            "spawn_is_decoy": false,
+            "only_affect_owned_units": false,
+            "formation": null,
+            "behaviour": "undead_crumbling",
+            "spawn_shares_health_and_fatigue": false,
+            "shared_recharge_time": -1.0,
+            "intensity_based_activation": false,
+            "mom_vortex_key": null
+          },
+          "conditions": {
+            "activates_when": [],
+            "deactivates_when": [
+              {
+                "key": "morale_is_higher_than_broken",
+                "summary": "morale is higher than broken",
+                "provenance_refs": [
+                  "32babbd7b0ea3ed79a68:566",
+                  "b3620445ce0f95efd2a1:98"
+                ]
+              }
+            ],
+            "recipient_requirements": [],
+            "recharges_when": [],
+            "unavailable_when": [],
+            "invalid_targets": [],
+            "unresolved": []
+          },
+          "phases": [
+            {
+              "key": "wh_main_unit_passive_unstable",
+              "order": 1,
+              "target_self": true,
+              "target_friends": false,
+              "target_enemies": false,
+              "duration": -1.0,
+              "lifecycle": {
+                "effect_type": "negative",
+                "requested_stance": null,
+                "cant_move": false,
+                "freeze_fatigue": false,
+                "fatigue_change_ratio": 0.0,
+                "inspiration_aura_range_mod": 0.0,
+                "ability_recharge_change": 0.0,
+                "mana_regen_mod": 0.0,
+                "mana_max_depletion_mod": 0.0,
+                "imbue_magical": false,
+                "imbue_ignition": 0,
+                "imbue_contact": null,
+                "affects_allies": true,
+                "affects_enemies": true,
+                "replenish_ammo": 0.0,
+                "spreading": null,
+                "freeze_recharge": false,
+                "remove_magical": false,
+                "execute_ratio": 0.0
+              },
+              "provenance_refs": [
+                "c79a638251410aaad17e:2693",
+                "d56bb4dc1aae3feef5b2:2493"
+              ]
+            }
+          ],
+          "effects": [
+            {
+              "kind": "periodic_damage",
+              "phase_ref": "wh_main_unit_passive_unstable",
+              "native_parameters": {
+                "damage_amount": 28,
+                "hp_change_frequency": 1.0,
+                "max_damaged_entities": 1
+              },
+              "provenance_refs": [
+                "d56bb4dc1aae3feef5b2:2493"
+              ]
+            },
+            {
+              "kind": "payload_reference",
+              "phase_ref": null,
+              "node_ref": "record:b720050e3f24db03b823:17",
+              "relationship": "unit_special_abilities_tables.behaviour",
+              "provenance_refs": [
+                "05412a0a8b985eef08d7:3133"
+              ]
+            }
+          ],
+          "provenance_refs": [
+            "cb3a51dedbb2920f9bb2:6362",
+            "69a2a77f6deb5608cc87:3139",
+            "05412a0a8b985eef08d7:3133",
+            "b152471923832465081f:3140"
+          ],
+          "detail_ref": "record:69a2a77f6deb5608cc87:3139",
+          "spreadings": []
+        },
+        {
+          "key": "wh_main_unit_passive_unstable_mark_ii",
+          "name": "Disintegrating",
+          "culture_key": "*",
+          "requires_effect_enabling": false,
+          "classification_evidence": [
+            "69a2a77f6deb5608cc87:3140",
+            "05412a0a8b985eef08d7:3134"
+          ],
+          "summary": "While active \u2014 Affects the bearer: Damage: 133 per entity per application; application interval: 0.2 seconds; maximum affected entities per application: 5. Effect: linked unit_special_abilities_tables.behaviour. Deactivates when: morale is higher than shattered.",
+          "native_parameters": {
+            "active_time": -1.0,
+            "recharge_time": -1.0,
+            "num_uses": -1,
+            "effect_range": 0.0,
+            "affect_self": true,
+            "num_effected_friendly_units": 0,
+            "num_effected_enemy_units": 0,
+            "update_targets_every_frame": false,
+            "initial_recharge": -1.0,
+            "activated_projectile": null,
+            "target_friends": false,
+            "target_enemies": false,
+            "target_ground": false,
+            "target_intercept_range": 0.0,
+            "always_affect_self": false,
+            "only_affect_target": false,
+            "wind_up_time": 0.0,
+            "bombardment": null,
+            "spawned_unit": null,
+            "min_range": 0.0,
+            "vortex": null,
+            "spawn_type": null,
+            "target_self": false,
+            "update_phase_by_ability_duration": false,
+            "spawn_is_transformation": false,
+            "spawn_is_decoy": false,
+            "only_affect_owned_units": false,
+            "formation": null,
+            "behaviour": "undead_crumbling",
+            "spawn_shares_health_and_fatigue": false,
+            "shared_recharge_time": -1.0,
+            "intensity_based_activation": false,
+            "mom_vortex_key": null
+          },
+          "conditions": {
+            "activates_when": [],
+            "deactivates_when": [
+              {
+                "key": "morale_is_higher_than_shattered",
+                "summary": "morale is higher than shattered",
+                "provenance_refs": [
+                  "32babbd7b0ea3ed79a68:565",
+                  "b3620445ce0f95efd2a1:100"
+                ]
+              }
+            ],
+            "recipient_requirements": [],
+            "recharges_when": [],
+            "unavailable_when": [],
+            "invalid_targets": [],
+            "unresolved": []
+          },
+          "phases": [
+            {
+              "key": "wh_main_unit_passive_unstable_mark_ii",
+              "order": 1,
+              "target_self": true,
+              "target_friends": false,
+              "target_enemies": false,
+              "duration": -1.0,
+              "lifecycle": {
+                "effect_type": "negative",
+                "requested_stance": null,
+                "cant_move": false,
+                "freeze_fatigue": false,
+                "fatigue_change_ratio": 0.0,
+                "inspiration_aura_range_mod": 0.0,
+                "ability_recharge_change": 0.0,
+                "mana_regen_mod": 0.0,
+                "mana_max_depletion_mod": 0.0,
+                "imbue_magical": false,
+                "imbue_ignition": 0,
+                "imbue_contact": null,
+                "affects_allies": true,
+                "affects_enemies": true,
+                "replenish_ammo": 0.0,
+                "spreading": null,
+                "freeze_recharge": false,
+                "remove_magical": false,
+                "execute_ratio": 0.0
+              },
+              "provenance_refs": [
+                "c79a638251410aaad17e:2694",
+                "d56bb4dc1aae3feef5b2:2494"
+              ]
+            }
+          ],
+          "effects": [
+            {
+              "kind": "periodic_damage",
+              "phase_ref": "wh_main_unit_passive_unstable_mark_ii",
+              "native_parameters": {
+                "damage_amount": 133,
+                "hp_change_frequency": 0.2,
+                "max_damaged_entities": 5
+              },
+              "provenance_refs": [
+                "d56bb4dc1aae3feef5b2:2494"
+              ]
+            },
+            {
+              "kind": "payload_reference",
+              "phase_ref": null,
+              "node_ref": "record:b720050e3f24db03b823:17",
+              "relationship": "unit_special_abilities_tables.behaviour",
+              "provenance_refs": [
+                "05412a0a8b985eef08d7:3134"
+              ]
+            }
+          ],
+          "provenance_refs": [
+            "cb3a51dedbb2920f9bb2:6363",
+            "69a2a77f6deb5608cc87:3140",
+            "05412a0a8b985eef08d7:3134",
+            "b152471923832465081f:3141"
+          ],
+          "detail_ref": "record:69a2a77f6deb5608cc87:3140",
+          "spreadings": []
+        }
+      ],
+      "activated_options": [],
+      "coverage": {
+        "melee": "present",
+        "ranged": "present",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 2,
+            "offset": 0,
+            "total": 2,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "complete",
+            "returned": 2,
+            "offset": 0,
+            "total": 2,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 3,
+            "offset": 0,
+            "total": 3,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "complete",
+            "returned": 3,
+            "offset": 0,
+            "total": 3,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "complete",
+            "returned": 0,
+            "offset": 0,
+            "total": 0,
+            "cursor": null
+          }
+        ],
+        "gaps": [
+          {
+            "code": "activation_boundary",
+            "section": "abilities",
+            "summary": "wh2_dlc11_unit_passive_extra_powder: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+            "provenance_refs": [
+              "cb3a51dedbb2920f9bb2:6361",
+              "69a2a77f6deb5608cc87:205",
+              "05412a0a8b985eef08d7:204"
+            ]
+          },
+          {
+            "code": "activation_boundary",
+            "section": "abilities",
+            "summary": "wh_main_unit_passive_unstable: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+            "provenance_refs": [
+              "cb3a51dedbb2920f9bb2:6362",
+              "69a2a77f6deb5608cc87:3139",
+              "05412a0a8b985eef08d7:3133"
+            ]
+          },
+          {
+            "code": "activation_boundary",
+            "section": "abilities",
+            "summary": "wh_main_unit_passive_unstable_mark_ii: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+            "provenance_refs": [
+              "cb3a51dedbb2920f9bb2:6363",
+              "69a2a77f6deb5608cc87:3140",
+              "05412a0a8b985eef08d7:3134"
+            ]
+          },
+          {
+            "code": "ammo_threshold_from_ui",
+            "section": "abilities",
+            "summary": "have_ammo_below_threshold: threshold comes from selected UI wording rather than a numeric condition field.",
+            "provenance_refs": [
+              "32babbd7b0ea3ed79a68:37",
+              "b3620445ce0f95efd2a1:65"
+            ]
+          },
+          {
+            "code": "unresolved_localization",
+            "section": "attributes",
+            "summary": "undead: unresolved text substitution.",
+            "provenance_refs": [
+              "9d85f8e27f99c7a0ada2:6598",
+              "15464982ee45f35d824d:82"
+            ]
+          },
+          {
+            "code": "targetability_unknown",
+            "section": "components",
+            "summary": "Source does not establish secondary-component targetability.",
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:2241"
+            ]
+          },
+          {
+            "code": "targetability_unknown",
+            "section": "components",
+            "summary": "crew_or_rider: targetability unknown.",
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:2241"
+            ]
+          }
+        ],
+        "diagnostic_count": 7
+      }
+    },
+    {
+      "identity": {
+        "unit_key": "wh_main_emp_cav_reiksguard",
+        "profile_unit_key": "wh_main_emp_cav_reiksguard",
+        "unit_keys": [
+          "wh_main_emp_cav_reiksguard"
+        ],
+        "subculture_key": "wh_main_sc_emp_empire",
+        "faction_name": [
+          "Empire"
+        ],
+        "name": "Reiksguard",
+        "unit_type": "cavalry"
+      },
+      "body": {
+        "entity_count": 60.0,
+        "hp_per_entity": 108.0,
+        "total_hp": 6480.0,
+        "barrier_health": 0.0,
+        "size": "medium",
+        "components": [
+          {
+            "id": "component:23de8daf4e757f0860fb:912",
+            "role": "mount",
+            "count": 60.0,
+            "hp_per_component": 8.0,
+            "bonus_hp_per_component": 100.0,
+            "known_hp_total": 6480.0,
+            "size": "medium",
+            "targetable": true,
+            "primary": true,
+            "provenance_refs": [
+              "23de8daf4e757f0860fb:912"
+            ],
+            "health_contribution": 6480.0
+          }
+        ],
+        "target_classification": {
+          "combat_class": "large",
+          "status": "reviewed_mapping",
+          "summary": "Combat target class: large. Native body size remains medium. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:1177",
+            "d53bb00c3d740abf5992:234",
+            "d53bb00c3d740abf5992:273"
+          ]
+        },
+        "firing_arc": {
+          "primary_body_key": "wh_main_cavalry_slow_blood",
+          "native_fire_arc_close": 360.0,
+          "interpretation": "Native primary-body setting; weapon coverage and angular units are not established.",
+          "provenance_refs": [
+            "7b179242cbee121c7c14:1177"
+          ]
+        },
+        "health_aggregation": {
+          "rule": "primary_body_only",
+          "summary": "Unit health uses the primary bodies; secondary component totals are not additional health.",
+          "provenance_refs": [
+            "567e934ed6df7cfa34a0:2475"
+          ]
+        }
+      },
+      "movement": {
+        "speed": 7.8,
+        "mass": 1000.0,
+        "speed_basis": "primary_body_run_speed",
+        "primary_body_key": "wh_main_cavalry_slow_blood",
+        "ground_speed": 7.8,
+        "flight_speed": 0.0,
+        "provenance_refs": [
+          "7b179242cbee121c7c14:1177"
+        ]
+      },
+      "leadership": 75.0,
+      "melee": {
+        "id": "melee:5e78e24b332add8fcb5e:1141",
+        "weapon_key": "wh_main_emp_lance_reiksguard",
+        "component_ref": null,
+        "slot": "primary",
+        "attack": 34.0,
+        "defence": 31.0,
+        "charge_bonus": 62.0,
+        "base_damage": 28.0,
+        "ap_damage": 12.0,
+        "attack_interval": 5.1,
+        "max_splash_targets": 1.0,
+        "native_parameters": {
+          "weapon_length": 1.0,
+          "splash_attack_target_size": null,
+          "splash_attack_power_multiplier": 1.0,
+          "building_damage_multiplier": 0.5,
+          "contact_phase": null,
+          "collision_attack_max_targets": 0.0,
+          "collision_attack_max_targets_cooldown": 10.0,
+          "scaling_damage": null
+        },
+        "provenance_refs": [
+          "5e78e24b332add8fcb5e:1141",
+          "2ed3f783ed26bfdde51a:1197",
+          "0b15dd2090a7a99b5fa6:126"
+        ],
+        "detail_ref": "record:2ed3f783ed26bfdde51a:1197",
+        "parameter_explanations": {
+          "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+        },
+        "variants": []
+      },
+      "ranged": null,
+      "protection": {
+        "armour": 120.0,
+        "shield_block_chance": 30.0,
+        "physical_resistance": 0.0,
+        "missile_resistance": 0.0,
+        "spell_resistance": 0.0,
+        "fire_resistance": 0.0,
+        "ward_save": 0.0
+      },
+      "attack_traits": {
+        "melee": {
+          "scope": {
+            "attack_ref": "melee:5e78e24b332add8fcb5e:1141",
+            "component_ref": null
+          },
+          "bonus_vs_infantry": 0.0,
+          "bonus_vs_large": 0.0,
+          "magical": false,
+          "flaming": false,
+          "provenance_refs": [
+            "0b15dd2090a7a99b5fa6:126"
+          ]
+        },
+        "ranged": null,
+        "explosion": null,
+        "additional": []
+      },
+      "attributes": [
+        {
+          "key": "hide_forest",
+          "name": null,
+          "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+          "provenance_refs": [
+            "9d85f8e27f99c7a0ada2:2791",
+            "15464982ee45f35d824d:39"
+          ]
+        }
+      ],
+      "abilities": [],
+      "activated_options": [],
+      "coverage": {
+        "melee": "present",
+        "ranged": "known_none",
+        "sections": [
+          {
+            "name": "components",
+            "state": "complete",
+            "returned": 1,
+            "offset": 0,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "weapons",
+            "state": "complete",
+            "returned": 1,
+            "offset": 0,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "attributes",
+            "state": "complete",
+            "returned": 1,
+            "offset": 0,
+            "total": 1,
+            "cursor": null
+          },
+          {
+            "name": "abilities",
+            "state": "complete",
+            "returned": 0,
+            "offset": 0,
+            "total": 0,
+            "cursor": null
+          },
+          {
+            "name": "activated_options",
+            "state": "complete",
+            "returned": 0,
+            "offset": 0,
+            "total": 0,
+            "cursor": null
+          }
+        ],
+        "gaps": [],
+        "diagnostic_count": 0
+      }
+    }
+  ],
+  "scenario_assumptions": {
+    "mode": "custom_battle",
+    "baseline": "unmodified_ultra_rank_0",
+    "separation_metres": 200.0,
+    "duration_seconds": 120.0,
+    "metres_per_second_per_speed_point": 1.0,
+    "path_length_factor": 1.0,
+    "terrain_speed_factor": 1.0,
+    "line_of_sight": true,
+    "historical_relations_apply_to_patch_9": true,
+    "barrier_damage_order": "barrier_first",
+    "barrier_damage_order_explicit": false,
+    "sides": {
+      "a": {
+        "order": "hold",
+        "fire": true,
+        "fight": true,
+        "facing": "front",
+        "ranged_attack_id": null,
+        "collision_probability": 0.5,
+        "firing_entities": null,
+        "cycle_seconds": 22.5,
+        "first_shot_delay_seconds": 1.0,
+        "projectiles_per_cycle": 1.0,
+        "flight_seconds": null,
+        "explosion_entities_per_collision": 1.0,
+        "active_contacts": null,
+        "charge_duration_seconds": 0.0,
+        "target_component_role": "primary",
+        "assume_targetable": false,
+        "assume_unit_protection_for_component": false,
+        "combat_effective_fraction": 0.5
+      },
+      "b": {
+        "order": "approach",
+        "fire": true,
+        "fight": true,
+        "facing": "front",
+        "ranged_attack_id": null,
+        "collision_probability": 0.5,
+        "firing_entities": null,
+        "cycle_seconds": null,
+        "first_shot_delay_seconds": 1.0,
+        "projectiles_per_cycle": null,
+        "flight_seconds": null,
+        "explosion_entities_per_collision": 1.0,
+        "active_contacts": null,
+        "charge_duration_seconds": 0.0,
+        "target_component_role": "primary",
+        "assume_targetable": false,
+        "assume_unit_protection_for_component": false,
+        "combat_effective_fraction": 0.5
+      }
+    }
+  },
+  "empirical_calibration": null,
+  "assumption_notes": [
+    "Speed scale, path factor and terrain factor are illustrative; no measured map coordinates or acceleration.",
+    "Default collision probability 0.5 is uncalibrated and is not the card accuracy value.",
+    "When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.",
+    "Unspecified active contacts use min(8, living primary bodies); firing entities use the attached component count.",
+    "Direct and explosion are separate expected hit events; default splash reach is one entity per collision.",
+    "Positive listed velocity gives straight flight time from exact shot distance. Missing or nonpositive velocity uses an immediate-arrival firing-opportunity approximation unless flight_seconds is supplied; this is an earliest-arrival scenario, not measured flight time. Collision probability remains independent.",
+    "Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.",
+    "Barrier-before-entity-cap is the represented default, not a verified game damage order; the alternate order is tested.",
+    "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",
+    "Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled."
+  ],
+  "derived": {
+    "phase_timing": {
+      "closing_speed_metres_per_second": 7.8,
+      "contact": {
+        "status": "reached_under_assumptions",
+        "seconds": 25.641025641025642
+      },
+      "range_entry": [
+        {
+          "status": "already_reached",
+          "seconds": 0.0
+        },
+        {
+          "status": "unknown_input",
+          "seconds": null
+        }
+      ],
+      "minimum_range": [
+        50.0,
+        null
+      ],
+      "flight_speed": [
+        120.0,
+        null
+      ]
+    },
+    "event_mechanics": [
+      {
+        "side": "a",
+        "missile": {
+          "attack_id": "ranged:5e78e24b332add8fcb5e:2683",
+          "collision_probability": 0.5,
+          "complete_cycle_seconds_assumed": 22.5,
+          "projectiles_per_cycle_assumed": 1.0,
+          "scheduled": true,
+          "flight_basis": "source_velocity",
+          "direct": {
+            "per_unblocked_hit": 271.6,
+            "size_bonus_as_base": 0.0,
+            "armour_survival": 0.13333333333333333,
+            "resistance_points": 0,
+            "spell_resistance_applied": false,
+            "shield_block_probability": 0.3
+          },
+          "explosion": {
+            "radius_source_metres": 12.0,
+            "affected_entities_assumed": 1.0,
+            "damage": {
+              "per_unblocked_hit": 77.0,
+              "size_bonus_as_base": 0.0,
+              "armour_survival": 0.13333333333333333,
+              "resistance_points": 0,
+              "spell_resistance_applied": false,
+              "shield_block_probability": 0.0
+            }
+          }
+        },
+        "melee": {
+          "attack_id": "melee:5e78e24b332add8fcb5e:2682",
+          "unmodified_hit_probability": 0.17999999999999997,
+          "target_combat_class": "large",
+          "target_component_role": "mount",
+          "targetability_source": true,
+          "target_supported": true,
+          "target_facing": "front",
+          "active_contacts_assumed": 1.0,
+          "attack_interval_source_seconds": 4.3,
+          "charge_bonus_source": 5.0,
+          "charge_decay_duration_assumed_seconds": 0.0,
+          "per_hit": {
+            "per_unblocked_hit": 9.933333333333334,
+            "size_bonus_as_base": 0.0,
+            "armour_survival": 0.13333333333333333,
+            "resistance_points": 0,
+            "spell_resistance_applied": false,
+            "shield_block_probability": 0.0
+          }
+        }
+      },
+      {
+        "side": "b",
+        "missile": null,
+        "melee": {
+          "attack_id": "melee:5e78e24b332add8fcb5e:1141",
+          "unmodified_hit_probability": 0.6,
+          "target_combat_class": "large",
+          "target_component_role": "engine",
+          "targetability_source": true,
+          "target_supported": true,
+          "target_facing": "front",
+          "active_contacts_assumed": 8,
+          "attack_interval_source_seconds": 5.1,
+          "charge_bonus_source": 62.0,
+          "charge_decay_duration_assumed_seconds": 0.0,
+          "per_hit": {
+            "per_unblocked_hit": 33.7,
+            "size_bonus_as_base": 0.0,
+            "armour_survival": 0.775,
+            "resistance_points": 0,
+            "spell_resistance_applied": false,
+            "shield_block_probability": 0.0
+          }
+        }
+      }
+    ],
+    "ledgers": [
+      {
+        "unit_key": "wh2_dlc11_cst_art_queen_bess",
+        "incoming_damage": {
+          "direct": 0.0,
+          "explosion": 0.0,
+          "melee": 2600.0,
+          "overkill": 0.0,
+          "attempted_damage": 2992.8446455505236,
+          "barrier_absorbed": 0.0
+        },
+        "remaining_health": 4700.0,
+        "initial_health": 7300.0,
+        "remaining_health_fraction": 0.6438356164383562,
+        "remaining_barrier": 0.0,
+        "initial_barrier": 0.0,
+        "effective_survivability_fraction": 0.6438356164383562,
+        "components": [
+          {
+            "role": "crew_or_rider",
+            "primary": false,
+            "remaining_health": 4700.0,
+            "initial_health": 4700.0,
+            "estimated_living_entities": 47.0,
+            "initial_entities": 47.0
+          },
+          {
+            "role": "engine",
+            "primary": true,
+            "remaining_health": 0.0,
+            "initial_health": 2600.0,
+            "estimated_living_entities": 0,
+            "initial_entities": 1.0
+          }
+        ],
+        "shots_fired_per_shooter": 1,
+        "discrete_firing_events": 1,
+        "stopping": {
+          "health_depleted_seconds": null,
+          "combat_ineffective_seconds": 108.0,
+          "firing_ceased_seconds": 25.641025641025642,
+          "contact_seconds": 25.641025641025642,
+          "routing": "unknown_no_morale_model",
+          "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+          "engine_disabled": "unknown_no_component_disable_rule",
+          "crew_firing_cessation": "unknown_no_crew_threshold",
+          "ammunition_exhausted": false
+        },
+        "coverage_gaps": [
+          "complete firing cycle assumes 1.25 times listed projectile reload; uncalibrated",
+          "splash reach assumes one entity per colliding projectile",
+          "active contacts default to min(8, living primary entities)"
+        ]
+      },
+      {
+        "unit_key": "wh_main_emp_cav_reiksguard",
+        "incoming_damage": {
+          "direct": 37.8,
+          "explosion": 38.5,
+          "melee": 34.24601073345257,
+          "overkill": 57.260000000000005,
+          "attempted_damage": 167.8060107334522,
+          "barrier_absorbed": 0.0
+        },
+        "remaining_health": 6369.453989266545,
+        "initial_health": 6480.0,
+        "remaining_health_fraction": 0.9829404304423681,
+        "remaining_barrier": 0.0,
+        "initial_barrier": 0.0,
+        "effective_survivability_fraction": 0.9829404304423681,
+        "components": [
+          {
+            "role": "mount",
+            "primary": true,
+            "remaining_health": 6369.453989266545,
+            "initial_health": 6480.0,
+            "estimated_living_entities": 59,
+            "initial_entities": 60.0
+          }
+        ],
+        "shots_fired_per_shooter": 0,
+        "discrete_firing_events": 0,
+        "stopping": {
+          "health_depleted_seconds": null,
+          "combat_ineffective_seconds": null,
+          "firing_ceased_seconds": null,
+          "contact_seconds": 25.641025641025642,
+          "routing": "unknown_no_morale_model",
+          "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+          "engine_disabled": "not_applicable",
+          "crew_firing_cessation": "not_applicable",
+          "ammunition_exhausted": false
+        },
+        "coverage_gaps": [
+          "active contacts default to min(8, living primary entities)"
+        ]
+      }
+    ]
+  },
+  "verdict": {
+    "status": "conditional",
+    "nominal_favored": "b",
+    "represented_point_ordering": "b",
+    "criterion": "remaining modeled health plus barrier fraction at horizon",
+    "collision_probability_corners": [
+      {
+        "collision_probability_a": 0,
+        "collision_probability_b": 0,
+        "favored": "b",
+        "effective_survivability_fraction": [
+          0.6438356164383562,
+          0.9947151218003928
+        ]
+      },
+      {
+        "collision_probability_a": 0,
+        "collision_probability_b": 1,
+        "favored": "b",
+        "effective_survivability_fraction": [
+          0.6438356164383562,
+          0.9947151218003928
+        ]
+      },
+      {
+        "collision_probability_a": 1,
+        "collision_probability_b": 0,
+        "favored": "b",
+        "effective_survivability_fraction": [
+          0.6438356164383562,
+          0.9711657390843433
+        ]
+      },
+      {
+        "collision_probability_a": 1,
+        "collision_probability_b": 1,
+        "favored": "b",
+        "effective_survivability_fraction": [
+          0.6438356164383562,
+          0.9711657390843433
+        ]
+      }
+    ],
+    "barrier_damage_order_sensitivity": [],
+    "bounds_cross": true,
+    "material_mechanic_unresolved": false,
+    "unresolved_inputs": [],
+    "one_parameter_flip_thresholds": [
+      {
+        "side": "b",
+        "parameter": "active_contacts",
+        "current": 8,
+        "approximate_flip_threshold": 0.3479576110839844,
+        "absolute_change": 7.652042388916016,
+        "method": "one-at-a-time sampled threshold; not a global minimum"
+      }
+    ],
+    "qualification": "Nominal result depends on uncalibrated firing/contact assumptions; routing is unknown."
+  },
+  "limitations": [
+    "complete firing cycle assumes 1.25 times listed projectile reload; uncalibrated",
+    "splash reach assumes one entity per colliding projectile",
+    "active contacts default to min(8, living primary entities)",
+    "source coverage: activation_boundary - wh2_dlc11_unit_passive_extra_powder: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+    "source coverage: activation_boundary - wh_main_unit_passive_unstable: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+    "source coverage: activation_boundary - wh_main_unit_passive_unstable_mark_ii: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+    "source coverage: ammo_threshold_from_ui - have_ammo_below_threshold: threshold comes from selected UI wording rather than a numeric condition field.",
+    "source coverage: unresolved_localization - undead: unresolved text substitution.",
+    "source coverage: targetability_unknown - Source does not establish secondary-component targetability.",
+    "source coverage: targetability_unknown - crew_or_rider: targetability unknown.",
+    "no routing or morale model",
+    "entity casualties use pooled expected damage, not hit allocation",
+    "shield facing and projectile block eligibility are simplified",
+    "passive and activated modifiers, penetration, collision attacks, shrapnel and special death behavior are not applied",
+    "8.1.1 relations are assumed applicable to 9.0; no live validation"
+  ],
+  "tactical_contingencies": [
+    "Distance, sight obstruction and terrain alter firing windows.",
+    "Facing can change shield blocking and melee defence.",
+    "Formation and interception change actual firing entities and active contacts.",
+    "Fatigue, charge disruption, passives and target selection require separate validation."
+  ]
+}

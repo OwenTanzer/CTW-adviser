@@ -1,0 +1,40 @@
+[
+  {
+    "case": "200m",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh2_dlc11_cst_art_queen_bess",
+      "wh_main_emp_cav_reiksguard",
+      "--scenario",
+      "{\"mode\": \"custom_battle\", \"baseline\": \"unmodified_ultra_rank_0\", \"separation_metres\": 200, \"duration_seconds\": 120, \"line_of_sight\": true, \"terrain_speed_factor\": 1, \"path_length_factor\": 1, \"sides\": {\"a\": {\"order\": \"hold\", \"fire\": true, \"fight\": true, \"facing\": \"front\"}, \"b\": {\"order\": \"approach\", \"fire\": true, \"fight\": true, \"facing\": \"front\"}}}"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "exact_data_equality": true,
+    "differences": []
+  },
+  {
+    "case": "300m",
+    "command": [
+      "python",
+      "-m",
+      "ctw_adviser.cli",
+      "evaluate",
+      "--db",
+      "work/adviser.sqlite",
+      "wh2_dlc11_cst_art_queen_bess",
+      "wh_main_emp_cav_reiksguard",
+      "--scenario",
+      "{\"mode\": \"custom_battle\", \"baseline\": \"unmodified_ultra_rank_0\", \"separation_metres\": 300, \"duration_seconds\": 120, \"line_of_sight\": true, \"terrain_speed_factor\": 1, \"path_length_factor\": 1, \"sides\": {\"a\": {\"order\": \"hold\", \"fire\": true, \"fight\": true, \"facing\": \"front\"}, \"b\": {\"order\": \"approach\", \"fire\": true, \"fight\": true, \"facing\": \"front\"}}}"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "exact_data_equality": true,
+    "differences": []
+  }
+]

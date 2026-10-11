@@ -1,0 +1,361 @@
+{
+  "status": "passed",
+  "comparison": "Parsed JSON equality; object key order and integral-float formatting are not semantic differences.",
+  "evaluations": 10,
+  "results": [
+    {
+      "conversation": "bloodletters",
+      "call_index": 5,
+      "arguments": {
+        "unit_a": "wh3_main_kho_inf_bloodletters_0",
+        "unit_b": "wh2_main_lzd_mon_kroxigors",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 20,
+          "line_of_sight": true,
+          "terrain_speed_factor": 1,
+          "path_length_factor": 1,
+          "metres_per_second_per_speed_point": 1,
+          "historical_relations_apply_to_patch_9": true,
+          "sides": {
+            "a": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true,
+              "active_contacts": 8,
+              "charge_duration_seconds": 0
+            },
+            "b": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true,
+              "active_contacts": 8,
+              "charge_duration_seconds": 0
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "bloodletters",
+      "call_index": 6,
+      "arguments": {
+        "unit_a": "wh3_main_kho_inf_bloodletters_0",
+        "unit_b": "wh2_main_lzd_mon_kroxigors",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 20,
+          "line_of_sight": true,
+          "terrain_speed_factor": 1,
+          "path_length_factor": 1,
+          "metres_per_second_per_speed_point": 1,
+          "historical_relations_apply_to_patch_9": true,
+          "sides": {
+            "a": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true,
+              "active_contacts": 8,
+              "charge_duration_seconds": 0
+            },
+            "b": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true,
+              "active_contacts": 4,
+              "charge_duration_seconds": 0
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "queen_bess",
+      "call_index": 4,
+      "arguments": {
+        "unit_a": "wh2_dlc11_cst_art_queen_bess",
+        "unit_b": "wh_main_emp_cav_reiksguard",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "separation_metres": 200,
+          "duration_seconds": 120,
+          "line_of_sight": true,
+          "terrain_speed_factor": 1,
+          "path_length_factor": 1,
+          "sides": {
+            "a": {
+              "order": "hold",
+              "fire": true,
+              "fight": true,
+              "facing": "front"
+            },
+            "b": {
+              "order": "approach",
+              "fire": true,
+              "fight": true,
+              "facing": "front"
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "queen_bess",
+      "call_index": 5,
+      "arguments": {
+        "unit_a": "wh2_dlc11_cst_art_queen_bess",
+        "unit_b": "wh_main_emp_cav_reiksguard",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "separation_metres": 300,
+          "duration_seconds": 120,
+          "line_of_sight": true,
+          "terrain_speed_factor": 1,
+          "path_length_factor": 1,
+          "sides": {
+            "a": {
+              "order": "hold",
+              "fire": true,
+              "fight": true,
+              "facing": "front"
+            },
+            "b": {
+              "order": "approach",
+              "fire": true,
+              "fight": true,
+              "facing": "front"
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "reiksguard",
+      "call_index": 3,
+      "arguments": {
+        "unit_a": "wh_main_emp_cav_reiksguard",
+        "unit_b": "wh_main_grn_art_doom_diver_catapult",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 200,
+          "line_of_sight": true,
+          "path_length_factor": 1,
+          "terrain_speed_factor": 1,
+          "sides": {
+            "a": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            },
+            "b": {
+              "order": "hold",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "reiksguard",
+      "call_index": 4,
+      "arguments": {
+        "unit_a": "wh_main_emp_cav_reiksguard",
+        "unit_b": "wh_main_grn_art_doom_diver_catapult",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 100,
+          "line_of_sight": true,
+          "path_length_factor": 1,
+          "terrain_speed_factor": 1,
+          "sides": {
+            "a": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            },
+            "b": {
+              "order": "hold",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "reiksguard",
+      "call_index": 5,
+      "arguments": {
+        "unit_a": "wh_main_emp_cav_reiksguard",
+        "unit_b": "wh_main_grn_art_doom_diver_catapult",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 200,
+          "line_of_sight": true,
+          "path_length_factor": 1,
+          "terrain_speed_factor": 1,
+          "sides": {
+            "a": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            },
+            "b": {
+              "order": "hold",
+              "facing": "front",
+              "fire": true,
+              "fight": true,
+              "flight_seconds": 22.5
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "reiksguard",
+      "call_index": 6,
+      "arguments": {
+        "unit_a": "wh_main_emp_cav_reiksguard",
+        "unit_b": "wh_main_grn_art_doom_diver_catapult",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 100,
+          "line_of_sight": true,
+          "path_length_factor": 1,
+          "terrain_speed_factor": 1,
+          "sides": {
+            "a": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            },
+            "b": {
+              "order": "hold",
+              "facing": "front",
+              "fire": true,
+              "fight": true,
+              "flight_seconds": 22.5
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "sea_guard",
+      "call_index": 3,
+      "arguments": {
+        "unit_a": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "unit_b": "wh3_main_tze_inf_blue_horrors_0",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 100,
+          "line_of_sight": true,
+          "terrain_speed_factor": 1,
+          "path_length_factor": 1,
+          "sides": {
+            "a": {
+              "order": "hold",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            },
+            "b": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    },
+    {
+      "conversation": "sea_guard",
+      "call_index": 5,
+      "arguments": {
+        "unit_a": "wh2_main_hef_inf_lothern_sea_guard_1",
+        "unit_b": "wh3_main_tze_inf_blue_horrors_0",
+        "scenario": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "duration_seconds": 120,
+          "separation_metres": 100,
+          "line_of_sight": true,
+          "terrain_speed_factor": 1,
+          "path_length_factor": 1,
+          "sides": {
+            "a": {
+              "order": "hold",
+              "facing": "rear",
+              "fire": true,
+              "fight": true
+            },
+            "b": {
+              "order": "approach",
+              "facing": "front",
+              "fire": true,
+              "fight": true
+            }
+          }
+        }
+      },
+      "exit_code": 0,
+      "data_equal": true,
+      "stderr": ""
+    }
+  ]
+}
