@@ -70,9 +70,12 @@ try {
     assert.equal(modeled.data.empirical_calibration, null);
     assert.ok(modeled.data.limitations.length > 0);
   }
-  const invalidScenario = await client.callTool({ name: 'evaluate_single_unit_matchup',
-    arguments: { unit_a: 'Reiksguard', unit_b: 'Kroxigor', scenario: { baseline: 'campaign' } } });
-  assert.equal(invalidScenario.isError, true);
+  await assert.rejects(() => client.callTool({ name: 'evaluate_single_unit_matchup',
+    arguments: { unit_a: 'Reiksguard', unit_b: 'Kroxigor', scenario: { baseline: 'campaign' } } }));
+  await assert.rejects(() => client.callTool({ name: 'evaluate_single_unit_matchup',
+    arguments: { unit_a: 'Reiksguard', unit_b: 'Kroxigor',
+      scenario: { sides: { a: { active_contacts: 1e100 } } } } }));
+  assert.equal((await call('resolve_unit', { name_or_key: 'Lothern Sea Guard' })).status, 'ok');
   await client.close();
   reconnected = new Client({ name: 'ctw-adviser-reconnect', version: '1.0.0' });
   await reconnected.connect(new StreamableHTTPClientTransport(new URL(endpoint)));

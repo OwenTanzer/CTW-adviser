@@ -31,8 +31,8 @@ The Node SDK is a development-only test dependency in ignored `work/`; the serve
 uses Python's standard library. For a reviewed deployment replace the URL in
 `accept_mcp_http.mjs` with the final `https://.../mcp` endpoint. The same four
 pairs, ambiguity, paging, detail, provenance and four calculation
-checks then run remotely. This integration branch requires the independently
-reviewed combat implementation from PR #16 before deployment.
+checks then run remotely. The combat implementation from PR #16 is present in
+the branch base; deployment still needs the separate production review below.
 
 ## Wire and lifecycle
 
@@ -79,8 +79,10 @@ version for the evaluator).
 conditional verdict, sensitivity and limitations as structured content. Names
 with multiple matches return candidates; the adapter never chooses a variant.
 The hosted adapter caps scenario duration at 300 seconds, separation at 10,000
-metres and an explicitly set firing cycle at a minimum of 0.25 seconds. The
-combat library validates the other scenario fields. Check direct library, CLI
+metres, an explicitly set firing cycle at a minimum of 0.25 seconds, and
+previously unbounded numeric scenario settings at 1,000,000,000. Nonfinite
+numbers are rejected as invalid arguments. The combat library validates the
+other scenario fields. Check direct library, CLI
 and MCP results against the same scenario JSON before release. ChatGPT
 workflow instructions should refer to these tool names and schemas, not copy
 data or equations.

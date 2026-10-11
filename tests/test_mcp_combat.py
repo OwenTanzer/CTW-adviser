@@ -66,6 +66,35 @@ class CombatAdapterTests(unittest.TestCase):
         for field in ("flight_seconds", "assume_targetable", "assume_unit_protection_for_component"):
             self.assertIn(field, side)
 
+    def test_numeric_scenario_boundary_is_shared_by_both_transports(self):
+        arguments = {"unit_a": "Reiksguard", "unit_b": "Kroxigor"}
+        bad_scenarios = (
+            {"sides": {"a": {"active_contacts": 10 ** 399}}},
+            {"sides": {"a": {"active_contacts": float("inf")}}},
+            {"sides": {"a": {"active_contacts": float("nan")}}},
+            {"sides": {"a": {"projectiles_per_cycle": 1e100}}},
+            {"metres_per_second_per_speed_point": -(10 ** 399)},
+            {"sides": {"a": {"cycle_seconds": True}}},
+        )
+        for scenario in bad_scenarios:
+            with self.subTest(scenario=scenario):
+                response = dispatch_method(FakeQueries(), "tools/call", {
+                    "name": "evaluate_single_unit_matchup",
+                    "arguments": {**arguments, "scenario": scenario}}, 1)
+                self.assertEqual(response["error"]["code"], -32602)
+
+        def evaluate(_queries, _a, _b, **options):
+            return {"model_version": "combat-test", "scenario": options["scenario"]}
+
+        valid = {"duration_seconds": 300, "metres_per_second_per_speed_point": 1e-300,
+                 "sides": {"a": {"active_contacts": 1_000_000_000,
+                                 "cycle_seconds": 0.25, "collision_probability": 0.5}}}
+        with patch.dict(sys.modules, {"ctw_adviser.combat": SimpleNamespace(evaluate_matchup=evaluate)}):
+            response = dispatch_method(FakeQueries(), "tools/call", {
+                "name": "evaluate_single_unit_matchup",
+                "arguments": {**arguments, "scenario": valid}}, 1)
+        self.assertEqual(response["result"]["structuredContent"]["data"]["scenario"], valid)
+
 
 DB = Path(os.environ.get("CTW_ADVISER_DB", "work/adviser.sqlite"))
 

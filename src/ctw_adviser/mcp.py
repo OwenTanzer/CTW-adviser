@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sqlite3
 import sys
 
@@ -32,20 +33,21 @@ def _tool(name, description, properties, required=()):
 
 STRING = {"type": "string", "minLength": 1}
 LIMIT = {"type": "integer", "minimum": 1, "maximum": 256, "default": 32}
+MAX_SCENARIO_NUMBER = 1_000_000_000
 SIDE_SETTINGS = {"type": "object", "properties": {
     "order": {"type": "string", "enum": ["approach", "hold", "retreat"]},
     "fire": {"type": "boolean"}, "fight": {"type": "boolean"},
     "facing": {"type": "string", "enum": ["front", "side", "rear"]},
     "ranged_attack_id": STRING,
     "collision_probability": {"type": "number", "minimum": 0, "maximum": 1},
-    "firing_entities": {"type": "number", "minimum": 0},
-    "cycle_seconds": {"type": "number", "minimum": 0.25},
-    "first_shot_delay_seconds": {"type": "number", "minimum": 0},
-    "projectiles_per_cycle": {"type": "number", "exclusiveMinimum": 0},
-    "flight_seconds": {"type": "number", "minimum": 0},
-    "explosion_entities_per_collision": {"type": "number", "minimum": 0},
-    "active_contacts": {"type": "number", "minimum": 0},
-    "charge_duration_seconds": {"type": "number", "minimum": 0},
+    "firing_entities": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "cycle_seconds": {"type": "number", "minimum": 0.25, "maximum": MAX_SCENARIO_NUMBER},
+    "first_shot_delay_seconds": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "projectiles_per_cycle": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "flight_seconds": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "explosion_entities_per_collision": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "active_contacts": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "charge_duration_seconds": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
     "target_component_role": STRING,
     "assume_targetable": {"type": "boolean"},
     "assume_unit_protection_for_component": {"type": "boolean"},
@@ -56,9 +58,9 @@ SCENARIO = {"type": "object", "description": "Conditional custom-battle assumpti
                            "baseline": {"type": "string", "enum": ["unmodified_ultra_rank_0"]},
                            "separation_metres": {"type": "number", "minimum": 0, "maximum": 10000},
                            "duration_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 300},
-                           "metres_per_second_per_speed_point": {"type": "number", "exclusiveMinimum": 0},
-                           "path_length_factor": {"type": "number", "exclusiveMinimum": 0},
-                           "terrain_speed_factor": {"type": "number", "exclusiveMinimum": 0},
+                           "metres_per_second_per_speed_point": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                           "path_length_factor": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                           "terrain_speed_factor": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
                            "line_of_sight": {"type": "boolean"},
                            "historical_relations_apply_to_patch_9": {"type": "boolean"},
                            "barrier_damage_order": {"type": "string", "enum": ["barrier_first", "entity_cap_first"]},
@@ -89,6 +91,31 @@ TOOLS = [
 BY_NAME = {tool["name"]: tool for tool in TOOLS}
 
 
+def _validate_scenario(value, rule, path):
+    kind = rule["type"]
+    if kind == "object":
+        if not isinstance(value, dict):
+            raise ValueError(f"{path} must be an object")
+        properties = rule["properties"]
+        if set(value) - set(properties):
+            raise ValueError(f"unsupported {path} field")
+        for key, item in value.items():
+            _validate_scenario(item, properties[key], f"{path}.{key}")
+    elif kind == "number":
+        if type(value) not in (int, float) or (type(value) is float and not math.isfinite(value)):
+            raise ValueError(f"{path} must be a finite number")
+        if (("minimum" in rule and value < rule["minimum"]) or
+                ("exclusiveMinimum" in rule and value <= rule["exclusiveMinimum"]) or
+                ("maximum" in rule and value > rule["maximum"])):
+            raise ValueError(f"{path} is outside the hosted range")
+    elif kind == "boolean" and type(value) is not bool:
+        raise ValueError(f"{path} must be boolean")
+    elif kind == "string" and (not isinstance(value, str) or not value.strip()):
+        raise ValueError(f"{path} must be a nonempty string")
+    if "enum" in rule and value not in rule["enum"]:
+        raise ValueError(f"unsupported {path}")
+
+
 def _validate(tool, args):
     schema = tool["inputSchema"]
     if not isinstance(args, dict):
@@ -114,21 +141,7 @@ def _validate(tool, args):
         if "enum" in rule and value not in rule["enum"]:
             raise ValueError(f"unsupported {key}")
     if tool["name"] == "evaluate_single_unit_matchup":
-        scenario = args.get("scenario", {})
-        if set(scenario) - set(SCENARIO["properties"]):
-            raise ValueError("unsupported scenario field")
-        for key, minimum, maximum in (("separation_metres", 0, 10000),
-                                      ("duration_seconds", 0, 300)):
-            if key in scenario:
-                value = scenario[key]
-                if type(value) not in (int, float) or not minimum <= value <= maximum or (key == "duration_seconds" and value == 0):
-                    raise ValueError(f"scenario.{key} is outside the hosted range")
-        for side in ("a", "b"):
-            settings = scenario.get("sides", {}).get(side, {}) if isinstance(scenario.get("sides", {}), dict) else {}
-            if isinstance(settings, dict) and "cycle_seconds" in settings:
-                value = settings["cycle_seconds"]
-                if type(value) not in (int, float) or value < 0.25:
-                    raise ValueError(f"scenario.sides.{side}.cycle_seconds must be at least 0.25")
+        _validate_scenario(args.get("scenario", {}), SCENARIO, "scenario")
 
 
 def _content(payload, is_error=False):
@@ -173,7 +186,7 @@ def call_tool(queries, name, args):
     except ResolutionError as exc:
         return _content({"status": exc.result["status"], "adapter_version": SERVER_VERSION,
                          "model_version": None, "snapshot": queries.snapshot, "data": exc.result}, True)
-    except (ValueError, KeyError, sqlite3.Error) as exc:
+    except (ValueError, OverflowError, KeyError, sqlite3.Error) as exc:
         return _content({"status": "error", "adapter_version": SERVER_VERSION,
                          "model_version": None, "snapshot": queries.snapshot,
                          "data": {"message": str(exc)}}, True)
