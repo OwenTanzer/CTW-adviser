@@ -73,6 +73,8 @@ def validate(value,s,root,path='$'):
     if typ in ('integer','number') and 'minimum' in s and value<s['minimum']:raise ValueError(path+': below minimum')
 
 def packet_checks(p, provenance_resolver=None):
+    if 'effect' in p:
+        return effect_packet_checks(p, provenance_resolver)
     if p.get('provenance_mode') == 'deferred':
         if p['schema_version'] not in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0','1.20.0') or p['sources'] or p['provenance']:
             raise ValueError('invalid deferred evidence envelope')
@@ -253,6 +255,60 @@ def packet_checks(p, provenance_resolver=None):
         for m in u['passives']['abilities']:
             for effect in m['effects']:
                 if effect['kind']=='payload_reference' and effect['node_ref'] not in nodes and effect['node_ref'] not in details:raise ValueError('dangling payload reference')
+
+def effect_packet_checks(p, provenance_resolver=None):
+    """Validate references and pagination in a specialized effect packet."""
+    if p['provenance_mode']=='deferred':
+        if p['sources'] or p['provenance'] or provenance_resolver is None:
+            raise ValueError('invalid deferred effect evidence envelope')
+        refs=set()
+        def collect(value):
+            if isinstance(value,dict):
+                for key,item in value.items():
+                    if key in ('provenance_refs','classification_evidence'):refs.update(item)
+                    else:collect(item)
+            elif isinstance(value,list):
+                for item in value:collect(item)
+        collect(p)
+        evidence={'sources':{},'provenance':{}}
+        ids=sorted(refs)
+        for start in range(0,len(ids),256):
+            chunk=provenance_resolver(ids[start:start+256])
+            if any(chunk['snapshot'].get(k)!=p['snapshot'].get(k) for k in ('commit','owners','baseline')):
+                raise ValueError('effect provenance belongs to a different snapshot')
+            for field in evidence:evidence[field].update(chunk[field])
+        if not refs <= evidence['provenance'].keys():raise ValueError('unresolved deferred effect evidence')
+        p={**p,**evidence}
+    sources=p['sources'];evidence=p['provenance'];details=p['detail_refs']
+    for record in evidence.values():
+        if record['source_id'] not in sources or any(r not in evidence for r in record.get('lineage_refs',[])):
+            raise ValueError('dangling effect source or lineage')
+    if any(source['owner'] not in p['snapshot']['owners'] for source in sources.values()):
+        raise ValueError('dangling effect owner')
+    def walk(value):
+        if isinstance(value,dict):
+            for key,item in value.items():
+                if key in ('provenance_refs','classification_evidence') and any(r not in evidence for r in item):
+                    raise ValueError('dangling effect evidence')
+                if key=='detail_ref' and item is not None and item not in details:
+                    raise ValueError('dangling effect detail reference')
+                walk(item)
+        elif isinstance(value,list):
+            for item in value:walk(item)
+    walk(p)
+    access=p['effect']['access']
+    if (access['returned']!=len(access['links']) or access['returned']+access['offset']>access['total'] or
+            (access['cursor'] is None)!=(access['returned']+access['offset']==access['total'])):
+        raise ValueError('effect access pagination mismatch')
+    if 'gaps' in p and p['diagnostic_count']!=len(p['gaps']):
+        raise ValueError('effect diagnostic count mismatch')
+    graph=p['payload_graph'];nodes={n['id'] for n in graph['nodes']}
+    if len(nodes)!=len(graph['nodes']) or any(
+            edge['from'] not in nodes or edge['to'] not in nodes for edge in graph['edges']):
+        raise ValueError('dangling effect graph edge')
+    for item in p['effect']['mechanic']['effects']:
+        if item['kind']=='payload_reference' and item['node_ref'] not in nodes and item['node_ref'] not in details:
+            raise ValueError('dangling effect payload reference')
 
 def pointer(p,path):
     for part in path.strip('/').split('/'):

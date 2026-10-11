@@ -80,7 +80,7 @@ class HTTPTransportTests(unittest.TestCase):
         self.assertEqual(status, 202)
         status, listed = self.rpc("tools/list")
         self.assertEqual(status, 200)
-        self.assertEqual(len(listed["result"]["tools"]), 7)
+        self.assertEqual(len(listed["result"]["tools"]), 8)
         for tool in listed["result"]["tools"]:
             self.assertIn("inputSchema", tool)
             self.assertIn("outputSchema", tool)
@@ -155,6 +155,35 @@ class HTTPTransportTests(unittest.TestCase):
             self.assertEqual(self.rpc("ping")[0], 429)
         finally:
             self.server.rate_limiter = previous
+
+    def test_oversized_and_nonfinite_scenario_numbers_do_not_disconnect(self):
+        for value in (10 ** 399, 1e100, float("inf"), float("nan")):
+            with self.subTest(value=str(value)[:30]):
+                status, response = self.rpc("tools/call", {
+                    "name": "evaluate_single_unit_matchup",
+                    "arguments": {"unit_a": "Reiksguard", "unit_b": "Kroxigor",
+                                  "scenario": {"sides": {"a": {"active_contacts": value}}}}})
+                self.assertEqual(status, 200)
+                self.assertEqual(response["error"]["code"], -32602)
+                self.assertEqual(self.rpc("ping")[1]["result"], {})
+        with closing(http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=5)) as connection:
+            body = (b'{"jsonrpc":"2.0","id":1,"method":"tools/call","params":'
+                    b'{"name":"evaluate_single_unit_matchup","arguments":'
+                    b'{"unit_a":"Reiksguard","unit_b":"Kroxigor",'
+                    b'"scenario":{"sides":{"a":{"active_contacts":1e400}}}}}}')
+            connection.request("POST", "/mcp", body=body,
+                               headers={"Content-Type": "application/json", "Accept": ACCEPT})
+            response = connection.getresponse()
+            self.assertEqual(response.status, 200)
+            self.assertEqual(json.loads(response.read())["error"]["code"], -32602)
+        self.assertEqual(self.rpc("ping")[1]["result"], {})
+        status, response = self.rpc("tools/call", {
+            "name": "evaluate_single_unit_matchup",
+            "arguments": {"unit_a": "Lothern Sea Guard (Shields)",
+                          "unit_b": "Blue Horrors of Tzeentch",
+                          "scenario": {"sides": {"a": {"active_contacts": 4.5}}}}})
+        self.assertEqual(status, 200)
+        self.assertEqual(response["result"]["structuredContent"]["status"], "ok")
 
     def test_completed_requests_release_all_connection_slots(self):
         held = []

@@ -240,5 +240,75 @@ schema['allOf'].append({
  'then':{'properties':{'units':{'items':{'properties':{'activated_options':{'items':{'required':['effect_kind','keywords']}}}}}}}
 })
 
+unit_schema_text=json.dumps(schema,indent=2)+'\n'
+# The specialized response has its own envelope and complete mechanical shape.
+# Reuse the unit schema's source, provenance, graph and mechanic definitions.
+defs['effect_summon']['properties']['trigger']['enum'].append('on_activation')
+activation_fields=('mana_cost','num_uses','initial_recharge','recharge_time','shared_recharge_time',
+ 'wind_up_time','active_time','miscast_chance','miscast_global_bonus','current_mana_moves_to_reserve',
+ 'intensity_based_activation','update_phase_by_ability_duration')
+target_fields=('target_self','target_friends','target_enemies','target_ground','target_ground_under_allies',
+ 'target_ground_under_enemies','only_affect_target','affect_self','always_affect_self',
+ 'only_affect_owned_units','affect_siege_equipment','num_effected_friendly_units',
+ 'num_effected_enemy_units','update_targets_every_frame')
+boolean_fields={'miscast_global_bonus','current_mana_moves_to_reserve','intensity_based_activation',
+ 'update_phase_by_ability_duration','target_self','target_friends','target_enemies','target_ground',
+ 'target_ground_under_allies','target_ground_under_enemies','only_affect_target','affect_self',
+ 'always_affect_self','only_affect_owned_units','affect_siege_equipment','update_targets_every_frame'}
+def field_values(fields):
+ return obj({field:B if field in boolean_fields else N for field in fields})
+defs['effect_field_group']=obj({'values':field_values(activation_fields),'native_sentinels':arr(S),'provenance_refs':refs})
+defs['effect_target_group']=obj({'values':field_values(target_fields),'native_sentinels':arr(S),'provenance_refs':refs})
+defs['effect_identity']=obj({'ability_key':S,'name':nullable(S),'effect_kind':enum('spell','activated_ability'),
+ 'kind_basis':S,'source_type':S,'ability_type':nullable(S),'keywords':arr(S,1),'provenance_refs':refs})
+defs['effect_variant']=obj({'direction':enum('incoming','outgoing'),'relation':enum('overcast_option','supersedes'),
+ 'ability_key':S,'status':enum('resolved','not_activated','missing'),'provenance_refs':refs,'detail_ref':nullable(S)})
+defs['effect_distance']=obj({'value':N,'meaning':S})
+defs['effect_chain']=obj({'path':arr(S,1),'leaf_ref':nullable(S),'provenance_refs':refs,
+ 'root_relationship':S,'branch':enum('activation','conditional_failure'),
+ 'condition':obj({'miscast_chance':N,'note':S})},
+ ['path','leaf_ref','provenance_refs','root_relationship','branch'])
+defs['effect_payload']=obj({'chains':arr(ref('effect_chain')),'complete':{'type':'boolean'},
+ 'omitted_leaf_refs':arr(S),'note':S})
+defs['effect_summon_unit']=obj({'unit_key':S,'unit_name':nullable(S)})
+defs['effect_summon_entry']=obj({'land_unit_key':S,'trigger':S,'mapping':enum('roster_profiles','unmapped_land_unit'),
+ 'units':arr(ref('effect_summon_unit')),'provenance_refs':refs})
+defs['effect_access_link']=obj({'unit_key':S,'unit_name':nullable(S),'profile_unit_key':nullable(S),
+ 'mapping':enum('roster_profile','no_roster_profile'),'culture_key':S,'route':S,
+ 'requires_effect_enabling':B,'qualification':S,'provenance_refs':refs})
+defs['effect_access']=obj({'total':{'type':'integer','minimum':0},'returned':{'type':'integer','minimum':0},
+ 'offset':{'type':'integer','minimum':0},'cursor':nullable(S),'links':arr(ref('effect_access_link')),
+ 'routes_not_imported':arr(S)})
+defs['specialized_effect']=obj({'identity':ref('effect_identity'),'variants':arr(ref('effect_variant')),
+ 'activation':ref('effect_field_group'),
+ 'distances':obj({field:ref('effect_distance') for field in ('target_intercept_range','effect_range','min_range')}),
+ 'targeting':ref('effect_target_group'),'mechanic':ref('mechanic'),'payload':ref('effect_payload'),
+ 'summons':arr(ref('effect_summon_entry')),'access':ref('effect_access'),'interpretation':S,'summary':S})
+effect_schema={'$schema':schema['$schema'],'$id':'urn:ctw-adviser:effect-packet:'+PACKET_VERSION,
+ 'title':'CTW adviser specialized effect packet v'+PACKET_VERSION,
+ **obj({'schema_version':const(PACKET_VERSION),'snapshot':ref('snapshot'),
+        'effect':ref('specialized_effect'),'sources':mapping(ref('source')),
+        'provenance':mapping(ref('evidence')),'detail_refs':mapping(obj({'kind':S,'key':S})),
+        'payload_graph':obj({'nodes':arr(ref('current_node')),'edges':arr(ref('edge'))}),
+        'diagnostic_count':{'type':'integer','minimum':0},
+        'provenance_mode':enum('deferred','expanded'),'gaps':arr(ref('gap'))},
+       ['schema_version','snapshot','effect','sources','provenance','detail_refs','payload_graph',
+        'diagnostic_count','provenance_mode']),'$defs':defs}
+needed=set()
+def collect_refs(value):
+ if isinstance(value,dict):
+  if '$ref' in value:
+   name=value['$ref'].removeprefix('#/$defs/')
+   if name not in needed:
+    needed.add(name)
+    collect_refs(defs[name])
+  for key,item in value.items():
+   if key!='$defs':collect_refs(item)
+ elif isinstance(value,list):
+  for item in value:collect_refs(item)
+collect_refs(effect_schema)
+effect_schema['$defs']={key:value for key,value in defs.items() if key in needed}
+
 if __name__=='__main__':
- (ROOT/'schema/evidence_packet.schema.json').write_text(json.dumps(schema,indent=2)+'\n')
+ (ROOT/'schema/evidence_packet.schema.json').write_text(unit_schema_text)
+ (ROOT/'schema/effect_packet.schema.json').write_text(json.dumps(effect_schema,indent=2)+'\n')

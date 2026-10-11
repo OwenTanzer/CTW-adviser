@@ -1,6 +1,6 @@
 # Hosted MCP transport candidate (issue #3)
 
-The same five read-only tools served over stdio are available at `/mcp` using
+The same eight read-only tools served over stdio are available at `/mcp` using
 MCP Streamable HTTP protocol `2025-06-18`. This is a deployable candidate, not a
 live endpoint or a completed ChatGPT Work connection. The existing Railway
 Datasette URL is only for human inspection.
@@ -30,7 +30,9 @@ On PowerShell use `$env:PYTHONPATH='src'` instead of `PYTHONPATH=src`.
 The Node SDK is a development-only test dependency in ignored `work/`; the server
 uses Python's standard library. For a reviewed deployment replace the URL in
 `accept_mcp_http.mjs` with the final `https://.../mcp` endpoint. The same four
-pairs, ambiguity, paging, detail and provenance checks then run remotely.
+pairs, ambiguity, paging, detail, provenance and four calculation
+checks then run remotely. The combat implementation from PR #16 is present in
+the branch base; deployment still needs the separate production review below.
 
 ## Wire and lifecycle
 
@@ -70,12 +72,18 @@ non-loopback binding requires explicit `--allow-public`. Never put a token or
 user input in the URL. The app writes no request bodies or conversation logs.
 
 Every tool response carries adapter version, source snapshot and a separate
-model version field (currently null). Source fields, context, and derived
-values retain their existing distinctions. `evaluate_single_unit_matchup`
-should be registered in `mcp.TOOLS` and delegated from `mcp.call_tool` to the
-canonical model library once issue #5 supplies the scenario/result contract;
-`dispatch_method` already serves both transports. Validate direct library,
-CLI and MCP results against the same scenario JSON before release. ChatGPT
+model version field (null for evidence tools, the combat library's reported
+version for the evaluator).
+`evaluate_single_unit_matchup` delegates unchanged scenario arguments to
+`combat.evaluate_matchup` and wraps its source facts, assumptions, two ledgers,
+conditional verdict, sensitivity and limitations as structured content. Names
+with multiple matches return candidates; the adapter never chooses a variant.
+The hosted adapter caps scenario duration at 300 seconds, separation at 10,000
+metres, an explicitly set firing cycle at a minimum of 0.25 seconds, and
+previously unbounded numeric scenario settings at 1,000,000,000. Nonfinite
+numbers are rejected as invalid arguments. The combat library validates the
+other scenario fields. Check direct library, CLI
+and MCP results against the same scenario JSON before release. ChatGPT
 workflow instructions should refer to these tool names and schemas, not copy
 data or equations.
 
@@ -133,7 +141,7 @@ For ChatGPT Work, once HTTPS, access policy and service are approved and live,
 go to ChatGPT Plugins, select **+ → Add custom MCP server**, enter a name and
 description, and supply the final `https://<domain>/mcp` URL under Connection.
 Choose the approved authentication mode, review the risk warning, create the
-plugin, and inspect the five discovered tools. Install it, start a new chat,
+plugin, and inspect the eight discovered tools. Install it, start a new chat,
 select the plugin with `@`, and run the exact-name, ambiguity and pair probes.
 Workspace policy can restrict custom servers. If tool metadata changes, refresh
 the connection and start a new chat before retesting. These steps follow the
