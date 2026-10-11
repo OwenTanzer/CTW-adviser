@@ -40,8 +40,15 @@ The source verifier runs before import, after reading and before installation.
 The manifest is written only after successful build and read-only integrity and
 foreign-key inspection. A failed build does not certify an artifact. Run
 `verify_release.py` before using a copied pair; it rejects name, size, hash,
-source-commit and integrity mismatches. The manifest is not a signature or an
-engine-truth certificate.
+unsupported store schema/import contract, foreign-key/integrity errors, and
+manifest metadata that differs from the database or this checkout's pinned
+source. It also requires a clean-build manifest and compares the adviser commit
+to this checkout's HEAD by default. To check against a separately verified
+revision, pass `--expected-adviser-commit` with its full SHA. The manifest is
+not a signature or an engine-truth certificate. Build time, operating-system
+description and query-plan text are descriptive measurements: their types and
+shape are checked, but the verifier cannot independently reconstruct the
+original build environment or authenticate authorship.
 
 Use `query_snapshot.py passive --db work/adviser.sqlite --include-documentation
 KEY` to request the separately attributed research documentation. Default
