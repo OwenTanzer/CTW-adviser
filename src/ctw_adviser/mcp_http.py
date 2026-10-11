@@ -7,12 +7,15 @@ the hosting platform; the local listener defaults to loopback.
 from __future__ import annotations
 
 import argparse
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import math
 import os
 from pathlib import Path
 import sys
 import threading
+import time
 
 from .mcp import PROTOCOL_VERSION, SERVER_VERSION, _response, dispatch_method
 from .queries import Queries
@@ -20,6 +23,28 @@ from .queries import Queries
 MAX_REQUEST_BYTES = 64 * 1024
 MAX_RESPONSE_BYTES = 1024 * 1024
 MAX_CONNECTIONS = 16
+MAX_REQUESTS_PER_MINUTE = 60
+
+
+class SlidingWindowLimiter:
+    """Process-wide request cap independent of untrusted forwarded IP headers."""
+
+    def __init__(self, capacity=MAX_REQUESTS_PER_MINUTE, window_seconds=60, clock=time.monotonic):
+        self.capacity = capacity
+        self.window_seconds = window_seconds
+        self.clock = clock
+        self._arrivals = deque()
+        self._lock = threading.Lock()
+
+    def admit(self):
+        with self._lock:
+            now = self.clock()
+            while self._arrivals and now - self._arrivals[0] >= self.window_seconds:
+                self._arrivals.popleft()
+            if len(self._arrivals) >= self.capacity:
+                return False, max(1, math.ceil(self.window_seconds - (now - self._arrivals[0])))
+            self._arrivals.append(now)
+            return True, 0
 
 
 class BoundedHTTPServer(ThreadingHTTPServer):
@@ -28,6 +53,7 @@ class BoundedHTTPServer(ThreadingHTTPServer):
 
     def __init__(self, *args, **kwargs):
         self._connections = threading.BoundedSemaphore(MAX_CONNECTIONS)
+        self.rate_limiter = SlidingWindowLimiter()
         super().__init__(*args, **kwargs)
 
     def process_request(self, request, client_address):
@@ -117,6 +143,12 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
                 return
             if self.path != "/mcp":
                 self._send(404, {"error": "not found"})
+                return
+            admitted, retry_after = self.server.rate_limiter.admit()
+            if not admitted:
+                self.close_connection = True
+                self._send(429, {"error": "request rate exceeded"},
+                           headers={"Retry-After": str(retry_after)})
                 return
             content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
             accept = self.headers.get("Accept", "").lower()

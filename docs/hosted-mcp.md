@@ -49,7 +49,12 @@ The server opens an already built SQLite artifact through `Queries` in
 `mode=ro` with `query_only=ON` and rejects unsupported schema/contract at
 startup. Ordinary calls never fetch, rebuild or write source data. Request
 bodies are limited to 64 KiB, responses to 1 MiB, concurrent connections to
-16 and inactive sockets to 15 seconds. Tool schemas retain 1–256 item paging
+16 and inactive sockets to 15 seconds. POST `/mcp` requests are also capped at
+60 per rolling minute per server process; excess requests receive HTTP 429 with
+`Retry-After`. `/healthz` is exempt. The limit is global because reverse proxy
+addresses and forwarded IP headers are not reliable user identities. If the
+service is scaled beyond one replica, each replica has its own limit. Tool
+schemas retain 1-256 item paging
 limits and 64 IDs per provenance call. Oversize responses return an actionable
 JSON-RPC error asking for a smaller limit or section. Origin headers are checked
 against exact `--allowed-origin` values or comma-separated
@@ -90,13 +95,13 @@ approved host with HTTPS termination that runs this same image and `/mcp`
 path. Do not repurpose the Datasette service or point a client at it. No
 service/domain/variable has been created by this candidate.
 
-The current candidate uses **public, unauthenticated read-only access** to
-public game data. This avoids a shared secret and supports standard MCP clients,
-but anyone with the URL can call it and individual revocation is unavailable.
-Before production, approve this public policy with platform rate limiting, or
-choose individual OAuth with revocation at a gateway. The latter needs a
-separate security design and configuration; no credential or permission
-expansion is included here. TLS must terminate at the platform HTTPS domain.
+Owen approved **public, unauthenticated read-only access** for the initial
+endpoint. Anyone with the URL can call it, and individual revocation is
+unavailable. The process-wide rolling limit, connection cap and body/response
+limits bound ordinary traffic; production may add platform edge controls after
+inspection. TLS must terminate at the platform HTTPS domain. Hosting cost
+approval remains separate, and no credential or permission expansion is
+included here.
 
 For each reviewed release: build the image at a reviewed adviser commit;
 download exactly the files in `source_lock.json` from the pinned CTW-data

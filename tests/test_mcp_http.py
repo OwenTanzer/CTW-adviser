@@ -11,11 +11,23 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from ctw_adviser.mcp_http import make_handler, BoundedHTTPServer
+from ctw_adviser.mcp_http import make_handler, BoundedHTTPServer, SlidingWindowLimiter
 
 
 DB = Path(os.environ.get("CTW_ADVISER_DB", "work/adviser.sqlite"))
 ACCEPT = "application/json, text/event-stream"
+
+
+class RateLimitTests(unittest.TestCase):
+    def test_rolling_window_and_retry_delay(self):
+        now = [100.0]
+        limiter = SlidingWindowLimiter(capacity=2, window_seconds=60, clock=lambda: now[0])
+        self.assertEqual(limiter.admit(), (True, 0))
+        self.assertEqual(limiter.admit(), (True, 0))
+        now[0] += 2.2
+        self.assertEqual(limiter.admit(), (False, 58))
+        now[0] += 57.8
+        self.assertEqual(limiter.admit(), (True, 0))
 
 
 @unittest.skipUnless(DB.is_file(), "build work/adviser.sqlite first")
@@ -123,6 +135,17 @@ class HTTPTransportTests(unittest.TestCase):
             # Disconnect before the declared body is complete.
         # A disconnected client leaves no server-side session or lock.
         self.assertEqual(self.rpc("ping")[1]["result"], {})
+
+    def test_post_rate_limit_preserves_health(self):
+        previous = self.server.rate_limiter
+        self.server.rate_limiter = SlidingWindowLimiter(capacity=2)
+        try:
+            self.assertEqual(self.rpc("ping")[0], 200)
+            self.assertEqual(self.rpc("ping")[0], 200)
+            self.assertEqual(self.rpc("ping")[0], 429)
+            self.assertEqual(self.request("GET", "/healthz")[0], 200)
+        finally:
+            self.server.rate_limiter = previous
 
 
 if __name__ == "__main__":
