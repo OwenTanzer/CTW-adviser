@@ -47,8 +47,9 @@ Query commands require only the built SQLite file. Ambiguous names return
 candidates; source aliases and availability remain distinct. Python callers use
 `Queries` from `ctw_adviser.queries` as a context manager. See the lookup contract
 for sections, modes, continuation, detail/provenance commands and interpretation
-boundaries. The public Datasette inspection deployment is separate from the
-offline query library and future client adapters. Its version must be checked
+boundaries. The existing public Datasette service uses this repository's
+[`inspection_plugins` and Docker build](docs/inspection-deployment.md) for
+read-only human inspection. Its live source and packet version must be checked
 against a reviewed merge before claiming parity.
 
 Packet 1.19.0 includes the Alpha 4 repairs first released in 1.15.0 and the

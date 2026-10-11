@@ -75,6 +75,12 @@ class PinnedStoreTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.temp.cleanup()
 
+    def test_snapshot_describes_implemented_packet_interface(self):
+        with closing(open_snapshot(self.output)) as db:
+            coverage = json.loads(db.execute('SELECT coverage_json FROM snapshot').fetchone()[0])
+        self.assertIn('versioned read-only query packets implemented', coverage['packet_interface'])
+        self.assertNotIn('not implemented', coverage['packet_interface'])
+
     def test_incompatible_contract_fails_at_open(self):
         older = self.directory / 'different-contract.sqlite'
         with closing(sqlite3.connect(self.output)) as source, closing(sqlite3.connect(older)) as target, target:
