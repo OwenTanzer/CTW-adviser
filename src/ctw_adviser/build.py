@@ -247,7 +247,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
                                  'semantic': 'partial; raw conditions/effects retained without application',
                                  'runtime': 'unverified; engine behavior is not fully reconstructed',
                                  'activated_payloads': 'deferred',
-                                 'packet_interface': 'phase 3, not implemented'})))
+                                 'packet_interface': 'versioned read-only query packets implemented; downstream consumers are separate'})))
             for entry in lock['files']:
                 path = entry['path']
                 raw = safe_path(source_root, path).read_bytes()

@@ -13,7 +13,7 @@ PACKET_VERSION = '1.19.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
-PASSIVE_RESEARCH_DOCUMENTATION = 'https://github.com/OwenTanzer/CTW-adviser/blob/issue-2-query-packets/docs/lookup-contract.md#focused-passive-research'
+PASSIVE_RESEARCH_DOCUMENTATION = 'https://github.com/OwenTanzer/CTW-adviser/blob/4c9676cfc3814450624bfdaa484c0e4c7087f8f6/docs/lookup-contract.md#focused-passive-research'
 
 # Reviewed families share payload handling, not necessarily phase sequences.
 SURVIVAL_PASSIVES = {

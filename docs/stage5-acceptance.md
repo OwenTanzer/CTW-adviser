@@ -62,7 +62,10 @@ The **idle fixed-case** run used 12 single units and three pairs with 25 warm
 query-plus-compact-serialization repetitions per case. Single packet median/max
 were **19,113.5/107,637 bytes**; pair median/max were **28,327/31,922 bytes**.
 The maximum per-case warm median/p95 were **152.46/159.08 ms**, both for Daemon
-Prince; its fresh-connection call took **162.13 ms**. The next-highest warm
+Prince; its first query on a newly opened connection took **162.13 ms**. That
+historical timer began after connection construction, so it excluded startup;
+the current benchmark starts its fresh timer before opening the connection.
+The next-highest warm
 median was **42.22 ms**. Daemon Prince still exceeds the provisional 100 ms
 warm-median target and remains the explicitly accepted exception, not a pass.
 The representative `tracemalloc` Python heap peak for one fresh-connection
