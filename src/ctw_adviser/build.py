@@ -636,6 +636,7 @@ def validate_character_access(db):
     crossed = db.execute('SELECT a.binding_record FROM effect_character_access a '
                          'LEFT JOIN magic_skill_bindings b ON b.record_id=a.binding_record '
                          'LEFT JOIN effect_abilities e ON e.ability_key=a.ability_key '
+                         'LEFT JOIN native_ability_definitions d ON d.key=a.ability_key '
                          "WHERE b.record_id IS NULL OR b.target_kind IS NOT 'ability' "
                          'OR b.target_key IS NOT a.ability_key '
                          'OR b.ability_key IS NOT a.ability_key '
@@ -649,7 +650,9 @@ def validate_character_access(db):
                          "WHEN 'disable' THEN 'disables' ELSE 'modifies' END "
                          'OR a.effect_ability IS NOT e.ability_key '
                          "OR (e.ability_key IS NOT NULL AND a.status IS NOT 'activated_effect') "
-                         "OR (e.ability_key IS NULL AND a.status IS 'activated_effect') LIMIT 1").fetchone()
+                         "OR (e.ability_key IS NULL AND a.status IS 'activated_effect') "
+                         "OR (e.ability_key IS NULL AND d.key IS NOT NULL "
+                         "AND a.status IS NOT 'not_activated') LIMIT 1").fetchone()
     if crossed:
         raise ValueError('crossed character access identity or source binding: ' + crossed[0])
 

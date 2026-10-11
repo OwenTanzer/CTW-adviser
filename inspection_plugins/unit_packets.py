@@ -12,6 +12,7 @@ from markupsafe import Markup
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from ctw_adviser.queries import Queries, ResolutionError, RESEARCHED_PASSIVES, PASSIVE_RESEARCH_DOCUMENTATION
+from ctw_adviser.preview import preview_banner, preview_revision
 
 
 def escape(value):
@@ -37,11 +38,12 @@ def page(content, query=''):
 <title>CTW · unit evidence inspection</title><style>
 body{font:16px/1.5 system-ui,sans-serif;background:#f5f4f0;color:#172b3a;margin:0}main{max-width:1100px;margin:auto;padding:28px}
 a{color:#155a79}h1{margin-bottom:4px}h2{font-size:1.35rem}h3{margin-bottom:6px}.preview{background:#f9e5bc;padding:10px 16px;border-radius:6px}
+.release-preview{background:#7c2d12;color:white;padding:12px 16px;border-radius:6px;margin:12px 0}.release-preview a{color:white}
 .card{background:white;border:1px solid #d5d9d8;border-radius:8px;padding:18px;margin:16px 0}input,select,button{font:inherit;padding:8px;border:1px solid #a7b5b9;border-radius:4px}
 input{width:min(65%,520px)}button{background:#172b3a;color:white;cursor:pointer}table{border-collapse:collapse;width:100%;margin:12px 0}th,td{padding:7px 10px;border-bottom:1px solid #e5e8e7;text-align:left;vertical-align:top}th{width:30%;font-weight:500}
 pre{font:13px/1.5 ui-monospace,monospace;overflow:auto;max-height:500px;background:#f1f4f4;padding:14px}summary{cursor:pointer}small,.muted{color:#52656e}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.grid .card{margin:0}
 </style><main><nav><a href="/inspect">Unit evidence</a> · <a href="/ctw/find_units?name=">Name search</a> · <a href="/ctw">All source tables</a> · <a href="https://github.com/OwenTanzer/CTW-adviser/issues/2">Issue #2</a></nav>
-<h1>Unit evidence inspection</h1><p class="preview">Read-only inspection of the pinned CTW-data snapshot. Source commit and packet version appear with each unit. Conditional mechanics are evidence, not applied combat results.</p>
+<h1>Unit evidence inspection</h1>''' + preview_banner() + '''<p class="preview">Read-only inspection of the pinned CTW-data snapshot. Source commit and packet version appear with each unit. Conditional mechanics are evidence, not applied combat results.</p>
 <form action="/inspect"><input name="q" aria-label="Unit name or key" placeholder="Unit name or exact key" value="''' + escape(query) + '''"><button>Find unit</button></form>
 <p class="muted">Base profiles and supported mechanics from pinned CTW-data. Conditional effects remain separate; no combat outcome is calculated.</p>''' + content + '</main></html>'
 
@@ -175,6 +177,7 @@ async def detail(request, datasette):
 
 @hookimpl
 def register_routes(datasette):
+    preview_revision()  # Reject a PR preview that cannot name its exact adviser commit.
     return [(r'^/inspect$', inspect), (r'^/inspect/detail$', detail)]
 
 

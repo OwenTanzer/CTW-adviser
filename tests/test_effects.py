@@ -599,6 +599,24 @@ class EffectTests(unittest.TestCase):
             plan = ' '.join(r[3] for r in db.execute('EXPLAIN QUERY PLAN ' + sql, params))
             self.assertNotIn('SCAN', plan, sql)
 
+    def test_character_access_known_definitions_cannot_be_reported_missing(self):
+        from ctw_adviser.build import validate_character_access
+        db = self.q.db
+        for actual_status in ('activated_effect', 'not_activated'):
+            with self.subTest(actual_status=actual_status):
+                known = db.execute('SELECT a.binding_record FROM effect_character_access a '
+                                   'JOIN native_ability_definitions d ON d.key=a.ability_key '
+                                   'WHERE a.status=? LIMIT 1', (actual_status,)).fetchone()
+                self.assertIsNotNone(known)
+                changed = self.tamper(
+                    "UPDATE effect_character_access SET status='missing_definition' WHERE binding_record=("
+                    'SELECT a.binding_record FROM effect_character_access a '
+                    'JOIN native_ability_definitions d ON d.key=a.ability_key '
+                    f"WHERE a.status='{actual_status}' LIMIT 1)")
+                with closing(sqlite3.connect(changed)) as tampered:
+                    with self.assertRaisesRegex(ValueError, 'crossed'):
+                        validate_character_access(tampered)
+
 
 if __name__ == '__main__':
     unittest.main()
