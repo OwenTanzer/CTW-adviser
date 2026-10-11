@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sqlite3
 import sys
 
@@ -32,6 +33,40 @@ def _tool(name, description, properties, required=()):
 
 STRING = {"type": "string", "minLength": 1}
 LIMIT = {"type": "integer", "minimum": 1, "maximum": 256, "default": 32}
+MAX_SCENARIO_NUMBER = 1_000_000_000
+SIDE_SETTINGS = {"type": "object", "properties": {
+    "order": {"type": "string", "enum": ["approach", "hold", "retreat"]},
+    "fire": {"type": "boolean"}, "fight": {"type": "boolean"},
+    "facing": {"type": "string", "enum": ["front", "side", "rear"]},
+    "ranged_attack_id": STRING,
+    "collision_probability": {"type": "number", "minimum": 0, "maximum": 1},
+    "firing_entities": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "cycle_seconds": {"type": "number", "minimum": 0.25, "maximum": MAX_SCENARIO_NUMBER},
+    "first_shot_delay_seconds": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "projectiles_per_cycle": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "flight_seconds": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "explosion_entities_per_collision": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "active_contacts": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "charge_duration_seconds": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+    "target_component_role": STRING,
+    "assume_targetable": {"type": "boolean"},
+    "assume_unit_protection_for_component": {"type": "boolean"},
+    "combat_effective_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+}, "additionalProperties": False}
+SCENARIO = {"type": "object", "description": "Conditional custom-battle assumptions; see docs/matchup-model.md. Duration is capped at 300 seconds for hosted calls.",
+            "properties": {"mode": {"type": "string", "enum": ["custom_battle"]},
+                           "baseline": {"type": "string", "enum": ["unmodified_ultra_rank_0"]},
+                           "separation_metres": {"type": "number", "minimum": 0, "maximum": 10000},
+                           "duration_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 300},
+                           "metres_per_second_per_speed_point": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                           "path_length_factor": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                           "terrain_speed_factor": {"type": "number", "exclusiveMinimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                           "line_of_sight": {"type": "boolean"},
+                           "historical_relations_apply_to_patch_9": {"type": "boolean"},
+                           "barrier_damage_order": {"type": "string", "enum": ["barrier_first", "entity_cap_first"]},
+                           "sides": {"type": "object", "properties": {"a": SIDE_SETTINGS,
+                                                                      "b": SIDE_SETTINGS},
+                                     "additionalProperties": False}}, "additionalProperties": False}
 TOOLS = [
     _tool("resolve_unit", "Resolve an exact unit key or name; ambiguous names return candidates. No fuzzy choice or availability inference.",
           {"name_or_key": STRING, "subculture": STRING}, ("name_or_key",)),
@@ -49,8 +84,36 @@ TOOLS = [
           {"ref": STRING, "cursor": STRING, "limit": LIMIT}, ("ref",)),
     _tool("get_provenance", "Expand exact source record IDs returned in a packet (maximum 64 per call).",
           {"record_ids": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 64}}, ("record_ids",)),
+    _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations.",
+          {"unit_a": STRING, "unit_b": STRING, "subculture_a": STRING, "subculture_b": STRING,
+           "scenario": SCENARIO}, ("unit_a", "unit_b")),
 ]
 BY_NAME = {tool["name"]: tool for tool in TOOLS}
+
+
+def _validate_scenario(value, rule, path):
+    kind = rule["type"]
+    if kind == "object":
+        if not isinstance(value, dict):
+            raise ValueError(f"{path} must be an object")
+        properties = rule["properties"]
+        if set(value) - set(properties):
+            raise ValueError(f"unsupported {path} field")
+        for key, item in value.items():
+            _validate_scenario(item, properties[key], f"{path}.{key}")
+    elif kind == "number":
+        if type(value) not in (int, float) or (type(value) is float and not math.isfinite(value)):
+            raise ValueError(f"{path} must be a finite number")
+        if (("minimum" in rule and value < rule["minimum"]) or
+                ("exclusiveMinimum" in rule and value <= rule["exclusiveMinimum"]) or
+                ("maximum" in rule and value > rule["maximum"])):
+            raise ValueError(f"{path} is outside the hosted range")
+    elif kind == "boolean" and type(value) is not bool:
+        raise ValueError(f"{path} must be boolean")
+    elif kind == "string" and (not isinstance(value, str) or not value.strip()):
+        raise ValueError(f"{path} must be a nonempty string")
+    if "enum" in rule and value not in rule["enum"]:
+        raise ValueError(f"unsupported {path}")
 
 
 def _validate(tool, args):
@@ -73,8 +136,12 @@ def _validate(tool, args):
         if kind == "array" and (not isinstance(value, list) or not rule["minItems"] <= len(value) <= rule["maxItems"]
                                 or any(not isinstance(item, str) or not item.strip() for item in value)):
             raise ValueError(f"{key} must contain 1 to 64 nonempty strings")
+        if kind == "object" and not isinstance(value, dict):
+            raise ValueError(f"{key} must be an object")
         if "enum" in rule and value not in rule["enum"]:
             raise ValueError(f"unsupported {key}")
+    if tool["name"] == "evaluate_single_unit_matchup":
+        _validate_scenario(args.get("scenario", {}), SCENARIO, "scenario")
 
 
 def _content(payload, is_error=False):
@@ -107,14 +174,19 @@ def call_tool(queries, name, args):
                                                 include_provenance=args.get("include_provenance", False))
         elif name == "get_detail":
             data = queries.get_detail(args["ref"], cursor=args.get("cursor"), limit=args.get("limit", 32))
+        elif name == "evaluate_single_unit_matchup":
+            from .combat import evaluate_matchup
+            data = evaluate_matchup(queries, args["unit_a"], args["unit_b"], scenario=args.get("scenario"),
+                                    subculture_a=args.get("subculture_a"), subculture_b=args.get("subculture_b"))
         else:
             data = queries.get_provenance(args["record_ids"])
         return _content({"status": "ok", "adapter_version": SERVER_VERSION,
-                         "model_version": None, "snapshot": queries.snapshot, "data": data})
+                         "model_version": data["model_version"] if name == "evaluate_single_unit_matchup" else None,
+                         "snapshot": queries.snapshot, "data": data})
     except ResolutionError as exc:
         return _content({"status": exc.result["status"], "adapter_version": SERVER_VERSION,
                          "model_version": None, "snapshot": queries.snapshot, "data": exc.result}, True)
-    except (ValueError, KeyError, sqlite3.Error) as exc:
+    except (ValueError, OverflowError, KeyError, sqlite3.Error) as exc:
         return _content({"status": "error", "adapter_version": SERVER_VERSION,
                          "model_version": None, "snapshot": queries.snapshot,
                          "data": {"message": str(exc)}}, True)
