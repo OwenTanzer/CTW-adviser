@@ -141,7 +141,7 @@ For ChatGPT Work, once HTTPS, access policy and service are approved and live,
 go to ChatGPT Plugins, select **+ → Add custom MCP server**, enter a name and
 description, and supply the final `https://<domain>/mcp` URL under Connection.
 Choose the approved authentication mode, review the risk warning, create the
-plugin, and inspect the five discovered tools. Install it, start a new chat,
+plugin, and inspect the six discovered tools. Install it, start a new chat,
 select the plugin with `@`, and run the exact-name, ambiguity and pair probes.
 Workspace policy can restrict custom servers. If tool metadata changes, refresh
 the connection and start a new chat before retesting. These steps follow the
