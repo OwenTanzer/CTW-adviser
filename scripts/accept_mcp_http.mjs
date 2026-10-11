@@ -18,13 +18,32 @@ try {
   const listed = await client.listTools();
   assert.deepEqual(new Set(listed.tools.map(t => t.name)), new Set([
     'resolve_unit', 'get_unit_combat_profile', 'get_matchup_evidence',
-    'get_detail', 'get_provenance', 'evaluate_single_unit_matchup'
+    'get_detail', 'get_provenance', 'evaluate_single_unit_matchup',
+    'discover_unit_fields', 'search_units'
   ]));
   for (const tool of listed.tools) {
     assert.ok(tool.inputSchema && tool.outputSchema && tool.description);
     assert.equal(tool.annotations?.readOnlyHint, true);
   }
   const call = async (name, args) => (await client.callTool({ name, arguments: args })).structuredContent;
+  const fields = await call('discover_unit_fields', {});
+  assert.ok(fields.data.items.some(f => f.name === 'melee_attack'));
+  const categories = await call('discover_unit_fields', { field: 'subculture_key' });
+  const highElves = categories.data.items.find(v => v.endsWith('_hef_high_elves'));
+  assert.ok(highElves);
+  const searchArgs = { filters: { and: [
+    { field: 'subculture_key', op: 'eq', value: highElves },
+    { field: 'source_caste', op: 'in', value: ['lord', 'hero'] }
+  ] }, mode: 'families', limit: 20 };
+  const first = await call('search_units', searchArgs);
+  assert.equal(first.data.total_count, 35);
+  assert.equal(first.data.total_matching_variants, 126);
+  const second = await call('search_units', { ...searchArgs, cursor: first.data.next_cursor });
+  assert.equal(second.data.complete, true);
+  assert.equal(first.data.returned_count + second.data.returned_count, 35);
+  const searchedKey = first.data.results[0].matching_variants[0].unit_key;
+  const searchedProfile = await call('get_unit_combat_profile', { unit_key: searchedKey });
+  assert.equal(searchedProfile.data.units[0].identity.unit_key, searchedKey);
   const exact = await call('resolve_unit', { name_or_key: 'Lothern Sea Guard' });
   assert.equal(exact.data.status, 'resolved');
   assert.equal(exact.snapshot.source_commit, '595e22764b22e748afdbafafcb0a6258973e2451');
@@ -79,10 +98,10 @@ try {
   await client.close();
   reconnected = new Client({ name: 'ctw-adviser-reconnect', version: '1.0.0' });
   await reconnected.connect(new StreamableHTTPClientTransport(new URL(endpoint)));
-  assert.equal((await reconnected.listTools()).tools.length, 6);
+  assert.equal((await reconnected.listTools()).tools.length, 8);
   console.log(JSON.stringify({ status: 'passed', endpoint, protocol: '2025-06-18',
     source_commit: exact.snapshot.source_commit, tools: listed.tools.map(t => t.name), pairs: 4,
-    calculations: 4, errors: true, reconnect: true }));
+    calculations: 4, unit_search: { families: 35, variants: 126, profile_followthrough: true }, errors: true, reconnect: true }));
 } finally {
   await reconnected?.close();
   await client.close();

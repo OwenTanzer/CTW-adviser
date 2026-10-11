@@ -69,7 +69,18 @@ SCENARIO = {"type": "object", "description": "Conditional custom-battle assumpti
                            "sides": {"type": "object", "properties": {"a": SIDE_SETTINGS,
                                                                       "b": SIDE_SETTINGS},
                                      "additionalProperties": False}}, "additionalProperties": False}
+SEARCH_LIMIT = {"type": "integer", "minimum": 1, "maximum": 100, "default": 50}
 TOOLS = [
+    _tool("discover_unit_fields", "Discover supported unit search fields, meanings, units, operators and null semantics. With field, page its observed categorical values. Discover before constructing roster/stat queries; no guessed field names.",
+          {"field": STRING, "cursor": STRING, "limit": SEARCH_LIMIT}),
+    _tool("search_units", "Search the pinned unit database with structured AND/OR filters. Enumerate rosters without guessing names. Filters precede optional mount-family grouping; each matching variant retains its own stats. Follow next_cursor with identical arguments for exhaustive results. No buffs applied. See discover_unit_fields for field/operator semantics.",
+          {"filters": {"$ref": "#/$defs/filter"},
+           "fields": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 16, "uniqueItems": True},
+           "sort": {"type": "array", "minItems": 1, "maxItems": 3, "items": {
+               "type": "object", "properties": {"field": STRING, "direction": {"type": "string", "enum": ["asc", "desc"]}},
+               "required": ["field", "direction"], "additionalProperties": False}},
+           "mode": {"type": "string", "enum": ["variants", "families"], "default": "variants"},
+           "cursor": STRING, "limit": SEARCH_LIMIT}),
     _tool("resolve_unit", "Resolve an exact unit key or name; ambiguous names return candidates. No fuzzy choice or availability inference.",
           {"name_or_key": STRING, "subculture": STRING}, ("name_or_key",)),
     _tool("get_unit_combat_profile", "Retrieve one qualified unit's sourced combat packet. Sections page explicitly; omitted sections are not absent mechanics. No damage or winner prediction.",
@@ -91,6 +102,17 @@ TOOLS = [
            "scenario": SCENARIO}, ("unit_a", "unit_b")),
 ]
 BY_NAME = {tool["name"]: tool for tool in TOOLS}
+BY_NAME["search_units"]["inputSchema"]["$defs"] = {"filter": {
+    "description": "At most depth 5 and 32 nodes. A leaf has field/op and value or value_field; null checks omit values.",
+    "oneOf": [
+        {"type": "object", "properties": {
+            "field": STRING, "op": {"type": "string", "enum": ["eq", "ne", "gt", "gte", "lt", "lte", "in", "not_in", "between", "contains", "is_null", "is_not_null"]},
+            "value": {"type": ["string", "number", "boolean", "array"], "items": {"type": ["string", "number", "boolean"]}, "maxItems": 32},
+            "value_field": STRING}, "required": ["field", "op"], "additionalProperties": False},
+        *[{"type": "object", "properties": {group: {"type": "array", "minItems": 1, "maxItems": 32,
+            "items": {"$ref": "#/$defs/filter"}}}, "required": [group], "additionalProperties": False}
+          for group in ("and", "or")]]}}
+
 
 
 def _validate_scenario(value, rule, path):
@@ -126,6 +148,8 @@ def _validate(tool, args):
         raise ValueError("unknown argument")
     if set(schema["required"]) - set(args):
         raise ValueError("missing required argument")
+    if tool["name"] in ("discover_unit_fields", "search_units"):
+        return  # Shared library validates the complete bounded query grammar.
     for key, value in args.items():
         rule = schema["properties"][key]
         kind = rule["type"]
@@ -160,7 +184,11 @@ def call_tool(queries, name, args):
         raise ValueError(f"unknown tool: {name}")
     _validate(tool, args)
     try:
-        if name == "resolve_unit":
+        if name == "discover_unit_fields":
+            data = queries.discover_unit_fields(**args)
+        elif name == "search_units":
+            data = queries.search_units(**args)
+        elif name == "resolve_unit":
             data = queries.resolve_unit(args["name_or_key"], args.get("subculture"))
         elif name == "get_unit_combat_profile":
             data = queries.get_unit_profile(args["unit_key"], subculture=args.get("subculture"),

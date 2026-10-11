@@ -364,6 +364,14 @@ class Queries:
             raise ValueError(f'nonunique evidence: {table}.{field}={value}')
         return rows[0] if rows else None
 
+    def discover_unit_fields(self, **options):
+        from .unit_search import discover_unit_fields
+        return discover_unit_fields(self, **options)
+
+    def search_units(self, **options):
+        from .unit_search import search_units
+        return search_units(self, **options)
+
     def resolve_unit(self, query, subculture=None):
         if not isinstance(query, str) or not query.strip():
             raise ValueError('unit query must be a nonempty string')
