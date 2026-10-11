@@ -20,7 +20,7 @@ datasette serve -i work/ctw.sqlite --metadata datasette-metadata.json \
 ```
 
 Check `/ctw.json`, `/inspect?q=Teclis`, and a Celestial Hurricanum unit view.
-The HTML should show the locked source commit and packet 1.20.0, with
+The HTML should show the locked source commit and packet 1.19.0, with
 “Supporting source documentation” closed by default. The JSON view should
 have `provenance_mode: deferred` and empty `sources`/`provenance`; requesting
 `provenance=1` should expand those dictionaries. Check ambiguous and unknown

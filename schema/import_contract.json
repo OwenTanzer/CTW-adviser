@@ -1,5 +1,5 @@
 {
-  "contract_version": 3,
+  "contract_version": 2,
   "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
   "baseline": {
     "game": "warhammer_3",
@@ -13,14 +13,13 @@
   "identity_policy": "Roster key includes snapshot/game/patch/scale/subculture/unit. Shared unit relations use main-unit identity, never an arbitrary race row. Permissions do not transfer across aliases or rosters.",
   "classification": {
     "core_passive": "Automatic normal-combat mechanic, including conditional effects; inspect ability definition and casting.passive.",
-    "activated_option": "Deliberate ability or spell, including bound spells. Issue #19: every source-classified activated definition is a payload root; retain its full casting, phase, condition and payload graph in the shared native tables, with distinct effect identity/variant/access records. Linkage is qualified access, never certified acquisition or an active effect.",
+    "activated_option": "Deliberate ability or spell, including bound spells; retain qualified access and deferred reference only.",
     "unresolved": "Absent or contradictory definition/casting evidence; never infer from name prefix or source_type alone.",
     "access_fields": [
       "culture_key",
       "requires_effect_enabling"
     ],
-    "application": "No changes to base stats. Interpretation and applicability belong to issues #5/#6.",
-    "effect_kind": "spell when definition.source_type is spell or bound, otherwise activated_ability; source_type is a source label, not a complete obtainability or Winds-funding classifier."
+    "application": "No changes to base stats. Interpretation and applicability belong to issues #5/#6."
   },
   "effect_kinds": [
     "stat_modifier",
@@ -37,8 +36,7 @@
     "semantic_coverage": "partial; preserve native unknowns and unresolved references",
     "runtime_coverage": "unverified; this step does not classify every ability, calculate effects or prove payload closure",
     "raw_passthrough_fields": "TEXT deliberately preserves extension tokens whose types are not established by the unit builder; reviewed native type refinement is required before numeric use.",
-    "next_step": "Contract 4: reviewed lock of CTW-data magic character/access outputs for skill/rank access routes.",
-    "activated_effects": "Structural closure from activated roots through the existing joins; runtime arithmetic, scheduling, targeting priority and stacking remain unverified. Character skill/rank access routes (CTW-data data/magic) are outside contract 3."
+    "next_step": "Commit packet schema and source-backed/synthetic fixtures before implementing the importer."
   },
   "metadata_gates": [
     {
