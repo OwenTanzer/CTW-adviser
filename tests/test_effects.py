@@ -1,5 +1,6 @@
 """Issue #19: specialized spell/activated-ability retrieval on the pinned store."""
 from contextlib import closing
+import copy
 import json
 import os
 from pathlib import Path
@@ -40,6 +41,7 @@ class EffectTests(unittest.TestCase):
         build_snapshot(SOURCE, cls.output)
         cls.q = Queries(cls.output)
         cls.schema = json.loads((ROOT / 'schema/evidence_packet.schema.json').read_text())
+        cls.effect_schema = json.loads((ROOT / 'schema/effect_packet.schema.json').read_text())
 
     @classmethod
     def tearDownClass(cls):
@@ -270,6 +272,21 @@ class EffectTests(unittest.TestCase):
         dropped = self.tamper(f"DELETE FROM effect_access WHERE ability_key='{BOUND}'")
         with closing(sqlite3.connect(dropped)) as db, self.assertRaisesRegex(ValueError, 'access reconciliation'):
             validate_effects(db, self.options(db))
+        wrong_unit = self.tamper("UPDATE effect_access SET unit_key=("
+            "SELECT unit_key FROM unit_identity WHERE namespace='roster' AND unit_key != "
+            "(SELECT unit_key FROM effect_access LIMIT 1) LIMIT 1) "
+            "WHERE link_record=(SELECT link_record FROM effect_access LIMIT 1)")
+        with closing(sqlite3.connect(wrong_unit)) as db:
+            self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
+            with self.assertRaisesRegex(ValueError, 'access reconciliation'):
+                validate_effects(db, self.options(db))
+        wrong_overcast = self.tamper(f"UPDATE effect_variants SET variant_key='{BOUND}', "
+            f"variant_ability='{BOUND}' WHERE rowid=(SELECT rowid FROM effect_variants "
+            "WHERE relation='overcast_option' LIMIT 1)")
+        with closing(sqlite3.connect(wrong_overcast)) as db:
+            self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
+            with self.assertRaisesRegex(ValueError, 'variant source reconciliation'):
+                validate_effects(db, self.options(db))
         missing = self.tamper(f"DELETE FROM effect_abilities WHERE ability_key='{POTION}'")
         with closing(sqlite3.connect(missing)) as db:
             self.assertTrue(db.execute('PRAGMA foreign_key_check').fetchall())
@@ -293,6 +310,53 @@ class EffectTests(unittest.TestCase):
         gone = self.tamper(f"DELETE FROM native_ability_casting WHERE key='{POTION}'")
         with Queries(gone) as q, self.assertRaisesRegex(ValueError, 'missing retained casting'):
             q.get_effect(POTION)
+
+    def test_specialized_effect_packet_contract(self):
+        for key in (COMET, COMET_OVERCAST, BOUND, POTION, SUMMON):
+            packet = self.q.get_effect(key, include_provenance=True, include_diagnostics=True)
+            validate(packet, self.effect_schema, self.effect_schema)
+            packet_checks(packet)
+        packet = self.q.get_effect(COMET, include_provenance=True)
+        for field in ('effect', 'sources', 'provenance', 'detail_refs', 'payload_graph', 'diagnostic_count'):
+            broken = copy.deepcopy(packet)
+            del broken[field]
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                validate(broken, self.effect_schema, self.effect_schema)
+        for group, fields in (('activation', ('mana_cost', 'recharge_time', 'num_uses')),
+                              ('targeting', ('target_enemies', 'num_effected_enemy_units'))):
+            for field in fields:
+                broken = copy.deepcopy(packet)
+                del broken['effect'][group]['values'][field]
+                with self.subTest(group=group, field=field), self.assertRaises(ValueError):
+                    validate(broken, self.effect_schema, self.effect_schema)
+        packet['effect']['activation']['values']['mana_cost'] = None
+        validate(packet, self.effect_schema, self.effect_schema)
+
+    def test_per_kind_omission_and_explicit_null(self):
+        common = {'phase_ref': None, 'provenance_refs': ['source']}
+        cases = {
+            'stat_modifier': ({'stat':'armour','operation':'add','native_operation':'add','value':None}, ('value',)),
+            'attribute_effect': ({'attribute_key':'flaming','operation':'grant','recipient':None,'native_parameters':{}}, ('recipient',)),
+            'periodic_damage': ({'native_parameters':{'damage_amount':None,'hp_change_frequency':None,'max_damaged_entities':None}}, ('native_parameters','damage_amount')),
+            'healing': ({'native_parameters':{'heal_amount':None,'barrier_heal_amount':None,'hp_change_frequency':None,'resurrect':None,'limits':{}}}, ('native_parameters','heal_amount')),
+            'summon': ({'unit_key':'land_unit','unit_name':None,'trigger':'on_activation','trigger_basis':'source','spawn_type':None,'num_uses':None,'native_parameters':{}}, ('unit_name',)),
+            'phase_behavior': ({'native_kind':'phase_behavior','native_parameters':{'imbue_contact':None},'reason':'source'}, ('native_parameters','imbue_contact')),
+            'phase_role': ({'native_kind':'phase_role','native_parameters':{'setting':None},'reason':'source'}, ('phase_ref',)),
+            'visual_indicator': ({'purpose':'source'}, ('phase_ref',)),
+            'payload_reference': ({'node_ref':'node','relationship':'source'}, ('phase_ref',)),
+            'unresolved': ({'native_kind':'unresolved','native_parameters':{'setting':None},'reason':'source'}, ('phase_ref',)),
+        }
+        for kind, (fields, nullable_path) in cases.items():
+            effect = {'kind':kind, **common, **fields}
+            with self.subTest(kind=kind):
+                validate(effect, {'$ref':'#/$defs/effect'}, self.effect_schema)
+                broken = copy.deepcopy(effect)
+                target = broken
+                for part in nullable_path[:-1]:
+                    target = target[part]
+                del target[nullable_path[-1]]
+                with self.assertRaises(ValueError):
+                    validate(broken, {'$ref':'#/$defs/effect'}, self.effect_schema)
 
 
     # -- Increment 2: character skill/rank access (contract 4) --------------

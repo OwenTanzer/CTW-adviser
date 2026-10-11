@@ -18,7 +18,8 @@ try {
   const listed = await client.listTools();
   assert.deepEqual(new Set(listed.tools.map(t => t.name)), new Set([
     'resolve_unit', 'get_unit_combat_profile', 'get_matchup_evidence',
-    'resolve_effect', 'get_effect', 'get_character_effects', 'get_detail', 'get_provenance'
+    'resolve_effect', 'get_effect', 'get_character_effects', 'get_detail', 'get_provenance',
+    'evaluate_single_unit_matchup'
   ]));
   for (const tool of listed.tools) {
     assert.ok(tool.inputSchema && tool.outputSchema && tool.description);
@@ -30,6 +31,12 @@ try {
   assert.equal(exact.snapshot.source_commit, '595e22764b22e748afdbafafcb0a6258973e2451');
   assert.equal((await call('resolve_unit', { name_or_key: 'Feral Manticore' })).data.status, 'ambiguous');
   assert.equal((await call('resolve_unit', { name_or_key: 'Bloodletters' })).data.status, 'not_found');
+  const effectKey = 'wh_main_spell_heavens_comet_of_casandora';
+  assert.equal((await call('resolve_effect', { name_or_key: effectKey })).data.status, 'resolved');
+  const effect = await call('get_effect', { name_or_key: effectKey });
+  assert.equal(effect.data.effect.identity.ability_key, effectKey);
+  assert.equal(effect.data.effect.identity.effect_kind, 'spell');
+  assert.equal(effect.data.snapshot.commit, exact.snapshot.source_commit);
   const profile = await call('get_unit_combat_profile', {
     unit_key: 'Lothern Sea Guard', section: 'weapons', limit: 1
   });
@@ -57,13 +64,32 @@ try {
     assert.equal(pair.data.units.length, 2);
     assert.equal(pair.data.snapshot.commit, exact.snapshot.source_commit);
   }
+  for (const [unit_a, unit_b] of [
+    ['Reiksguard', 'Doom Diver Catapults'],
+    ['Lothern Sea Guard (Shields)', 'Blue Horrors of Tzeentch'],
+    ['Bloodletters of Khorne', 'Kroxigor'],
+    ['Queen Bess', 'Reiksguard']
+  ]) {
+    const modeled = await call('evaluate_single_unit_matchup', { unit_a, unit_b });
+    assert.equal(modeled.model_version, modeled.data.model_version);
+    assert.equal(modeled.data.derived.ledgers.length, 2);
+    assert.equal(modeled.data.snapshot.commit, exact.snapshot.source_commit);
+    assert.equal(modeled.data.empirical_calibration, null);
+    assert.ok(modeled.data.limitations.length > 0);
+  }
+  await assert.rejects(() => client.callTool({ name: 'evaluate_single_unit_matchup',
+    arguments: { unit_a: 'Reiksguard', unit_b: 'Kroxigor', scenario: { baseline: 'campaign' } } }));
+  await assert.rejects(() => client.callTool({ name: 'evaluate_single_unit_matchup',
+    arguments: { unit_a: 'Reiksguard', unit_b: 'Kroxigor',
+      scenario: { sides: { a: { active_contacts: 1e100 } } } } }));
+  assert.equal((await call('resolve_unit', { name_or_key: 'Lothern Sea Guard' })).status, 'ok');
   await client.close();
   reconnected = new Client({ name: 'ctw-adviser-reconnect', version: '1.0.0' });
   await reconnected.connect(new StreamableHTTPClientTransport(new URL(endpoint)));
-  assert.equal((await reconnected.listTools()).tools.length, 5);
+  assert.equal((await reconnected.listTools()).tools.length, 8);
   console.log(JSON.stringify({ status: 'passed', endpoint, protocol: '2025-06-18',
     source_commit: exact.snapshot.source_commit, tools: listed.tools.map(t => t.name), pairs: 4,
-    errors: true, reconnect: true }));
+    calculations: 4, errors: true, reconnect: true }));
 } finally {
   await reconnected?.close();
   await client.close();

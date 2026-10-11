@@ -43,8 +43,8 @@ or obtainability. Keywords name retained fields only: `spell`, `bound`,
 `stat_modifier` and `attribute_effect`.
 
 The build reconciles every activated option with an effect row and full
-records. It also checks every activated unit link against an access row and
-rejects crossed variant identities. Effect lookups by key, name, unit, ability
+records. It reconciles each qualified access row and variant relation against
+its source record, including culture, enabling and provenance. Effect lookups by key, name, unit, ability
 and reverse variant use indexed SEARCH plans.
 
 ## Retrieval
@@ -55,6 +55,10 @@ versions) return candidates. `unit` restricts candidates to effects linked to th
 unit's source keys.
 
 `Queries.get_effect(...)` returns `effect`:
+
+The complete response is validated by `schema/effect_packet.schema.json` and
+`scripts/validate_packets.py`; omission differs from an explicit source null in
+each supported mechanic kind.
 
 - `identity`: key, name, kind, basis, source/ability type, keywords.
 - `variants`: outgoing and incoming overcast/supersession links with `effect:` refs.

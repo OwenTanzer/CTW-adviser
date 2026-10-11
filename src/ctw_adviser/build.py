@@ -644,15 +644,57 @@ def validate_effects(db, options):
     activated = {k for k, (kind, _, _) in options.items() if kind == 'activated_option'}
     if {r[0] for r in db.execute('SELECT ability_key FROM effect_abilities')} != activated:
         raise ValueError('activated effect reconciliation failure')
+    definitions = {r[0]: r for r in db.execute(
+        'SELECT key,source_type,type,record_id,overpower_option,superseded_abilities_set,'
+        'requires_effect_enabling FROM native_ability_definitions')}
+    castings = dict(db.execute('SELECT key,record_id FROM native_ability_casting'))
+    for key, kind, source_type, ability_type, definition_record, casting_record in db.execute(
+            'SELECT ability_key,effect_kind,source_type,ability_type,definition_record,casting_record '
+            'FROM effect_abilities'):
+        definition = definitions.get(key)
+        if (definition is None or key not in castings or
+                (kind, source_type, ability_type, definition_record, casting_record) !=
+                ('spell' if definition[1] in SPELL_SOURCE_TYPES else 'activated_ability',
+                 definition[1], definition[2], definition[3], castings[key])):
+            raise ValueError('activated effect source reconciliation failure')
     if db.execute("SELECT count(*) FROM effect_abilities e JOIN record_provenance p "
                   "ON p.id IN (e.definition_record,e.casting_record) WHERE p.retention!='full'").fetchone()[0]:
         raise ValueError('activated effect retained without full payload records')
-    linked = db.execute('SELECT count(*) FROM unit_abilities JOIN effect_abilities USING(ability_key)').fetchone()[0]
-    if db.execute('SELECT count(*) FROM effect_access').fetchone()[0] != linked:
+    qualification = ('Source unit ability link, qualified by culture and effect enabling; '
+                     'not proof of campaign acquisition or of an active effect.')
+    expected_access = {(rid, unit, ability, culture, 'unit_ability_link',
+                        definitions[ability][6], qualification)
+                       for rid, unit, ability, culture in db.execute(
+                           'SELECT record_id,unit_key,ability_key,culture_key FROM unit_abilities')
+                       if ability in activated}
+    actual_access = set(db.execute('SELECT link_record,unit_key,ability_key,culture_key,route,'
+                                   'requires_effect_enabling,qualification FROM effect_access'))
+    if actual_access != expected_access or len(actual_access) != db.execute(
+            'SELECT count(*) FROM effect_access').fetchone()[0]:
         raise ValueError('activated access reconciliation failure')
+    expected_variants = set()
+    for key in activated:
+        definition = definitions[key]
+        variants = []
+        if definition[4]:
+            variants.append(('overcast_option', definition[4], definition[3]))
+        if definition[5]:
+            variants.extend(('supersedes', target, rid) for rid, target in db.execute(
+                'SELECT record_id,superseded_ability_key FROM '
+                'native_unit_ability_superseded_abilities_set_elements WHERE set_key=?', (definition[5],)))
+        for relation, target, rid in variants:
+            status = ('resolved' if target in activated else
+                      'not_activated' if target in definitions else 'missing')
+            expected_variants.add((key, relation, target,
+                                   target if status == 'resolved' else None, status, rid))
     if db.execute('SELECT count(*) FROM effect_variants WHERE variant_ability IS NOT NULL '
                   'AND variant_ability!=variant_key').fetchone()[0]:
         raise ValueError('crossed effect variant identity')
+    actual_variants = set(db.execute('SELECT ability_key,relation,variant_key,variant_ability,'
+                                     'status,source_record FROM effect_variants'))
+    if actual_variants != expected_variants or len(actual_variants) != db.execute(
+            'SELECT count(*) FROM effect_variants').fetchone()[0]:
+        raise ValueError('activated variant source reconciliation failure')
 
 
 def record_semantic_gaps(db):

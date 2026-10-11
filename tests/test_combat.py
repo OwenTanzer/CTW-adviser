@@ -48,6 +48,73 @@ class SavedPacketQueries:
 
 
 class CombatTests(unittest.TestCase):
+    def test_firing_opportunities_contact_flight_and_collision(self):
+        def project(delay, *, flight=None, collision=1, horizon=3, velocity=None):
+            source = PacketQueries("sea_guard", "kroxigor")
+            if velocity is not None:
+                source.mutate = lambda packet: packet["units"][0]["ranged"].__setitem__("velocity", velocity)
+            side = {"order": "hold", "fight": False, "cycle_seconds": 10,
+                    "firing_entities": 1, "first_shot_delay_seconds": delay,
+                    "collision_probability": collision}
+            if flight is not None:
+                side["flight_seconds"] = flight
+            return evaluate_matchup(source, "a", "b", scenario={
+                "separation_metres": 10, "duration_seconds": horizon,
+                "sides": {"a": side, "b": {"order": "approach", "fire": False, "fight": False}}})
+
+        positive_velocity = project(0)
+        self.assertEqual(positive_velocity["derived"]["event_mechanics"][0]["missile"]["flight_basis"],
+                         "source_velocity")
+        contact = positive_velocity["derived"]["phase_timing"]["contact"]["seconds"]
+        just_before = project(contact - .05, velocity=-1)
+        just_after = project(contact + .05, velocity=-1)
+        self.assertEqual(just_before["derived"]["ledgers"][0]["shots_fired_per_shooter"], 1)
+        self.assertGreater(just_before["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+        self.assertEqual(just_before["derived"]["event_mechanics"][0]["missile"]["flight_basis"],
+                         "firing_opportunity_immediate_arrival")
+        self.assertEqual(just_after["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+        self.assertEqual(just_after["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+        missed = project(contact - .05, flight=0, collision=0)
+        self.assertEqual(missed["derived"]["ledgers"][0]["shots_fired_per_shooter"], 1)
+        self.assertEqual(missed["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+        in_flight = project(contact - .1, flight=.3, horizon=contact + .1)
+        arrived = project(contact - .1, flight=.3, horizon=contact + .5)
+        self.assertEqual(in_flight["derived"]["ledgers"][0]["shots_fired_per_shooter"], 1)
+        self.assertEqual(in_flight["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+        self.assertEqual(arrived["derived"]["ledgers"][0]["shots_fired_per_shooter"], 1)
+        self.assertGreater(arrived["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+
+    def test_minimum_range_ammo_and_firing_entities(self):
+        def project(delay, *, ammo=None, firing_entities=1, horizon=5):
+            q = PacketQueries("queen_bess", "wargor")
+            if ammo is not None:
+                q.mutate = lambda packet: packet["units"][0]["ranged"].__setitem__("ammunition", ammo)
+            return evaluate_matchup(q, "a", "b", scenario={
+                "separation_metres": 55, "duration_seconds": horizon,
+                "sides": {"a": {"order": "hold", "fight": False, "cycle_seconds": .25,
+                                "flight_seconds": 0, "first_shot_delay_seconds": delay,
+                                "firing_entities": firing_entities, "collision_probability": 1},
+                          "b": {"order": "approach", "fire": False, "fight": False}}})
+        in_range = project(1, horizon=2)
+        inside_minimum = project(2, horizon=3)
+        self.assertEqual(in_range["derived"]["ledgers"][0]["shots_fired_per_shooter"], 2)
+        self.assertEqual(inside_minimum["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+        self.assertEqual(inside_minimum["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+        one = project(0, ammo=1, firing_entities=1)
+        self.assertEqual(one["derived"]["ledgers"][0]["shots_fired_per_shooter"], 1)
+        def guard(firing_entities):
+            return evaluate_matchup(PacketQueries("sea_guard", "kroxigor"), "a", "b", scenario={
+                "separation_metres": 10, "duration_seconds": 1,
+                "sides": {"a": {"order": "hold", "fight": False, "cycle_seconds": .25,
+                                "flight_seconds": 0, "first_shot_delay_seconds": 0,
+                                "firing_entities": firing_entities, "collision_probability": 1},
+                          "b": {"order": "approach", "fire": False, "fight": False}}})
+        one_guard, two_guard = guard(1), guard(2)
+        self.assertEqual(one_guard["derived"]["ledgers"][0]["shots_fired_per_shooter"], 4)
+        self.assertEqual(two_guard["derived"]["ledgers"][0]["shots_fired_per_shooter"], 4)
+        self.assertAlmostEqual(two_guard["derived"]["ledgers"][1]["incoming_damage"]["direct"],
+                               2 * one_guard["derived"]["ledgers"][1]["incoming_damage"]["direct"])
+
     def test_armour_integral_and_attack_type(self):
         self.assertEqual(_armour_survival(0), 1)
         self.assertAlmostEqual(_armour_survival(80), .4)
@@ -200,7 +267,6 @@ class PinnedStoreTests(unittest.TestCase):
             (0, ("ranged", "ap_damage"), "ranged.ap_damage"),
             (0, ("ranged", "reload_time"), "ranged.reload_time"),
             (0, ("ranged", "projectiles_per_shot"), "ranged.projectiles_per_shot"),
-            (0, ("ranged", "velocity"), "ranged.velocity"),
             (0, ("ranged", "ammunition_supply", "capacity"), "ranged.ammunition_supply.capacity"),
             (0, ("ranged", "ammunition_supply", "unlimited"), "ranged.ammunition_supply.unlimited"),
         ]
@@ -224,6 +290,16 @@ class PinnedStoreTests(unittest.TestCase):
                     self.assertIn(("a" if side == 0 else "b", expected),
                                   {(item["side"], item["source_path"])
                                    for item in result["verdict"]["unresolved_inputs"]})
+            no_velocity = copy.deepcopy(packet)
+            no_velocity["units"][0]["ranged"]["velocity"] = None
+            approximated = evaluate_matchup(SavedPacketQueries(no_velocity, q.snapshot), "a", "b",
+                                           scenario=scenario)
+            self.assertEqual(approximated["verdict"]["status"], "conditional")
+            self.assertNotIn("ranged.velocity", {item["source_path"] for item in
+                                                 approximated["verdict"]["unresolved_inputs"]})
+            self.assertEqual(approximated["derived"]["event_mechanics"][0]["missile"]["flight_basis"],
+                             "firing_opportunity_immediate_arrival")
+            self.assertGreater(approximated["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
             disputed = copy.deepcopy(packet)
             disputed["units"][0]["ranged"]["ammunition_supply"]["assignment_status"] = "source_disagreement"
             result = evaluate_matchup(SavedPacketQueries(disputed, q.snapshot), "a", "b", scenario=scenario)
@@ -394,19 +470,32 @@ class PinnedStoreTests(unittest.TestCase):
 
     def test_nonpositive_velocity_and_exact_fire_range(self):
         with Queries(DB) as q:
+            out_of_range = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario={
+                "separation_metres": 1000, "duration_seconds": 10,
+                "sides": {"a": {"order": "hold"}, "b": {"order": "hold"}}})
+            self.assertEqual(out_of_range["verdict"]["unresolved_inputs"], [])
+            self.assertFalse(out_of_range["verdict"]["material_mechanic_unresolved"])
+            self.assertEqual(out_of_range["derived"]["phase_timing"]["range_entry"][1]["status"],
+                             "not_reached_under_assumptions")
+            self.assertEqual(out_of_range["derived"]["ledgers"][1]["shots_fired_per_shooter"], 0)
             artillery = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario={
                 "separation_metres": 200, "duration_seconds": 1,
                 "sides": {"a": {"order": "hold", "fight": False},
                           "b": {"order": "hold", "fight": False, "first_shot_delay_seconds": 0}}})
             self.assertEqual(artillery["source_facts"][1]["ranged"]["velocity"], -1)
-            self.assertEqual(artillery["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
-            self.assertEqual(artillery["verdict"]["status"], "indeterminate")
+            self.assertGreater(artillery["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            self.assertEqual(artillery["derived"]["event_mechanics"][1]["missile"]["flight_basis"],
+                             "firing_opportunity_immediate_arrival")
+            self.assertNotIn("ranged.velocity", {item["source_path"] for item in
+                                                 artillery["verdict"]["unresolved_inputs"]})
             explicit = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario={
                 "separation_metres": 200, "duration_seconds": 1,
                 "sides": {"a": {"order": "hold", "fight": False},
                           "b": {"order": "hold", "fight": False, "first_shot_delay_seconds": 0,
                                 "flight_seconds": .25}}})
             self.assertGreater(explicit["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            self.assertEqual(explicit["derived"]["event_mechanics"][1]["missile"]["flight_basis"],
+                             "scenario_flight_seconds")
             bess = evaluate_matchup(q, "Queen Bess", "Reiksguard", scenario={
                 "separation_metres": 55, "duration_seconds": 2,
                 "sides": {"a": {"order": "hold", "first_shot_delay_seconds": .75,
@@ -414,6 +503,69 @@ class PinnedStoreTests(unittest.TestCase):
                           "b": {"order": "approach", "fire": False, "fight": False}}})
             self.assertEqual(bess["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
             self.assertEqual(bess["derived"]["ledgers"][1]["incoming_damage"]["direct"], 0)
+
+    def test_nontrivial_projectile_counts_require_labeled_scenario(self):
+        with Queries(DB) as q:
+            default = evaluate_matchup(q, "Casket of Souls", "Reiksguard")
+            self.assertEqual([default["source_facts"][0]["ranged"][key] for key in
+                              ("projectiles_per_shot", "shots_per_volley", "burst_size")],
+                             [7, 1, 1])
+            self.assertIn("ranged.projectile_volley_burst",
+                          {item["source_path"] for item in default["verdict"]["unresolved_inputs"]})
+            self.assertEqual(default["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+            low = evaluate_matchup(q, "Casket of Souls", "Reiksguard", scenario={
+                "sides": {"a": {"projectiles_per_cycle": 1}}})
+            assumed = evaluate_matchup(q, "Casket of Souls", "Reiksguard", scenario={
+                "sides": {"a": {"projectiles_per_cycle": 7}}})
+            self.assertEqual(low["scenario_assumptions"]["sides"]["a"]["projectiles_per_cycle"], 1)
+            self.assertEqual(assumed["scenario_assumptions"]["sides"]["a"]["projectiles_per_cycle"], 7)
+            self.assertEqual(low["verdict"]["status"], "conditional")
+            self.assertEqual(assumed["verdict"]["status"], "conditional")
+            self.assertGreater(assumed["derived"]["ledgers"][0]["shots_fired_per_shooter"], 0)
+            self.assertGreater(assumed["derived"]["ledgers"][1]["incoming_damage"]["direct"],
+                               low["derived"]["ledgers"][1]["incoming_damage"]["direct"])
+            multifactor = evaluate_matchup(q, "Thunderers (Grudge-Rakers)", "Reiksguard")
+            self.assertEqual([multifactor["source_facts"][0]["ranged"][key] for key in
+                              ("projectiles_per_shot", "shots_per_volley", "burst_size")],
+                             [3, 2, 1])
+            self.assertIn("ranged.projectile_volley_burst",
+                          {item["source_path"] for item in multifactor["verdict"]["unresolved_inputs"]})
+            individual_cases = [evaluate_matchup(q, "Thunderers (Grudge-Rakers)", "Reiksguard",
+                                                 scenario={"sides": {"a": {"projectiles_per_cycle": n}}})
+                                for n in (1, 2, 3)]
+            self.assertTrue(all(case["verdict"]["status"] == "conditional" for case in individual_cases))
+            self.assertEqual([case["scenario_assumptions"]["sides"]["a"]["projectiles_per_cycle"]
+                              for case in individual_cases], [1, 2, 3])
+            self.assertEqual([case["derived"]["ledgers"][0]["shots_fired_per_shooter"]
+                              for case in individual_cases], [1, 1, 1])
+            self.assertLess(individual_cases[0]["derived"]["ledgers"][1]["incoming_damage"]["direct"],
+                            individual_cases[1]["derived"]["ledgers"][1]["incoming_damage"]["direct"])
+            self.assertLess(individual_cases[1]["derived"]["ledgers"][1]["incoming_damage"]["direct"],
+                            individual_cases[2]["derived"]["ledgers"][1]["incoming_damage"]["direct"])
+
+    def test_sentinel_flight_latency_sensitivity_and_model_version(self):
+        scenario = {"separation_metres": 200, "duration_seconds": 2,
+                    "sides": {"a": {"order": "hold", "fight": False},
+                              "b": {"order": "hold", "fight": False,
+                                    "first_shot_delay_seconds": 0}}}
+        with Queries(DB) as q:
+            immediate = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario=scenario)
+            self.assertEqual(immediate["model_version"], "combat-0.1.4")
+            self.assertEqual(immediate["source_facts"][1]["ranged"]["velocity"], -1)
+            self.assertEqual(immediate["verdict"]["represented_point_ordering"], "b")
+            self.assertGreater(immediate["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            cycle = immediate["scenario_assumptions"]["sides"]["b"]["cycle_seconds"]
+            self.assertGreater(cycle, scenario["duration_seconds"])
+            delayed_scenario = copy.deepcopy(scenario)
+            delayed_scenario["sides"]["b"]["flight_seconds"] = cycle
+            delayed = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults",
+                                       scenario=delayed_scenario)
+            self.assertEqual(delayed["model_version"], immediate["model_version"])
+            self.assertEqual(delayed["derived"]["ledgers"][1]["shots_fired_per_shooter"], 1)
+            self.assertEqual(delayed["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
+            self.assertEqual(delayed["verdict"]["represented_point_ordering"], "tie")
+            self.assertEqual(delayed["derived"]["event_mechanics"][1]["missile"]["flight_basis"],
+                             "scenario_flight_seconds")
 
     def test_component_target_class_and_targetability(self):
         with Queries(DB) as q:
