@@ -12,6 +12,8 @@ is implemented; [issue #5](https://github.com/OwenTanzer/CTW-adviser/issues/5)
 remains open for predictions-versus-battles validation, not another backend.
 Use the [CTW matchup skill](skills/ctw-matchup/SKILL.md) and
 [setup and acceptance guide](docs/chatgpt-workflow.md) for tactical conversations.
+For Claude chat, use the [connector and skill setup guide](docs/claude-chat.md)
+and its ten fixed [test scenarios](docs/claude-fixtures.json).
 The [closure evidence](docs/closure-3-6.md) distinguishes connector/CLI
 reproducibility from game accuracy and Claude acceptance (issue #4).
 
