@@ -24,19 +24,28 @@ CLI and MCP return identical structures for identical inputs, which is tested.
 The calculator walks the effect's payload graph from each casting root, per
 route. Multiplicity comes only from source counts: bombardment
 `num_projectiles`, shrapnel `amount` and `num_vortexes`.
+Dangling graph references fail with `dangling_payload_reference`; a missing
+linked node never silently lowers the total.
 
 | Component | Per entity | Count | Totals |
 | --- | --- | --- | --- |
 | Direct projectile | shared relation, missile kind (armour, AP, ward/physical/missile/fire/spell resistance, front shield) | launched × `projectile_hit_probability` × (1 − shield block); one entity per hit | calculated |
 | Explosion | shared relation, explosion kind | launched × `entities_per_explosion` | calculated |
 | Vortex | shared relation per application | `num_vortexes` × `vortex_entities_per_application` × `vortex_applications` | only when both counts are supplied; otherwise the per-application value is shown and the total is unresolved |
-| Damaging contact phase | raw `damage_amount` (protection application unresolved) | affected entities × `contact_phase_ticks`, capped by `max_damaged_entities` | only when ticks are supplied; flagged in limitations |
+| Damaging contact phase | raw `damage_amount` (protection application unresolved) | affected entities × ticks, capped by `max_damaged_entities` | source-implied `floor(duration / hp_change_frequency)` ticks when positive; scenario override; partial |
+| Outward enemy phase (for example Spirit Leech) | raw `damage_amount` (protection and intensity unresolved) | affected entities × applications, always capped by positive `max_damaged_entities` | source-implied `floor(duration / hp_change_frequency)` applications when positive; scenario override; partial |
 
 The spell-resistance flag comes from each payload's `is_spell` field. Magic and
 fire flags come from `is_magical` and `ignition_amount`. Totals apply the
 target barrier first (`barrier_first`), cap per-entity damage at entity health,
 and report overkill. Casualties are reported as a pooled expectation with whole-entity
-bounds that bracket it. They are not an individual hit allocation.
+bounds that bracket it. They are not an individual hit allocation. Contact and
+outward phase components contribute to `attempted_damage` as raw estimates,
+but are separated in `raw_unresolved_attempted_damage`; only
+`modeled_delivery_attempted_damage` is used for barrier, health and casualty
+results. Phase protection, actual tick timing and intensity scaling still need
+live validation. Source intensity settings and their references are preserved
+under `source_facts.intensity_settings`.
 
 ## What is not added to target damage
 
@@ -52,12 +61,13 @@ bounds that bracket it. They are not an individual hit allocation.
 
 ## Status and blocks
 
-`calculated` means every component was totalled. `partial` means at least one
-component or route needs a stated assumption, or the result has an upper bound.
+`calculated` means modeled damage components were totalled without unresolved
+delivery. `partial` includes raw phase estimates, unknown components and route
+ambiguity. Source-implied schedules are estimates, not measured game behavior.
 `blocked` means one of:
 
-- `ineligible_recipient`: the effect targets neither enemies nor ground (for
-  example the friendly-target Warpbomb, or self-only Potion of Charoi).
+- `ineligible_recipient`: neither the casting nor an outward phase or payload
+  can reach enemies (for example self-only Potion of Charoi).
 - `out_of_range` or `inside_min_range`: the supplied `cast_distance_metres` is
   checked against `target_intercept_range` and `min_range`, never projectile
   range or payload radius.
@@ -73,7 +83,8 @@ reported as `linked` or `not_established`. A link is not proof of acquisition.
 | `projectile_hit_probability` | 0.5 | uncalibrated, as in #5 |
 | `entities_per_explosion` | 1 | radius geometry is not modeled |
 | `vortex_entities_per_application`, `vortex_applications` | required | vortex totals |
-| `contact_phase_ticks` | required | contact-phase totals |
+| `contact_phase_ticks`, `phase_damage_applications` | source-implied schedule when duration and frequency are positive | raw phase totals; overrides do not establish game cadence |
+| `phase_damage_entities` | source cap, or living entities if uncapped | always clamped to a positive source cap |
 | `facing` | front | |
 | `target_component_role` | primary | |
 | `cast_distance_metres` | unchecked | range check |
@@ -83,10 +94,12 @@ Unknown fields, out-of-range values and other barrier orders are rejected.
 
 ## Verification
 
-`tests/test_effect_calc.py` (12 tests, from source evidence) covers:
+`tests/test_effect_calc.py` (15 tests, from source evidence and one synthetic corruption probe) covers:
 
 - a spell chain recomputed through the shared relation (Comet)
-- a non-spell ability with a contact phase (Pyromaniac)
+- a non-spell ability with a contact phase (Pyromaniac), including the source-implied schedule
+- Spirit Leech raw phase damage, cap enforcement and unresolved protection/intensity
+- a linked Comet explosion removed from a copied packet, which must be rejected
 - zero-direct-damage transport (Hell Hammer)
 - overcast versus normal and the excluded miscast branch
 - shared shrapnel counted once with an upper bound (Dreaded Thirteenth)
@@ -98,7 +111,6 @@ Unknown fields, out-of-range values and other barrier orders are rejected.
 - library/CLI/MCP equality
 - resolvable cross-references and provenance
 
-A sweep over all 1,884 effects against Lothern Sea Guard returned no errors:
-193 calculated, 320 partial, 796 ineligible recipient and 575 with no damage
-payload. Median 8 ms, maximum 40 ms, results at most 13 KB. These are
-regression checks, not live-battle observations; `empirical_calibration` is null.
+The earlier full-inventory sweep needs refreshing after these phase changes.
+These regression checks are not live-battle observations;
+`empirical_calibration` is null.

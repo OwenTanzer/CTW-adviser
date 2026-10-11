@@ -24,6 +24,8 @@ DEFAULTS = {
     "vortex_entities_per_application": None,
     "vortex_applications": None,
     "contact_phase_ticks": None,
+    "phase_damage_applications": None,
+    "phase_damage_entities": None,
     "facing": "front",
     "target_component_role": "primary",
     "cast_distance_metres": None,
@@ -35,7 +37,9 @@ ASSUMPTION_NOTES = {
     "entities_per_explosion": "Target entities inside each explosion radius; geometry is not modeled.",
     "vortex_entities_per_application": "Target entities touched per vortex damage application; required for vortex totals.",
     "vortex_applications": "Damage applications per touched entity over the vortex lifetime; required for vortex totals.",
-    "contact_phase_ticks": "Contact-phase damage applications per affected entity; required for contact-phase totals.",
+    "contact_phase_ticks": "Contact-phase damage applications per affected entity; default is floor(duration / hp_change_frequency) when both source fields are positive. This is an unverified schedule.",
+    "phase_damage_applications": "Applications of outward phase damage; default is the source-implied duration / hp_change_frequency, an unverified schedule.",
+    "phase_damage_entities": "Target entities damaged per application; capped by source max_damaged_entities when positive. Default is that cap, or every living entity when uncapped.",
     "cast_distance_metres": "Caster-to-target distance used for the range check; omitted means range is not checked.",
 }
 FAILURE_SUFFIX = ".miscast_explosion"
@@ -90,7 +94,12 @@ def _routes(packet):
         if edge["relationship"] != "phase_effect":
             children.setdefault(edge["from"], []).append(edge)
     roots = [(e["relationship"], e["node_ref"]) for e in packet["effect"]["mechanic"]["effects"]
-             if e["kind"] == "payload_reference" and e["node_ref"] in nodes]
+             if e["kind"] == "payload_reference"]
+    missing = sorted({ref for _, ref in roots if ref not in nodes} |
+                     {edge["to"] for edge in graph["edges"] if edge["to"] not in nodes} |
+                     {edge["from"] for edge in graph["edges"] if edge["from"] not in nodes})
+    if missing:
+        raise ValueError("dangling_payload_reference: " + ", ".join(missing))
     events = []
 
     def walk(node_id, launched, branch, path, via):
@@ -116,6 +125,18 @@ def _routes(packet):
         branch = "conditional_failure" if relationship.endswith(FAILURE_SUFFIX) else "activation"
         walk(node_id, 1.0, branch, [], relationship)
     return events
+
+
+def _damages_enemies(node):
+    """True when a payload node carries nonzero damage that can reach enemies."""
+    kind, n = node["kind"], node["native_parameters"]
+    if kind in ("projectiles", "explosions"):
+        return any((n.get(k) or 0) > 0 for k in ("base_damage", "ap_damage"))
+    if kind == "native_vortices":
+        return n.get("affects_enemies") is not False and any((n.get(k) or 0) > 0 for k in ("damage", "damage_ap"))
+    if kind == "native_ability_phases":
+        return (n.get("damage_amount") or 0) > 0 and n.get("affects_enemies") is not False
+    return False
 
 
 def _health(unit, role):
@@ -166,9 +187,14 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
 
     targeting = eff["targeting"]["values"]
     blocked = []
-    if not (targeting.get("target_enemies") or targeting.get("target_ground")):
+    enemy_phase = any(phase["target_enemies"] for phase in eff["mechanic"]["phases"])
+    outward_payload = any(e["branch"] == "activation" and _damages_enemies(e["node"]) for e in _routes(packet))
+    if not (targeting.get("target_enemies") or targeting.get("target_ground") or enemy_phase or outward_payload):
         blocked.append({"code": "ineligible_recipient",
-                        "detail": "The effect does not target enemies or ground; an enemy unit is not a selectable recipient."})
+                        "detail": "Neither the casting nor any phase link targets enemies or ground; an enemy unit is not a recipient."})
+    elif not (targeting.get("target_enemies") or targeting.get("target_ground")):
+        limitations.append("Enemies are reached through phase links or an outward payload of a self/friendly-cast "
+                           "ability (aura or self-centred blast); which enemies fall inside its reach is not modeled.")
     distance = cfg["cast_distance_metres"]
     intercept = eff["distances"]["target_intercept_range"]["value"]
     minimum = eff["distances"]["min_range"]["value"]
@@ -188,7 +214,7 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
 
     pool, component, barrier = _health(unit, cfg["target_component_role"])
     living = pool["initial_entities"]
-    components, conditional = [], []
+    components, conditional, friendly_only = [], [], []
     hit_p = _assumption(cfg, "projectile_hit_probability")
     for event in _routes(packet):
         node, launched = event["node"], event["launched"]
@@ -202,6 +228,12 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
             if not amount:
                 if any(params.get(k) for k in ("heal_amount", "barrier_heal_amount")):
                     unsupported.append({**record, "reason": "Healing phase; not damage to the target."})
+                continue
+            if params.get("affects_enemies") is False:
+                if not any(x["node_ref"] == record["node_ref"] for x in friendly_only):
+                    friendly_only.append({**record, "damage_amount": amount,
+                                          "affects_allies": params.get("affects_allies"),
+                                          "reason": "Contact phase sets affects_enemies=false; it cannot damage the target."})
                 continue
         if event["branch"] == "conditional_failure":
             conditional.append({**record, "reason": "Miscast failure branch; it is not added to target damage.",
@@ -266,24 +298,86 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
                              expected_damage=per["per_unblocked_hit"] * launched * count * touched * applications)
             components.append(entry)
         else:
+            frequency, duration = params.get("hp_change_frequency"), params.get("duration")
+            ticks, ticks_basis = cfg["contact_phase_ticks"], "scenario"
+            if ticks is None and frequency and frequency > 0 and duration and duration > 0:
+                ticks, ticks_basis = math.floor(duration / frequency), "source_implied_duration_over_frequency"
             entry = {**record, "channel": "contact_phase", "launched": launched,
                      "per_application_per_entity_raw": params.get("damage_amount"),
                      "max_damaged_entities": params.get("max_damaged_entities"),
+                     "applications": ticks, "applications_basis": ticks_basis,
                      "basis": "raw damage_amount; armour/resistance application is unresolved",
                      "expected_damage": None, "entities_affected": None}
-            if cfg["contact_phase_ticks"] is None:
+            if ticks is None:
                 issue("contact_phase_ticks_required",
-                      "Contact-phase tick count is not source-established; supply contact_phase_ticks.",
+                      "Duration or application interval is missing or a sentinel; supply contact_phase_ticks.",
                       "contact_phase", node["provenance_refs"])
             else:
                 entities = min(launched, living)
                 if (params.get("max_damaged_entities") or 0) > 0:
                     entities = min(entities, params["max_damaged_entities"])
                 entry.update(entities_affected=entities,
-                             expected_damage=params["damage_amount"] * entities * cfg["contact_phase_ticks"])
-                limitations.append(f"{record['key']}: contact-phase damage applied raw; protections unverified.")
+                             expected_damage=params["damage_amount"] * entities * ticks)
+                issue("contact_phase_delivery_unresolved",
+                      "Raw contact damage is estimated, but protections and tick timing have not been verified.",
+                      "contact_phase", node["provenance_refs"])
+                limitations.append(f"{record['key']}: contact-phase damage uses {ticks_basis} ticks; protections unverified, as is tick timing.")
             components.append(entry)
 
+    # Damage carried directly by phase links (e.g. Spirit Leech) rather than a
+    # payload. Outward phases are target damage; self-only phases never are.
+    self_effects = []
+    phases = {}
+    for phase in eff["mechanic"]["phases"]:
+        phases.setdefault(phase["key"], []).append(phase)
+    for effect in eff["mechanic"]["effects"]:
+        if effect["kind"] != "periodic_damage" or effect["phase_ref"] not in phases:
+            continue
+        links = phases[effect["phase_ref"]]
+        n = effect["native_parameters"]
+        record = {"node_ref": "phase:" + effect["phase_ref"], "kind": "ability_phases", "key": {"id": effect["phase_ref"]},
+                  "route": "phase_link", "path": ["phase:" + effect["phase_ref"]], "provenance_refs": effect["provenance_refs"]}
+        if not any(link["target_enemies"] for link in links):
+            self_effects.append({**record, "recipients": {k: any(l[k] for l in links) for k in ("target_self", "target_friends")},
+                                 "damage_amount": n.get("damage_amount"),
+                                 "reason": "Phase damage targets the caster or friends; never counted against the target."})
+            continue
+        amount, frequency, duration = n.get("damage_amount"), n.get("hp_change_frequency"), links[0].get("duration")
+        applications = cfg["phase_damage_applications"]
+        basis = "scenario"
+        if applications is None:
+            if frequency and frequency > 0 and duration and duration > 0:
+                applications, basis = math.floor(duration / frequency), "source_implied_duration_over_frequency"
+            else:
+                issue("phase_damage_schedule_unresolved",
+                      "Phase duration or application interval is missing or a sentinel; supply phase_damage_applications.",
+                      "phase_damage", effect["provenance_refs"])
+        cap = n.get("max_damaged_entities")
+        entities = cfg["phase_damage_entities"]
+        if entities is None:
+            entities = cap if cap is not None and cap > 0 else living
+        elif cap is not None and cap > 0 and entities > cap:
+            issue("phase_damage_entity_cap", "Scenario entity count exceeds the sourced maximum; clamped to max_damaged_entities.",
+                  "phase_damage", effect["provenance_refs"])
+        if cap is not None and cap > 0:
+            entities = min(entities, cap)
+        entities = min(entities, living)
+        entry = {**record, "channel": "phase_damage", "launched": 1.0, "route_role": None,
+                 "per_application_per_entity_raw": amount, "applications": applications, "applications_basis": basis,
+                 "entities_affected": entities, "max_damaged_entities": cap,
+                 "basis": "raw damage_amount x entities x applications; armour/resistance application is unresolved",
+                 "expected_damage": None if applications is None or amount is None else amount * entities * applications}
+        components.append(entry)
+        issue("phase_damage_delivery_unresolved",
+              "Raw phase damage is estimated, but target protections and actual application timing have not been verified.",
+              "phase_damage", effect["provenance_refs"])
+        limitations.append(f"{effect['phase_ref']}: outward phase damage applied raw over a "
+                           f"{basis.replace('_', ' ')} schedule; protections and tick timing unverified.")
+    for effect in eff["mechanic"]["effects"]:
+        if effect.get("native_kind") == "intensity_settings" and any(c["channel"] == "phase_damage" for c in components):
+            issue("intensity_unresolved",
+                  "Source intensity settings may change listed phase damage; scaling is not modeled.",
+                  "phase_damage", effect["provenance_refs"])
     for effect in eff["mechanic"]["effects"]:
         if effect["kind"] in ("summon", "healing", "stat_modifier", "attribute_effect"):
             unsupported.append({"kind": effect["kind"], "phase_ref": effect.get("phase_ref"),
@@ -320,15 +414,19 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
     known = [c for c in components if c.get("expected_damage") is not None and c["route_role"] == "nominal"]
     upper_all_routes = sum(c["expected_damage"] for c in components if c.get("expected_damage") is not None)
     attempted = sum(c["expected_damage"] for c in known)
-    absorbed = min(barrier, attempted)
-    to_health = attempted - absorbed
+    raw_unresolved = sum(c["expected_damage"] for c in known if c["channel"] in ("contact_phase", "phase_damage"))
+    modeled_delivery = attempted - raw_unresolved
+    absorbed = min(barrier, modeled_delivery)
+    to_health = modeled_delivery - absorbed
     hp_entity = pool["hp_per_entity"]
     capped, overkill, lethal = 0.0, 0.0, 0.0
     for c in known:
+        if c["channel"] in ("contact_phase", "phase_damage"):
+            continue
         affected = c.get("entities_affected") or 0
         if affected <= 0 or not c["expected_damage"]:
             continue
-        share = c["expected_damage"] / attempted * to_health if attempted else 0.0
+        share = c["expected_damage"] / modeled_delivery * to_health if modeled_delivery else 0.0
         per_entity = share / affected
         if per_entity >= hp_entity:
             capped += hp_entity * affected
@@ -367,18 +465,26 @@ def evaluate_effect_damage(queries: Queries, effect: str, target: str, *, scenar
                        "variants": eff["variants"], "target": unit["identity"]},
         "access": access, "range": range_check, "blocked": blocked,
         "source_facts": {"activation": eff["activation"]["values"], "targeting": targeting,
+                         "intensity_settings": [{"values": e["native_parameters"],
+                                                 "provenance_refs": e["provenance_refs"]}
+                                                for e in eff["mechanic"]["effects"]
+                                                if e.get("native_kind") == "intensity_settings"],
                          "target_protection": unit["passives"]["protection"],
                          "target_health": {"component": component.get("role"), "entities": living,
                                            "hp_per_entity": hp_entity, "health": pool["initial_hp"],
                                            "barrier": barrier}},
         "scenario_assumptions": {k: {"value": cfg[k], "note": ASSUMPTION_NOTES.get(k)} for k in DEFAULTS},
         "derived": {"components": components,
-                    "totals": {"attempted_damage": attempted, "barrier_absorbed": absorbed,
+                    "totals": {"attempted_damage": attempted,
+                               "raw_unresolved_attempted_damage": raw_unresolved,
+                               "modeled_delivery_attempted_damage": modeled_delivery,
+                               "barrier_absorbed": absorbed,
                                "health_damage_capped": capped, "overkill": overkill,
                                "fraction_of_health": capped / pool["initial_hp"] if pool["initial_hp"] else None,
                                "casualties": casualties, "upper_all_routes_attempted_damage": upper_all_routes,
                                "complete": status == "calculated"}},
-        "conditional_branches": conditional, "unsupported_components": unsupported,
+        "conditional_branches": conditional, "self_effects": self_effects + friendly_only,
+        "unsupported_components": unsupported,
         "unresolved_inputs": unresolved, "limitations": limitations,
         "empirical_calibration": None,
     }
