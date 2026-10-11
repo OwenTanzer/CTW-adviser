@@ -112,7 +112,7 @@ CREATE TABLE character_unit_forms (
 ) STRICT;
 CREATE INDEX character_unit_forms_unit ON character_unit_forms(unit_key,agent_subtype_key);
 CREATE TABLE effect_character_access (
-  binding_record TEXT PRIMARY KEY REFERENCES record_provenance(id),
+  binding_record TEXT PRIMARY KEY REFERENCES magic_skill_bindings(record_id),
   agent_subtype_key TEXT NOT NULL, ability_key TEXT NOT NULL,
   effect_ability TEXT REFERENCES effect_abilities(ability_key),
   role TEXT NOT NULL CHECK(role IN ('enables','enables_overcast','disables','modifies')),

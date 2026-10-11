@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import sqlite3
+import subprocess
 import sys
 import tempfile
 import time
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 sys.path.insert(0, str(ROOT / 'scripts'))
 from ctw_adviser.build import build_snapshot, validate_effects
+from ctw_adviser.mcp import dispatch_method
 from ctw_adviser.queries import Queries, ResolutionError
 from ctw_adviser.store import open_snapshot
 from validate_packets import validate, packet_checks
@@ -458,6 +460,79 @@ class EffectTests(unittest.TestCase):
         with self.assertRaises(ResolutionError):
             self.q.get_character_effects('Tomb King')
 
+    def test_character_binding_pages_and_detail_continue_without_losing_rank_or_provenance(self):
+        agent = 'wh3_dlc24_tze_blue_scribes'
+        packet = self.q.get_character_effects(agent, limit=32, include_provenance=True)
+        self.assertEqual(packet['binding_page']['total'], 369)
+        self.assertEqual(packet['binding_page']['returned'], 32)
+        self.assertLess(len(json.dumps(packet).encode()), 50000)
+        seen = set()
+        while True:
+            page = packet['binding_page']
+            refs = [ref for effect in packet['effects'] for binding in effect['bindings']
+                    for ref in binding['provenance_refs']]
+            self.assertEqual(len(refs), page['returned'])
+            self.assertEqual(set(refs), set(self.q.get_provenance(refs)['provenance']))
+            self.assertFalse(seen & set(refs))
+            seen.update(refs)
+            if page['cursor'] is None:
+                break
+            packet = self.q.get_detail(page['detail_ref'], limit=32, cursor=page['cursor'])
+        expected = {r[0] for r in self.q.db.execute(
+            'SELECT binding_record FROM effect_character_access WHERE agent_subtype_key=?', (agent,))}
+        self.assertEqual(seen, expected)
+        self.assertEqual(self.q.get_detail('character:' + agent, limit=2)['binding_page']['returned'], 2)
+        first = self.q.get_character_effects(agent, limit=2)
+        with self.assertRaisesRegex(ValueError, 'cursor'):
+            self.q.get_detail('character:wh2_main_hef_teclis', limit=2,
+                              cursor=first['binding_page']['cursor'])
+        with self.assertRaisesRegex(ValueError, 'cursor'):
+            self.q.get_detail('character:' + agent, limit=3, cursor=first['binding_page']['cursor'])
+        with self.assertRaisesRegex(ValueError, 'cursor'):
+            self.q.get_detail('character:' + agent, limit=2,
+                              cursor=first['binding_page']['cursor'][:-1] + '0')
+
+    def test_selected_skill_pages_and_nonability_summary_keep_the_selection(self):
+        firebelly = 'wh3_main_ogr_firebelly'
+        skill = 'wh3_main_skill_ogr_firebelly_unique_incendiary:1'
+        first = self.q.get_character_effects(firebelly, skills=[skill], limit=20)
+        self.assertEqual(first['binding_page']['total'], 200)
+        second = self.q.get_detail(first['binding_page']['detail_ref'], limit=20,
+                                   cursor=first['binding_page']['cursor'])
+        self.assertEqual(second['supplied_skills'], [skill])
+        self.assertEqual(second['binding_page']['offset'], 20)
+        self.assertTrue(all(b['skill_key'] + ':' + str(b['skill_level']) == skill
+                            for e in second['effects'] for b in e['bindings']))
+        with self.assertRaisesRegex(ValueError, 'cursor'):
+            self.q.get_character_effects(firebelly, skills=['invented:1'], limit=20,
+                                         cursor=first['binding_page']['cursor'])
+        picked = self.q.get_character_effects('Teclis',
+            skills=['wh2_main_skill_magic_dark_flock_of_doom_teclis:1'])
+        self.assertEqual(picked['other_bindings'], [])
+        manifold = self.q.get_character_effects('Teclis',
+            skills=['wh2_dlc14_skill_hef_teclis_manifold_sorcery:1'])
+        self.assertEqual(manifold['effects'], [])
+        self.assertEqual(manifold['other_bindings'], [
+            {'target_kind': 'ability_group', 'bonus_value_id': 'cost_percentage_mod', 'bindings': 63}])
+        unknown = self.q.get_character_effects('Teclis', skills=['invented:3'])
+        self.assertEqual((unknown['effects'], unknown['other_bindings']), ([], []))
+        self.assertEqual(unknown['unknown_supplied_skills'], ['invented:3'])
+
+    def test_character_paging_is_exposed_through_mcp_and_cli(self):
+        agent = 'wh3_dlc24_tze_blue_scribes'
+        rpc = dispatch_method(self.q, 'tools/call', {'name': 'get_character_effects',
+            'arguments': {'character': agent, 'limit': 2}}, 1)
+        data = rpc['result']['structuredContent']['data']
+        self.assertEqual(data['binding_page']['returned'], 2)
+        continuation = dispatch_method(self.q, 'tools/call', {'name': 'get_detail',
+            'arguments': {'ref': data['binding_page']['detail_ref'], 'limit': 2,
+                          'cursor': data['binding_page']['cursor']}}, 2)
+        self.assertEqual(continuation['result']['structuredContent']['data']['binding_page']['offset'], 2)
+        cli = subprocess.run([sys.executable, '-m', 'ctw_adviser.cli', 'character', '--db', str(self.output),
+                              agent, '--limit', '2'], capture_output=True, text=True,
+                             env=dict(os.environ, PYTHONPATH=str(ROOT / 'src')), check=True)
+        self.assertEqual(json.loads(cli.stdout)['binding_page']['returned'], 2)
+
     def test_group_bindings_are_modifiers_not_grants(self):
         teclis = self.q.get_character_effects('Teclis')
         groups = [o for o in teclis['other_bindings'] if o['target_kind'] == 'ability_group']
@@ -487,6 +562,8 @@ class EffectTests(unittest.TestCase):
         self.assertEqual(db.execute("SELECT count(*) FROM effect_character_access").fetchone()[0],
                          db.execute("SELECT count(*) FROM magic_skill_bindings WHERE target_kind='ability'").fetchone()[0])
         self.assertEqual(db.execute("SELECT count(*) FROM effect_character_access WHERE status='missing_definition'").fetchone()[0], 0)
+        self.assertIn('magic_skill_bindings',
+                      {r[2] for r in db.execute('PRAGMA foreign_key_list(effect_character_access)')})
         from ctw_adviser.build import validate_character_access
         dropped = self.tamper("DELETE FROM effect_character_access WHERE rowid IN (SELECT rowid FROM effect_character_access LIMIT 1)")
         with closing(sqlite3.connect(dropped)) as tampered, self.assertRaisesRegex(ValueError, 'reconciliation'):
@@ -495,6 +572,22 @@ class EffectTests(unittest.TestCase):
                               f"(SELECT rowid FROM effect_character_access WHERE ability_key='{COMET}' LIMIT 1)")
         with closing(sqlite3.connect(crossed)) as tampered, self.assertRaisesRegex(ValueError, 'crossed'):
             validate_character_access(tampered)
+        detached = self.tamper("UPDATE effect_character_access SET binding_record="
+                               "(SELECT record_id FROM unit_profiles LIMIT 1) WHERE rowid IN "
+                               "(SELECT rowid FROM effect_character_access LIMIT 1)")
+        with closing(sqlite3.connect(detached)) as tampered:
+            self.assertTrue(tampered.execute('PRAGMA foreign_key_check').fetchall())
+            with self.assertRaisesRegex(ValueError, 'crossed'):
+                validate_character_access(tampered)
+        for assignment in ("skill_level=999", "skill_key='invented_skill'",
+                           "node_set_key='invented_nodes'", "bonus_value_id='invented_bonus'",
+                           "role='disables'", f"effect_ability='{BOUND}'"):
+            with self.subTest(assignment=assignment):
+                changed = self.tamper('UPDATE effect_character_access SET ' + assignment +
+                    " WHERE rowid IN (SELECT rowid FROM effect_character_access WHERE role='enables' "
+                    'AND status=\'activated_effect\' LIMIT 1)')
+                with closing(sqlite3.connect(changed)) as tampered, self.assertRaisesRegex(ValueError, 'crossed'):
+                    validate_character_access(tampered)
         drift = self.tamper("DELETE FROM magic_skill_bindings WHERE rowid IN (SELECT rowid FROM magic_skill_bindings "
                             "WHERE target_kind!='ability' LIMIT 1)")
         with closing(sqlite3.connect(drift)) as tampered, self.assertRaisesRegex(ValueError, 'count drift'):

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import json
 import re
@@ -665,7 +666,7 @@ class Queries:
         if kind == 'effect-characters':
             return self.effect_characters(key, limit=limit, cursor=cursor)
         if kind == 'character':
-            return self.get_character_effects(key)
+            return self.get_character_effects(key, limit=limit, cursor=cursor)
         if kind == 'availability':
             unit = self.resolved(key)
             c = Packet(self)
@@ -887,32 +888,86 @@ class Queries:
                     'characters': result, 'sources': {}, 'provenance': {}}
         return result
 
-    def get_character_effects(self, character, *, skills=None, include_provenance=False):
+    @staticmethod
+    def _character_skills(skills):
+        if skills is None:
+            return None
+        if not isinstance(skills, (list, tuple)) or not 1 <= len(skills) <= 64:
+            raise ValueError('skills must contain 1 to 64 SKILL_KEY:RANK pairs')
+        selected = set()
+        for item in skills:
+            if not isinstance(item, str) or len(item) > 256:
+                raise ValueError('skill must be SKILL_KEY:RANK (at most 256 characters)')
+            skill, sep, rank = item.rpartition(':')
+            if not sep or not skill or not rank.isascii() or not rank.isdigit():
+                raise ValueError('skill must be SKILL_KEY:RANK')
+            selected.add((skill, int(rank)))
+        return selected
+
+    def _character_cursor(self, agent, selected, offset, limit):
+        data = {'snapshot': self.snapshot['id'], 'version': PACKET_VERSION,
+                'character': agent,
+                'skills': sorted(f'{skill}:{rank}' for skill, rank in selected) if selected is not None else None,
+                'offset': offset, 'limit': limit}
+        raw = compact(data).encode()
+        return base64.urlsafe_b64encode(raw).decode().rstrip('=') + '.' + hashlib.sha256(raw).hexdigest()[:16]
+
+    def _decode_character_cursor(self, token, agent, limit):
+        try:
+            if not isinstance(token, str) or len(token) > 32768:
+                raise ValueError()
+            encoded, digest = token.split('.')
+            raw = base64.b64decode(encoded + '=' * (-len(encoded) % 4), altchars=b'-_', validate=True)
+            if digest != hashlib.sha256(raw).hexdigest()[:16]:
+                raise ValueError()
+            data = json.loads(raw)
+            if set(data) != {'snapshot', 'version', 'character', 'skills', 'offset', 'limit'} or any(
+                    data[k] != expected for k, expected in (
+                        ('snapshot', self.snapshot['id']), ('version', PACKET_VERSION),
+                        ('character', agent), ('limit', limit))):
+                raise ValueError()
+            if type(data['offset']) is not int or data['offset'] < 1:
+                raise ValueError()
+            selected = self._character_skills(data['skills'])
+            if selected is not None and data['skills'] != sorted(f'{skill}:{rank}' for skill, rank in selected):
+                raise ValueError()
+            return data['offset'], selected
+        except (ValueError, TypeError, KeyError, UnicodeError, AttributeError, binascii.Error) as exc:
+            raise ValueError('invalid, stale or incompatible character cursor') from exc
+
+    def get_character_effects(self, character, *, skills=None, limit=32, cursor=None,
+                              include_provenance=False):
         """Character -> effects its skill bindings enable or modify.
 
         Supplied skills are exact SKILL_KEY:RANK pairs; only those bindings are
-        returned and unknown pairs are reported. No build solver or rank sums.
+        returned and unknown pairs are reported. Pages count source bindings,
+        so one ability may continue on the next page. No build solver or rank sums.
         """
+        if type(limit) is not int or not 1 <= limit <= 256:
+            raise ValueError('limit must be an integer between 1 and 256')
         resolution = self.resolve_character(character)
         if resolution['status'] != 'resolved':
             raise ResolutionError(resolution)
         agent = resolution['resolved']['agent_subtype_key']
-        selected = None
-        if skills is not None:
-            if not isinstance(skills, (list, tuple)) or not skills:
-                raise ValueError('skills must be a nonempty list of SKILL_KEY:RANK')
-            selected = set()
-            for item in skills:
-                skill, sep, rank = str(item).rpartition(':')
-                if not sep or not skill or not rank.isdigit():
-                    raise ValueError('skill must be SKILL_KEY:RANK')
-                selected.add((skill, int(rank)))
+        selected = self._character_skills(skills)
+        offset = 0
+        if cursor:
+            offset, resumed = self._decode_character_cursor(cursor, agent, limit)
+            if selected is not None and selected != resumed:
+                raise ValueError('character cursor does not match supplied skills')
+            selected = resumed
         c = Packet(self)
-        rows = self.rows('effect_character_access', 'agent_subtype_key', agent, 'ability_key,skill_key,skill_level,binding_record')
+        where, params = 'agent_subtype_key=?', [agent]
+        if selected is not None:
+            where += ' AND (' + ' OR '.join('(skill_key=? AND skill_level=?)' for _ in selected) + ')'
+            params.extend(value for pair in sorted(selected) for value in pair)
+        total = self.db.execute('SELECT count(*) FROM effect_character_access WHERE ' + where, params).fetchone()[0]
+        rows = [dict(r) for r in self.db.execute(
+            'SELECT * FROM effect_character_access WHERE ' + where +
+            ' ORDER BY ability_key,skill_key,skill_level,role,node_set_key,binding_record LIMIT ? OFFSET ?',
+            [*params, limit, offset])]
         known = {(r['skill_key'], r['skill_level']) for r in self.db.execute(
             'SELECT DISTINCT skill_key,skill_level FROM magic_skill_bindings WHERE agent_subtype_key=?', (agent,))}
-        if selected is not None:
-            rows = [r for r in rows if (r['skill_key'], r['skill_level']) in selected]
         effects = {}
         for row in rows:
             entry = effects.get(row['ability_key'])
@@ -929,17 +984,26 @@ class Queries:
                 entry['roles'].append(row['role'])
         for entry in effects.values():
             entry['bindings'] = c.bindings(entry.pop('rows'))
+        other_where, other_params = "agent_subtype_key=? AND target_kind!='ability'", [agent]
+        if selected is not None:
+            other_where += ' AND (' + ' OR '.join('(skill_key=? AND skill_level=?)' for _ in selected) + ')'
+            other_params.extend(value for pair in sorted(selected) for value in pair)
         other = [dict(r) for r in self.db.execute(
-            "SELECT target_kind,bonus_value_id,count(*) AS bindings FROM magic_skill_bindings "
-            "WHERE agent_subtype_key=? AND target_kind!='ability' GROUP BY 1,2 ORDER BY 1,2", (agent,))]
+            'SELECT target_kind,bonus_value_id,count(*) AS bindings FROM magic_skill_bindings WHERE ' +
+            other_where + ' GROUP BY 1,2 ORDER BY 1,2', other_params)]
+        next_cursor = (self._character_cursor(agent, selected, offset + len(rows), limit)
+                       if offset + len(rows) < total else None)
         result = {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'],
                   'character': c.character(agent),
                   'supplied_skills': sorted(f'{k}:{v}' for k, v in selected) if selected is not None else None,
                   'unknown_supplied_skills': sorted(f'{k}:{v}' for k, v in (selected or set()) - known),
                   'effects': sorted(effects.values(), key=lambda e: e['ability_key']),
+                  'binding_page': {'total': total, 'offset': offset, 'returned': len(rows), 'limit': limit,
+                                   'cursor': next_cursor, 'detail_ref': c.detail('character', agent)},
                   'other_bindings': other,
-                  'note': CHARACTER_ROUTE_NOTE + ' Group, phase, unit-set, army and context bindings are listed '
-                          'separately and never grant individual spells.',
+                  'note': CHARACTER_ROUTE_NOTE + ' Effects page by exact source binding and may repeat an ability '
+                          'across pages. Group, phase, unit-set, army and context bindings are listed separately '
+                          'for the selected skills only, when supplied, and never grant individual spells.',
                   'routes_not_imported': NOT_IMPORTED_ROUTES,
                   'sources': c.packet['sources'], 'provenance': c.packet['provenance'],
                   'detail_refs': c.packet['detail_refs']}

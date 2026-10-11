@@ -633,11 +633,25 @@ def validate_character_access(db):
                           'ON c.agent_subtype_key=f.agent_subtype_key WHERE c.record_id IS NULL').fetchone()[0]
     if orphans:
         raise ValueError('character access references an unindexed character')
-    crossed = db.execute('SELECT count(*) FROM effect_character_access a JOIN magic_skill_bindings b '
-                         'ON b.record_id=a.binding_record WHERE b.ability_key!=a.ability_key '
-                         'OR b.agent_subtype_key!=a.agent_subtype_key').fetchone()[0]
+    crossed = db.execute('SELECT a.binding_record FROM effect_character_access a '
+                         'LEFT JOIN magic_skill_bindings b ON b.record_id=a.binding_record '
+                         'LEFT JOIN effect_abilities e ON e.ability_key=a.ability_key '
+                         "WHERE b.record_id IS NULL OR b.target_kind IS NOT 'ability' "
+                         'OR b.target_key IS NOT a.ability_key '
+                         'OR b.ability_key IS NOT a.ability_key '
+                         'OR b.agent_subtype_key IS NOT a.agent_subtype_key '
+                         'OR b.bonus_value_id IS NOT a.bonus_value_id '
+                         'OR b.skill_key IS NOT a.skill_key '
+                         'OR b.skill_level IS NOT a.skill_level '
+                         'OR b.node_set_key IS NOT a.node_set_key '
+                         "OR a.role IS NOT CASE b.bonus_value_id WHEN 'enable' THEN 'enables' "
+                         "WHEN 'enable_overchage' THEN 'enables_overcast' "
+                         "WHEN 'disable' THEN 'disables' ELSE 'modifies' END "
+                         'OR a.effect_ability IS NOT e.ability_key '
+                         "OR (e.ability_key IS NOT NULL AND a.status IS NOT 'activated_effect') "
+                         "OR (e.ability_key IS NULL AND a.status IS 'activated_effect') LIMIT 1").fetchone()
     if crossed:
-        raise ValueError('crossed character access identity')
+        raise ValueError('crossed character access identity or source binding: ' + crossed[0])
 
 
 # Payload fields whose retained value must appear as a relation edge (resolved

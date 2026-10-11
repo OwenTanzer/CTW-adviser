@@ -107,6 +107,7 @@ def main():
                     result = queries.resolve_character(key)
                 elif args.command == 'character':
                     result = queries.get_character_effects(key, skills=args.skill,
+                                                           limit=args.limit, cursor=args.cursor,
                                                            include_provenance=args.include_provenance)
                 elif args.command == 'unit-effects':
                     result = queries.get_unit_effects(key, subculture=args.subculture,

@@ -157,10 +157,15 @@ python scripts/query_snapshot.py detail --db work/units.sqlite effect-characters
   `effect-characters:<key>` detail ref pages through all characters with full
   forms and node sets. `access.group_modifiers` lists the effect's groups and
   their modifiers.
-- `get_character_effects(character, skills=None)` lists the effects the
-  character's bindings enable, enable overcast for, disable or modify, plus
-  non-ability binding families. With supplied `SKILL_KEY:RANK` pairs it returns
-  only those exact bindings and reports unknown pairs.
+- `get_character_effects(character, skills=None, limit=32, cursor=None)` pages
+  exact source bindings (1–256 per page). `binding_page` reports the total,
+  offset, returned count, limit, continuation cursor and `character:<key>`
+  detail reference. `get_detail` accepts that reference with the same limit and
+  cursor. An ability may span pages; collect all pages before interpreting its
+  full set of skill/rank/role bindings. The cursor retains supplied
+  `SKILL_KEY:RANK` pairs, so detail continuation keeps the same selection.
+  Unknown pairs are reported, and non-ability binding summaries are filtered
+  to supplied pairs when present. Group modifiers never grant a spell.
 - `get_unit_effects` → `character_skill_effects`: unit → indexed character
   forms → effects their skill bindings can enable.
 - The MCP adds `get_character_effects`. Packet version 1.21.0 leaves unit
