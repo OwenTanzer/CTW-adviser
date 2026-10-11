@@ -162,6 +162,9 @@ Changed inputs are listed with before and after values. Morale, reload,
 accuracy and other stats, and healing, summons and attributes, are listed as
 unsupported. If nothing supported remains, the result is
 `blocked: no_supported_modifier`.
+Effect-owned modifier and variant citations must resolve in the same-snapshot
+effect packet before an engagement result is returned. Unit evidence in the
+embedded #5 matchups retains its separate packet provenance.
 
 **Recipients.** `relation=enemy` requires an enemy-targeting phase link;
 self/friendly cast selection can produce an outward aura. Its coverage is
@@ -184,13 +187,14 @@ A null or sentinel duration reports only the horizon bound, as `partial`.
 Intensity-scaled abilities use full listed values and are flagged. Stacking,
 replacement, recipient caps and area coverage are not modeled.
 
-Verified with `tests/test_effect_engagement.py` (18 tests, from source evidence):
+Verified with `tests/test_effect_engagement.py` (19 tests, from source evidence and a synthetic citation probe):
 
 - Hand of Glory: a friendly spell attack buff lowers only the enemy's survivability
 - Wither: an enemy armour debuff, plus the ineligible-relation block
 - Aura of Inertia: an enemy phase from a self cast, with reach uncertainty
 - Potion of Charoi: a self-only phase cannot modify an unrelated unit
 - Crooked Dice phase III: later-stage start remains unresolved
+- a nonexistent Wither modifier provenance ID is rejected before return
 - Shanty Verse: a non-spell defence buff
 - Wild Mantle of Ghorok: inverse effects (armour down, attack up) both reflected
 - Tomb King Rally: the morale-only block

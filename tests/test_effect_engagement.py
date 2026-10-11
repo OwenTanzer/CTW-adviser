@@ -256,6 +256,17 @@ class EffectEngagementTests(unittest.TestCase):
         with patch.object(self.q, 'get_effect', stale), self.assertRaisesRegex(ValueError, 'different snapshots'):
             self.run_case(HAND_OF_GLORY, recipient='a')
 
+    def test_missing_modifier_provenance_is_rejected(self):
+        from unittest.mock import patch
+        packet = copy.deepcopy(self.q.get_effect(WITHER, limit=256, include_diagnostics=True,
+                                                 include_provenance=True))
+        stat = next(effect for effect in packet['effect']['mechanic']['effects']
+                    if effect['kind'] == 'stat_modifier')
+        stat['provenance_refs'].append('synthetic:missing')
+        with patch.object(self.q, 'get_effect', return_value=packet), self.assertRaisesRegex(
+                ValueError, 'missing provenance in calculation result'):
+            self.run_case(WITHER, recipient='b', relation='enemy')
+
 
     def test_out_of_domain_modifier_is_clamped_and_flagged(self):
         # Found by the full-inventory sweep: this debuff drives armour below zero.

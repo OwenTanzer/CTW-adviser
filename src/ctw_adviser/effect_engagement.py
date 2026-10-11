@@ -15,6 +15,7 @@ import copy
 import math
 
 from .combat import evaluate_matchup
+from .effect_calc import _check_provenance_refs
 from .queries import STAT_NAMES, Queries, ResolutionError
 
 MODEL_VERSION = "effect-engagement-0.1.0"
@@ -184,7 +185,8 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
     resolution = queries.resolve_effect(effect)
     if resolution["status"] != "resolved":
         raise ResolutionError(resolution)
-    packet = queries.get_effect(resolution["resolved"]["ability_key"], limit=256, include_diagnostics=True)
+    packet = queries.get_effect(resolution["resolved"]["ability_key"], limit=256,
+                                include_diagnostics=True, include_provenance=True)
     if packet["snapshot"]["commit"] != queries.snapshot["source_commit"]:
         raise ValueError("effect evidence and engagement units come from different snapshots")
     eff = packet["effect"]
@@ -323,7 +325,7 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
         "Passive abilities remain unapplied in the #5 model, so no interaction with them is represented.",
         "All #5 assumptions and limitations apply to both runs; see the embedded matchup results.",
     ]
-    return {
+    result = {
         "model_version": MODEL_VERSION, "source_packet_version": packet["schema_version"],
         "snapshot": {"commit": packet["snapshot"]["commit"], "serving_contract_sha256": queries.snapshot["contract_sha256"]},
         "status": status, "blocked": blocked,
@@ -348,3 +350,8 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
         "baseline_check": baseline_check, "unresolved_inputs": unresolved, "limitations": limitations,
         "empirical_calibration": None,
     }
+    # The selected phase and variants are effect-owned citations. Matchup
+    # packets carry separate unit provenance and are validated by #5.
+    _check_provenance_refs({"variants": result["variants"], "modifiers": result["modifiers"]},
+                           set(packet["provenance"]))
+    return result
