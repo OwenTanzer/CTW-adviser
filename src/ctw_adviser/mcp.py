@@ -50,6 +50,9 @@ TOOLS = [
     _tool("get_effect", "Retrieve one spell or activated ability: costs/timing, distinct distance settings, recipients, phases, payload chains, failure branches, summons, variants and qualified unit access. Source parameters only; no damage totals, buff application or availability claim.",
           {"name_or_key": STRING, "unit_key": STRING, "subculture": STRING, "culture": STRING,
            "cursor": STRING, "limit": LIMIT, "include_provenance": {"type": "boolean"}}, ("name_or_key",)),
+    _tool("get_character_effects", "Resolve a character (agent subtype key or exact name) and list spells/abilities its indexed skill bindings enable or modify, with exact skill/rank and unit forms. Optional skills are exact SKILL_KEY:RANK pairs; no build solver, rank sums or legality claim.",
+          {"character": STRING, "skills": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 64},
+           "include_provenance": {"type": "boolean"}}, ("character",)),
     _tool("get_detail", "Expand an exact packet detail reference with bounded pagination.",
           {"ref": STRING, "cursor": STRING, "limit": LIMIT}, ("ref",)),
     _tool("get_provenance", "Expand exact source record IDs returned in a packet (maximum 64 per call).",
@@ -116,6 +119,9 @@ def call_tool(queries, name, args):
             data = queries.get_effect(args["name_or_key"], unit=args.get("unit_key"), subculture=args.get("subculture"),
                                       culture=args.get("culture"), cursor=args.get("cursor"), limit=args.get("limit", 32),
                                       include_provenance=args.get("include_provenance", False))
+        elif name == "get_character_effects":
+            data = queries.get_character_effects(args["character"], skills=args.get("skills"),
+                                                 include_provenance=args.get("include_provenance", False))
         elif name == "get_detail":
             data = queries.get_detail(args["ref"], cursor=args.get("cursor"), limit=args.get("limit", 32))
         else:

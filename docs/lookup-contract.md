@@ -1,9 +1,9 @@
-# Evidence packet contract 1.20.0
+# Evidence packet contract 1.21.0
 
 The authoritative schema is `schema/evidence_packet.schema.json`. Phases 1–2
 established reviewed design fixtures and the pinned SQLite snapshot; phase 3
 implements `ctw_adviser.queries.Queries` and the offline command-line interface.
-The schema still accepts earlier reviewed examples. Runtime packets use 1.20.0.
+The schema still accepts earlier reviewed examples. Runtime packets use 1.21.0.
 
 Development diagnostics are separate from ordinary agent output. Default packets
 omit `coverage.gaps` prose and include only `coverage.diagnostic_count`, alongside
@@ -973,3 +973,7 @@ or null for unresolved classifications) and concise derived `keywords`. Its
 or ability payloads. The specialized effect packet, access links and payload
 paths are described in [activated effects](activated-effects.md). Legacy
 `option:` refs return an `effect_ref` pointer for classified activated options.
+
+Packet 1.21.0 leaves unit packets unchanged. Effect packets add character
+routes and group modifiers; character packets are new. See
+[activated effects](activated-effects.md).

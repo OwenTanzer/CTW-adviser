@@ -99,3 +99,26 @@ CREATE TABLE effect_access (
 ) STRICT;
 CREATE INDEX effect_access_unit ON effect_access(unit_key,ability_key);
 CREATE INDEX effect_access_ability ON effect_access(ability_key,unit_key);
+-- Issue #19 increment 2 (contract 4): character forms and skill access.
+CREATE TABLE character_unit_forms (
+  record_id TEXT PRIMARY KEY REFERENCES record_provenance(id),
+  agent_subtype_key TEXT NOT NULL, form_ordinal INTEGER NOT NULL CHECK(form_ordinal>=0),
+  main_unit_key TEXT NOT NULL, land_unit_key TEXT,
+  via_kind TEXT NOT NULL CHECK(via_kind IN ('associated_unit_override','mount_variant')),
+  unit_key TEXT REFERENCES unit_identity(unit_key),
+  mapping TEXT NOT NULL CHECK(mapping IN ('roster_unit','unmapped')),
+  CHECK((mapping='roster_unit') = (unit_key IS NOT NULL)),
+  UNIQUE(agent_subtype_key,form_ordinal)
+) STRICT;
+CREATE INDEX character_unit_forms_unit ON character_unit_forms(unit_key,agent_subtype_key);
+CREATE TABLE effect_character_access (
+  binding_record TEXT PRIMARY KEY REFERENCES record_provenance(id),
+  agent_subtype_key TEXT NOT NULL, ability_key TEXT NOT NULL,
+  effect_ability TEXT REFERENCES effect_abilities(ability_key),
+  role TEXT NOT NULL CHECK(role IN ('enables','enables_overcast','disables','modifies')),
+  bonus_value_id TEXT NOT NULL, skill_key TEXT NOT NULL, skill_level INTEGER NOT NULL, node_set_key TEXT NOT NULL,
+  status TEXT NOT NULL CHECK(status IN ('activated_effect','not_activated','missing_definition')),
+  CHECK((status='activated_effect') = (effect_ability IS NOT NULL))
+) STRICT;
+CREATE INDEX effect_character_access_ability ON effect_character_access(ability_key,agent_subtype_key,role);
+CREATE INDEX effect_character_access_character ON effect_character_access(agent_subtype_key,ability_key);

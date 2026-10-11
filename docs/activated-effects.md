@@ -1,4 +1,4 @@
-# Spells and activated abilities — issue #19, increment 1
+# Spells and activated abilities — issue #19
 
 This is the data/retrieval half of ONT-120, first increment. Calculations and
 scenario application belong to #20. CTW-data stays authoritative; the pin is
@@ -101,12 +101,80 @@ build exactly, apart from the intended `activated_options` additions.
 
 ## Not in this increment
 
-- Character skill/rank routes (`CTW-data/data/magic` characters, access and
-  indexes) need contract 4 and a reviewed lock expansion. 1,306 effects
-  currently have no unit link. They are retrievable, but this snapshot does not
-  establish who can cast them.
+- Character skill/rank routes: delivered in increment 2 below.
 - Item, trait, mount, form and script grants.
 - Damage estimates, buff application, stacking, scheduling, combat verdicts (#20).
 - `scripts/audit_alpha4_recovery.py` fails on `main` as well: its pinned
   baseline predates the `spreadings` field. This increment does not change that
   audit.
+
+## Increment 2: character skill/rank access (contract 4)
+
+Contract 4 keeps the pin `595e227`, as Owen confirmed. It locks 1,086
+additional CTW-data files:
+
+- `data/magic/character_index.csv`
+- the 534 per-character skill-binding CSVs
+- the 550 `data/magic/access/*.json` unit-form files
+- `abilities/tables/ability_group_members.csv`
+
+`scripts/contract4_magic_access.py` performs the migration. It checks each file
+against its Git blob at the pin and against CTW-data's own
+`data/magic/output_manifest.json`, and aborts on any mismatch rather than
+refreshing a hash. The existing lock entries, joins and dataset specs are unchanged.
+
+New linked tables (still store schema 4):
+
+| Table | Holds |
+| --- | --- |
+| `magic_characters` | 550 indexed characters (agent subtype, name, class, caster flag) |
+| `magic_skill_bindings` | All 50,934 skill → effect → binding rows with exact skill, rank, node set, bonus value and source lines |
+| `character_unit_forms` | 1,370 character → main/land unit forms (associated unit override or mount variant). 1,367 map to snapshot unit keys by exact key; 3 stay `unmapped` with a coverage gap |
+| `effect_character_access` | The 29,146 ability-targeted bindings with role `enables`, `enables_overcast` (native `enable_overchage`), `disables` or `modifies`, and status `activated_effect`, `not_activated` (for example skill-granted passives) or `missing_definition` (none) |
+| `native_ability_group_members` | Exact lore/group membership |
+
+Group, phase, unit-set, army, pre-battle and context bindings stay in
+`magic_skill_bindings`. They never create per-spell access rows. Group
+modifiers are shown on effect packets as modifiers of a group the effect
+belongs to, never as grants. Ranks are separate records and are never summed,
+and no build solver chooses skills.
+
+Retrieval additions:
+
+```sh
+python scripts/query_snapshot.py resolve-character --db work/units.sqlite "Tomb King"
+python scripts/query_snapshot.py character --db work/units.sqlite Teclis
+python scripts/query_snapshot.py character --db work/units.sqlite Teclis --skill wh2_main_skill_magic_dark_flock_of_doom_teclis:1
+python scripts/query_snapshot.py detail --db work/units.sqlite effect-characters:wh_main_spell_heavens_comet_of_casandora
+```
+
+- `get_effect` → `access.characters`: the first 8 characters, each with
+  compact unit forms and bindings grouped by exact skill/rank/role. The
+  `effect-characters:<key>` detail ref pages through all characters with full
+  forms and node sets. `access.group_modifiers` lists the effect's groups and
+  their modifiers.
+- `get_character_effects(character, skills=None)` lists the effects the
+  character's bindings enable, enable overcast for, disable or modify, plus
+  non-ability binding families. With supplied `SKILL_KEY:RANK` pairs it returns
+  only those exact bindings and reports unknown pairs.
+- `get_unit_effects` → `character_skill_effects`: unit → indexed character
+  forms → effects their skill bindings can enable.
+- The MCP adds `get_character_effects`. Packet version 1.21.0 leaves unit
+  packets unchanged.
+
+Snapshots now open with a read-only `mmap_size` of 256 MiB. On the
+165 MB schema-4 file this brought warm effect-lookup p95 from about 57 ms to
+about 10 ms.
+
+Verified with contract 4 (see the evidence file): 1,084 of 1,884 effects have
+an access route (578 through unit links, 849 through character skill
+bindings). Effect lookups run at median 2.6 ms and p95 10 ms, with a maximum
+packet of 35 KB. Character lookups over all 550 characters run at median 4 ms
+and maximum 36 ms. All 503 passive outputs and all 2,409 unit packets are
+identical to increment 1. The remaining 800 effects (mostly army, quest, item
+and upgrade abilities) have no route established by these indexes; that is not
+evidence that they are unavailable.
+
+Still not established: item, trait and ancillary grants, mount unlocks,
+scripted forms, campaign legality and calculations (#20). Completing #19 does
+not close ONT-120.

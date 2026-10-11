@@ -31,13 +31,14 @@ python scripts/audit_alpha4_recovery.py --db work/units.sqlite
 python -m unittest discover -s tests -v
 ```
 
-Issue #19 (increment 1) adds spell and activated-ability retrieval in distinct
-linked tables (store schema 4, contract 3, same CTW-data pin):
+Issue #19 adds spell and activated-ability retrieval in distinct linked tables,
+with character skill/rank access (store schema 4, contract 4, same CTW-data pin):
 
 ```sh
 python scripts/query_snapshot.py resolve-effect --db work/units.sqlite "Fiery Convocation"
 python scripts/query_snapshot.py effect --db work/units.sqlite wh_main_spell_heavens_comet_of_casandora
 python scripts/query_snapshot.py unit-effects --db work/units.sqlite wh2_main_hef_cha_teclis_0
+python scripts/query_snapshot.py character --db work/units.sqlite Teclis
 ```
 
 See [activated effects](docs/activated-effects.md) for tables, packet sections,
@@ -67,7 +68,7 @@ boundaries. The existing public Datasette service uses this repository's
 read-only human inspection. Its live source and packet version must be checked
 against a reviewed merge before claiming parity.
 
-Packet 1.20.0 includes the Alpha 4 repairs first released in 1.15.0 and the
+Packet 1.21.0 includes the Alpha 4 repairs first released in 1.15.0 and the
 Chej unit supplements. Default packets keep
 inline evidence IDs and defer source/provenance dictionaries; use
 `--include-provenance` to expand them or the `provenance` command to resolve IDs.

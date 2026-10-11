@@ -30,7 +30,8 @@ SNAPSHOT_KEYS = {'id', 'schema_version', 'source_commit', 'contract_sha256',
                  'baseline_json', 'owners_json', 'coverage_json'}
 PLAN_KEYS = {'unit_key', 'unit_name', 'source_unit_name', 'alias_key',
              'relations', 'reverse_edge', 'effect_key', 'effect_name',
-             'unit_effects', 'effect_units', 'effect_variant_reverse'}
+             'unit_effects', 'effect_units', 'effect_variant_reverse', 'effect_characters',
+             'character_effects', 'unit_characters', 'character_name', 'group_bindings'}
 
 
 def sha256(path):

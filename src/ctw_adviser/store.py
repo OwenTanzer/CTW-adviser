@@ -9,7 +9,7 @@ import sqlite3
 # Store schema 4 (issue #19) adds linked spell/activated-ability tables and the
 # contract-3 activated payload scope. Schema-3 stores at the same CTW-data pin
 # lack those records and must be rebuilt.
-SUPPORTED_CONTRACT_SHA256 = 'fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1'
+SUPPORTED_CONTRACT_SHA256 = 'bf65bfc844ee8bc8f4688310ad66a3748ef396389575650dd601cacb0186885f'
 
 
 def quote(name: str) -> str:
@@ -59,6 +59,9 @@ def open_snapshot(path: Path) -> sqlite3.Connection:
     try:
         db.execute('PRAGMA foreign_keys=ON')
         db.execute('PRAGMA query_only=ON')
+        # Read-only memory mapping keeps indexed lookups fast on the larger
+        # schema-4 snapshot (#19); the file is never written through it.
+        db.execute('PRAGMA mmap_size=268435456')
         if db.execute('SELECT schema_version FROM snapshot').fetchone() != (4,):
             raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
         if db.execute('SELECT contract_sha256 FROM snapshot').fetchone() != (SUPPORTED_CONTRACT_SHA256,):

@@ -125,7 +125,7 @@ inspect integrity; then publish the image. Redeploy only after review, record
 deployment ID and require Railway `SUCCESS`, `/healthz`, and the remote SDK
 acceptance command above. Record returned source commit, base patch/build
 `9.0/25507028`, unit scale `ultra`, owner-specific supplemental patch/build,
-store schema 4, packet 1.20.0 and model version. On mismatch, stop rollout and
+store schema 4, packet 1.21.0 and model version. On mismatch, stop rollout and
 restore the previous successful deployment. A source refresh changes the lock,
 contract and verification evidence through its separate reviewed process.
 

@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .store import open_snapshot, quote
 
-PACKET_VERSION = '1.20.0'
+PACKET_VERSION = '1.21.0'
 MURDEROUS_INDICATOR = 'wh2_main_faction_abilities_murderous_prowess_indicator'
 MURDEROUS_BUFFS = {'wh2_main_faction_abilities_murderous_prowess',
                    'wh2_main_faction_abilities_murderous_mastery'}
@@ -275,6 +275,13 @@ EFFECT_RELATION_LABELS = {
     'data/unit_stats/abilities/tables/ability_casting.csv.mom_vortex_key': 'linked mom_vortex_key reference',
 }
 MAX_PAYLOAD_CHAINS = 24
+CHARACTER_ROUTE_NOTE = ('Skill bindings are conditional possibilities for an exact skill and rank; they are not '
+                        'selected skills, campaign legality or proof that a character currently has the ability. '
+                        'Ranks are never summed.')
+# Default effect packets embed a short first page of character routes;
+# the effect-characters:<key> detail ref pages through the rest.
+CHARACTER_PAGE = 8
+NOT_IMPORTED_ROUTES = ['items, traits and ancillaries', 'mount unlocks and scripted forms', 'campaign scripts']
 # Child kinds that deliver a further effect; modifiers such as penetration do not.
 TRANSPORTED_KINDS = {'native_vortices', 'native_bombardments', 'projectiles', 'explosions', 'native_ability_phases',
                      'native_projectile_shrapnels', 'native_special_ability_spreadings',
@@ -655,6 +662,10 @@ class Queries:
                     'reason': 'Unresolved classifications have no effect payload interface.'}
         if kind == 'effect':
             return self.get_effect(key, limit=limit, cursor=cursor)
+        if kind == 'effect-characters':
+            return self.effect_characters(key, limit=limit, cursor=cursor)
+        if kind == 'character':
+            return self.get_character_effects(key)
         if kind == 'availability':
             unit = self.resolved(key)
             c = Packet(self)
@@ -763,7 +774,8 @@ class Queries:
                             'provenance_refs': [c.evidence(link['link_record'])],
                             'detail_ref': c.detail('effect', effect['ability_key'])})
         result = {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'unit': resolved,
-                  'effects': effects, 'routes_not_imported': ['character skill/rank bindings', 'items, traits, mounts and scripts'],
+                  'effects': effects, 'character_skill_effects': c.unit_character_effects(resolved),
+                  'routes_not_imported': NOT_IMPORTED_ROUTES, 'character_route_note': CHARACTER_ROUTE_NOTE,
                   'sources': c.packet['sources'], 'provenance': c.packet['provenance'], 'detail_refs': c.packet['detail_refs']}
         return self.response_view(result, include_provenance, False)
 
@@ -811,7 +823,9 @@ class Queries:
                                  'cursor': self.cursor(binding, 'combined', 'activated_options', offset + limit, limit)
                                  if offset + limit < len(access) else None,
                                  'links': [c.access_link(a) for a in page],
-                                 'routes_not_imported': ['character skill/rank bindings', 'items, traits, mounts and scripts']},
+                                 'characters': self.effect_characters(key, limit=min(limit, CHARACTER_PAGE), packet=c),
+                                 'group_modifiers': c.group_modifiers(key),
+                                 'routes_not_imported': NOT_IMPORTED_ROUTES},
                       'interpretation': ('Source parameters and linked payload records, not calculated damage, buff application '
                                          'or availability. Linked access is qualified and not proof of acquisition.'),
                   },
@@ -824,6 +838,112 @@ class Queries:
         if include_diagnostics:
             packet['gaps'] = gaps
         return self.response_view(packet, include_provenance, include_diagnostics)
+
+    # -- Issue #19 increment 2: characters and skill/rank routes ------------
+
+    def resolve_character(self, query):
+        """Exact agent subtype key, else case-insensitive character name."""
+        if not isinstance(query, str) or not query.strip():
+            raise ValueError('character query must be a nonempty string')
+        query = query.strip()
+        exact = self.one('magic_characters', 'agent_subtype_key', query)
+        rows = [exact] if exact else [dict(r) for r in self.db.execute(
+            'SELECT * FROM magic_characters WHERE character_name=? COLLATE NOCASE ORDER BY agent_subtype_key', (query,))]
+        candidates = [{'agent_subtype_key': r['agent_subtype_key'], 'character_name': r['character_name'],
+                       'character_class': r['character_class'], 'is_caster': boolean(r['is_caster'])} for r in rows]
+        status = 'resolved' if len(candidates) == 1 else 'ambiguous' if candidates else 'not_found'
+        return {'status': status, 'query': query, 'candidates': candidates,
+                'resolved': candidates[0] if status == 'resolved' else None}
+
+    def effect_characters(self, key, *, limit=32, cursor=None, packet=None):
+        """Effect -> characters with exact skill/rank bindings, one entry per character."""
+        if type(limit) is not int or not 1 <= limit <= 256:
+            raise ValueError('limit must be an integer between 1 and 256')
+        binding = {'unit_key': 'effect-characters:' + key, 'subculture_key': None}
+        offset = self.decode_cursor(cursor, binding, 'combined', 'abilities', limit)['offset'] if cursor else 0
+        c = packet or Packet(self)
+        agents = [r[0] for r in self.db.execute(
+            'SELECT DISTINCT agent_subtype_key FROM effect_character_access WHERE ability_key=? ORDER BY agent_subtype_key', (key,))]
+        page = []
+        for agent in agents[offset:offset + limit]:
+            rows = [dict(r) for r in self.db.execute(
+                'SELECT * FROM effect_character_access WHERE ability_key=? AND agent_subtype_key=? '
+                'ORDER BY skill_key,skill_level,role,node_set_key,binding_record', (key, agent))]
+            entry = dict(c.character(agent), bindings=c.bindings(rows))
+            if packet is not None:
+                # Embedded first page stays compact; the detail ref has full forms.
+                entry['unit_forms'] = [{'unit_key': f['unit_key'], 'mapping': f['mapping'], 'via': f['via'],
+                                        **({'main_unit_key': f['main_unit_key']} if f['unit_key'] is None else {})}
+                                       for f in entry['unit_forms']]
+                for b in entry['bindings']:
+                    b['node_set_count'] = len(b.pop('node_set_keys'))
+            page.append(entry)
+        result = {'total': len(agents), 'offset': offset, 'returned': len(page), 'entries': page,
+                  'detail_ref': c.detail('effect-characters', key),
+                  'cursor': self.cursor(binding, 'combined', 'abilities', offset + limit, limit)
+                  if offset + limit < len(agents) else None, 'note': CHARACTER_ROUTE_NOTE}
+        if packet is None:
+            return {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'], 'ability_key': key,
+                    'characters': result, 'sources': {}, 'provenance': {}}
+        return result
+
+    def get_character_effects(self, character, *, skills=None, include_provenance=False):
+        """Character -> effects its skill bindings enable or modify.
+
+        Supplied skills are exact SKILL_KEY:RANK pairs; only those bindings are
+        returned and unknown pairs are reported. No build solver or rank sums.
+        """
+        resolution = self.resolve_character(character)
+        if resolution['status'] != 'resolved':
+            raise ResolutionError(resolution)
+        agent = resolution['resolved']['agent_subtype_key']
+        selected = None
+        if skills is not None:
+            if not isinstance(skills, (list, tuple)) or not skills:
+                raise ValueError('skills must be a nonempty list of SKILL_KEY:RANK')
+            selected = set()
+            for item in skills:
+                skill, sep, rank = str(item).rpartition(':')
+                if not sep or not skill or not rank.isdigit():
+                    raise ValueError('skill must be SKILL_KEY:RANK')
+                selected.add((skill, int(rank)))
+        c = Packet(self)
+        rows = self.rows('effect_character_access', 'agent_subtype_key', agent, 'ability_key,skill_key,skill_level,binding_record')
+        known = {(r['skill_key'], r['skill_level']) for r in self.db.execute(
+            'SELECT DISTINCT skill_key,skill_level FROM magic_skill_bindings WHERE agent_subtype_key=?', (agent,))}
+        if selected is not None:
+            rows = [r for r in rows if (r['skill_key'], r['skill_level']) in selected]
+        effects = {}
+        for row in rows:
+            entry = effects.get(row['ability_key'])
+            if entry is None:
+                effect = self.one('effect_abilities', 'ability_key', row['ability_key'])
+                entry = effects[row['ability_key']] = {
+                    'ability_key': row['ability_key'], 'name': effect['name'] if effect else None,
+                    'effect_kind': effect['effect_kind'] if effect else None,
+                    'keywords': json.loads(effect['keywords_json']) if effect else [],
+                    'status': row['status'], 'roles': [], 'rows': [],
+                    'detail_ref': c.detail('effect', row['ability_key']) if effect else None}
+            entry['rows'].append(row)
+            if row['role'] not in entry['roles']:
+                entry['roles'].append(row['role'])
+        for entry in effects.values():
+            entry['bindings'] = c.bindings(entry.pop('rows'))
+        other = [dict(r) for r in self.db.execute(
+            "SELECT target_kind,bonus_value_id,count(*) AS bindings FROM magic_skill_bindings "
+            "WHERE agent_subtype_key=? AND target_kind!='ability' GROUP BY 1,2 ORDER BY 1,2", (agent,))]
+        result = {'schema_version': PACKET_VERSION, 'snapshot': c.packet['snapshot'],
+                  'character': c.character(agent),
+                  'supplied_skills': sorted(f'{k}:{v}' for k, v in selected) if selected is not None else None,
+                  'unknown_supplied_skills': sorted(f'{k}:{v}' for k, v in (selected or set()) - known),
+                  'effects': sorted(effects.values(), key=lambda e: e['ability_key']),
+                  'other_bindings': other,
+                  'note': CHARACTER_ROUTE_NOTE + ' Group, phase, unit-set, army and context bindings are listed '
+                          'separately and never grant individual spells.',
+                  'routes_not_imported': NOT_IMPORTED_ROUTES,
+                  'sources': c.packet['sources'], 'provenance': c.packet['provenance'],
+                  'detail_refs': c.packet['detail_refs']}
+        return self.response_view(result, include_provenance, False)
 
 
 class Packet:
@@ -1716,6 +1836,69 @@ class Packet:
                              'detail_ref': self.detail('effect', row['ability_key'])})
         return variants
 
+    def character(self, agent):
+        row = self.q.one('magic_characters', 'agent_subtype_key', agent)
+        forms = []
+        for form in self.q.rows('character_unit_forms', 'agent_subtype_key', agent, 'form_ordinal'):
+            profile = None
+            if form['unit_key']:
+                alias = self.q.one('unit_aliases', 'unit_key', form['unit_key'])
+                profile = self.q.one('unit_profiles', 'unit_key', alias['profile_unit_key']) if alias else None
+            forms.append({'unit_key': form['unit_key'], 'main_unit_key': form['main_unit_key'],
+                          'land_unit_key': form['land_unit_key'], 'unit_name': profile['unit_name'] if profile else None,
+                          'via': form['via_kind'], 'mapping': form['mapping'],
+                          'provenance_refs': [self.evidence(form['record_id'])]})
+        return {'agent_subtype_key': agent, 'character_name': row['character_name'],
+                'character_class': row['character_class'], 'is_caster': boolean(row['is_caster']),
+                'unit_forms': forms, 'detail_ref': self.detail('character', agent),
+                'provenance_refs': [self.evidence(row['record_id'])]}
+
+    def bindings(self, rows):
+        """One entry per exact skill/rank/role; node sets and records stay listed."""
+        grouped = {}
+        for row in rows:
+            entry = grouped.setdefault((row['skill_key'], row['skill_level'], row['role'], row['bonus_value_id']), {
+                'role': row['role'], 'bonus_value_id': row['bonus_value_id'], 'skill_key': row['skill_key'],
+                'skill_level': row['skill_level'], 'node_set_keys': [], 'provenance_refs': []})
+            if row['node_set_key'] not in entry['node_set_keys']:
+                entry['node_set_keys'].append(row['node_set_key'])
+            entry['provenance_refs'].append(self.evidence(row['binding_record']))
+        return list(grouped.values())
+
+    def group_modifiers(self, key):
+        """Lore/group bindings that modify a group containing this effect; never grants."""
+        result = []
+        for member in self.q.rows('native_ability_group_members', 'unit_special_abilities', key, 'special_ability_groups'):
+            group = member['special_ability_groups']
+            rows = [dict(r) for r in self.q.db.execute(
+                "SELECT bonus_value_id,count(*) AS bindings,count(DISTINCT agent_subtype_key) AS characters "
+                "FROM magic_skill_bindings WHERE target_kind='ability_group' AND target_key=? GROUP BY 1 ORDER BY 1", (group,))]
+            result.append({'group': group, 'modifiers': rows, 'membership_refs': [self.evidence(member['record_id'])],
+                           'note': 'Group membership; these bindings modify the group and do not grant its spells.'})
+        return result
+
+    def unit_character_effects(self, resolved):
+        """Unit -> indexed character forms -> effects their skill bindings can enable."""
+        result = []
+        for key in resolved['source_unit_keys']:
+            for form in self.q.rows('character_unit_forms', 'unit_key', key, 'agent_subtype_key,form_ordinal'):
+                agent = form['agent_subtype_key']
+                enabled = {}
+                for row in self.q.rows('effect_character_access', 'agent_subtype_key', agent, 'ability_key,skill_key,skill_level'):
+                    if row['role'] in ('enables', 'enables_overcast') and row['status'] == 'activated_effect':
+                        enabled.setdefault(row['ability_key'], []).append(
+                            {'skill_key': row['skill_key'], 'skill_level': row['skill_level'], 'role': row['role']})
+                effects = []
+                for ability, skills in sorted(enabled.items()):
+                    effect = self.q.one('effect_abilities', 'ability_key', ability)
+                    effects.append({'ability_key': ability, 'name': effect['name'], 'effect_kind': effect['effect_kind'],
+                                    'keywords': json.loads(effect['keywords_json']), 'skills': skills,
+                                    'detail_ref': self.detail('effect', ability)})
+                result.append({'agent_subtype_key': agent, 'unit_key': key, 'via': form['via_kind'],
+                               'form_ref': self.evidence(form['record_id']), 'effects': effects,
+                               'detail_ref': self.detail('character', agent)})
+        return result
+
     @staticmethod
     def effect_summary(effect):
         identity = effect['identity']
@@ -1745,10 +1928,13 @@ class Packet:
         mechanic = effect['mechanic']['summary']
         if mechanic:
             text += ' ' + mechanic
+        characters = effect['access']['characters']['total']
         if effect['access']['total']:
             text += f" Linked to {effect['access']['total']} unit record(s) as qualified access."
-        else:
-            text += ' No unit ability link in this snapshot; character skill routes are not yet imported.'
+        if characters:
+            text += f' {characters} character(s) have skill bindings that can enable or modify it (conditional on the skill rank).'
+        if not effect['access']['total'] and not characters:
+            text += ' No unit link or character skill binding in this snapshot.'
         return text
 
     def access_link(self, row):

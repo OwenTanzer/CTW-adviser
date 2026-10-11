@@ -180,3 +180,10 @@ summon mapping. Activated definitions and casting records are retained in full
 and follow the same bounded dependency joins as passives. Unit tables are
 unchanged. Schema-3 artifacts are rejected and must be rebuilt. See
 [activated effects](activated-effects.md).
+
+Increment 2 adds `magic_characters`, `magic_skill_bindings`,
+`character_unit_forms`, `effect_character_access` and
+`native_ability_group_members` within schema 4. These are linked by agent subtype, binding record, exact
+main-unit key and ability key, and reconciled at build time: binding counts per
+character, every ability-targeted binding to an access row, every access file
+to an indexed character, and no crossed identities.

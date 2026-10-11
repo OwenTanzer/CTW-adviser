@@ -18,7 +18,7 @@ try {
   const listed = await client.listTools();
   assert.deepEqual(new Set(listed.tools.map(t => t.name)), new Set([
     'resolve_unit', 'get_unit_combat_profile', 'get_matchup_evidence',
-    'resolve_effect', 'get_effect', 'get_detail', 'get_provenance'
+    'resolve_effect', 'get_effect', 'get_character_effects', 'get_detail', 'get_provenance'
   ]));
   for (const tool of listed.tools) {
     assert.ok(tool.inputSchema && tool.outputSchema && tool.description);

@@ -721,7 +721,7 @@ class QueryTests(unittest.TestCase):
         a, b = 'Lothern Sea Guard', 'Blue Horrors of Tzeentch'
         packet = self.q.get_matchup_evidence(a, b)
         self.check(packet)
-        self.assertEqual(packet['schema_version'], '1.20.0')
+        self.assertEqual(packet['schema_version'], '1.21.0')
         self.assertEqual(packet['comparison']['unit_names'], [a, b])
         dimensions = {d['dimension']: d for d in packet['comparison']['dimensions']}
         self.assertEqual(set(dimensions), {'range', 'ammunition', 'attack_types', 'material_conditions'})

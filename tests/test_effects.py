@@ -178,7 +178,7 @@ class EffectTests(unittest.TestCase):
         packet = self.q.get_unit_profile(TECLIS, limit=256)
         validate(packet, self.schema, self.schema)
         packet_checks(packet, provenance_resolver=self.q.get_provenance)
-        self.assertEqual(packet['schema_version'], '1.20.0')
+        self.assertEqual(packet['schema_version'], '1.21.0')
         options = {o['key']: o for o in packet['units'][0]['activated_options']}
         bound = options[BOUND]
         self.assertEqual(bound['effect_kind'], 'spell')
@@ -293,6 +293,88 @@ class EffectTests(unittest.TestCase):
         gone = self.tamper(f"DELETE FROM native_ability_casting WHERE key='{POTION}'")
         with Queries(gone) as q, self.assertRaisesRegex(ValueError, 'missing retained casting'):
             q.get_effect(POTION)
+
+
+    # -- Increment 2: character skill/rank access (contract 4) --------------
+
+    def test_character_routes_round_trip_with_exact_skill_rank(self):
+        routes = self.effect(COMET)['access']['characters']
+        self.assertGreater(routes['total'], 0)
+        mage = next(e for e in routes['entries'] if e['agent_subtype_key'] == 'wh2_dlc10_hef_mage_heavens')
+        roles = {(b['role'], b['skill_key'], b['skill_level']) for b in mage['bindings']}
+        self.assertIn(('enables', 'wh_main_skill_all_magic_heavens_09_comet_of_casandora', 1), roles)
+        # Successive ranks remain separate records; nothing is summed.
+        self.assertIn(('enables', 'wh_main_skill_all_magic_heavens_09_comet_of_casandora', 2), roles)
+        self.assertTrue(any(b['role'] == 'enables_overcast' for b in mage['bindings']))
+        form = mage['unit_forms'][0]
+        self.assertEqual(form['mapping'], 'roster_unit')
+        self.assertEqual(self.q.resolve_unit(form['unit_key'])['status'], 'resolved')
+        character = self.q.get_character_effects(mage['agent_subtype_key'])
+        self.assertIn(COMET, {e['ability_key'] for e in character['effects']})
+        back = self.q.get_unit_effects(form['unit_key'])['character_skill_effects']
+        self.assertIn(COMET, {e['ability_key'] for c in back for e in c['effects']})
+        self.assertIn('not selected skills', routes['note'])
+
+    def test_supplied_skills_filter_without_solver(self):
+        full = self.q.get_character_effects('Teclis')
+        self.assertIsNone(full['supplied_skills'])
+        picked = self.q.get_character_effects('Teclis', skills=['wh2_main_skill_magic_dark_flock_of_doom_teclis:1', 'invented:3'])
+        self.assertEqual({e['ability_key'] for e in picked['effects']}, {'wh_dlc03_spell_beasts_flock_of_doom'})
+        self.assertEqual(picked['unknown_supplied_skills'], ['invented:3'])
+        self.assertTrue(all(b['skill_level'] == 1 for e in picked['effects'] for b in e['bindings']))
+        with self.assertRaisesRegex(ValueError, 'SKILL_KEY:RANK'):
+            self.q.get_character_effects('Teclis', skills=['no_rank'])
+        self.assertEqual(self.q.resolve_character('Tomb King')['status'], 'ambiguous')
+        with self.assertRaises(ResolutionError):
+            self.q.get_character_effects('Tomb King')
+
+    def test_group_bindings_are_modifiers_not_grants(self):
+        teclis = self.q.get_character_effects('Teclis')
+        groups = [o for o in teclis['other_bindings'] if o['target_kind'] == 'ability_group']
+        self.assertTrue(groups)
+        self.assertIn('never grant', teclis['note'])
+        modifiers = self.effect('wh_main_spell_heavens_chain_lightning')['access']['group_modifiers']
+        self.assertTrue(modifiers)
+        self.assertTrue(all('do not grant' in g['note'] for g in modifiers))
+        # Group bindings never create per-spell access rows.
+        self.assertEqual(self.q.db.execute("SELECT count(*) FROM effect_character_access a JOIN magic_skill_bindings b "
+                                           "ON b.record_id=a.binding_record WHERE b.target_kind!='ability'").fetchone()[0], 0)
+
+    def test_unmapped_character_forms_stay_explicit(self):
+        unmapped = [tuple(r) for r in self.q.db.execute(
+            "SELECT agent_subtype_key,main_unit_key FROM character_unit_forms WHERE mapping='unmapped' ORDER BY 1")]
+        self.assertIn(('wh3_main_pro_slavin_0', 'wh3_main_pro_ksl_cha_slavin_0'), unmapped)
+        form = next(f for f in self.q.get_character_effects('wh3_main_pro_slavin_0')['character']['unit_forms']
+                    if f['main_unit_key'] == 'wh3_main_pro_ksl_cha_slavin_0')
+        self.assertIsNone(form['unit_key'])
+        self.assertEqual(form['mapping'], 'unmapped')
+        gaps = self.q.db.execute("SELECT count(*) FROM coverage_gaps WHERE kind='character_form_unmapped'").fetchone()[0]
+        self.assertEqual(gaps, len(unmapped))
+
+    def test_character_access_reconciles_and_detects_tampering(self):
+        db = self.q.db
+        self.assertEqual(db.execute('SELECT count(*) FROM magic_characters').fetchone()[0], 550)
+        self.assertEqual(db.execute("SELECT count(*) FROM effect_character_access").fetchone()[0],
+                         db.execute("SELECT count(*) FROM magic_skill_bindings WHERE target_kind='ability'").fetchone()[0])
+        self.assertEqual(db.execute("SELECT count(*) FROM effect_character_access WHERE status='missing_definition'").fetchone()[0], 0)
+        from ctw_adviser.build import validate_character_access
+        dropped = self.tamper("DELETE FROM effect_character_access WHERE rowid IN (SELECT rowid FROM effect_character_access LIMIT 1)")
+        with closing(sqlite3.connect(dropped)) as tampered, self.assertRaisesRegex(ValueError, 'reconciliation'):
+            validate_character_access(tampered)
+        crossed = self.tamper(f"UPDATE effect_character_access SET ability_key='{BOUND}' WHERE rowid IN "
+                              f"(SELECT rowid FROM effect_character_access WHERE ability_key='{COMET}' LIMIT 1)")
+        with closing(sqlite3.connect(crossed)) as tampered, self.assertRaisesRegex(ValueError, 'crossed'):
+            validate_character_access(tampered)
+        drift = self.tamper("DELETE FROM magic_skill_bindings WHERE rowid IN (SELECT rowid FROM magic_skill_bindings "
+                            "WHERE target_kind!='ability' LIMIT 1)")
+        with closing(sqlite3.connect(drift)) as tampered, self.assertRaisesRegex(ValueError, 'count drift'):
+            validate_character_access(tampered)
+        for sql, params in (('SELECT * FROM effect_character_access WHERE ability_key=?', (COMET,)),
+                            ('SELECT * FROM effect_character_access WHERE agent_subtype_key=?', ('x',)),
+                            ('SELECT * FROM character_unit_forms WHERE unit_key=?', (TECLIS,)),
+                            ('SELECT * FROM magic_skill_bindings WHERE target_kind=? AND target_key=?', ('ability_group', 'x'))):
+            plan = ' '.join(r[3] for r in db.execute('EXPLAIN QUERY PLAN ' + sql, params))
+            self.assertNotIn('SCAN', plan, sql)
 
 
 if __name__ == '__main__':

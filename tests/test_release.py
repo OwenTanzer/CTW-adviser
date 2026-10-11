@@ -58,7 +58,8 @@ class ReleaseVerificationTests(unittest.TestCase):
                        'classifications': {}},
             'build_query_plans': {key: ['SEARCH synthetic fixture'] for key in
                 ('unit_key', 'unit_name', 'source_unit_name', 'alias_key', 'relations', 'reverse_edge',
-                 'effect_key', 'effect_name', 'unit_effects', 'effect_units', 'effect_variant_reverse')},
+                 'effect_key', 'effect_name', 'unit_effects', 'effect_units', 'effect_variant_reverse',
+                 'effect_characters', 'character_effects', 'unit_characters', 'character_name', 'group_bindings')},
         }
         cls.manifest_path.write_text(json.dumps(cls.manifest), encoding='utf-8')
 

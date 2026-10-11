@@ -179,7 +179,7 @@ def select_records(specs, records, edges):
     # Roster and normalized unit relations are complete roots. Projectile,
     # explosion and raw weapon catalogs are selected through attachments.
     for path, spec in specs.items():
-        if spec['role'] in ('roster', 'unit_relation') or 'unit_mount_variants__' in path:
+        if spec['role'] in ('roster', 'unit_relation', *MAGIC_ROLES) or 'unit_mount_variants__' in path:
             for rid in records[path]:
                 enqueue(rid)
     while queue:
@@ -197,9 +197,17 @@ def select_records(specs, records, edges):
     return selected, options, indexes
 
 
+MAGIC_ROLES = {'magic_character_index': 'magic_characters', 'magic_skill_bindings': 'magic_skill_bindings',
+               'effect_group_membership': 'native_ability_group_members'}
+MAGIC_ACCESS = 'data/magic/access/'
+BINDING_ROLES = {'enable': 'enables', 'enable_overchage': 'enables_overcast', 'disable': 'disables'}
+
+
 def table_name(path, role):
     if role == 'roster':
         return 'unit_roster_records'
+    if role in MAGIC_ROLES:
+        return MAGIC_ROLES[role]
     if '/source_exports/db/' in path:
         return Path(path).parent.name.removesuffix('_tables')
     if role == 'selected_native_definition':
@@ -208,6 +216,8 @@ def table_name(path, role):
 
 
 def owner_name(path):
+    if path.startswith('data/magic/'):
+        return 'magic'
     if '/effect_semantics/' in path:
         return 'effect_semantics'
     if '/abilities/' in path:
@@ -254,7 +264,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
                                  'semantic': 'partial; raw conditions/effects retained without application',
                                  'runtime': 'unverified; engine behavior is not fully reconstructed',
                                  'activated_payloads': 'source graphs retained for every activated root; runtime execution unverified',
-                                 'activated_access': 'unit ability links only; character skill/rank routes are not yet imported',
+                                 'activated_access': 'unit ability links and indexed character skill bindings; items, traits, scripts and campaign legality unresolved',
                                  'packet_interface': 'versioned read-only query packets implemented; downstream consumers are separate'})))
             for entry in lock['files']:
                 path = entry['path']
@@ -363,6 +373,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
             import_payload_lineage(db, source_root)
             import_localization(db, source_root, lock, options)
             import_effects(db, snapshot_id, options)
+            import_character_access(db, source_root, lock, {r['key'] for _, r in records[DEFINITION].values()})
             record_semantic_gaps(db)
             validate_candidate(db, specs, records, selected, options)
             db.commit()
@@ -543,6 +554,90 @@ def import_effects(db, snapshot_id, options):
                     definitions[ability]['requires_effect_enabling'],
                     'Source unit ability link, qualified by culture and effect enabling; '
                     'not proof of campaign acquisition or of an active effect.'))
+
+
+def import_character_access(db, root, lock, source_definitions):
+    """Character unit forms and ability-targeted skill bindings (contract 4).
+
+    Bindings are conditional skill/rank possibilities. Only exact main-unit keys
+    present in the snapshot map a character form; nothing is matched by name.
+    """
+    db.execute('CREATE UNIQUE INDEX magic_characters_identity ON magic_characters(agent_subtype_key)')
+    db.execute('CREATE INDEX magic_characters_name_nocase ON magic_characters(character_name COLLATE NOCASE)')
+    db.execute('CREATE INDEX magic_skill_bindings_target ON magic_skill_bindings(target_kind,target_key)')
+    db.execute('CREATE INDEX magic_skill_bindings_character ON magic_skill_bindings(agent_subtype_key,skill_key,skill_level)')
+    db.execute('CREATE INDEX native_ability_group_members_ability ON native_ability_group_members(unit_special_abilities)')
+    characters = {r[0] for r in db.execute('SELECT agent_subtype_key FROM magic_characters')}
+    units = {r[0] for r in db.execute('SELECT unit_key FROM unit_identity')}
+    seen = set()
+    for entry in lock['files']:
+        path = entry['path']
+        if not path.startswith(MAGIC_ACCESS):
+            continue
+        data = json.loads(safe_path(root, path).read_text(encoding='utf-8'))
+        if set(data) != {'agent_subtype_key', 'skill_relation_count', 'unit_forms', 'unresolved_routes', 'interpretation'}:
+            raise ValueError('character access structure drift: ' + path)
+        agent = data['agent_subtype_key']
+        if path != MAGIC_ACCESS + agent + '.json' or agent not in characters or agent in seen:
+            raise ValueError('character access identity mismatch: ' + path)
+        seen.add(agent)
+        for ordinal, form in enumerate(data['unit_forms']):
+            via = form['via']
+            if via['kind'] not in ('associated_unit_override', 'mount_variant') or not form['main_unit_key']:
+                raise ValueError('unsupported character unit form: ' + path)
+            rid = record_id(path, ordinal + 2)
+            record = via.get('record') or {}
+            line = record.get('source_line')
+            db.execute('INSERT INTO record_provenance VALUES(?,?,?,?,?,?,?,?)',
+                       (rid, path, ordinal + 2, compact({'agent_subtype_key': agent, 'main_unit_key': form['main_unit_key'],
+                                                         'land_unit_key': form['land_unit_key']}),
+                        record.get('source_path') or None, int(line) if line else None,
+                        record.get('source_patch') or None, 'full'))
+            unit = form['main_unit_key'] if form['main_unit_key'] in units else None
+            db.execute('INSERT INTO character_unit_forms VALUES(?,?,?,?,?,?,?,?)',
+                       (rid, agent, ordinal, form['main_unit_key'], form['land_unit_key'] or None, via['kind'],
+                        unit, 'roster_unit' if unit else 'unmapped'))
+            if unit is None:
+                db.execute('INSERT INTO coverage_gaps(record_id,kind,detail) VALUES(?,?,?)',
+                           (rid, 'character_form_unmapped', agent + ':' + form['main_unit_key']))
+        db.execute('UPDATE source_files SET input_rows=?,retained_rows=?,selection_policy=? WHERE path=?',
+                   (len(data['unit_forms']), len(data['unit_forms']),
+                    'all indexed character unit forms; exact main-unit key mapping only', path))
+    if seen != characters:
+        raise ValueError('character access files do not reconcile with the character index')
+    effects = {r[0] for r in db.execute('SELECT ability_key FROM effect_abilities')}
+    # Judge missing definitions against the full locked source inventory: a
+    # skill-granted passive need not be retained to exist.
+    definitions = source_definitions
+    rows = db.execute("SELECT record_id,agent_subtype_key,ability_key,bonus_value_id,skill_key,skill_level,node_set_key "
+                      "FROM magic_skill_bindings WHERE target_kind='ability' ORDER BY record_id").fetchall()
+    for rid, agent, ability, bonus, skill, level, node_set in rows:
+        status = 'activated_effect' if ability in effects else 'not_activated' if ability in definitions else 'missing_definition'
+        db.execute('INSERT INTO effect_character_access VALUES(?,?,?,?,?,?,?,?,?,?)',
+                   (rid, agent, ability, ability if status == 'activated_effect' else None,
+                    BINDING_ROLES.get(bonus, 'modifies'), bonus, skill, level, node_set, status))
+
+
+def validate_character_access(db):
+    if db.execute("SELECT count(*) FROM magic_skill_bindings WHERE target_kind='ability'").fetchone()[0] != \
+            db.execute('SELECT count(*) FROM effect_character_access').fetchone()[0]:
+        raise ValueError('character access reconciliation failure')
+    mismatched = db.execute('SELECT c.agent_subtype_key FROM magic_characters c LEFT JOIN magic_skill_bindings b '
+                            'ON b.agent_subtype_key=c.agent_subtype_key GROUP BY c.agent_subtype_key '
+                            'HAVING count(b.record_id)!=c.relation_count').fetchall()
+    if mismatched:
+        raise ValueError('character binding count drift: ' + compact([r[0] for r in mismatched]))
+    orphans = db.execute('SELECT count(*) FROM magic_skill_bindings b LEFT JOIN magic_characters c '
+                         'ON c.agent_subtype_key=b.agent_subtype_key WHERE c.record_id IS NULL').fetchone()[0]
+    orphans += db.execute('SELECT count(*) FROM character_unit_forms f LEFT JOIN magic_characters c '
+                          'ON c.agent_subtype_key=f.agent_subtype_key WHERE c.record_id IS NULL').fetchone()[0]
+    if orphans:
+        raise ValueError('character access references an unindexed character')
+    crossed = db.execute('SELECT count(*) FROM effect_character_access a JOIN magic_skill_bindings b '
+                         'ON b.record_id=a.binding_record WHERE b.ability_key!=a.ability_key '
+                         'OR b.agent_subtype_key!=a.agent_subtype_key').fetchone()[0]
+    if crossed:
+        raise ValueError('crossed character access identity')
 
 
 def validate_effects(db, options):
@@ -752,6 +847,7 @@ def validate_candidate(db, specs, records, selected, options):
             raise ValueError('duplicate native identity: ' + path)
     db.execute('CREATE UNIQUE INDEX roster_identity ON unit_availability(subculture_key,unit_key)')
     validate_effects(db, options)
+    validate_character_access(db)
 
 
 def report_candidate(db):
@@ -768,6 +864,11 @@ def report_candidate(db):
         ('unit_effects', 'SELECT ability_key FROM effect_access WHERE unit_key=?', ('example',)),
         ('effect_units', 'SELECT unit_key FROM effect_access WHERE ability_key=?', ('example',)),
         ('effect_variant_reverse', 'SELECT ability_key FROM effect_variants WHERE variant_key=?', ('example',)),
+        ('effect_characters', 'SELECT agent_subtype_key FROM effect_character_access WHERE ability_key=?', ('example',)),
+        ('character_effects', 'SELECT ability_key FROM effect_character_access WHERE agent_subtype_key=?', ('example',)),
+        ('unit_characters', 'SELECT agent_subtype_key FROM character_unit_forms WHERE unit_key=?', ('example',)),
+        ('character_name', 'SELECT agent_subtype_key FROM magic_characters WHERE character_name=? COLLATE NOCASE', ('Example',)),
+        ('group_bindings', 'SELECT record_id FROM magic_skill_bindings WHERE target_kind=? AND target_key=?', ('ability_group', 'example')),
     ]:
         plans[label] = [r[3] for r in db.execute('EXPLAIN QUERY PLAN ' + sql, params)]
         if any('SCAN ' in detail for detail in plans[label]):
@@ -784,6 +885,10 @@ def report_candidate(db):
             'effects': dict(db.execute('SELECT effect_kind,count(*) FROM effect_abilities GROUP BY effect_kind')),
             'effect_access_links': db.execute('SELECT count(*) FROM effect_access').fetchone()[0],
             'effect_variants': dict(db.execute("SELECT relation||':'||status,count(*) FROM effect_variants GROUP BY 1")),
+            'characters': db.execute('SELECT count(*) FROM magic_characters').fetchone()[0],
+            'character_unit_forms': dict(db.execute('SELECT mapping,count(*) FROM character_unit_forms GROUP BY 1')),
+            'skill_bindings': db.execute('SELECT count(*) FROM magic_skill_bindings').fetchone()[0],
+            'effect_character_access': dict(db.execute("SELECT role||':'||status,count(*) FROM effect_character_access GROUP BY 1")),
             'query_plans': plans,
             'integrity': 'ok', 'foreign_key_errors': [],
             'datasets': [{'path': r[0], 'input': r[1], 'retained': r[2], 'excluded': r[1]-r[2]}

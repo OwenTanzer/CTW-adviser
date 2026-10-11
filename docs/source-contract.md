@@ -145,3 +145,13 @@ boundary. Only the contract fingerprint in the lock changes. Character
 skill/rank access from CTW-data `data/magic` is deferred to contract 4. See
 [activated effects](activated-effects.md) and its
 [verification evidence](activated-effects-verification.json).
+
+## Contract 4: magic character access (#19 increment 2)
+
+Contract 4 locks 1,086 CTW-data `data/magic` files and the exact group
+membership table at the unchanged pin. Each new file is checked against its
+Git blob and against CTW-data's magic output manifest
+(`scripts/contract4_magic_access.py`). It adds explicit column schemas for the
+derived character index and binding files, three magic metadata gates and a
+`character_access` classification and coverage boundary. Contract-3 datasets,
+joins and gates are unchanged. See [activated effects](activated-effects.md).
