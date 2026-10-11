@@ -8,6 +8,7 @@ from .build import build_snapshot
 from .store import inspect_snapshot
 from .queries import Queries, ResolutionError
 from .model import movement_phase
+from .combat import evaluate_matchup
 
 
 def main():
@@ -28,6 +29,13 @@ def main():
     movement.add_argument('--metres-per-second-per-speed-point', type=float, default=1.0)
     movement.add_argument('--subculture-a')
     movement.add_argument('--subculture-b')
+    evaluate = commands.add_parser('evaluate', help='Conditional first-order two-unit combat calculation')
+    evaluate.add_argument('--db', type=Path, required=True)
+    evaluate.add_argument('unit_a')
+    evaluate.add_argument('unit_b')
+    evaluate.add_argument('--scenario', help='JSON scenario object; defaults are illustrative, not calibrated')
+    evaluate.add_argument('--subculture-a')
+    evaluate.add_argument('--subculture-b')
     for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance'):
         query = commands.add_parser(command)
         query.add_argument('--db', type=Path, required=True)
@@ -58,6 +66,11 @@ def main():
                                         order_a=args.order_a, order_b=args.order_b,
                                         metres_per_second_per_speed_point=args.metres_per_second_per_speed_point,
                                         subculture_a=args.subculture_a, subculture_b=args.subculture_b)
+        elif args.command == 'evaluate':
+            with Queries(args.db) as queries:
+                result = evaluate_matchup(queries, args.unit_a, args.unit_b,
+                                          scenario=json.loads(args.scenario) if args.scenario else None,
+                                          subculture_a=args.subculture_a, subculture_b=args.subculture_b)
         else:
             with Queries(args.db) as queries:
                 key = args.keys[0]
@@ -96,3 +109,4 @@ def main():
 
 if __name__ == '__main__':
     raise SystemExit(main())
+
