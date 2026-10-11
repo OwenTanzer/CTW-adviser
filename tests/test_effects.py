@@ -359,6 +359,72 @@ class EffectTests(unittest.TestCase):
                     validate(broken, {'$ref':'#/$defs/effect'}, self.effect_schema)
 
 
+    def test_dropped_payload_branch_fails_verification(self):
+        from ctw_adviser.build import validate_payload_edges
+        validate_payload_edges(self.q.db)
+        explosion_edge = (f"DELETE FROM relation_edges WHERE source_record=(SELECT record_id FROM projectiles "
+                          f"WHERE projectile_key='{COMET}') AND target_key_json=json_array('{COMET}')")
+        miscast_edge = (f"DELETE FROM relation_edges WHERE source_record=(SELECT casting_record FROM effect_abilities "
+                        f"WHERE ability_key='{COMET_OVERCAST}') AND target_key_json=json_array('wh_main_heavens_miscast')")
+        for statement, field in ((explosion_edge, 'projectiles.explosion_key'),
+                                 (miscast_edge, 'native_ability_casting.miscast_explosion')):
+            dropped = self.tamper(statement)
+            with self.subTest(field=field), closing(sqlite3.connect(dropped)) as db,                     self.assertRaisesRegex(ValueError, 'dropped payload branch: ' + field):
+                validate_payload_edges(db)
+
+    def test_shared_definitions_keep_separate_routes_without_extra_events(self):
+        bound, lore = 'wh2_dlc11_spell_bound_tidecall', 'wh2_dlc11_spell_deep_tidecall'
+        packets = {key: self.q.get_effect(key) for key in (bound, lore)}
+        vortex = {key: [n for n in p['payload_graph']['nodes'] if n['kind'] == 'native_vortices']
+                  for key, p in packets.items()}
+        # One shared vortex record, reached from each ability's own casting route.
+        self.assertEqual(len(vortex[bound]), 1)
+        self.assertEqual(vortex[bound][0]['id'], vortex[lore][0]['id'])
+        for key, packet in packets.items():
+            roots = [c for c in packet['effect']['payload']['chains'] if c['path'][0].startswith('vortices ')]
+            self.assertEqual(len(roots), 1, key)
+            self.assertEqual(packet['effect']['identity']['ability_key'], key)
+        # Identities keep their own source labels; the key's "bound" is not a
+        # classifier (this definition's source_type is active).
+        self.assertEqual(packets[bound]['effect']['identity']['source_type'], 'active')
+        self.assertEqual(packets[bound]['effect']['identity']['effect_kind'], 'activated_ability')
+        self.assertEqual(packets[lore]['effect']['identity']['effect_kind'], 'spell')
+        # Within one packet a definition reached by two routes is one node with
+        # two edges, not two events (Comet: projectile and explosion contacts).
+        comet = self.q.get_effect(COMET)
+        phase_nodes = [n['id'] for n in comet['payload_graph']['nodes']
+                       if n['kind'] == 'native_ability_phases' and 'monstrous_impact' in n['key']]
+        self.assertEqual(len(phase_nodes), 1)
+        kinds = {n['id']: n['kind'] for n in comet['payload_graph']['nodes']}
+        # Count delivering routes; the phase's own stat-effect ownership links are not routes.
+        routes = {e['from'] for e in comet['payload_graph']['edges']
+                  if e['to'] == phase_nodes[0] and kinds[e['from']] in ('projectiles', 'explosions')}
+        self.assertEqual({kinds[r] for r in routes}, {'projectiles', 'explosions'})
+        self.assertEqual(sum('monstrous_impact' in ' '.join(c['path']) for c in comet['effect']['payload']['chains']), 2)
+
+    def test_character_route_required_fields(self):
+        packet = self.q.get_effect(COMET, include_provenance=True)
+        validate(packet, self.effect_schema, self.effect_schema)
+        entry = packet['effect']['access']['characters']['entries'][0]
+        for path in (('bindings', 0, 'skill_level'), ('bindings', 0, 'role'), ('unit_forms', 0, 'mapping'),
+                     ('agent_subtype_key',)):
+            broken = copy.deepcopy(packet)
+            target = broken['effect']['access']['characters']['entries'][0]
+            for part in path[:-1]:
+                target = target[part]
+            del target[path[-1]]
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                validate(broken, self.effect_schema, self.effect_schema)
+        broken = copy.deepcopy(packet)
+        broken['effect']['access']['characters']['entries'][0]['bindings'][0]['role'] = 'grants'
+        with self.assertRaises(ValueError):
+            validate(broken, self.effect_schema, self.effect_schema)
+        broken = copy.deepcopy(packet)
+        broken['effect']['access']['characters']['returned'] += 1
+        with self.assertRaisesRegex(ValueError, 'character pagination'):
+            packet_checks(broken)
+        self.assertIsNone(entry['unit_forms'][0].get('main_unit_key') if entry['unit_forms'][0]['unit_key'] else None)
+
     # -- Increment 2: character skill/rank access (contract 4) --------------
 
     def test_character_routes_round_trip_with_exact_skill_rank(self):

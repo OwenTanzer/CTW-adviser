@@ -640,6 +640,28 @@ def validate_character_access(db):
         raise ValueError('crossed character access identity')
 
 
+# Payload fields whose retained value must appear as a relation edge (resolved
+# or explicitly unresolved). A missing edge is a silently dropped branch.
+PAYLOAD_EDGE_FIELDS = (
+    ('native_ability_casting', 'bombardment'), ('native_ability_casting', 'vortex'),
+    ('native_ability_casting', 'activated_projectile'), ('native_ability_casting', 'miscast_explosion'),
+    ('native_ability_casting', 'mom_vortex_key'), ('projectiles', 'explosion_key'), ('projectiles', 'shrapnel_key'),
+    ('explosions', 'contact_phase_effect'), ('native_vortices', 'contact_effect'),
+    ('native_vortices', 'subsequent_vortex'), ('native_bombardments', 'projectile_type'),
+    ('native_ability_phases', 'imbue_contact'), ('native_ability_phases', 'spreading'),
+)
+
+
+def validate_payload_edges(db):
+    for table, field in PAYLOAD_EDGE_FIELDS:
+        missing = db.execute(
+            f'SELECT x.record_id FROM {quote(table)} x WHERE x.{quote(field)} IS NOT NULL AND NOT EXISTS('
+            f'SELECT 1 FROM relation_edges e WHERE e.source_record=x.record_id '
+            f'AND e.target_key_json=json_array(x.{quote(field)})) LIMIT 1').fetchone()
+        if missing:
+            raise ValueError(f'dropped payload branch: {table}.{field} at {missing[0]}')
+
+
 def validate_effects(db, options):
     activated = {k for k, (kind, _, _) in options.items() if kind == 'activated_option'}
     if {r[0] for r in db.execute('SELECT ability_key FROM effect_abilities')} != activated:
@@ -889,6 +911,7 @@ def validate_candidate(db, specs, records, selected, options):
             raise ValueError('duplicate native identity: ' + path)
     db.execute('CREATE UNIQUE INDEX roster_identity ON unit_availability(subculture_key,unit_key)')
     validate_effects(db, options)
+    validate_payload_edges(db)
     validate_character_access(db)
 
 
