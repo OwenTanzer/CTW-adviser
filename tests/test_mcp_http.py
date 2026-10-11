@@ -50,6 +50,9 @@ class HTTPTransportTests(unittest.TestCase):
         cls.server.server_close()
         cls.thread.join(timeout=3)
 
+    def setUp(self):
+        self.server.rate_limiter = SlidingWindowLimiter()
+
     def request(self, method, path="/mcp", payload=None, headers=None):
         connection = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=5)
         body = json.dumps(payload).encode() if payload is not None else None
@@ -142,16 +145,33 @@ class HTTPTransportTests(unittest.TestCase):
         # A disconnected client leaves no server-side session or lock.
         self.assertEqual(self.rpc("ping")[1]["result"], {})
 
-    def test_post_rate_limit_preserves_health(self):
+    def test_rate_limit_includes_health(self):
         previous = self.server.rate_limiter
         self.server.rate_limiter = SlidingWindowLimiter(capacity=2)
         try:
-            self.assertEqual(self.rpc("ping")[0], 200)
-            self.assertEqual(self.rpc("ping")[0], 200)
-            self.assertEqual(self.rpc("ping")[0], 429)
             self.assertEqual(self.request("GET", "/healthz")[0], 200)
+            self.assertEqual(self.request("GET", "/healthz")[0], 200)
+            self.assertEqual(self.request("GET", "/healthz")[0], 429)
+            self.assertEqual(self.rpc("ping")[0], 429)
         finally:
             self.server.rate_limiter = previous
+
+    def test_completed_requests_release_all_connection_slots(self):
+        held = []
+        try:
+            for _ in range(16):
+                connection = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=5)
+                connection.request("GET", "/healthz")
+                response = connection.getresponse()
+                self.assertEqual(response.status, 200)
+                self.assertEqual(response.getheader("Connection"), "close")
+                response.read()
+                held.append(connection)
+            time.sleep(0.05)
+            self.assertEqual(self.rpc("ping")[0], 200)
+        finally:
+            for connection in held:
+                connection.close()
 
     def test_slow_body_has_absolute_deadline(self):
         with patch("ctw_adviser.mcp_http.BODY_READ_SECONDS", 0.25):

@@ -108,9 +108,13 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
         def _send(self, status: int, payload=None, *, headers=None):
             body = (json.dumps(payload, ensure_ascii=False, allow_nan=False,
                                separators=(",", ":")).encode("utf-8") if payload is not None else b"")
+            # A stateless exchange has no reason to retain a worker on an idle
+            # HTTP/1.1 connection after the response has been delivered.
+            self.close_connection = True
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8" if body else "application/json")
             self.send_header("Content-Length", str(len(body)))
+            self.send_header("Connection", "close")
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
             for key, value in (headers or {}).items():
@@ -125,6 +129,13 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
                 self._send(403, {"error": "origin not allowed"})
                 return False
             return True
+
+        def _admit_request(self):
+            admitted, retry_after = self.server.rate_limiter.admit()
+            if not admitted:
+                self._send(429, {"error": "request rate exceeded"},
+                           headers={"Retry-After": str(retry_after)})
+            return admitted
 
         def _read_body(self, length: int):
             # BufferedReader.read(length) can wait indefinitely when a peer
@@ -148,7 +159,7 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
             return b"".join(chunks)
 
         def do_GET(self):
-            if not self._origin_ok():
+            if not self._admit_request() or not self._origin_ok():
                 return
             if self.path == "/healthz":
                 self._send(200, {"status": "ok", "transport": "streamable-http",
@@ -160,12 +171,12 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
                 self._send(404, {"error": "not found"})
 
         def do_DELETE(self):
-            if not self._origin_ok():
+            if not self._admit_request() or not self._origin_ok():
                 return
             self._send(405, {"error": "stateless server has no sessions"}, headers={"Allow": "POST, GET"})
 
         def do_OPTIONS(self):
-            if self._origin_ok():
+            if self._admit_request() and self._origin_ok():
                 self._send(405, {"error": "method not allowed"}, headers={"Allow": "POST, GET"})
 
         do_HEAD = do_OPTIONS
@@ -173,16 +184,10 @@ def make_handler(db_path: str, allowed_origins: frozenset[str]):
         do_PATCH = do_OPTIONS
 
         def do_POST(self):
-            if not self._origin_ok():
+            if not self._admit_request() or not self._origin_ok():
                 return
             if self.path != "/mcp":
                 self._send(404, {"error": "not found"})
-                return
-            admitted, retry_after = self.server.rate_limiter.admit()
-            if not admitted:
-                self.close_connection = True
-                self._send(429, {"error": "request rate exceeded"},
-                           headers={"Retry-After": str(retry_after)})
                 return
             content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
             accept = self.headers.get("Accept", "").lower()

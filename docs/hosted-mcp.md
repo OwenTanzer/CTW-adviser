@@ -41,7 +41,8 @@ responses are JSON (including `structuredContent` and an equivalent text
 block). The server is stateless: it issues no `Mcp-Session-Id`, does not retain
 conversations, and does not produce unsolicited messages. GET `/mcp` and DELETE
 `/mcp` return 405 because there is no SSE stream or session to close. The MCP
-SDK reconnects by initializing again; a disconnected request does not mutate
+server sends `Connection: close` after each response, releasing its worker slot.
+The SDK reconnects by initializing again; a disconnected request does not mutate
 the source or leave a session behind. Stdio remains available with
 `PYTHONPATH=src python -m ctw_adviser.mcp --db work/adviser.sqlite`.
 
@@ -54,9 +55,9 @@ replace the build manifest's file-integrity verification. Ordinary calls never
 fetch, rebuild or write source data. Request
 bodies are limited to 64 KiB, responses to 1 MiB, concurrent connections to
 16, inactive sockets to 15 seconds and complete body upload to 10 seconds.
-POST `/mcp` requests are also capped at
-60 per rolling minute per server process; excess requests receive HTTP 429 with
-`Retry-After`. `/healthz` is exempt. The limit is global because reverse proxy
+Handled HTTP requests, including `/healthz`, are also capped at 60 per rolling
+minute per server process; excess requests receive HTTP 429 with `Retry-After`.
+The limit is global because reverse proxy
 addresses and forwarded IP headers are not reliable user identities. If the
 service is scaled beyond one replica, each replica has its own limit. Tool
 schemas retain 1-256 item paging
