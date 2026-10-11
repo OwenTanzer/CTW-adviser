@@ -183,6 +183,13 @@ def register_routes(datasette):
 
 @hookimpl
 def render_cell(row, value, column, table, database, datasette):
+    if database == 'ctw' and column in ('ability_key', 'name') and value is not None:
+        values = dict(row)
+        if {'ability_key', 'name', 'effect_kind', 'source_type', 'keywords_json'} <= values.keys():
+            ability_key = values['ability_key']
+            if ability_key:
+                return Markup('<a href="' + escape(link('/inspect/detail', ref='effect:' + ability_key)) +
+                              '">' + escape(value) + '</a>')
     if database == 'ctw' and column == 'unit_name' and value is not None:
         values = dict(row)
         return Markup('<a href="' + escape(link('/inspect', unit=values.get('unit_key'), q=None if values.get('unit_key') else value)) + '">' + escape(value) + '</a>')
