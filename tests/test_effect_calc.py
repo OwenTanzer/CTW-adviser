@@ -229,5 +229,29 @@ class EffectDamageTests(unittest.TestCase):
         self.assertEqual(result['snapshot']['commit'], self.q.snapshot['source_commit'])
 
 
+    def test_end_to_end_from_unit_and_incompatible_evidence(self):
+        option = next(o for o in self.q.get_unit_profile(TECLIS, limit=256)['units'][0]['activated_options']
+                      if o['key'] == FIERY)
+        effect = self.q.get_detail(option['detail_ref'])['effect']['identity']['ability_key']
+        scenario = {'vortex_entities_per_application': 4, 'vortex_applications': 2}
+        from_unit = self.run_case(effect, caster=TECLIS, scenario=scenario)
+        from_name = self.run_case('Bound Fiery Convocation', caster=TECLIS, scenario=scenario)
+        self.assertEqual(from_unit, from_name)
+        self.assertEqual(from_unit['access']['status'], 'linked')
+        # A different form of another character is not silently substituted.
+        other = self.run_case(effect, caster='wh2_main_lzd_cha_skink_priest_beasts_0', scenario=scenario)
+        self.assertEqual(other['access']['status'], 'not_established')
+        with self.assertRaises(ResolutionError):
+            self.run_case(COMET, target_subculture='wh_main_sc_emp_empire')
+        from unittest.mock import patch
+        original = self.q.get_effect
+        def stale(*args, **kwargs):
+            packet = original(*args, **kwargs)
+            packet['snapshot'] = dict(packet['snapshot'], commit='0' * 40)
+            return packet
+        with patch.object(self.q, 'get_effect', stale), self.assertRaisesRegex(ValueError, 'different snapshots'):
+            self.run_case(COMET)
+
+
 if __name__ == '__main__':
     unittest.main()

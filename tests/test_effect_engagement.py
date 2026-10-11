@@ -96,7 +96,7 @@ class EffectEngagementTests(unittest.TestCase):
         self.assertEqual([u['stat_token'] for u in result['modifiers']['unsupported'] if 'stat_token' in u], ['stat_morale'])
 
     def test_window_expiry_and_shared_baseline(self):
-        result = self.run_case(HAND_OF_GLORY, recipient='a')
+        result = self.run_case(HAND_OF_GLORY, recipient='a', include_matchups=True)
         window = result['matchups']['active_window']
         duration = result['window']['phase_duration']
         self.assertLess(duration, result['window']['horizon_seconds'])
@@ -112,6 +112,21 @@ class EffectEngagementTests(unittest.TestCase):
         covers = self.run_case(HAND_OF_GLORY, recipient='a', scenario={**SCENARIO, 'duration_seconds': duration})
         self.assertEqual(covers['window']['basis'], 'covers_horizon')
         self.assertEqual(set(covers['comparisons']), {'horizon'})
+
+    def test_compact_default_fits_response_budget(self):
+        prince = 'wh3_main_dae_cha_daemon_prince_0'
+        compact = evaluate_effect_engagement(self.q, HAND_OF_GLORY, prince, B, scenario=SCENARIO)
+        full = evaluate_effect_engagement(self.q, HAND_OF_GLORY, prince, B, scenario=SCENARIO, include_matchups=True)
+        self.assertLess(len(json.dumps(compact)), 64 * 1024)
+        self.assertGreater(len(json.dumps(full)), len(json.dumps(compact)))
+        # Compact and full agree on every comparison number and verdict.
+        self.assertEqual(compact['comparisons'], full['comparisons'])
+        for name, pair in full['matchups'].items():
+            for which in ('without', 'with'):
+                self.assertEqual(compact['matchups'][name][which]['verdict']['represented_point_ordering'],
+                                 pair[which]['verdict']['represented_point_ordering'])
+        corners = compact['comparisons']['horizon']['sensitivity']['collision_corners']
+        self.assertEqual(len(corners), 4)
 
     def test_zero_modifier_does_not_change_result(self):
         import ctw_adviser.effect_engagement as module
@@ -148,6 +163,84 @@ class EffectEngagementTests(unittest.TestCase):
                                                               'recipient': 'b', 'relation': 'enemy', 'scenario': SCENARIO})
         self.assertEqual(mcp['structuredContent']['model_version'], MODEL_VERSION)
         self.assertEqual(mcp['structuredContent']['data'], json.loads(json.dumps(library)))
+
+
+    def test_end_to_end_from_unit_activated_options(self):
+        crone = 'wh2_dlc10_def_cha_crone_0'
+        packet = self.q.get_unit_profile(crone, limit=256)
+        option = next(o for o in packet['units'][0]['activated_options']
+                      if o['key'] == 'wh2_dlc10_lord_abilities_gaze_of_khaine')
+        self.assertIn('stat_modifier', option['keywords'])
+        effect = self.q.get_detail(option['detail_ref'])['effect']
+        from_unit = evaluate_effect_engagement(self.q, effect['identity']['ability_key'], crone, B,
+                                               recipient='a', caster=crone, scenario=SCENARIO)
+        from_name = evaluate_effect_engagement(self.q, 'wh2_dlc10_lord_abilities_gaze_of_khaine', crone, B,
+                                               recipient='a', caster=crone, scenario=SCENARIO)
+        self.assertEqual(from_unit, from_name)
+        self.assertEqual(from_unit['access']['status'], 'linked')
+        self.assertEqual(from_unit['identities']['units'][0]['unit_key'], crone)
+        paths = {c['path']: c for c in from_unit['modifiers']['changed_inputs']}
+        self.assertEqual(paths['melee.attack']['after'] - paths['melee.attack']['before'], 24.0)
+        self.assertAlmostEqual(paths['melee.base_damage']['after'], paths['melee.base_damage']['before'] * 1.25)
+
+    def test_replacement_is_reported_not_stacked(self):
+        waaagh = 'wh2_dlc15_army_abilities_azhags_big_waaagh'
+        result = self.run_case(waaagh, recipient='a')
+        self.assertIn('wh2_dlc15_army_abilities_azhags_waaagh', result['replacement']['supersedes'])
+        own = {(m['stat_token'], m['operation'], m['value']) for m in result['modifiers']['applied']}
+        superseded = self.q.get_effect('wh2_dlc15_army_abilities_azhags_waaagh')['effect']['mechanic']['effects']
+        # Changed inputs come only from the selected effect's own phase rows.
+        self.assertTrue(result['modifiers']['changed_inputs'])
+        self.assertTrue(all(c['stat_token'] in {m[0] for m in own} for c in result['modifiers']['changed_inputs']))
+        # Each supported own modifier changes each mapped field exactly once (no stacking with superseded rows).
+        applied = [c for c in result['modifiers']['changed_inputs'] if c['status'] == 'applied']
+        self.assertEqual(len(applied), len({(c['stat_token'], c['path'], c.get('attack_ref')) for c in applied}))
+        self.assertTrue(superseded)
+
+    def test_overcast_duration_and_held_out_spell(self):
+        normal = self.run_case('wh2_dlc14_spell_ruin_flensing_ruin', recipient='b', relation='enemy')
+        overcast = self.run_case('wh2_dlc14_spell_ruin_flensing_ruin_upgraded', recipient='b', relation='enemy')
+        self.assertEqual((normal['window']['phase_duration'], overcast['window']['phase_duration']), (22.0, 34.0))
+        self.assertEqual(normal['modifiers']['applied'][0]['value'], overcast['modifiers']['applied'][0]['value'])
+        self.assertIn('wh2_dlc14_spell_ruin_flensing_ruin_upgraded',
+                      [v['ability_key'] for v in normal['variants'] if v['relation'] == 'overcast_option'])
+        held_out = self.run_case('wh2_dlc10_spell_bound_soulblight', recipient='b', relation='enemy')
+        paths = {c['path'] for c in held_out['modifiers']['changed_inputs']}
+        self.assertEqual(paths, {'protection.armour', 'melee.ap_damage', 'melee.base_damage'})
+        a_side, b_side = held_out['comparisons']['active_window']['sides']
+        # Debuffed enemy (lower armour) takes more damage; its weaker melee hurts the friendly side less.
+        self.assertGreater(b_side['incoming_attempted_damage']['delta'], 0)
+        self.assertLess(b_side['effective_survivability_fraction']['delta'], 0)
+        self.assertLess(a_side['incoming_attempted_damage']['delta'], 0)
+
+    def test_wrong_variant_and_incompatible_evidence(self):
+        effect = 'wh2_dlc12_unit_abilities_burning_alignment'
+        linked = self.run_case(effect, recipient='b', relation='enemy', caster='wh2_dlc12_lzd_cha_skink_priest_beasts_4')
+        other_form = self.run_case(effect, recipient='b', relation='enemy', caster='wh2_main_lzd_cha_skink_priest_beasts_0')
+        self.assertEqual(linked['access']['status'], 'linked')
+        self.assertEqual(other_form['access']['status'], 'not_established')
+        with self.assertRaises(ResolutionError):
+            evaluate_effect_engagement(self.q, HAND_OF_GLORY, A, B, subculture_a='wh_main_sc_emp_empire', scenario=SCENARIO)
+        from unittest.mock import patch
+        original = self.q.get_effect
+        def stale(*args, **kwargs):
+            packet = original(*args, **kwargs)
+            packet['snapshot'] = dict(packet['snapshot'], commit='0' * 40)
+            return packet
+        with patch.object(self.q, 'get_effect', stale), self.assertRaisesRegex(ValueError, 'different snapshots'):
+            self.run_case(HAND_OF_GLORY, recipient='a')
+
+
+    def test_out_of_domain_modifier_is_clamped_and_flagged(self):
+        # Found by the full-inventory sweep: this debuff drives armour below zero.
+        result = self.run_case('wh2_dlc09_character_abilities_curse_of_khsar', recipient='b', relation='enemy')
+        clamped = [c for c in result['modifiers']['changed_inputs'] if c['status'] == 'clamped']
+        self.assertTrue(clamped)
+        for change in clamped:
+            self.assertEqual(change['after'], 0.0)
+            self.assertLess(change['unclamped'], 0)
+        self.assertIn('modifier_clamped', [u['code'] for u in result['unresolved_inputs']])
+        self.assertTrue(result['comparisons'])
 
 
 if __name__ == '__main__':

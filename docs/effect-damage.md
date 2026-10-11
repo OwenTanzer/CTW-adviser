@@ -31,6 +31,7 @@ route. Multiplicity comes only from source counts: bombardment
 | Explosion | shared relation, explosion kind | launched × `entities_per_explosion` | calculated |
 | Vortex | shared relation per application | `num_vortexes` × `vortex_entities_per_application` × `vortex_applications` | only when both counts are supplied; otherwise the per-application value is shown and the total is unresolved |
 | Damaging contact phase | raw `damage_amount` (protection application unresolved) | affected entities × `contact_phase_ticks`, capped by `max_damaged_entities` | only when ticks are supplied; flagged in limitations |
+| Outward phase damage (enemy-targeting phase link, e.g. Spirit Leech) | raw `damage_amount` (protection application unresolved) | `max_damaged_entities` (or every living entity if uncapped) × applications | default applications = source-implied duration ÷ `hp_change_frequency`, labeled unverified; overridable |
 
 The spell-resistance flag comes from each payload's `is_spell` field. Magic and
 fire flags come from `is_magical` and `ignition_amount`. Totals apply the
@@ -46,6 +47,9 @@ bounds that bracket it. They are not an individual hit allocation.
   cast (for example, a projectile and its explosion both naming one shrapnel
   record) is counted once. `totals.upper_all_routes_attempted_damage` adds every
   route, and `shared_definition_multiplicity` makes the status `partial`.
+- **Self and friendly-only damage.** Phases linked only to self or friends, and
+  contact phases with `affects_enemies=false` (for example the Warpbomb's
+  2,660-damage `kill_self` contact), are listed in `self_effects`.
 - **Healing, stat and attribute effects, and summons.** These are listed in
   `unsupported_components`. Buff/debuff engagement comparison is the next #20
   increment.
@@ -171,3 +175,36 @@ Verified with `tests/test_effect_engagement.py` (9 tests, from source evidence):
 - library/CLI/MCP equality
 
 These are regression checks, not live observations.
+
+## Review round: response budget, sensitivity and coverage
+
+- **Compact engagement results by default.** Each run reports its verdict,
+  contact and ledgers; full #5 results are opt-in (`include_matchups`). A
+  Daemon Prince engagement drops from 1.27 MB, over the hosted 1 MiB cap, to
+  21 KB. Compact and full results agree on every comparison.
+- **Sensitivity.** Each comparison lists the four #5 collision-probability
+  corners with the favored side with and without the effect, and both runs'
+  one-parameter flip thresholds.
+- **Clamping.** Modifiers that push a field below its domain (armour, damage,
+  attack, block chance) are clamped at the bound, marked `clamped` with the
+  unclamped value, and flagged `modifier_clamped`. The full-inventory sweep
+  found 20 such effects that previously failed.
+- **Replacement.** `replacement.supersedes` lists superseded effects. Only the
+  selected effect's phase is applied, never stacked with its variants.
+- **Eligibility.** A self or friendly-cast ability reaches enemies only through
+  enemy-targeting phases or payloads that can damage enemies; this is
+  labeled as aura or self-centred.
+
+[Recorded predictions](effect-predictions.json) come from
+`scripts/record_effect_predictions.py`. They give exact inputs and key outputs
+for six damage and five engagement cases, plus sweeps of every effect through
+both paths with no errors:
+
+- **Damage:** 326 calculated, 383 partial, 648 ineligible recipient, 527 no damage payload.
+- **Engagement**, over the 809 effects with stat phases: 108 calculated, 536
+  partial (mostly unsupported co-effects or intensity), 100 with no supported
+  modifier, 40 ineligible, 25 needing a phase choice.
+- **Latency:** damage median 8 ms; engagement median ~0.7 s, since it runs up to
+  four full #5 engagements with their sensitivity.
+
+These are model predictions, not live observations.

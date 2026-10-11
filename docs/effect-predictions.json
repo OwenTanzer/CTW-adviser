@@ -1,0 +1,680 @@
+{
+  "note": "Model predictions and regression evidence; no live-battle observation or calibration is claimed.",
+  "models": {
+    "damage": "effect-damage-0.1.0",
+    "engagement": "effect-engagement-0.1.0"
+  },
+  "snapshot": {
+    "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+    "contract_sha256": "fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1"
+  },
+  "runtime": {
+    "python": "3.12.10",
+    "sqlite": "3.49.1"
+  },
+  "damage_cases": [
+    {
+      "inputs": {
+        "effect": "wh_main_spell_heavens_comet_of_casandora",
+        "target": "Lothern Sea Guard",
+        "scenario": {}
+      },
+      "resolved": {
+        "effect": "wh_main_spell_heavens_comet_of_casandora",
+        "target": "wh2_main_hef_inf_lothern_sea_guard_0"
+      },
+      "status": "calculated",
+      "unresolved": [],
+      "components": [
+        {
+          "channel": "direct_projectile",
+          "key": {
+            "projectile_key": "wh_main_spell_heavens_comet_of_casandora"
+          },
+          "route_role": "nominal",
+          "expected_damage": 734.4
+        },
+        {
+          "channel": "explosion",
+          "key": {
+            "explosion_key": "wh_main_spell_heavens_comet_of_casandora"
+          },
+          "route_role": "nominal",
+          "expected_damage": 72.0
+        }
+      ],
+      "attempted_damage": 806.4,
+      "upper_all_routes": 806.4,
+      "health_damage_capped": 102.0,
+      "fraction_of_health": 0.016666666666666666,
+      "casualties": {
+        "lower": 1,
+        "expected_pooled": 1.5,
+        "upper": 2
+      }
+    },
+    {
+      "inputs": {
+        "effect": "wh_main_spell_heavens_comet_of_casandora_upgraded",
+        "target": "Lothern Sea Guard",
+        "scenario": {}
+      },
+      "resolved": {
+        "effect": "wh_main_spell_heavens_comet_of_casandora_upgraded",
+        "target": "wh2_main_hef_inf_lothern_sea_guard_0"
+      },
+      "status": "calculated",
+      "unresolved": [],
+      "components": [
+        {
+          "channel": "direct_projectile",
+          "key": {
+            "projectile_key": "wh_main_spell_heavens_comet_of_casandora_upgraded"
+          },
+          "route_role": "nominal",
+          "expected_damage": 734.4
+        },
+        {
+          "channel": "explosion",
+          "key": {
+            "explosion_key": "wh_main_spell_heavens_comet_of_casandora_upgraded"
+          },
+          "route_role": "nominal",
+          "expected_damage": 144.0
+        }
+      ],
+      "attempted_damage": 878.4,
+      "upper_all_routes": 878.4,
+      "health_damage_capped": 102.0,
+      "fraction_of_health": 0.016666666666666666,
+      "casualties": {
+        "lower": 1,
+        "expected_pooled": 1.5,
+        "upper": 2
+      }
+    },
+    {
+      "inputs": {
+        "effect": "wh3_dlc23_spell_bound_hell_hammer",
+        "target": "Lothern Sea Guard",
+        "scenario": {
+          "vortex_entities_per_application": 4,
+          "vortex_applications": 2
+        }
+      },
+      "resolved": {
+        "effect": "wh3_dlc23_spell_bound_hell_hammer",
+        "target": "wh2_main_hef_inf_lothern_sea_guard_0"
+      },
+      "status": "calculated",
+      "unresolved": [],
+      "components": [
+        {
+          "channel": "direct_projectile",
+          "key": {
+            "projectile_key": "wh3_dlc23_spell_hashut_hell_hammer_dummy_explosion"
+          },
+          "route_role": "nominal",
+          "expected_damage": 0.0
+        },
+        {
+          "channel": "explosion",
+          "key": {
+            "explosion_key": "wh3_dlc23_spell_hashut_hell_hammer_dummy_explosion"
+          },
+          "route_role": "nominal",
+          "expected_damage": 40.8
+        },
+        {
+          "channel": "vortex",
+          "key": {
+            "vortex_key": "wh3_dlc23_spell_hashut_hell_hammer"
+          },
+          "route_role": "nominal",
+          "expected_damage": 326.4
+        }
+      ],
+      "attempted_damage": 367.2,
+      "upper_all_routes": 367.2,
+      "health_damage_capped": 312.8,
+      "fraction_of_health": 0.051111111111111114,
+      "casualties": {
+        "lower": 4,
+        "expected_pooled": 4.6000000000000005,
+        "upper": 5
+      }
+    },
+    {
+      "inputs": {
+        "effect": "wh2_main_spell_grey_seer_the_dreaded_thirteenth_spell",
+        "target": "Lothern Sea Guard",
+        "scenario": {}
+      },
+      "resolved": {
+        "effect": "wh2_main_spell_grey_seer_the_dreaded_thirteenth_spell",
+        "target": "wh2_main_hef_inf_lothern_sea_guard_0"
+      },
+      "status": "partial",
+      "unresolved": [
+        "shared_definition_multiplicity",
+        "shared_definition_multiplicity"
+      ],
+      "components": [
+        {
+          "channel": "direct_projectile",
+          "key": {
+            "projectile_key": "wh2_main_spell_plague_the_dreaded_thirteenth_spell"
+          },
+          "route_role": "nominal",
+          "expected_damage": 0.0
+        },
+        {
+          "channel": "direct_projectile",
+          "key": {
+            "projectile_key": "wh2_main_spell_plague_the_dreaded_thirteenth_spell_shrapnel"
+          },
+          "route_role": "nominal",
+          "expected_damage": 792.0
+        },
+        {
+          "channel": "explosion",
+          "key": {
+            "explosion_key": "wh2_main_spell_plague_the_dreaded_thirteenth_spell_shrapnel"
+          },
+          "route_role": "nominal",
+          "expected_damage": 109.19999999999999
+        },
+        {
+          "channel": "explosion",
+          "key": {
+            "explosion_key": "wh2_main_spell_plague_the_dreaded_thirteenth_spell"
+          },
+          "route_role": "nominal",
+          "expected_damage": 64.8
+        },
+        {
+          "channel": "direct_projectile",
+          "key": {
+            "projectile_key": "wh2_main_spell_plague_the_dreaded_thirteenth_spell_shrapnel"
+          },
+          "route_role": "alternate_route",
+          "expected_damage": 792.0
+        },
+        {
+          "channel": "explosion",
+          "key": {
+            "explosion_key": "wh2_main_spell_plague_the_dreaded_thirteenth_spell_shrapnel"
+          },
+          "route_role": "alternate_route",
+          "expected_damage": 109.19999999999999
+        }
+      ],
+      "attempted_damage": 966.0,
+      "upper_all_routes": 1867.2,
+      "health_damage_capped": 378.0,
+      "fraction_of_health": 0.061764705882352944,
+      "casualties": {
+        "lower": 3,
+        "expected_pooled": 5.5588235294117645,
+        "upper": 6
+      }
+    },
+    {
+      "inputs": {
+        "effect": "wh2_dlc09_spell_death_spirit_leech_bound",
+        "target": "Lothern Sea Guard",
+        "scenario": {}
+      },
+      "resolved": {
+        "effect": "wh2_dlc09_spell_death_spirit_leech_bound",
+        "target": "wh2_main_hef_inf_lothern_sea_guard_0"
+      },
+      "status": "calculated",
+      "unresolved": [],
+      "components": [
+        {
+          "channel": "phase_damage",
+          "key": {
+            "id": "wh_main_spell_death_spirit_leech"
+          },
+          "route_role": "nominal",
+          "expected_damage": 871
+        }
+      ],
+      "attempted_damage": 871,
+      "upper_all_routes": 871,
+      "health_damage_capped": 68.0,
+      "fraction_of_health": 0.011111111111111112,
+      "casualties": {
+        "lower": 1,
+        "expected_pooled": 1.0,
+        "upper": 1
+      }
+    },
+    {
+      "inputs": {
+        "effect": "wh2_dlc11_character_abilities_pyromaniac",
+        "target": "Lothern Sea Guard",
+        "scenario": {
+          "contact_phase_ticks": 4
+        }
+      },
+      "resolved": {
+        "effect": "wh2_dlc11_character_abilities_pyromaniac",
+        "target": "wh2_main_hef_inf_lothern_sea_guard_0"
+      },
+      "status": "partial",
+      "unresolved": [
+        "shared_definition_multiplicity"
+      ],
+      "components": [
+        {
+          "channel": "direct_projectile",
+          "key": {
+            "projectile_key": "wh2_dlc11_character_abilities_pyromanianc"
+          },
+          "route_role": "nominal",
+          "expected_damage": 0.35
+        },
+        {
+          "channel": "contact_phase",
+          "key": {
+            "id": "wh2_dlc11_character_abilities_pyromaniac"
+          },
+          "route_role": "nominal",
+          "expected_damage": 20.0
+        },
+        {
+          "channel": "explosion",
+          "key": {
+            "explosion_key": "wh2_dlc11_character_abilities_pyromanianc"
+          },
+          "route_role": "nominal",
+          "expected_damage": 28.799999999999997
+        },
+        {
+          "channel": "contact_phase",
+          "key": {
+            "id": "wh2_dlc11_character_abilities_pyromaniac"
+          },
+          "route_role": "alternate_route",
+          "expected_damage": 20.0
+        }
+      ],
+      "attempted_damage": 49.15,
+      "upper_all_routes": 69.14999999999999,
+      "health_damage_capped": 49.150000000000006,
+      "fraction_of_health": 0.008031045751633988,
+      "casualties": {
+        "lower": 0,
+        "expected_pooled": 0.7227941176470589,
+        "upper": 1
+      }
+    }
+  ],
+  "engagement_cases": [
+    {
+      "inputs": {
+        "effect": "wh2_main_spell_high_magic_hand_of_glory",
+        "unit_a": "Lothern Sea Guard",
+        "unit_b": "Bloodletters of Khorne",
+        "recipient": "a",
+        "relation": "friendly",
+        "scenario": {
+          "separation_metres": 40,
+          "sides": {
+            "a": {
+              "order": "hold"
+            },
+            "b": {
+              "order": "approach"
+            }
+          }
+        }
+      },
+      "status": "partial",
+      "window": {
+        "phase_duration": 29.0,
+        "horizon_seconds": 120.0,
+        "start_seconds": 0.0,
+        "basis": "active_window"
+      },
+      "changed_inputs": [
+        [
+          "melee.attack",
+          22.0,
+          46.0
+        ]
+      ],
+      "unsupported": [
+        "stat_reloading"
+      ],
+      "primary_comparison": "active_window",
+      "survivability": {
+        "a": {
+          "without": 0.9143730650154797,
+          "with": 0.9143730650154797,
+          "delta": 0.0
+        },
+        "b": {
+          "without": 0.9074024342105258,
+          "with": 0.8881898026315791,
+          "delta": -0.019212631578946704
+        }
+      },
+      "verdict": {
+        "without": "a",
+        "with": "a",
+        "status_without": "conditional",
+        "status_with": "conditional"
+      },
+      "corners_changed": 0
+    },
+    {
+      "inputs": {
+        "effect": "wh2_main_spell_plague_wither",
+        "unit_a": "Lothern Sea Guard",
+        "unit_b": "Bloodletters of Khorne",
+        "recipient": "b",
+        "relation": "enemy",
+        "scenario": {
+          "separation_metres": 40,
+          "sides": {
+            "a": {
+              "order": "hold"
+            },
+            "b": {
+              "order": "approach"
+            }
+          }
+        }
+      },
+      "status": "partial",
+      "window": {
+        "phase_duration": 50.0,
+        "horizon_seconds": 120.0,
+        "start_seconds": 0.0,
+        "basis": "active_window"
+      },
+      "changed_inputs": [
+        [
+          "protection.armour",
+          35.0,
+          5.0
+        ]
+      ],
+      "unsupported": [],
+      "primary_comparison": "active_window",
+      "survivability": {
+        "a": {
+          "without": 0.8170364637082898,
+          "with": 0.8170364637082898,
+          "delta": 0.0
+        },
+        "b": {
+          "without": 0.8791924342105252,
+          "with": 0.8535162124060157,
+          "delta": -0.025676221804509458
+        }
+      },
+      "verdict": {
+        "without": "b",
+        "with": "b",
+        "status_without": "conditional",
+        "status_with": "conditional"
+      },
+      "corners_changed": 0
+    },
+    {
+      "inputs": {
+        "effect": "wh2_dlc11_army_abilities_shanty_verse_1",
+        "unit_a": "Lothern Sea Guard",
+        "unit_b": "Bloodletters of Khorne",
+        "recipient": "a",
+        "relation": "friendly",
+        "scenario": {
+          "separation_metres": 40,
+          "sides": {
+            "a": {
+              "order": "hold"
+            },
+            "b": {
+              "order": "approach"
+            }
+          }
+        }
+      },
+      "status": "partial",
+      "window": {
+        "phase_duration": 30.0,
+        "horizon_seconds": 120.0,
+        "start_seconds": 0.0,
+        "basis": "active_window"
+      },
+      "changed_inputs": [
+        [
+          "melee.defence",
+          32.0,
+          52.0
+        ]
+      ],
+      "unsupported": [
+        "stat_reloading"
+      ],
+      "primary_comparison": "active_window",
+      "survivability": {
+        "a": {
+          "without": 0.9097379887627564,
+          "with": 0.9489823414746003,
+          "delta": 0.0392443527118439
+        },
+        "b": {
+          "without": 0.9060591008771924,
+          "with": 0.9060591008771924,
+          "delta": 0.0
+        }
+      },
+      "verdict": {
+        "without": "a",
+        "with": "a",
+        "status_without": "conditional",
+        "status_with": "conditional"
+      },
+      "corners_changed": 0
+    },
+    {
+      "inputs": {
+        "effect": "wh2_dlc17_spell_wild_mantle_of_ghorok_upgraded",
+        "unit_a": "Lothern Sea Guard",
+        "unit_b": "Bloodletters of Khorne",
+        "recipient": "a",
+        "relation": "friendly",
+        "scenario": {
+          "separation_metres": 40,
+          "sides": {
+            "a": {
+              "order": "hold"
+            },
+            "b": {
+              "order": "approach"
+            }
+          }
+        }
+      },
+      "status": "partial",
+      "window": {
+        "phase_duration": 52.0,
+        "horizon_seconds": 120.0,
+        "start_seconds": 0.0,
+        "basis": "active_window"
+      },
+      "changed_inputs": [
+        [
+          "protection.armour",
+          40.0,
+          10.0
+        ],
+        [
+          "melee.attack",
+          22.0,
+          62.0
+        ],
+        [
+          "melee.ap_damage",
+          8.0,
+          12.0
+        ],
+        [
+          "melee.base_damage",
+          20.0,
+          30.0
+        ]
+      ],
+      "unsupported": [],
+      "primary_comparison": "active_window",
+      "survivability": {
+        "a": {
+          "without": 0.807766311202843,
+          "with": 0.7843865382410279,
+          "delta": -0.02337977296181515
+        },
+        "b": {
+          "without": 0.8765057675438584,
+          "with": 0.7408176973684208,
+          "delta": -0.1356880701754376
+        }
+      },
+      "verdict": {
+        "without": "b",
+        "with": "a",
+        "status_without": "conditional",
+        "status_with": "conditional"
+      },
+      "corners_changed": 2
+    },
+    {
+      "inputs": {
+        "effect": "wh2_dlc10_lord_abilities_gaze_of_khaine",
+        "unit_a": "wh2_dlc10_def_cha_crone_0",
+        "unit_b": "Bloodletters of Khorne",
+        "recipient": "a",
+        "relation": "friendly",
+        "scenario": {
+          "separation_metres": 40,
+          "sides": {
+            "a": {
+              "order": "hold"
+            },
+            "b": {
+              "order": "approach"
+            }
+          }
+        }
+      },
+      "status": "partial",
+      "window": {
+        "phase_duration": 28.0,
+        "horizon_seconds": 120.0,
+        "start_seconds": 0.0,
+        "basis": "active_window"
+      },
+      "changed_inputs": [
+        [
+          "melee.attack",
+          70.0,
+          94.0
+        ],
+        [
+          "melee.ap_damage",
+          330.0,
+          412.5
+        ],
+        [
+          "melee.base_damage",
+          140.0,
+          175.0
+        ]
+      ],
+      "unsupported": [
+        "stat_morale",
+        "attribute_effect"
+      ],
+      "primary_comparison": "active_window",
+      "survivability": {
+        "a": {
+          "without": 0.9225067098716943,
+          "with": 0.9225067098716943,
+          "delta": 0.0
+        },
+        "b": {
+          "without": 0.9606842105263158,
+          "with": 0.9606842105263158,
+          "delta": 0.0
+        }
+      },
+      "verdict": {
+        "without": "b",
+        "with": "b",
+        "status_without": "conditional",
+        "status_with": "conditional"
+      },
+      "corners_changed": 0
+    }
+  ],
+  "damage_sweep": {
+    "target": "Lothern Sea Guard",
+    "checked": 1884,
+    "errors": [],
+    "statuses": {
+      "blocked:ineligible_recipient": 648,
+      "blocked:no_damage_payload": 527,
+      "calculated": 326,
+      "partial": 383
+    },
+    "latency_ms": {
+      "median": 8.2,
+      "p95": 14.66,
+      "max": 39.86
+    },
+    "bytes": {
+      "median": 5676,
+      "max": 12982
+    }
+  },
+  "engagement_sweep": {
+    "units": [
+      "Lothern Sea Guard",
+      "Bloodletters of Khorne"
+    ],
+    "scenario": {
+      "separation_metres": 40,
+      "sides": {
+        "a": {
+          "order": "hold"
+        },
+        "b": {
+          "order": "approach"
+        }
+      }
+    },
+    "policy": "recipient a when a phase targets friends/self, else b as enemy",
+    "checked": 829,
+    "errors": [],
+    "statuses": {
+      "blocked:ineligible_recipient": 40,
+      "blocked:no_supported_modifier": 100,
+      "blocked:phase_selection_required": 25,
+      "calculated": 94,
+      "partial": 570
+    },
+    "latency_ms": {
+      "median": 666.54,
+      "p95": 807.77,
+      "max": 2227.86
+    },
+    "bytes": {
+      "median": 21147,
+      "max": 24688
+    }
+  }
+}

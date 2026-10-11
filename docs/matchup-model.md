@@ -184,6 +184,38 @@ infer a count from card accuracy.
 Use the verdict and sensitivity as conditional projections, and report other
 unresolved inputs rather than filling them from projectile speed.
 
+### Spells and activated abilities (#20)
+
+Use the same resolve → retrieve → evaluate → explain flow:
+
+1. **Resolve.** Resolve the units with `resolve_unit` and the effect with
+   `resolve_effect`. A shared label returns normal, bound, quest and overcast
+   candidates; present them rather than choosing. Passing a `unit_key` limits
+   effect candidates to that unit's links. Start either from a unit's
+   `activated_options[*].detail_ref` (`effect:<key>`) or from a named spell;
+   both reach the same evidence.
+2. **Retrieve.** Read `get_effect` before calculating: costs, timing, distinct
+   distance settings, recipients, phases, payload paths, failure branches and
+   qualified access. A link is qualified access, not proof of acquisition.
+3. **Evaluate damage** with `evaluate_effect_damage` (effect, target, optional
+   caster and `cast_distance_metres`). Report `status`, `unresolved_inputs`, the
+   components, totals and casualty bounds.
+   - Vortex and contact-phase totals need explicit application counts.
+   - Phase-linked damage defaults to the source-implied duration ÷ interval schedule.
+   - Shared definitions are counted once, with an all-routes upper bound.
+   - `self_effects` and `conditional_branches` are never target damage.
+4. **Evaluate a buff or debuff** with `evaluate_effect_engagement`: the effect,
+   the two units, the receiving side, the relation (`friendly` or `enemy`) and
+   the same scenario you would pass to `evaluate_single_unit_matchup`.
+   - Report the `active_window` comparison first and the `horizon` upper bound second.
+   - List changed inputs (including `clamped` ones) and unsupported effects, and
+     report whether `sensitivity.effect_changes_favored_at` is non-empty.
+   - The default result is compact; request `include_matchups` only when the
+     full #5 ledgers are needed.
+5. **Explain.** Separate source facts, scenario assumptions and calculated
+   values. Say which components were blocked or need assumptions, and never
+   present a `partial` total as complete. These are uncalibrated projections.
+
 ## Verification and adding cases
 
 `python -m unittest discover -s tests -p test_combat.py -v` runs arithmetic,

@@ -41,6 +41,11 @@ STAT_FIELDS = {
     "stat_bonus_vs_infantry": [("melee_traits", "bonus_vs_infantry")],
 }
 OPERATIONS = {"add": lambda v, x: v + x, "mult": lambda v, x: v * x}
+# Modified values below a field's valid domain are clamped and flagged. The
+# floor is a model assumption, not an established engine rule.
+FIELD_BOUNDS = {"shield_block_chance": (0.0, 100.0)}
+NONNEGATIVE = {"attack", "defence", "base_damage", "ap_damage", "charge_bonus", "speed", "ground_speed", "armour",
+               "bonus_vs_large", "bonus_vs_infantry"}
 DELTA_FIELDS = ("effective_survivability_fraction", "remaining_health", "remaining_health_fraction", "remaining_barrier")
 
 
@@ -83,10 +88,18 @@ def _apply(unit, modifiers):
                     changes.append({"stat_token": mod["stat_token"], "path": f"{area}.{field}", "before": None,
                                     "after": None, "status": "source_value_null"})
                     continue
-                after = OPERATIONS[mod["operation"]](before, mod["value"])
+                raw = OPERATIONS[mod["operation"]](before, mod["value"])
+                low, high = FIELD_BOUNDS.get(field, (0.0 if field in NONNEGATIVE else None, None))
+                after = raw
+                if low is not None and after < low:
+                    after = low
+                if high is not None and after > high:
+                    after = high
                 target[field] = after
                 changes.append({"stat_token": mod["stat_token"], "path": f"{area}.{field}",
-                                "attack_ref": target.get("id"), "before": before, "after": after, "status": "applied"})
+                                "attack_ref": target.get("id"), "before": before, "after": after,
+                                "status": "applied" if after == raw else "clamped",
+                                **({"unclamped": raw} if after != raw else {})})
     return changes
 
 
@@ -122,10 +135,32 @@ def _delta(base, mod):
         row["stopping"] = {k: {"without": b["stopping"].get(k), "with": m["stopping"].get(k)}
                            for k in ("contact_seconds", "health_depleted_seconds", "combat_ineffective_seconds")}
         rows.append(row)
+    corners = [{"collision_probability_a": b["collision_probability_a"], "collision_probability_b": b["collision_probability_b"],
+                "favored_without": b["favored"], "favored_with": m["favored"]}
+               for b, m in zip(base["verdict"]["collision_probability_corners"], mod["verdict"]["collision_probability_corners"])]
     return {"sides": rows,
+            "sensitivity": {"collision_corners": corners,
+                            "effect_changes_favored_at": [c for c in corners if c["favored_without"] != c["favored_with"]],
+                            "flip_thresholds_without": base["verdict"]["one_parameter_flip_thresholds"],
+                            "flip_thresholds_with": mod["verdict"]["one_parameter_flip_thresholds"],
+                            "note": "#5 one-at-a-time sensitivity on both runs; not a confidence interval."},
             "verdict": {"without": base["verdict"]["represented_point_ordering"],
                         "with": mod["verdict"]["represented_point_ordering"],
                         "status_without": base["verdict"]["status"], "status_with": mod["verdict"]["status"]}}
+
+
+def _compact(run):
+    """Bounded summary of one #5 result; the full result is opt-in."""
+    timing = run["derived"]["phase_timing"]
+    return {"model_version": run["model_version"],
+            "verdict": {k: run["verdict"][k] for k in ("status", "nominal_favored", "represented_point_ordering",
+                                                       "bounds_cross", "material_mechanic_unresolved",
+                                                       "unresolved_inputs", "one_parameter_flip_thresholds")},
+            "contact": timing["contact"] if timing else None,
+            "ledgers": [{k: row[k] for k in ("unit_key", "incoming_damage", "remaining_health", "initial_health",
+                                             "effective_survivability_fraction", "stopping")}
+                        for row in (run["derived"]["ledgers"] or [])],
+            "limitation_count": len(run["limitations"])}
 
 
 def _run_pair(queries, unit_a, unit_b, scenario, modifier, subculture_a, subculture_b):
@@ -140,7 +175,7 @@ def _run_pair(queries, unit_a, unit_b, scenario, modifier, subculture_a, subcult
 def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_b: str, *, recipient: str = "a",
                                relation: str = "friendly", phase: str | None = None, scenario: dict | None = None,
                                caster: str | None = None, subculture_a: str | None = None,
-                               subculture_b: str | None = None) -> dict:
+                               subculture_b: str | None = None, include_matchups: bool = False) -> dict:
     """Compare one #5 engagement with and without one effect phase on one side."""
     if recipient not in SIDES:
         raise ValueError("recipient must be a or b")
@@ -150,6 +185,8 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
     if resolution["status"] != "resolved":
         raise ResolutionError(resolution)
     packet = queries.get_effect(resolution["resolved"]["ability_key"], limit=256, include_diagnostics=True)
+    if packet["snapshot"]["commit"] != queries.snapshot["source_commit"]:
+        raise ValueError("effect evidence and engagement units come from different snapshots")
     eff = packet["effect"]
     mechanic = eff["mechanic"]
     casting = {**eff["activation"]["values"], **eff["targeting"]["values"]}
@@ -232,6 +269,10 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
             runs["active_window"] = _run_pair(queries, unit_a, unit_b, {**scenario, "duration_seconds": duration},
                                               modifier, subculture_a, subculture_b)
     changes = applied.get("changes", [])
+    if any(c["status"] == "clamped" for c in changes):
+        unresolved.append({"code": "modifier_clamped",
+                           "detail": "A modifier pushed a field outside its valid range; it was clamped at the bound. "
+                                     "Whether the engine floors the value this way is unverified."})
     if any(c["status"] == "source_value_null" for c in changes):
         unresolved.append({"code": "modifier_target_null",
                            "detail": "A modified field is null in the source packet; that modifier was not applied."})
@@ -267,9 +308,19 @@ def evaluate_effect_engagement(queries: Queries, effect: str, unit_a: str, unit_
                        "recipient": recipient, "relation": relation,
                        "units": runs["horizon"][0]["identities"] if runs else None},
         "access": access, "recipient_flags": recipient_flags, "window": window,
+        "variants": eff["variants"],
+        "replacement": {"supersedes": [v["ability_key"] for v in eff["variants"]
+                                       if v["relation"] == "supersedes" and v["direction"] == "outgoing"],
+                        "note": "Only the selected effect's phase is applied; superseded or overcast variants are "
+                                "not applied or stacked with it."},
         "modifiers": {"applied": modifiers, "changed_inputs": changes, "unsupported": unsupported},
         "comparisons": comparisons,
-        "matchups": {name: {"without": pair[0], "with": pair[1]} for name, pair in runs.items()},
+        "matchups": {name: {"without": (pair[0] if include_matchups else _compact(pair[0])),
+                            "with": (pair[1] if include_matchups else _compact(pair[1]))} for name, pair in runs.items()},
+        "matchup_detail": ("full" if include_matchups else
+                           "compact; rerun with include_matchups=true or call evaluate_single_unit_matchup with the same "
+                           "units and scenario for the unmodified full result"),
+        "matchup_limitations": (runs["horizon"][0]["limitations"][:40] if runs else []),
         "baseline_check": baseline_check, "unresolved_inputs": unresolved, "limitations": limitations,
         "empirical_calibration": None,
     }

@@ -58,6 +58,7 @@ def main():
     engagement.add_argument('--scenario', help='JSON #5 matchup scenario shared by both runs')
     engagement.add_argument('--subculture-a')
     engagement.add_argument('--subculture-b')
+    engagement.add_argument('--include-matchups', action='store_true', help='Embed both full #5 matchup results')
     for command in ('resolve', 'unit', 'matchup', 'relations', 'coverage', 'passive', 'detail', 'provenance',
                     'resolve-effect', 'effect', 'unit-effects'):
         query = commands.add_parser(command)
@@ -101,7 +102,7 @@ def main():
                                                     recipient=args.recipient, relation=args.relation, phase=args.phase,
                                                     scenario=json.loads(args.scenario) if args.scenario else None,
                                                     caster=args.caster, subculture_a=args.subculture_a,
-                                                    subculture_b=args.subculture_b)
+                                                    subculture_b=args.subculture_b, include_matchups=args.include_matchups)
         elif args.command == 'effect-damage':
             with Queries(args.db) as queries:
                 result = evaluate_effect_damage(queries, args.effect, args.target,

@@ -110,7 +110,8 @@ TOOLS = [
     _tool("evaluate_effect_engagement", "Compare the same evaluate_single_unit_matchup engagement with and without one spell/ability phase applied to one side (recipient a or b, relation friendly or enemy). Only stat modifiers the matchup model reads are applied, to copies; others are listed. A phase shorter than the horizon is compared over its active window, with the whole-horizon run as an upper bound. Report deltas, changed inputs, unsupported effects and unresolved inputs.",
           {"effect": STRING, "unit_a": STRING, "unit_b": STRING,
            "recipient": {"type": "string", "enum": ["a", "b"]}, "relation": {"type": "string", "enum": ["friendly", "enemy"]},
-           "phase": STRING, "caster": STRING, "subculture_a": STRING, "subculture_b": STRING, "scenario": SCENARIO},
+           "phase": STRING, "caster": STRING, "subculture_a": STRING, "subculture_b": STRING, "scenario": SCENARIO,
+           "include_matchups": {"type": "boolean"}},
           ("effect", "unit_a", "unit_b")),
     _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Missing/nonpositive source velocity uses a labeled immediate-arrival approximation. If its damage is material, rerun with flight_seconds equal to that side's returned cycle_seconds as an illustrative delayed case; report both outcomes. bounds_cross does not cover flight timing. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts; compare multiple factors individually rather than multiplying them or claiming exact engine cadence.",
           {"unit_a": STRING, "unit_b": STRING, "subculture_a": STRING, "subculture_b": STRING,
@@ -217,7 +218,8 @@ def call_tool(queries, name, args):
             data = evaluate_effect_engagement(queries, args["effect"], args["unit_a"], args["unit_b"],
                                               recipient=args.get("recipient", "a"), relation=args.get("relation", "friendly"),
                                               phase=args.get("phase"), scenario=args.get("scenario"), caster=args.get("caster"),
-                                              subculture_a=args.get("subculture_a"), subculture_b=args.get("subculture_b"))
+                                              subculture_a=args.get("subculture_a"), subculture_b=args.get("subculture_b"),
+                                              include_matchups=args.get("include_matchups", False))
         elif name == "evaluate_effect_damage":
             from .effect_calc import evaluate_effect_damage
             data = evaluate_effect_damage(queries, args["effect"], args["target"], scenario=args.get("scenario"),
