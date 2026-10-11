@@ -69,6 +69,19 @@ SCENARIO = {"type": "object", "description": "Conditional custom-battle assumpti
                            "sides": {"type": "object", "properties": {"a": SIDE_SETTINGS,
                                                                       "b": SIDE_SETTINGS},
                                      "additionalProperties": False}}, "additionalProperties": False}
+EFFECT_SCENARIO = {"type": "object", "description": "Single-cast assumptions; see docs/effect-damage.md.",
+                   "properties": {
+                       "projectile_hit_probability": {"type": "number", "minimum": 0, "maximum": 1},
+                       "entities_per_explosion": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                       "vortex_entities_per_application": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                       "vortex_applications": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                       "contact_phase_ticks": {"type": "number", "minimum": 0, "maximum": MAX_SCENARIO_NUMBER},
+                       "facing": {"type": "string", "enum": ["front", "side", "rear"]},
+                       "target_component_role": STRING,
+                       "cast_distance_metres": {"type": "number", "minimum": 0, "maximum": 10000},
+                       "barrier_damage_order": {"type": "string", "enum": ["barrier_first"]},
+                       "historical_relations_apply_to_patch_9": {"type": "boolean"}},
+                   "additionalProperties": False}
 TOOLS = [
     _tool("resolve_unit", "Resolve an exact unit key or name; ambiguous names return candidates. No fuzzy choice or availability inference.",
           {"name_or_key": STRING, "subculture": STRING}, ("name_or_key",)),
@@ -91,6 +104,9 @@ TOOLS = [
           {"ref": STRING, "cursor": STRING, "limit": LIMIT}, ("ref",)),
     _tool("get_provenance", "Expand exact source record IDs returned in a packet (maximum 64 per call).",
           {"record_ids": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 64}}, ("record_ids",)),
+    _tool("evaluate_effect_damage", "Expected single-cast damage of one exact spell/activated-ability variant against one resolved unit. Walks the source payload chain (projectiles, shrapnel, explosions, vortices, contact phases) with the shared damage relation. Vortex and contact-phase totals need explicit application counts; shared definitions are counted once with an all-routes upper bound; failure branches, healing, buffs and summons are listed, not added. Report status, unresolved inputs and assumptions with the numbers.",
+          {"effect": STRING, "target": STRING, "caster": STRING, "subculture": STRING, "target_subculture": STRING,
+           "scenario": EFFECT_SCENARIO}, ("effect", "target")),
     _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Missing/nonpositive source velocity uses a labeled immediate-arrival approximation. If its damage is material, rerun with flight_seconds equal to that side's returned cycle_seconds as an illustrative delayed case; report both outcomes. bounds_cross does not cover flight timing. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts; compare multiple factors individually rather than multiplying them or claiming exact engine cadence.",
           {"unit_a": STRING, "unit_b": STRING, "subculture_a": STRING, "subculture_b": STRING,
            "scenario": SCENARIO}, ("unit_a", "unit_b")),
@@ -149,6 +165,8 @@ def _validate(tool, args):
             raise ValueError(f"unsupported {key}")
     if tool["name"] == "evaluate_single_unit_matchup":
         _validate_scenario(args.get("scenario", {}), SCENARIO, "scenario")
+    if tool["name"] == "evaluate_effect_damage":
+        _validate_scenario(args.get("scenario", {}), EFFECT_SCENARIO, "scenario")
 
 
 def _content(payload, is_error=False):
@@ -187,6 +205,11 @@ def call_tool(queries, name, args):
                                       include_provenance=args.get("include_provenance", False))
         elif name == "get_detail":
             data = queries.get_detail(args["ref"], cursor=args.get("cursor"), limit=args.get("limit", 32))
+        elif name == "evaluate_effect_damage":
+            from .effect_calc import evaluate_effect_damage
+            data = evaluate_effect_damage(queries, args["effect"], args["target"], scenario=args.get("scenario"),
+                                          caster=args.get("caster"), subculture=args.get("subculture"),
+                                          target_subculture=args.get("target_subculture"))
         elif name == "evaluate_single_unit_matchup":
             from .combat import evaluate_matchup
             data = evaluate_matchup(queries, args["unit_a"], args["unit_b"], scenario=args.get("scenario"),
@@ -194,7 +217,7 @@ def call_tool(queries, name, args):
         else:
             data = queries.get_provenance(args["record_ids"])
         return _content({"status": "ok", "adapter_version": SERVER_VERSION,
-                         "model_version": data["model_version"] if name == "evaluate_single_unit_matchup" else None,
+                         "model_version": data["model_version"] if name in ("evaluate_single_unit_matchup", "evaluate_effect_damage") else None,
                          "snapshot": queries.snapshot, "data": data})
     except ResolutionError as exc:
         return _content({"status": exc.result["status"], "adapter_version": SERVER_VERSION,
