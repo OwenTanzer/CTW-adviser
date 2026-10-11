@@ -1,6 +1,6 @@
 # Calculation interpretation
 
-Workflow 1.0.0; repository `docs/matchup-model.md` defines the full contract.
+Workflow 1.1.0; repository `docs/matchup-model.md` defines the full contract.
 
 Read source facts/provenance separately from scenario assumptions, derived values and empirical calibration (currently null). Inspect both ledgers, not just the verdict.
 

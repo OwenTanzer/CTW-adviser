@@ -12,6 +12,7 @@ import sqlite3
 import sys
 
 from .queries import Queries, ResolutionError
+from .unit_search import SearchError, UnitSearch
 
 PROTOCOL_VERSION = "2025-06-18"
 SERVER_VERSION = "0.1.0"
@@ -91,6 +92,17 @@ TOOLS = [
           {"ref": STRING, "cursor": STRING, "limit": LIMIT}, ("ref",)),
     _tool("get_provenance", "Expand exact source record IDs returned in a packet (maximum 64 per call).",
           {"record_ids": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 64}}, ("record_ids",)),
+    _tool("discover_unit_fields", "Describe the unit search: row and count definitions, searchable fields with types, units, operators, null counts and scope, ambiguous terms, unsupported classifications, grammar and examples. With field, page that field's categorical values (subcultures, castes, attributes...). Call before search_units; never guess field names or category values.",
+          {"field": STRING, "cursor": STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 256, "default": 64}}),
+    _tool("search_units", "Enumerate or filter units from the pinned snapshot: rosters by subculture, lords/heroes by caste, stat thresholds, AND/OR groups, field-to-field comparisons, sorting and mount-family grouping. Returns qualified unit keys, requested baseline values, totals with their count unit, and a cursor. Values are unmodified base stats; follow results with get_unit_combat_profile. Complete within the snapshot, not proof of complete game coverage.",
+          {"where": {"type": "object", "description": "Condition {field, op, value|other_field} or group {all: [...]} / {any: [...]}; see discover_unit_fields."},
+           "fields": {"type": "array", "items": STRING, "maxItems": 24, "description": "Output field ids (default caste, unit_type, mount_relation)."},
+           "sort": {"type": "array", "maxItems": 3, "items": {"type": "object", "properties": {
+               "field": STRING, "direction": {"type": "string", "enum": ["asc", "desc"]}},
+               "required": ["field"], "additionalProperties": False}},
+           "group_by": {"type": "string", "enum": ["variant", "mount_family"]},
+           "limit": {"type": "integer", "minimum": 1, "maximum": 100, "default": 25},
+           "cursor": STRING}),
     _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Missing/nonpositive source velocity uses a labeled immediate-arrival approximation. If its damage is material, rerun with flight_seconds equal to that side's returned cycle_seconds as an illustrative delayed case; report both outcomes. bounds_cross does not cover flight timing. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts; compare multiple factors individually rather than multiplying them or claiming exact engine cadence.",
           {"unit_a": STRING, "unit_b": STRING, "subculture_a": STRING, "subculture_b": STRING,
            "scenario": SCENARIO}, ("unit_a", "unit_b")),
@@ -140,9 +152,12 @@ def _validate(tool, args):
             raise ValueError(f"{key} must be an integer from {rule['minimum']} to {rule['maximum']}")
         if kind == "boolean" and type(value) is not bool:
             raise ValueError(f"{key} must be boolean")
-        if kind == "array" and (not isinstance(value, list) or not rule["minItems"] <= len(value) <= rule["maxItems"]
-                                or any(not isinstance(item, str) or not item.strip() for item in value)):
-            raise ValueError(f"{key} must contain 1 to 64 nonempty strings")
+        if kind == "array" and rule["items"].get("type") == "string" and (
+                not isinstance(value, list) or not rule.get("minItems", 0) <= len(value) <= rule["maxItems"]
+                or any(not isinstance(item, str) or not item.strip() for item in value)):
+            raise ValueError(f"{key} must contain {rule.get('minItems', 0)} to {rule['maxItems']} nonempty strings")
+        if kind == "array" and not isinstance(value, list):
+            raise ValueError(f"{key} must be an array")
         if kind == "object" and not isinstance(value, dict):
             raise ValueError(f"{key} must be an object")
         if "enum" in rule and value not in rule["enum"]:
@@ -157,6 +172,13 @@ def _content(payload, is_error=False):
     if is_error:
         result["isError"] = True
     return result
+
+
+def _unit_search(queries):
+    # One search helper per open snapshot keeps category lists cached across calls.
+    if getattr(queries, "_unit_search", None) is None:
+        queries._unit_search = UnitSearch(queries)
+    return queries._unit_search
 
 
 def call_tool(queries, name, args):
@@ -187,6 +209,13 @@ def call_tool(queries, name, args):
                                       include_provenance=args.get("include_provenance", False))
         elif name == "get_detail":
             data = queries.get_detail(args["ref"], cursor=args.get("cursor"), limit=args.get("limit", 32))
+        elif name == "discover_unit_fields":
+            data = _unit_search(queries).discover(args.get("field"), cursor=args.get("cursor"),
+                                                limit=args.get("limit", 64))
+        elif name == "search_units":
+            data = _unit_search(queries).search(args.get("where"), fields=args.get("fields"), sort=args.get("sort"),
+                                              group_by=args.get("group_by", "variant"),
+                                              limit=args.get("limit", 25), cursor=args.get("cursor"))
         elif name == "evaluate_single_unit_matchup":
             from .combat import evaluate_matchup
             data = evaluate_matchup(queries, args["unit_a"], args["unit_b"], scenario=args.get("scenario"),
@@ -196,6 +225,9 @@ def call_tool(queries, name, args):
         return _content({"status": "ok", "adapter_version": SERVER_VERSION,
                          "model_version": data["model_version"] if name == "evaluate_single_unit_matchup" else None,
                          "snapshot": queries.snapshot, "data": data})
+    except SearchError as exc:
+        return _content({"status": "invalid_query", "adapter_version": SERVER_VERSION,
+                         "model_version": None, "snapshot": queries.snapshot, "data": exc.detail}, True)
     except ResolutionError as exc:
         return _content({"status": exc.result["status"], "adapter_version": SERVER_VERSION,
                          "model_version": None, "snapshot": queries.snapshot, "data": exc.result}, True)

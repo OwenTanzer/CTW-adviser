@@ -1,4 +1,8 @@
-# ChatGPT matchup workflow 1.0.0
+# ChatGPT matchup workflow 1.1.0
+
+Version 1.1.0 adds roster and stat search through `discover_unit_fields` and
+`search_units` ([unit search](unit-search.md), issue #28). Reinstall the skill and
+refresh the connector metadata to pick it up.
 
 ## Install and invoke
 

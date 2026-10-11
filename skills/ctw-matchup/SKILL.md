@@ -1,11 +1,15 @@
 ---
 name: ctw-matchup
-description: Compare Total War Warhammer III units and answer tactical matchup questions using the connected CTW Advisor tools. Use for unit-versus-unit advice, approach under fire, ranged exchanges, melee contacts, scenario changes, and interpreting conditional combat calculations. Resolve identities and use the shared evaluator; never invent combat numbers.
+description: Compare Total War Warhammer III units and answer tactical matchup and roster questions using the connected CTW Advisor tools. Use for listing rosters, lords and heroes, filtering units by stats, unit-versus-unit advice, approach under fire, ranged exchanges, melee contacts, scenario changes, and interpreting conditional combat calculations. Resolve identities and use the shared evaluator; never invent combat numbers.
 ---
 
 # CTW matchup
 
-Workflow version 1.0.0. Use the installed CTW Advisor connector. Discover its actual callable schemas; tool-name prefixes may vary. If tools are unavailable, report the missing connector and stop numerical advice. Do not substitute remembered unit stats or build another backend.
+Workflow version 1.1.0. Use the installed CTW Advisor connector. Discover its actual callable schemas; tool-name prefixes may vary. If tools are unavailable, report the missing connector and stop numerical advice. Do not substitute remembered unit stats or build another backend.
+
+## Find units without guessing names
+
+For roster, list or stat-threshold questions ("all High Elf heroes", "infantry with armour below 40"), or when the user has not named exact units, call `discover_unit_fields` first. Use its field ids, units and category values (subculture keys are labeled with faction names); never guess fields, categories or names, and never consult external roster lists. Then call `search_units` with explicit `all`/`any` groups. Choose one field when a term is ambiguous (cost, AP damage) and say which one you used. Page with `next_cursor` until `complete` is true before calling a list exhaustive. Report `total` with its `count_unit`, and the coverage boundary: complete within the imported snapshot, not proof of full game coverage. Use `group_by: mount_family` to present characters with their mounts; each variant keeps its own values. Search values are unmodified base stats, and null is not zero. Unsupported classifications, such as legendary versus generic lords, are reported as unsupported, not inferred from names. Follow a result into evidence or evaluation with its `unit_key` and `subculture`.
 
 ## Resolve the question
 
