@@ -1,5 +1,6 @@
 """Adapter contract for the independently developed combat evaluator."""
 
+import copy
 import importlib.util
 import os
 from pathlib import Path
@@ -105,6 +106,37 @@ class RealCombatAdapterTests(unittest.TestCase):
                         self.assertTrue(payload["data"]["verdict"]["material_mechanic_unresolved"])
                     else:
                         self.assertFalse(payload["data"]["verdict"]["material_mechanic_unresolved"])
+
+    def test_missing_armour_structured_unknown_is_preserved(self):
+        from ctw_adviser.combat import evaluate_matchup
+
+        class MissingArmourQueries:
+            def __init__(self, packet, snapshot):
+                self.packet = packet
+                self.snapshot = snapshot
+
+            def get_matchup_evidence(self, *_args, **_kwargs):
+                return copy.deepcopy(self.packet)
+
+        scenario = {"separation_metres": 80, "duration_seconds": 60,
+                    "barrier_damage_order": "barrier_first",
+                    "sides": {"a": {"order": "hold"}, "b": {"order": "hold"}}}
+        with Queries(DB) as queries:
+            packet = queries.get_matchup_evidence("Lothern Sea Guard (Shields)",
+                "Blue Horrors of Tzeentch", limit=256, include_diagnostics=True,
+                include_provenance=True)
+            packet["units"][1]["passives"]["protection"]["armour"] = None
+            altered = MissingArmourQueries(packet, queries.snapshot)
+            expected = evaluate_matchup(altered, "Lothern Sea Guard (Shields)",
+                                        "Blue Horrors of Tzeentch", scenario=scenario)
+            actual = call_tool(altered, "evaluate_single_unit_matchup", {
+                "unit_a": "Lothern Sea Guard (Shields)",
+                "unit_b": "Blue Horrors of Tzeentch", "scenario": scenario})["structuredContent"]
+        self.assertEqual(actual["data"], expected)
+        self.assertEqual(expected["verdict"]["status"], "indeterminate")
+        self.assertIn(("b", "passives.protection.armour"),
+            {(item["side"], item["source_path"])
+             for item in actual["data"]["verdict"]["unresolved_inputs"]})
 
 
 if __name__ == "__main__":
