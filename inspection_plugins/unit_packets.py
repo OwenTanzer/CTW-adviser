@@ -154,7 +154,18 @@ async def detail(request, datasette):
             result = queries.get_detail(args.get('ref', ''), cursor=args.get('cursor'), limit=int(args.get('limit', '64')))
         if args.get('format') == 'json':
             return Response.json(result)
-        content = '<section class="card"><h2>Source evidence detail</h2>' + raw(result)
+        content = '<section class="card"><h2>Source evidence detail</h2>'
+        if 'effect' in result:
+            # Issue #19: readable spell/activated-ability mechanics first; the
+            # full packet, including qualified unit access, stays below.
+            effect = result['effect']
+            content += '<p>' + escape(effect['summary']) + '</p><h3>Payload paths</h3><ul>' + ''.join(
+                '<li>' + escape(chain['branch'] + ': ' + ' -> '.join(chain['path'])) + '</li>'
+                for chain in effect['payload']['chains']) + '</ul>'
+            if effect['access']['cursor']:
+                content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=effect['access']['cursor'],
+                                                     limit=args.get('limit', '64'))) + '">More linked units</a>'
+        content += raw(result)
         if result.get('cursor'):
             content += '<a href="' + escape(link('/inspect/detail', ref=args['ref'], cursor=result['cursor'], limit=args.get('limit', '64'))) + '">Continue evidence graph</a>'
         return Response.html(page(content + '</section>'))

@@ -181,16 +181,22 @@ class PinnedStoreTests(unittest.TestCase):
                                 if c['name'] in actual}
                     self.assertEqual({k: v for k, v in actual.items() if k != 'record_id'}, expected, rid)
 
-    def test_passive_roots_and_activated_payload_exclusion(self):
+    def test_passive_and_activated_payload_roots(self):
         with closing(open_snapshot(self.output)) as db:
             for key in ('wh2_main_unit_passive_martial_prowess', 'wh3_dlc24_unit_passive_spawn_kin_kroxigors'):
                 self.assertEqual(db.execute('SELECT classification FROM ability_option_metadata WHERE ability_key=?',
                                             (key,)).fetchone()[0], 'core_passive')
                 self.assertGreater(db.execute('SELECT count(*) FROM native_ability_phase_links WHERE special_ability=?',
                                               (key,)).fetchone()[0], 0)
+            # Contract 3 (#19): activated roots retain full casting rows; only
+            # unresolved definitions would remain metadata-only.
             for cid, in db.execute("SELECT casting_record FROM ability_option_metadata WHERE classification='activated_option'"):
-                self.assertIsNone(db.execute('SELECT record_id FROM native_ability_casting WHERE record_id=?', (cid,)).fetchone())
-                self.assertIsNotNone(db.execute('SELECT record_id FROM native_ability_casting_metadata WHERE record_id=?', (cid,)).fetchone())
+                self.assertIsNotNone(db.execute('SELECT record_id FROM native_ability_casting WHERE record_id=?', (cid,)).fetchone())
+            for key_json, in db.execute("SELECT native_key_json FROM record_provenance WHERE retention='option_metadata'"):
+                self.assertEqual(db.execute('SELECT classification FROM ability_option_metadata WHERE ability_key=?',
+                                            (json.loads(key_json)['key'],)).fetchone()[0], 'unresolved')
+            self.assertEqual(db.execute('SELECT count(*) FROM effect_abilities').fetchone()[0],
+                             db.execute("SELECT count(*) FROM ability_option_metadata WHERE classification='activated_option'").fetchone()[0])
             self.assertEqual(db.execute('SELECT count(*) FROM unit_abilities').fetchone()[0], 8065)
 
     def test_native_nulls_components_and_contact_groups(self):

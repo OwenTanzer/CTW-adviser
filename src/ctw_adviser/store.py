@@ -6,10 +6,10 @@ from contextlib import closing
 from pathlib import Path
 import sqlite3
 
-# Store schema 3 spans more than one import contract. Query packet 1.16 needs
-# the native unit supplements selected by contract 2; an older schema-3 store
-# cannot satisfy those lookups even when it uses the same CTW-data source pin.
-SUPPORTED_CONTRACT_SHA256 = '81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16'
+# Store schema 4 (issue #19) adds linked spell/activated-ability tables and the
+# contract-3 activated payload scope. Schema-3 stores at the same CTW-data pin
+# lack those records and must be rebuilt.
+SUPPORTED_CONTRACT_SHA256 = 'fefc71d116c658fa453f9786c67c9ff3b5eb23e40ec8882332914261cad246a1'
 
 
 def quote(name: str) -> str:
@@ -59,7 +59,7 @@ def open_snapshot(path: Path) -> sqlite3.Connection:
     try:
         db.execute('PRAGMA foreign_keys=ON')
         db.execute('PRAGMA query_only=ON')
-        if db.execute('SELECT schema_version FROM snapshot').fetchone() != (3,):
+        if db.execute('SELECT schema_version FROM snapshot').fetchone() != (4,):
             raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
         if db.execute('SELECT contract_sha256 FROM snapshot').fetchone() != (SUPPORTED_CONTRACT_SHA256,):
             raise ValueError('unsupported snapshot schema or import contract; rebuild from pinned sources')
@@ -91,6 +91,9 @@ def inspect_snapshot(path: Path) -> dict:
                 'SELECT namespace,count(*) FROM unit_identity GROUP BY namespace').fetchall()),
             'classifications': dict(db.execute(
                 'SELECT classification,count(*) FROM ability_option_metadata GROUP BY classification').fetchall()),
+            'effects': dict(db.execute(
+                'SELECT effect_kind,count(*) FROM effect_abilities GROUP BY effect_kind').fetchall()),
+            'effect_access_links': db.execute('SELECT count(*) FROM effect_access').fetchone()[0],
             'integrity': db.execute('PRAGMA integrity_check').fetchone()[0],
             'foreign_key_errors': [tuple(r) for r in db.execute('PRAGMA foreign_key_check')],
             'sources': [dict(r) for r in db.execute(

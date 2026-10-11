@@ -144,12 +144,12 @@ def select_records(specs, records, edges):
         path = owner[rid]
         if path in (DEFINITION, CASTING):
             kind, did, cid = option(records[path][rid][1]['key'])
-            # Preserve both classification sources, but never follow activated
-            # or unresolved payload roots, including ones reached through graphs.
+            # Preserve both classification sources. Activated roots (#19) own
+            # their payload graphs; unresolved definitions are never expanded.
             for related in (did, cid):
                 if related and related != rid:
                     enqueue(related)
-            if kind != 'core_passive':
+            if kind == 'unresolved':
                 return
         queue.append(rid)
 
@@ -169,6 +169,13 @@ def select_records(specs, records, edges):
 
     for _, row in records[ABILITY_LINK].values():
         option(row['ability_key'])
+    # Every source-classified activated definition is a root, linked or not,
+    # so arbitrary represented spells/abilities share one lookup path.
+    for key, did in sorted(definition_by_key.items()):
+        cid = casting_by_key.get(key)
+        casting = records[CASTING][cid][1] if cid else None
+        if classification(records[DEFINITION][did][1], casting) == 'activated_option':
+            enqueue(did)
     # Roster and normalized unit relations are complete roots. Projectile,
     # explosion and raw weapon catalogs are selected through attachments.
     for path, spec in specs.items():
@@ -239,14 +246,15 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
         try:
             db.executescript((ROOT / 'schema/store.sql').read_text(encoding='utf-8'))
             db.execute('BEGIN IMMEDIATE')
-            snapshot_id = lock['source_commit'] + ':' + lock['contract_sha256'] + ':store3'
+            snapshot_id = lock['source_commit'] + ':' + lock['contract_sha256'] + ':store4'
             db.execute('INSERT INTO snapshot VALUES(?,?,?,?,?,?,?)',
-                       (snapshot_id, 3, lock['source_commit'], lock['contract_sha256'],
+                       (snapshot_id, 4, lock['source_commit'], lock['contract_sha256'],
                         compact(contract['baseline']), compact(lock['owners']),
                         compact({'structural': 'validated selected records and dependency edges',
                                  'semantic': 'partial; raw conditions/effects retained without application',
                                  'runtime': 'unverified; engine behavior is not fully reconstructed',
-                                 'activated_payloads': 'deferred',
+                                 'activated_payloads': 'source graphs retained for every activated root; runtime execution unverified',
+                                 'activated_access': 'unit ability links only; character skill/rank routes are not yet imported',
                                  'packet_interface': 'versioned read-only query packets implemented; downstream consumers are separate'})))
             for entry in lock['files']:
                 path = entry['path']
@@ -283,7 +291,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
                     if rid not in selected:
                         continue
                     retention = 'full'
-                    if path in metadata_fields and options[row['key']][0] != 'core_passive':
+                    if path in metadata_fields and options[row['key']][0] == 'unresolved':
                         retention = 'option_metadata'
                     db.execute('INSERT INTO record_provenance VALUES(?,?,?,?,?,?,?,?)',
                         (rid, path, logical, compact({k: row[k] for k in spec['keys']}),
@@ -321,7 +329,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
                 for rid, (_, row) in records[edge['source']].items():
                     if rid not in selected:
                         continue
-                    if edge['source'] in (DEFINITION, CASTING) and options[row['key']][0] != 'core_passive':
+                    if edge['source'] in (DEFINITION, CASTING) and options[row['key']][0] == 'unresolved':
                         continue
                     values = tuple(row[c] for c in edge['source_columns'])
                     if not all(v != '' for v in values):
@@ -343,7 +351,7 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
                                     status, ordinal))
                         if target and edge['target'] in (DEFINITION, CASTING) and edge['source'] != ABILITY_LINK:
                             target_key = records[edge['target']][target][1]['key']
-                            if options[target_key][0] != 'core_passive':
+                            if options[target_key][0] == 'unresolved':
                                 db.execute('INSERT OR IGNORE INTO coverage_gaps(record_id,kind,detail) VALUES(?,?,?)',
                                     (rid, 'nonpassive_dependency_deferred', edge['name'] + ':' + target_key))
                     if not targets:
@@ -354,8 +362,9 @@ def build_snapshot(source_root: Path, output: Path, *, before_install=None) -> d
             normalize_roster(db, next(s for s in specs.values() if s['role'] == 'roster'), specs)
             import_payload_lineage(db, source_root)
             import_localization(db, source_root, lock, options)
+            import_effects(db, snapshot_id, options)
             record_semantic_gaps(db)
-            validate_candidate(db, specs, records, selected)
+            validate_candidate(db, specs, records, selected, options)
             db.commit()
             db.execute('ANALYZE')
             db.commit()
@@ -447,6 +456,110 @@ def import_localization(db, root, lock, options):
                    (total, count, 'linked labels/condition text and stat/trait dictionaries', path))
 
 
+SPELL_SOURCE_TYPES = ('spell', 'bound')
+PAYLOAD_KEYWORDS = (('bombardment', 'bombardment'), ('activated_projectile', 'projectile'),
+                    ('vortex', 'vortex'), ('mom_vortex_key', 'vortex'), ('spawned_unit', 'summon'),
+                    ('miscast_explosion', 'miscast'))
+TARGET_KEYWORDS = (('target_self', 'targets_self'), ('target_friends', 'targets_friends'),
+                   ('target_enemies', 'targets_enemies'), ('target_ground', 'targets_ground'))
+
+
+def effect_keywords(db, key, definition, casting, overcast_targets):
+    """Concise derived index terms; every term names a retained source field."""
+    words = ['spell' if definition['source_type'] in SPELL_SOURCE_TYPES else 'activated_ability']
+    if definition['source_type'] == 'bound':
+        words.append('bound')
+    if definition['overpower_option']:
+        words.append('has_overcast')
+    if key in overcast_targets:
+        words.append('overcast')
+    for field, word in PAYLOAD_KEYWORDS:
+        if casting[field]:
+            words.append(word)
+    for field, word in TARGET_KEYWORDS:
+        if casting[field] == 1:
+            words.append(word)
+    columns = [r[1] for r in db.execute('PRAGMA table_info(native_ability_phases)')]
+    phases = db.execute('SELECT p.* FROM native_ability_phase_links l JOIN native_ability_phases p ON p.id=l.phase '
+                        'WHERE l.special_ability=? ORDER BY l."order",p.id', (key,)).fetchall()
+    for phase in (dict(zip(columns, row)) for row in phases):
+        if (phase['damage_amount'] or 0) > 0:
+            words.append('phase_damage')
+        if any((phase[k] or 0) > 0 for k in ('heal_amount', 'barrier_heal_amount')) or phase['resurrect'] == 1:
+            words.append('healing')
+        if db.execute('SELECT 1 FROM native_phase_stat_effects WHERE phase=? LIMIT 1', (phase['id'],)).fetchone():
+            words.append('stat_modifier')
+        if db.execute('SELECT 1 FROM native_phase_attribute_effects WHERE phase=? LIMIT 1', (phase['id'],)).fetchone():
+            words.append('attribute_effect')
+    return list(dict.fromkeys(words))
+
+
+def import_effects(db, snapshot_id, options):
+    """Specialized spell/activated-ability identity, variant and access tables.
+
+    Detailed mechanics stay in the shared native tables and relation graph;
+    these rows hold stable identities, concise keywords and qualified links.
+    """
+    db.row_factory = sqlite3.Row
+    try:
+        definitions = {r['key']: dict(r) for r in db.execute('SELECT * FROM native_ability_definitions')}
+        castings = {r['key']: dict(r) for r in db.execute('SELECT * FROM native_ability_casting')}
+        names = {r['key'].removeprefix('unit_abilities_onscreen_name_'): r['text'] for r in db.execute(
+            "SELECT key,text FROM localization WHERE key LIKE 'unit_abilities_onscreen_name_%'")}
+    finally:
+        db.row_factory = None
+    activated = sorted(k for k, (kind, _, _) in options.items() if kind == 'activated_option')
+    overcast_targets = {definitions[k]['overpower_option'] for k in activated if definitions[k]['overpower_option']}
+    for key in activated:
+        definition, casting = definitions[key], castings[key]
+        kind = 'spell' if definition['source_type'] in SPELL_SOURCE_TYPES else 'activated_ability'
+        db.execute('INSERT INTO effect_abilities VALUES(?,?,?,?,?,?,?,?,?,?)',
+                   (key, snapshot_id, kind, 'definition.source_type in (spell, bound); casting.passive=false',
+                    definition['source_type'], definition['type'], names.get(key),
+                    definition['record_id'], casting['record_id'],
+                    compact(effect_keywords(db, key, definition, casting, overcast_targets))))
+    for key in activated:
+        definition = definitions[key]
+        variants = []
+        if definition['overpower_option']:
+            variants.append(('overcast_option', definition['overpower_option'], definition['record_id']))
+        if definition['superseded_abilities_set']:
+            for element_rid, replaced in db.execute(
+                    'SELECT record_id,superseded_ability_key FROM native_unit_ability_superseded_abilities_set_elements '
+                    'WHERE set_key=? ORDER BY superseded_ability_key', (definition['superseded_abilities_set'],)).fetchall():
+                variants.append(('supersedes', replaced, element_rid))
+        for relation, target, rid in variants:
+            kind = options.get(target, ('missing',))[0]
+            status = ('resolved' if kind == 'activated_option' else
+                      'not_activated' if target in definitions else 'missing')
+            db.execute('INSERT OR IGNORE INTO effect_variants VALUES(?,?,?,?,?,?)',
+                       (key, relation, target, target if status == 'resolved' else None, status, rid))
+    for rid, unit, ability, culture in db.execute(
+            'SELECT record_id,unit_key,ability_key,culture_key FROM unit_abilities ORDER BY record_id').fetchall():
+        if options.get(ability, ('unresolved',))[0] != 'activated_option':
+            continue
+        db.execute('INSERT INTO effect_access VALUES(?,?,?,?,?,?,?)',
+                   (rid, unit, ability, culture, 'unit_ability_link',
+                    definitions[ability]['requires_effect_enabling'],
+                    'Source unit ability link, qualified by culture and effect enabling; '
+                    'not proof of campaign acquisition or of an active effect.'))
+
+
+def validate_effects(db, options):
+    activated = {k for k, (kind, _, _) in options.items() if kind == 'activated_option'}
+    if {r[0] for r in db.execute('SELECT ability_key FROM effect_abilities')} != activated:
+        raise ValueError('activated effect reconciliation failure')
+    if db.execute("SELECT count(*) FROM effect_abilities e JOIN record_provenance p "
+                  "ON p.id IN (e.definition_record,e.casting_record) WHERE p.retention!='full'").fetchone()[0]:
+        raise ValueError('activated effect retained without full payload records')
+    linked = db.execute('SELECT count(*) FROM unit_abilities JOIN effect_abilities USING(ability_key)').fetchone()[0]
+    if db.execute('SELECT count(*) FROM effect_access').fetchone()[0] != linked:
+        raise ValueError('activated access reconciliation failure')
+    if db.execute('SELECT count(*) FROM effect_variants WHERE variant_ability IS NOT NULL '
+                  'AND variant_ability!=variant_key').fetchone()[0]:
+        raise ValueError('crossed effect variant identity')
+
+
 def record_semantic_gaps(db):
     # Engine behaviors and summons remain source evidence, not implemented
     # mechanics. Absence of a behavior-to-ability row is not a broken join.
@@ -491,6 +604,8 @@ def normalize_roster(db, spec, specs):
                "CHECK(json_valid(faction_name) AND json_type(faction_name)='array')")
     db.execute("ALTER TABLE unit_profiles ADD COLUMN source_unit_name TEXT NOT NULL DEFAULT ''")
     db.execute('CREATE INDEX unit_profiles_source_unit_name_nocase ON unit_profiles(source_unit_name COLLATE NOCASE)')
+    # Summoned land units (#19) map to profiles by exact source key only.
+    db.execute('CREATE INDEX unit_profiles_source_land_unit ON unit_profiles(source_land_unit_key)')
     create_native_table(db, 'unit_availability', availability_columns, ['unit_key', 'faction_key', 'subculture_key'],
                         constraints=['FOREIGN KEY(unit_key) REFERENCES unit_identity(unit_key)'])
     for key, (rid, values) in sorted(profiles.items()):
@@ -609,7 +724,7 @@ def qualify_mount_names(db):
                    (label, key))
 
 
-def validate_candidate(db, specs, records, selected):
+def validate_candidate(db, specs, records, selected, options):
     if db.execute('PRAGMA integrity_check').fetchone() != ('ok',):
         raise ValueError('candidate integrity failure')
     if db.execute('PRAGMA foreign_key_check').fetchall():
@@ -636,6 +751,7 @@ def validate_candidate(db, specs, records, selected):
         if duplicate:
             raise ValueError('duplicate native identity: ' + path)
     db.execute('CREATE UNIQUE INDEX roster_identity ON unit_availability(subculture_key,unit_key)')
+    validate_effects(db, options)
 
 
 def report_candidate(db):
@@ -647,6 +763,11 @@ def report_candidate(db):
         ('alias_key', 'SELECT p.record_id FROM unit_aliases a JOIN unit_profiles p ON p.unit_key=a.profile_unit_key WHERE a.unit_key=?', ('wh2_main_lzd_mon_kroxigors_nakai',)),
         ('relations', 'SELECT record_id FROM unit_records WHERE unit_key=?', ('wh2_main_lzd_mon_kroxigors',)),
         ('reverse_edge', 'SELECT source_record FROM relation_edges WHERE target_record=?', ('example',)),
+        ('effect_key', 'SELECT definition_record FROM effect_abilities WHERE ability_key=?', ('example',)),
+        ('effect_name', 'SELECT ability_key FROM effect_abilities WHERE name=? COLLATE NOCASE', ('Example',)),
+        ('unit_effects', 'SELECT ability_key FROM effect_access WHERE unit_key=?', ('example',)),
+        ('effect_units', 'SELECT unit_key FROM effect_access WHERE ability_key=?', ('example',)),
+        ('effect_variant_reverse', 'SELECT ability_key FROM effect_variants WHERE variant_key=?', ('example',)),
     ]:
         plans[label] = [r[3] for r in db.execute('EXPLAIN QUERY PLAN ' + sql, params)]
         if any('SCAN ' in detail for detail in plans[label]):
@@ -660,6 +781,9 @@ def report_candidate(db):
             'retained_records': db.execute('SELECT count(*) FROM record_provenance').fetchone()[0],
             'relations': dict(db.execute('SELECT status,count(*) FROM relation_edges GROUP BY status')),
             'coverage_gaps': db.execute('SELECT count(*) FROM coverage_gaps').fetchone()[0],
+            'effects': dict(db.execute('SELECT effect_kind,count(*) FROM effect_abilities GROUP BY effect_kind')),
+            'effect_access_links': db.execute('SELECT count(*) FROM effect_access').fetchone()[0],
+            'effect_variants': dict(db.execute("SELECT relation||':'||status,count(*) FROM effect_variants GROUP BY 1")),
             'query_plans': plans,
             'integrity': 'ok', 'foreign_key_errors': [],
             'datasets': [{'path': r[0], 'input': r[1], 'retained': r[2], 'excluded': r[1]-r[2]}

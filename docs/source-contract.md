@@ -135,3 +135,13 @@ historical payload baseline, reconciliation validator, magic output manifest and
 baseline comparison. These five authority artifacts expand verification only;
 no imported table or raw combat value changes. See [Chej findings 3](chej-findings-3.md)
 for upstream continuous-integration evidence and downstream acceptance.
+
+## Contract 3: activated-root payload scope (#19)
+
+Contract 3 keeps the same pin and locked files. It reviews the import scope so
+that every source-classified activated definition is a payload root. It also
+records the `effect_kind` source-label basis and the activated-effect coverage
+boundary. Only the contract fingerprint in the lock changes. Character
+skill/rank access from CTW-data `data/magic` is deferred to contract 4. See
+[activated effects](activated-effects.md) and its
+[verification evidence](activated-effects-verification.json).

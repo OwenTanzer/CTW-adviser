@@ -6,7 +6,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from ctw_adviser.queries import PACKET_VERSION
-VERSIONS=['1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0']
+VERSIONS=['1.1.0','1.2.0','1.3.0','1.4.0','1.5.0','1.6.0','1.7.0','1.8.0','1.8.1','1.9.0','1.10.0','1.11.0','1.12.0','1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0','1.20.0']
 VERSIONS=VERSIONS[:VERSIONS.index(PACKET_VERSION)+1]
 S={'type':'string','minLength':1}; N={'type':['number','null']}; B={'type':['boolean','null']}
 def enum(*values):return {'enum':list(values)}
@@ -185,14 +185,14 @@ schema['allOf'].append({
 })
 schema['properties']['provenance_mode']=enum('deferred','expanded')
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum(*[v for v in VERSIONS if v in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0')])},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum(*[v for v in VERSIONS if v in ('1.13.0','1.14.0','1.15.0','1.16.0','1.17.0','1.18.0','1.19.0','1.20.0')])},'required':['schema_version']},
  'then':{'required':['provenance_mode']}
 })
 
 new_attack={'required':['firing_policy','reload','ammunition_supply','entity_stat_overrides'],
  'properties':{'explosion':{'anyOf':[{'type':'null'},{'required':['native_parameters','detail_ref'],'properties':{'native_parameters':ref('parameters_explosions')}}]}}}
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum('1.16.0','1.17.0','1.18.0','1.19.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum('1.16.0','1.17.0','1.18.0','1.19.0','1.20.0')},'required':['schema_version']},
  'then':{'properties':{'units':{'items':{'properties':{
   'movement':{'required':['ground_speed','flight_speed','speed_basis','primary_body_key','provenance_refs']},
   'body':{'required':['firing_arc','health_aggregation'],'properties':{'components':{'items':{'required':['health_contribution']}}}},
@@ -204,7 +204,7 @@ schema['allOf'].append({
 defs['ranged_attack']['properties']['ammunition_supply']['properties'].update(capacity=N, unlimited=B)
 supply_required={'properties':{'ammunition_supply':{'required':['capacity','unlimited']}}}
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum('1.17.0','1.18.0','1.19.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum('1.17.0','1.18.0','1.19.0','1.20.0')},'required':['schema_version']},
  'then':{'properties':{'units':{'items':{'properties':{'ranged':{
   'if':{'type':'object','properties':{'status':const('present')},'required':['status']},
   'then':{'properties':{**supply_required['properties'],'variants':{'items':supply_required}}}
@@ -223,13 +223,21 @@ for kind,fields in [('melee',['building_damage_multiplier']),('ranged',['traject
 def current_attack(kind):
  return {'required':['parameter_explanations'],'properties':{'native_parameters':{'required':(['building_damage_multiplier'] if kind=='melee' else ['building_damage_multiplier','trajectory_sight','fixed_elevation','max_elevation'])}}}
 schema['allOf'].append({
- 'if':{'properties':{'schema_version':enum('1.18.0','1.19.0')},'required':['schema_version']},
+ 'if':{'properties':{'schema_version':enum('1.18.0','1.19.0','1.20.0')},'required':['schema_version']},
  'then':{'properties':{'units':{'items':{'properties':{
   'body':{'required':['target_classification']},
   'passives':{'properties':{'abilities':{'items':{'required':['spreadings']}}}},
   'melee':{'if':{'type':'object'},'then':{**current_attack('melee'),'properties':{**current_attack('melee')['properties'],'variants':{'items':current_attack('melee')}}}},
   'ranged':{'if':{'type':'object','properties':{'status':const('present')},'required':['status']},'then':{**current_attack('ranged'),'properties':{**current_attack('ranged')['properties'],'variants':{'items':current_attack('ranged')}}}}
  }}}}}
+})
+
+# Packet 1.20.0 (#19): activated options carry the effect kind, concise
+# derived keywords and an effect:<key> reference into the specialized tables.
+defs['option']['properties'].update(effect_kind=nullable(enum('spell','activated_ability')), keywords=arr(S))
+schema['allOf'].append({
+ 'if':{'properties':{'schema_version':enum('1.20.0')},'required':['schema_version']},
+ 'then':{'properties':{'units':{'items':{'properties':{'activated_options':{'items':{'required':['effect_kind','keywords']}}}}}}}
 })
 
 if __name__=='__main__':
