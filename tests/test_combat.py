@@ -550,7 +550,7 @@ class PinnedStoreTests(unittest.TestCase):
                                     "first_shot_delay_seconds": 0}}}
         with Queries(DB) as q:
             immediate = evaluate_matchup(q, "Reiksguard", "Doom Diver Catapults", scenario=scenario)
-            self.assertEqual(immediate["model_version"], "combat-0.1.4")
+            self.assertEqual(immediate["model_version"], "combat-0.2.0")
             self.assertEqual(immediate["source_facts"][1]["ranged"]["velocity"], -1)
             self.assertEqual(immediate["verdict"]["represented_point_ordering"], "b")
             self.assertGreater(immediate["derived"]["ledgers"][0]["incoming_damage"]["direct"], 0)
