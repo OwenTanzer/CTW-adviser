@@ -82,3 +82,12 @@ deployment and metadata refresh are verified, report the missing search
 capability; repeated guessed-name resolution cannot prove roster completeness.
 The installed skill must be synchronized at release; local protocol tests do
 not constitute an actual connected ChatGPT conversation.
+
+## Material passives
+
+Follow canonical [conditional passive guidance](../skills/ctw-matchup/references/passives.md).
+When callable, use `sides.<side>.passives` to calculate supported initial-active
+and disabled cases through the shared evaluator. Do not leave material supported
+passives as prose caveats or add them manually. Before the 0.2.0 schema is deployed
+and actually callable, label affected results “base stats only; [effect] omitted.”
+Local/CLI/adapter tests do not establish connected-tool acceptance.

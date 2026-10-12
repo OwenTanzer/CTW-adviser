@@ -26,7 +26,7 @@ record.
 
 ## Scenario and result contract
 
-Calculator model `combat-0.1.4` uses the immediate-arrival firing-opportunity
+Calculator model `combat-0.2.0` preserves the `combat-0.1.4` behavior and uses the immediate-arrival firing-opportunity
 convention for missing or nonpositive source velocity. The changed model
 version distinguishes these projections from earlier zero-shot results under
 the same source packet and data commit.
@@ -204,3 +204,39 @@ component losses and morale state on the pinned game build. Repeat a controlled
 separation, facing, contact or order mutation. Report observed minus predicted
 times and health and keep any empirical calibration separate from source facts.
 No such observations are claimed by this increment.
+
+## Conditional passive phases — issue #32 / combat-0.2.0
+
+The same `evaluate_matchup` entry point now accepts the explicit per-side passive
+scenario documented in [the client reference](../skills/ctw-matchup/references/passives.md).
+The earlier blanket passive exclusion above applies to unselected/unsupported
+modifiers only. Imported profiles and `source_facts` remain immutable. Selected
+attached self-passive effects are resolved by source identity, phase recipient,
+typed operation and condition, then applied to fresh effective copies. No unit
+pair or expected winner is encoded. `modifiers.py` is the shared field/operation
+layer for #32 and future #20 adapters; its field design is extracted from #20
+branch `562cdede29a9543e1a4c301885e51db4ce89d8c1`, without importing its spell
+retrieval or active-window evaluator. #20 should reuse this module, not duplicate
+it or copy phase-mutated profiles back into base facts. #5 retains only its
+existing empirical battle comparisons.
+
+The default disabled path retains 1-second historical melee integration. Explicit
+passive scenarios use 0.1-second windows, with .01–1 selectable for convergence
+checks. Health transitions are evaluated after each simultaneous melee segment
+and after each ordered projectile arrival, before subsequent launches. Thus a
+continuous melee crossing is represented no later than one chosen window after
+it occurs; impacts reevaluate at their event timestamp. Existing pooled-casualty
+and charge-integration approximations remain. No universal damage error bound is
+claimed. The #32 crossing fixture agrees within 0.5 damage at .1/.05/.025 s;
+new scenarios with material crossings require their own halved-window sensitivity.
+
+`passive_coverage` records source refs, side/recipient, explicit activation basis,
+choice and unresolved rules. Each damage ledger contains `effect_phases` with
+start/end, transition cause, active identities, base/effective values, operations,
+source references and effective phase inputs. `event_mechanics` describes the
+initial effective phase. Both damage ledgers and separate stopping fields remain.
+Movement transitions retain remaining distance and recomputed contact; range
+entry fields describe the initial projection, with later movement events listed
+separately. Before-first-shot delay restarting is an explicit approximation.
+Leadership modifiers change the reported effective value only; no rout model is
+added. Recovery is a lifecycle trace API test, not general healing combat.

@@ -12,8 +12,9 @@ import math
 
 from .model import ORDERS, _entry, _number
 from .queries import Queries
+from .passives import normalize_choices, resolve_passives, transition, effective_unit
 
-MODEL_VERSION = "combat-0.1.4"
+MODEL_VERSION = "combat-0.2.0"
 SIDES = ("a", "b")
 FACING = {"front": 1.0, "side": 0.6, "rear": 0.3}
 
@@ -169,7 +170,7 @@ def _scenario(value):
         raise ValueError("scenario must be an object")
     allowed = {"mode", "baseline", "separation_metres", "duration_seconds", "metres_per_second_per_speed_point",
                "path_length_factor", "terrain_speed_factor", "line_of_sight", "sides",
-               "historical_relations_apply_to_patch_9", "barrier_damage_order"}
+               "historical_relations_apply_to_patch_9", "barrier_damage_order", "passive_step_seconds"}
     if set(value) - allowed:
         raise ValueError("unsupported scenario fields: " + ", ".join(sorted(set(value) - allowed)))
     sides = value.get("sides", {})
@@ -187,6 +188,7 @@ def _scenario(value):
         "historical_relations_apply_to_patch_9": value.get("historical_relations_apply_to_patch_9", True),
         "barrier_damage_order": value.get("barrier_damage_order", "barrier_first"),
         "barrier_damage_order_explicit": "barrier_damage_order" in value,
+        "passive_step_seconds": _setting(value, "passive_step_seconds", .1, "passive_step_seconds", positive=True),
         "sides": {},
     }
     if normalized["mode"] != "custom_battle" or normalized["baseline"] != "unmodified_ultra_rank_0":
@@ -196,10 +198,13 @@ def _scenario(value):
             raise ValueError(f"{key} must be boolean")
     if normalized["barrier_damage_order"] not in ("barrier_first", "entity_cap_first"):
         raise ValueError("barrier_damage_order must be barrier_first or entity_cap_first")
+    if not .01 <= normalized["passive_step_seconds"] <= 1:
+        raise ValueError("passive_step_seconds must be between .01 and 1")
     allowed_side = {"order", "fire", "fight", "facing", "ranged_attack_id", "collision_probability", "firing_entities",
                     "cycle_seconds", "first_shot_delay_seconds", "projectiles_per_cycle", "explosion_entities_per_collision",
                     "active_contacts", "charge_duration_seconds", "target_component_role", "combat_effective_fraction",
-                    "flight_seconds", "assume_targetable", "assume_unit_protection_for_component"}
+                    "flight_seconds", "assume_targetable", "assume_unit_protection_for_component",
+                    "passives", "initial_health_fraction"}
     for side in SIDES:
         user = sides.get(side, {})
         if not isinstance(user, dict) or set(user) - allowed_side:
@@ -214,6 +219,8 @@ def _scenario(value):
             if type(user.get(name, False)) is not bool:
                 raise ValueError(f"{name} must be boolean")
         normalized["sides"][side] = {
+            "passives": normalize_choices(user.get("passives", [])),
+            "initial_health_fraction": _setting(user, "initial_health_fraction", 1, side + ".initial_health_fraction", fraction=True),
             "order": order, "fire": user.get("fire", True), "fight": user.get("fight", True), "facing": facing,
             "ranged_attack_id": user.get("ranged_attack_id"),
             "collision_probability": _setting(user, "collision_probability", .5, f"{side}.collision_probability", fraction=True),
@@ -248,6 +255,8 @@ def _validate_source(packet, scenario):
 
 def _prepare(unit, side, setting):
     pools, target, target_source = _pool(unit, setting["target_component_role"])
+    for pool in pools.values():
+        pool["remaining_hp"] *= setting["initial_health_fraction"]
     primary = next(p for p in pools.values() if p["primary"])
     ranged = _attacks(unit, "ranged")
     selected = ([x for x in ranged if x["id"] == setting["ranged_attack_id"]]
@@ -370,13 +379,53 @@ def _run(states, scenario, timing):
     contact = timing["contact"]["seconds"]
     closing = timing["closing_speed_metres_per_second"] or 0.0
     separation = scenario["separation_metres"]
+    movement_epoch = 0.0
     queue = []
     epsilon = 1e-9
 
     def distance_at(t):
-        return max(0.0, separation - closing * t)
+        return max(0.0, separation - closing * (t - movement_epoch))
+
+    def refresh_passives(t):
+        nonlocal separation, movement_epoch, closing, contact
+        changed = False
+        for state in states:
+            fraction = sum(p['remaining_hp'] for p in state['pools'].values()) / sum(p['initial_hp'] for p in state['pools'].values())
+            for item in state['passive_items']:
+                changed |= transition(item, fraction)
+        if not changed:
+            return
+        distance = distance_at(t)
+        for state in states:
+            state['effect_phases'][-1]['end_seconds'] = t
+            unit, changes = effective_unit(state['base_unit'], state['passive_items'])
+            state['unit'] = unit
+            if state['melee']:
+                state['melee'] = next(a for a in _attacks(unit, 'melee') if a['id'] == state['melee']['id'])
+            if state['ranged']:
+                state['ranged'] = next(a for a in _attacks(unit, 'ranged') if a['id'] == state['ranged']['id'])
+            state['effect_phases'].append(_effect_phase(state, t, scenario['duration_seconds'], changes, 'health_condition'))
+        if contact is None or t < contact - epsilon:
+            local = dict(scenario, separation_metres=distance)
+            new = _timing(states, local)
+            separation, movement_epoch = distance, t
+            closing = new['closing_speed_metres_per_second'] or 0.0
+            contact = None if new['contact']['seconds'] is None else t + new['contact']['seconds']
+            timing['contact'] = dict(new['contact'], seconds=contact)
+            timing.setdefault('movement_transitions', []).append({'seconds': t, 'distance_metres': distance,
+                'closing_speed_metres_per_second': closing, 'contact_seconds': contact})
+            for i, state in enumerate(states):
+                # Before the first launch, recompute entry and the assumed wind-up.
+                cfg = scenario['sides'][SIDES[i]]
+                # A previously unreachable range has no next_shot. Re-evaluate
+                # eligibility, not the old schedule's existence, after speed changes.
+                if (state['shots_fired'] == 0 and state['ranged'] is not None
+                        and cfg['fire'] and cfg['cycle_seconds'] is not None):
+                    entry = new['range_entry'][i]['seconds']
+                    state['next_shot'] = None if entry is None else t + entry + scenario['sides'][SIDES[i]]['first_shot_delay_seconds']
 
     def update_stops(t):
+        refresh_passives(t)
         for i, state in enumerate(states):
             cfg = scenario["sides"][SIDES[i]]
             pools = state["pools"]
@@ -503,7 +552,8 @@ def _run(states, scenario, timing):
     shots_due(t)
     impacts_due(t)
     while t < duration - epsilon:
-        candidates = [duration, math.floor(t + epsilon) + 1.0]
+        step = scenario["passive_step_seconds"] if any(s["passive_items"] for s in states) else 1.0
+        candidates = [duration, (math.floor((t + epsilon) / step) + 1) * step]
         if contact is not None and contact > t + epsilon:
             candidates.append(contact)
         if queue:
@@ -727,6 +777,7 @@ def _summary(states, scenario):
         attack = state["ranged"]
         out.append({"unit_key": state["unit"]["identity"]["unit_key"], "incoming_damage": state["ledger"],
                     "remaining_health": remaining, "initial_health": total,
+                    "scenario_starting_health": total * scenario["sides"][SIDES[i]]["initial_health_fraction"],
                     "remaining_health_fraction": remaining / total,
                     "remaining_barrier": state["remaining_barrier"], "initial_barrier": state["initial_barrier"],
                     "effective_survivability_fraction": (remaining + state["remaining_barrier"]) /
@@ -744,7 +795,9 @@ def _summary(states, scenario):
                                  "crew_firing_cessation": "unknown_no_crew_threshold" if len(pools) > 1 else "not_applicable",
                                  "ammunition_exhausted": bool(attack and _ammo_limit(attack) is not None and
                                                                state["shots_fired"] >= _ammo_limit(attack))},
-                    "coverage_gaps": state["gaps"]})
+                    "coverage_gaps": state["gaps"],
+                    "effect_phases": state["effect_phases"],
+                    "passive_diagnostics": [d for item in state["passive_items"] for d in item["diagnostics"]]})
     return out
 
 
@@ -813,8 +866,25 @@ def _mechanics(units, scenario):
     return result
 
 
+def _effect_phase(state, start, end, changes, cause):
+    return {'start_seconds': start, 'end_seconds': end, 'transition_cause': cause,
+            'active_keys': [x['choice']['key'] for x in state['passive_items'] if x['active']],
+            'modifiers': changes, 'effective_inputs': {'melee': state['unit']['melee'],
+                'movement': state['unit']['movement'], 'leadership': state['unit']['leadership']}}
+
+
 def _simulate(units, scenario):
-    states = [_prepare(units[i], SIDES[i], scenario["sides"][SIDES[i]]) for i in range(2)]
+    states = []
+    for i in range(2):
+        cfg = scenario['sides'][SIDES[i]]
+        items = copy.deepcopy(scenario.get('_resolved_passives', [[], []])[i])
+        for item in items:
+            transition(item, cfg['initial_health_fraction'], initial=True)
+        effective, changes = effective_unit(units[i], items) if items else (units[i], [])
+        state = _prepare(effective, SIDES[i], cfg)
+        state.update(base_unit=units[i], passive_items=items, effect_phases=[])
+        state['effect_phases'].append(_effect_phase(state, 0.0, scenario['duration_seconds'], changes, 'explicit_initial_state'))
+        states.append(state)
     timing = _timing(states, scenario)
     for i, state in enumerate(states):
         cfg = scenario["sides"][SIDES[i]]
@@ -896,6 +966,13 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                           include_diagnostics=True, include_provenance=True)
     _validate_source(packet, sc)
     units = packet["units"]
+    sc['_resolved_passives'] = [resolve_passives(u, sc['sides'][SIDES[i]]['passives'], packet.get('provenance', {})) for i,u in enumerate(units)]
+    initial_units = []
+    for i, u in enumerate(units):
+        items = copy.deepcopy(sc['_resolved_passives'][i])
+        for item in items:
+            transition(item, sc['sides'][SIDES[i]]['initial_health_fraction'], initial=True)
+        initial_units.append(effective_unit(u, items)[0] if items else u)
     unresolved_inputs = _core_unresolved(units, sc)
     timing = None
     summary = None
@@ -950,11 +1027,30 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
     gaps.extend("source coverage: " + g["code"] + " - " + g["summary"] for u in units for g in u["coverage"].get("gaps", []))
     gaps += ["no routing or morale model",
              "entity casualties use pooled expected damage, not hit allocation", "shield facing and projectile block eligibility are simplified",
-             "passive and activated modifiers, penetration, collision attacks, shrapnel and special death behavior are not applied"]
+             "unselected passive and activated modifiers, penetration, collision attacks, shrapnel and special death behavior are not applied"]
     if sc["historical_relations_apply_to_patch_9"]:
         gaps.append("8.1.1 relations are assumed applicable to 9.0; no live validation")
     if any(u["body"].get("barrier_health") for u in units):
         gaps.append("barrier damage order is a scenario assumption; recharge and barrier-specific rules are unmodeled")
+    passive_coverage = []
+    for i, u in enumerate(units):
+        selected = {x['choice']['key']: x for x in sc['_resolved_passives'][i]}
+        for ability in u['passives'].get('abilities', []):
+            item = selected.get(ability['key'])
+            passive_coverage.append({'side': SIDES[i], 'key': ability['key'],
+                'status': 'conditional_scenario' if item else 'omitted_base_stats_only',
+                'source_refs': item['source_refs'] if item else ability['provenance_refs'],
+                'activation_basis': 'explicit_scenario_assumption_not_inferred_from_deactivation' if item else None,
+                'choice': item['choice'] if item else None,
+                'unsupported_effects': item['unsupported_effects'] if item else [],
+                'unsupported_lifecycle': item['unsupported_lifecycle'] if item else {},
+                'unresolved_rules': ['engine activation, equality, refresh and reactivation unverified; scenario choices apply'] if item else []})
+            if item and (item['unsupported_effects'] or item['unsupported_lifecycle']):
+                material_unresolved = True
+                gaps.append('selected passive has unsupported effects/lifecycle: ' + ability['key'])
+            if not item:
+                gaps.append('base stats only; ' + (ability.get('name') or ability['key']) + ' omitted')
+    public_scenario = {k:v for k,v in sc.items() if not k.startswith('_')}
     return {"model_version": MODEL_VERSION, "source_packet_version": packet["schema_version"],
             "snapshot": {**packet["snapshot"],
                          "serving_contract_sha256": getattr(queries, "snapshot", {}).get("contract_sha256")},
@@ -969,7 +1065,13 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                               "abilities": u["passives"].get("abilities"),
                               "activated_options": u.get("activated_options"),
                               "coverage": u["coverage"]} for u in units],
-            "scenario_assumptions": sc, "empirical_calibration": None,
+            "scenario_assumptions": public_scenario,
+            "passive_coverage": passive_coverage,
+            "passive_event_policy": {"health_basis": "sum of component health / immutable base total; barrier excluded",
+                "equality_tolerance_fraction": 1e-9, "transition_window_seconds": sc["passive_step_seconds"],
+                "order": "initial conditions; simultaneous melee segment; health transitions; ordered arrivals with transitions; simultaneous launches; zero-flight arrivals",
+                "movement": "recompute remaining distance/contact on state change; before first launch restart assumed wind-up from new range entry",
+                "reactivation": "only explicit when_eligible assumption; otherwise scoped unresolved on recovery"}, "empirical_calibration": None,
             "assumption_notes": ["Speed scale, path factor and terrain factor are illustrative; no measured map coordinates or acceleration.",
                                  "Default collision probability 0.5 is uncalibrated and is not the card accuracy value.",
                                  "When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.",
@@ -981,7 +1083,7 @@ def evaluate_matchup(queries: Queries, unit_a: str, unit_b: str, *, scenario: di
                                  "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",
                                  "Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled."],
             "derived": {"phase_timing": timing,
-                        "event_mechanics": _mechanics(units, sc) if summary is not None and sc["historical_relations_apply_to_patch_9"] else None,
+                        "event_mechanics": _mechanics(initial_units, sc) if summary is not None and sc["historical_relations_apply_to_patch_9"] else None,
                         "ledgers": summary},
             "verdict": {"status": "conditional" if nominal not in ("tie", "indeterminate") and not material_unresolved else "indeterminate",
                         "nominal_favored": nominal if not material_unresolved else "indeterminate",

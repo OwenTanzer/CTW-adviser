@@ -1,0 +1,258 @@
+{
+  "tool": "CTW Advisor evaluate_single_unit_matchup",
+  "observed_at": "2026-10-12",
+  "request": {
+    "unit_a": "wh2_main_skv_inf_clanrat_spearmen_0",
+    "unit_b": "wh_main_grn_inf_goblin_spearmen",
+    "scenario": {
+      "duration_seconds": 120,
+      "separation_metres": 0,
+      "sides": {
+        "a": {
+          "order": "hold",
+          "fire": false,
+          "active_contacts": 8
+        },
+        "b": {
+          "order": "hold",
+          "fire": false,
+          "active_contacts": 8
+        }
+      }
+    }
+  },
+  "status": "ok",
+  "adapter_version": "0.1.0",
+  "model_version": "combat-0.1.4",
+  "snapshot": {
+    "id": "595e22764b22e748afdbafafcb0a6258973e2451:81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16:store3",
+    "schema_version": 3,
+    "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+    "contract_sha256": "81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16",
+    "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+    "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+    "coverage_json": "{\"activated_payloads\":\"deferred\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+  },
+  "data": {
+    "scenario_assumptions": {
+      "mode": "custom_battle",
+      "baseline": "unmodified_ultra_rank_0",
+      "separation_metres": 0,
+      "duration_seconds": 120,
+      "metres_per_second_per_speed_point": 1,
+      "path_length_factor": 1,
+      "terrain_speed_factor": 1,
+      "line_of_sight": true,
+      "historical_relations_apply_to_patch_9": true,
+      "barrier_damage_order": "barrier_first",
+      "barrier_damage_order_explicit": false,
+      "sides": {
+        "a": {
+          "order": "hold",
+          "fire": false,
+          "fight": true,
+          "facing": "front",
+          "ranged_attack_id": null,
+          "collision_probability": 0.5,
+          "firing_entities": null,
+          "cycle_seconds": null,
+          "first_shot_delay_seconds": 1,
+          "projectiles_per_cycle": null,
+          "flight_seconds": null,
+          "explosion_entities_per_collision": 1,
+          "active_contacts": 8,
+          "charge_duration_seconds": 0,
+          "target_component_role": "primary",
+          "assume_targetable": false,
+          "assume_unit_protection_for_component": false,
+          "combat_effective_fraction": 0.5
+        },
+        "b": {
+          "order": "hold",
+          "fire": false,
+          "fight": true,
+          "facing": "front",
+          "ranged_attack_id": null,
+          "collision_probability": 0.5,
+          "firing_entities": null,
+          "cycle_seconds": null,
+          "first_shot_delay_seconds": 1,
+          "projectiles_per_cycle": null,
+          "flight_seconds": null,
+          "explosion_entities_per_collision": 1,
+          "active_contacts": 8,
+          "charge_duration_seconds": 0,
+          "target_component_role": "primary",
+          "assume_targetable": false,
+          "assume_unit_protection_for_component": false,
+          "combat_effective_fraction": 0.5
+        }
+      }
+    },
+    "derived": {
+      "phase_timing": {
+        "closing_speed_metres_per_second": 0,
+        "contact": {
+          "status": "already_reached",
+          "seconds": 0
+        },
+        "range_entry": [
+          {
+            "status": "unknown_input",
+            "seconds": null
+          },
+          {
+            "status": "unknown_input",
+            "seconds": null
+          }
+        ],
+        "minimum_range": [
+          null,
+          null
+        ],
+        "flight_speed": [
+          null,
+          null
+        ]
+      },
+      "event_mechanics": [
+        {
+          "side": "a",
+          "missile": null,
+          "melee": {
+            "attack_id": "melee:5e78e24b332add8fcb5e:2405",
+            "unmodified_hit_probability": 0.24999999999999997,
+            "target_combat_class": "infantry",
+            "target_component_role": "man",
+            "targetability_source": true,
+            "target_supported": true,
+            "target_facing": "front",
+            "active_contacts_assumed": 8,
+            "attack_interval_source_seconds": 4.3,
+            "charge_bonus_source": 6,
+            "charge_decay_duration_assumed_seconds": 0,
+            "per_hit": {
+              "per_unblocked_hit": 19.625,
+              "size_bonus_as_base": 0,
+              "armour_survival": 0.8125,
+              "resistance_points": 0,
+              "spell_resistance_applied": false,
+              "shield_block_probability": 0
+            }
+          }
+        },
+        {
+          "side": "b",
+          "missile": null,
+          "melee": {
+            "attack_id": "melee:5e78e24b332add8fcb5e:1409",
+            "unmodified_hit_probability": 0.29,
+            "target_combat_class": "infantry",
+            "target_component_role": "man",
+            "targetability_source": true,
+            "target_supported": true,
+            "target_facing": "front",
+            "active_contacts_assumed": 8,
+            "attack_interval_source_seconds": 4.6,
+            "charge_bonus_source": 8,
+            "charge_decay_duration_assumed_seconds": 0,
+            "per_hit": {
+              "per_unblocked_hit": 19.8125,
+              "size_bonus_as_base": 0,
+              "armour_survival": 0.8125,
+              "resistance_points": 0,
+              "spell_resistance_applied": false,
+              "shield_block_probability": 0
+            }
+          }
+        }
+      ],
+      "ledgers": [
+        {
+          "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0",
+          "incoming_damage": {
+            "direct": 0,
+            "explosion": 0,
+            "melee": 1199.086956521741,
+            "overkill": 0,
+            "attempted_damage": 1199.086956521741,
+            "barrier_absorbed": 0
+          },
+          "remaining_health": 8400.913043478286,
+          "initial_health": 9600,
+          "remaining_health_fraction": 0.8750951086956548,
+          "remaining_barrier": 0,
+          "initial_barrier": 0,
+          "effective_survivability_fraction": 0.8750951086956548,
+          "components": [
+            {
+              "role": "man",
+              "primary": true,
+              "remaining_health": 8400.913043478286,
+              "initial_health": 9600,
+              "estimated_living_entities": 141,
+              "initial_entities": 160
+            }
+          ],
+          "shots_fired_per_shooter": 0,
+          "discrete_firing_events": 0,
+          "stopping": {
+            "health_depleted_seconds": null,
+            "combat_ineffective_seconds": null,
+            "firing_ceased_seconds": null,
+            "contact_seconds": 0,
+            "routing": "unknown_no_morale_model",
+            "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+            "engine_disabled": "not_applicable",
+            "crew_firing_cessation": "not_applicable",
+            "ammunition_exhausted": false
+          },
+          "coverage_gaps": []
+        },
+        {
+          "unit_key": "wh_main_grn_inf_goblin_spearmen",
+          "incoming_damage": {
+            "direct": 0,
+            "explosion": 0,
+            "melee": 1095.3488372093004,
+            "overkill": 0,
+            "attempted_damage": 1095.3488372093004,
+            "barrier_absorbed": 0
+          },
+          "remaining_health": 7864.6511627906875,
+          "initial_health": 8960,
+          "remaining_health_fraction": 0.8777512458471749,
+          "remaining_barrier": 0,
+          "initial_barrier": 0,
+          "effective_survivability_fraction": 0.8777512458471749,
+          "components": [
+            {
+              "role": "man",
+              "primary": true,
+              "remaining_health": 7864.6511627906875,
+              "initial_health": 8960,
+              "estimated_living_entities": 141,
+              "initial_entities": 160
+            }
+          ],
+          "shots_fired_per_shooter": 0,
+          "discrete_firing_events": 0,
+          "stopping": {
+            "health_depleted_seconds": null,
+            "combat_ineffective_seconds": null,
+            "firing_ceased_seconds": null,
+            "contact_seconds": 0,
+            "routing": "unknown_no_morale_model",
+            "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+            "engine_disabled": "not_applicable",
+            "crew_firing_cessation": "not_applicable",
+            "ammunition_exhausted": false
+          },
+          "coverage_gaps": []
+        }
+      ]
+    }
+  },
+  "new_passive_schema_callable": false,
+  "qualification": "Actual connected baseline receipt; not acceptance of the new implementation."
+}

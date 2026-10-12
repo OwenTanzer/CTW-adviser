@@ -34,7 +34,15 @@ def _tool(name, description, properties, required=()):
 STRING = {"type": "string", "minLength": 1}
 LIMIT = {"type": "integer", "minimum": 1, "maximum": 256, "default": 32}
 MAX_SCENARIO_NUMBER = 1_000_000_000
+PASSIVE_CHOICE = {"type": "object", "properties": {
+    "key": STRING, "initial_active": {"type": "boolean"},
+    "equality": {"type": "string", "enum": ["active", "inactive"]},
+    "reactivation": {"type": "string", "enum": ["unresolved", "when_eligible", "never"]},
+    "condition_assumptions": {"type": "object", "properties": {}, "additionalProperties": {"type": "boolean"}},
+}, "required": ["key", "initial_active"], "additionalProperties": False}
 SIDE_SETTINGS = {"type": "object", "properties": {
+    "passives": {"type": "array", "maxItems": 8, "items": PASSIVE_CHOICE},
+    "initial_health_fraction": {"type": "number", "minimum": 0, "maximum": 1},
     "order": {"type": "string", "enum": ["approach", "hold", "retreat"]},
     "fire": {"type": "boolean"}, "fight": {"type": "boolean"},
     "facing": {"type": "string", "enum": ["front", "side", "rear"]},
@@ -56,7 +64,8 @@ SIDE_SETTINGS = {"type": "object", "properties": {
     "combat_effective_fraction": {"type": "number", "minimum": 0, "maximum": 1},
 }, "additionalProperties": False}
 SCENARIO = {"type": "object", "description": "Conditional custom-battle assumptions; see docs/matchup-model.md. Duration is capped at 300 seconds for hosted calls.",
-            "properties": {"mode": {"type": "string", "enum": ["custom_battle"]},
+            "properties": {"passive_step_seconds": {"type": "number", "minimum": .01, "maximum": 1},
+                           "mode": {"type": "string", "enum": ["custom_battle"]},
                            "baseline": {"type": "string", "enum": ["unmodified_ultra_rank_0"]},
                            "separation_metres": {"type": "number", "minimum": 0, "maximum": 10000},
                            "duration_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 300},
@@ -97,7 +106,7 @@ TOOLS = [
           {"ref": STRING, "cursor": STRING, "limit": LIMIT}, ("ref",)),
     _tool("get_provenance", "Expand exact source record IDs returned in a packet (maximum 64 per call).",
           {"record_ids": {"type": "array", "items": STRING, "minItems": 1, "maxItems": 64}}, ("record_ids",)),
-    _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Missing/nonpositive source velocity uses a labeled immediate-arrival approximation. If its damage is material, rerun with flight_seconds equal to that side's returned cycle_seconds as an illustrative delayed case; report both outcomes. bounds_cross does not cover flight timing. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts; compare multiple factors individually rather than multiplying them or claiming exact engine cadence.",
+    _tool("evaluate_single_unit_matchup", "Conditional two-unit combat projection, not a battle winner prediction. For material supported passives, supply side.passives with sourced key and explicit initial_active, and compare an otherwise identical disabled run. Inspect effect_phases and passive_coverage; omitted effects are base-stats-only. Engine equality/reactivation is not inferred. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Missing/nonpositive source velocity uses a labeled immediate-arrival approximation. If its damage is material, rerun with flight_seconds equal to that side's returned cycle_seconds as an illustrative delayed case; report both outcomes. bounds_cross does not cover flight timing. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts; compare multiple factors individually rather than multiplying them or claiming exact engine cadence.",
           {"unit_a": STRING, "unit_b": STRING, "subculture_a": STRING, "subculture_b": STRING,
            "scenario": SCENARIO}, ("unit_a", "unit_b")),
 ]
@@ -121,10 +130,18 @@ def _validate_scenario(value, rule, path):
         if not isinstance(value, dict):
             raise ValueError(f"{path} must be an object")
         properties = rule["properties"]
-        if set(value) - set(properties):
+        additional = rule.get("additionalProperties", False)
+        if set(rule.get("required", [])) - set(value):
+            raise ValueError(f"missing required {path} field")
+        if set(value) - set(properties) and not additional:
             raise ValueError(f"unsupported {path} field")
         for key, item in value.items():
-            _validate_scenario(item, properties[key], f"{path}.{key}")
+            _validate_scenario(item, properties.get(key, additional), f"{path}.{key}")
+    elif kind == "array":
+        if not isinstance(value, list) or len(value) > rule.get("maxItems", 256):
+            raise ValueError(f"{path} must be a bounded array")
+        for i, item in enumerate(value):
+            _validate_scenario(item, rule["items"], f"{path}[{i}]")
     elif kind == "number":
         if type(value) not in (int, float) or (type(value) is float and not math.isfinite(value)):
             raise ValueError(f"{path} must be a finite number")
