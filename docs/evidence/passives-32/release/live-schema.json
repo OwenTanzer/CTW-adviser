@@ -1,0 +1,1034 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "discover_unit_fields",
+        "description": "Discover supported unit search fields, meanings, units, operators and null semantics. With field, page its observed categorical values. Discover before constructing roster/stat queries; no guessed field names.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      },
+      {
+        "name": "search_units",
+        "description": "Search the pinned unit database with structured AND/OR filters. Enumerate rosters without guessing names. Filters precede optional mount-family grouping; each matching variant retains its own stats. Follow next_cursor with identical arguments for exhaustive results. No buffs applied. See discover_unit_fields for field/operator semantics.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "filters": {
+              "$ref": "#/$defs/filter"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "maxItems": 16,
+              "uniqueItems": true
+            },
+            "sort": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "direction": {
+                    "type": "string",
+                    "enum": [
+                      "asc",
+                      "desc"
+                    ]
+                  }
+                },
+                "required": [
+                  "field",
+                  "direction"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "variants",
+                "families"
+              ],
+              "default": "variants"
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          "required": [],
+          "additionalProperties": false,
+          "$defs": {
+            "filter": {
+              "description": "At most depth 5 and 32 nodes. A leaf has field/op and value or value_field; null checks omit values.",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "op": {
+                      "type": "string",
+                      "enum": [
+                        "eq",
+                        "ne",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte",
+                        "in",
+                        "not_in",
+                        "between",
+                        "contains",
+                        "is_null",
+                        "is_not_null"
+                      ]
+                    },
+                    "value": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "array"
+                      ],
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      },
+                      "maxItems": 32
+                    },
+                    "value_field": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "op"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "and": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 32,
+                      "items": {
+                        "$ref": "#/$defs/filter"
+                      }
+                    }
+                  },
+                  "required": [
+                    "and"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "or": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 32,
+                      "items": {
+                        "$ref": "#/$defs/filter"
+                      }
+                    }
+                  },
+                  "required": [
+                    "or"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          }
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      },
+      {
+        "name": "resolve_unit",
+        "description": "Resolve an exact unit key or name; ambiguous names return candidates. No fuzzy choice or availability inference.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "name_or_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subculture": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "name_or_key"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      },
+      {
+        "name": "get_unit_combat_profile",
+        "description": "Retrieve one qualified unit's sourced combat packet. Sections page explicitly; omitted sections are not absent mechanics. No damage or winner prediction.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "unit_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subculture": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "combined",
+                "melee",
+                "missile"
+              ]
+            },
+            "section": {
+              "type": "string",
+              "enum": [
+                "components",
+                "weapons",
+                "attributes",
+                "abilities",
+                "activated_options"
+              ]
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "default": 32
+            },
+            "include_provenance": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "unit_key"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      },
+      {
+        "name": "get_matchup_evidence",
+        "description": "Retrieve two units through the same read-only query path. Source facts, variants, coverage and provenance only; no modeled outcome.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "unit_a": {
+              "type": "string",
+              "minLength": 1
+            },
+            "unit_b": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subculture_a": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subculture_b": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "combined",
+                "melee",
+                "missile"
+              ]
+            },
+            "section": {
+              "type": "string",
+              "enum": [
+                "components",
+                "weapons",
+                "attributes",
+                "abilities",
+                "activated_options"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "default": 32
+            },
+            "include_provenance": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "unit_a",
+            "unit_b"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      },
+      {
+        "name": "get_detail",
+        "description": "Expand an exact packet detail reference with bounded pagination.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256,
+              "default": 32
+            }
+          },
+          "required": [
+            "ref"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      },
+      {
+        "name": "get_provenance",
+        "description": "Expand exact source record IDs returned in a packet (maximum 64 per call).",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "record_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "maxItems": 64
+            }
+          },
+          "required": [
+            "record_ids"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      },
+      {
+        "name": "evaluate_single_unit_matchup",
+        "description": "Conditional two-unit combat projection, not a battle winner prediction. For material supported passives, supply side.passives with sourced key and explicit initial_active, and compare an otherwise identical disabled run. Inspect effect_phases and passive_coverage; omitted effects are base-stats-only. Engine equality/reactivation is not inferred. Resolve ambiguous names first; inspect assumptions, sensitivity and limitations. Missing/nonpositive source velocity uses a labeled immediate-arrival approximation. If its damage is material, rerun with flight_seconds equal to that side's returned cycle_seconds as an illustrative delayed case; report both outcomes. bounds_cross does not cover flight timing. Build labeled projectiles_per_cycle cases from nontrivial source projectile, volley and burst counts; compare multiple factors individually rather than multiplying them or claiming exact engine cadence.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "unit_a": {
+              "type": "string",
+              "minLength": 1
+            },
+            "unit_b": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subculture_a": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subculture_b": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scenario": {
+              "type": "object",
+              "description": "Conditional custom-battle assumptions; see docs/matchup-model.md. Duration is capped at 300 seconds for hosted calls.",
+              "properties": {
+                "passive_step_seconds": {
+                  "type": "number",
+                  "minimum": 0.01,
+                  "maximum": 1
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "custom_battle"
+                  ]
+                },
+                "baseline": {
+                  "type": "string",
+                  "enum": [
+                    "unmodified_ultra_rank_0"
+                  ]
+                },
+                "separation_metres": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "duration_seconds": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 300
+                },
+                "metres_per_second_per_speed_point": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 1000000000
+                },
+                "path_length_factor": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 1000000000
+                },
+                "terrain_speed_factor": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 1000000000
+                },
+                "line_of_sight": {
+                  "type": "boolean"
+                },
+                "historical_relations_apply_to_patch_9": {
+                  "type": "boolean"
+                },
+                "barrier_damage_order": {
+                  "type": "string",
+                  "enum": [
+                    "barrier_first",
+                    "entity_cap_first"
+                  ]
+                },
+                "sides": {
+                  "type": "object",
+                  "properties": {
+                    "a": {
+                      "type": "object",
+                      "properties": {
+                        "passives": {
+                          "type": "array",
+                          "maxItems": 8,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "initial_active": {
+                                "type": "boolean"
+                              },
+                              "equality": {
+                                "type": "string",
+                                "enum": [
+                                  "active",
+                                  "inactive"
+                                ]
+                              },
+                              "reactivation": {
+                                "type": "string",
+                                "enum": [
+                                  "unresolved",
+                                  "when_eligible",
+                                  "never"
+                                ]
+                              },
+                              "condition_assumptions": {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": {
+                                  "type": "boolean"
+                                }
+                              }
+                            },
+                            "required": [
+                              "key",
+                              "initial_active"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "initial_health_fraction": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "order": {
+                          "type": "string",
+                          "enum": [
+                            "approach",
+                            "hold",
+                            "retreat"
+                          ]
+                        },
+                        "fire": {
+                          "type": "boolean"
+                        },
+                        "fight": {
+                          "type": "boolean"
+                        },
+                        "facing": {
+                          "type": "string",
+                          "enum": [
+                            "front",
+                            "side",
+                            "rear"
+                          ]
+                        },
+                        "ranged_attack_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "collision_probability": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "firing_entities": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "cycle_seconds": {
+                          "type": "number",
+                          "minimum": 0.25,
+                          "maximum": 1000000000
+                        },
+                        "first_shot_delay_seconds": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "projectiles_per_cycle": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "maximum": 1000000000,
+                          "description": "Explicit scenario interpretation of sourced projectile, volley and burst counts; compare labeled cases when counts are nontrivial, without assuming their exact engine composition."
+                        },
+                        "flight_seconds": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000,
+                          "description": "Optional measured or assumed flight duration. Without it, missing/nonpositive source velocity uses an immediate-arrival firing-opportunity approximation."
+                        },
+                        "explosion_entities_per_collision": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "active_contacts": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "charge_duration_seconds": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "target_component_role": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "assume_targetable": {
+                          "type": "boolean"
+                        },
+                        "assume_unit_protection_for_component": {
+                          "type": "boolean"
+                        },
+                        "combat_effective_fraction": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "b": {
+                      "type": "object",
+                      "properties": {
+                        "passives": {
+                          "type": "array",
+                          "maxItems": 8,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "initial_active": {
+                                "type": "boolean"
+                              },
+                              "equality": {
+                                "type": "string",
+                                "enum": [
+                                  "active",
+                                  "inactive"
+                                ]
+                              },
+                              "reactivation": {
+                                "type": "string",
+                                "enum": [
+                                  "unresolved",
+                                  "when_eligible",
+                                  "never"
+                                ]
+                              },
+                              "condition_assumptions": {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": {
+                                  "type": "boolean"
+                                }
+                              }
+                            },
+                            "required": [
+                              "key",
+                              "initial_active"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "initial_health_fraction": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "order": {
+                          "type": "string",
+                          "enum": [
+                            "approach",
+                            "hold",
+                            "retreat"
+                          ]
+                        },
+                        "fire": {
+                          "type": "boolean"
+                        },
+                        "fight": {
+                          "type": "boolean"
+                        },
+                        "facing": {
+                          "type": "string",
+                          "enum": [
+                            "front",
+                            "side",
+                            "rear"
+                          ]
+                        },
+                        "ranged_attack_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "collision_probability": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "firing_entities": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "cycle_seconds": {
+                          "type": "number",
+                          "minimum": 0.25,
+                          "maximum": 1000000000
+                        },
+                        "first_shot_delay_seconds": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "projectiles_per_cycle": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "maximum": 1000000000,
+                          "description": "Explicit scenario interpretation of sourced projectile, volley and burst counts; compare labeled cases when counts are nontrivial, without assuming their exact engine composition."
+                        },
+                        "flight_seconds": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000,
+                          "description": "Optional measured or assumed flight duration. Without it, missing/nonpositive source velocity uses an immediate-arrival firing-opportunity approximation."
+                        },
+                        "explosion_entities_per_collision": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "active_contacts": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "charge_duration_seconds": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1000000000
+                        },
+                        "target_component_role": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "assume_targetable": {
+                          "type": "boolean"
+                        },
+                        "assume_unit_protection_for_component": {
+                          "type": "boolean"
+                        },
+                        "combat_effective_fraction": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "unit_a",
+            "unit_b"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object"
+            },
+            "adapter_version": {
+              "type": "string"
+            },
+            "model_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "adapter_version",
+            "model_version",
+            "snapshot",
+            "data"
+          ]
+        }
+      }
+    ]
+  }
+}

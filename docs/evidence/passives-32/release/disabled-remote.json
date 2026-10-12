@@ -1,0 +1,1960 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"ok\", \"adapter_version\": \"0.1.0\", \"model_version\": \"combat-0.2.0\", \"snapshot\": {\"id\": \"595e22764b22e748afdbafafcb0a6258973e2451:81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16:store3\", \"schema_version\": 3, \"source_commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"contract_sha256\": \"81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16\", \"baseline_json\": \"{\\\"build\\\":\\\"25507028\\\",\\\"context\\\":\\\"unmodified custom battle\\\",\\\"game\\\":\\\"warhammer_3\\\",\\\"patch\\\":\\\"9.0\\\",\\\"rank\\\":0,\\\"unit_scale\\\":\\\"ultra\\\"}\", \"owners_json\": \"{\\\"effect_semantics\\\":{\\\"build\\\":\\\"25546563\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1,\\\"scope\\\":\\\"native stat definitions only\\\"},\\\"shared_abilities\\\":{\\\"base_patch\\\":\\\"9.0\\\",\\\"build\\\":\\\"25546563\\\",\\\"coverage\\\":\\\"partial\\\",\\\"extraction_patch\\\":\\\"9.0.1\\\",\\\"schema\\\":1},\\\"units\\\":{\\\"build\\\":\\\"25507028\\\",\\\"patch\\\":\\\"9.0\\\",\\\"schema\\\":4}}\", \"coverage_json\": \"{\\\"activated_payloads\\\":\\\"deferred\\\",\\\"packet_interface\\\":\\\"versioned read-only query packets implemented; downstream consumers are separate\\\",\\\"runtime\\\":\\\"unverified; engine behavior is not fully reconstructed\\\",\\\"semantic\\\":\\\"partial; raw conditions/effects retained without application\\\",\\\"structural\\\":\\\"validated selected records and dependency edges\\\"}\"}, \"data\": {\"model_version\": \"combat-0.2.0\", \"source_packet_version\": \"1.19.0\", \"snapshot\": {\"commit\": \"595e22764b22e748afdbafafcb0a6258973e2451\", \"owners\": {\"effect_semantics\": {\"patch\": \"9.0.1\", \"build\": \"25546563\", \"schema\": 1}, \"shared_abilities\": {\"patch\": \"9.0.1\", \"build\": \"25546563\", \"schema\": 1}, \"units\": {\"patch\": \"9.0\", \"build\": \"25507028\", \"schema\": 4}}, \"baseline\": {\"context\": \"unmodified custom battle\", \"game\": \"warhammer_3\", \"rank\": 0, \"unit_scale\": \"ultra\"}, \"coverage\": {\"activated_payloads\": \"deferred\", \"runtime\": \"unverified; engine behavior is not fully reconstructed\", \"semantic\": \"partial; raw conditions/effects retained without application\", \"structural\": \"validated selected records and dependency edges\"}, \"serving_contract_sha256\": \"81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16\"}, \"source_fingerprints\": {\"s_05412a0a8b98\": {\"path\": \"data/unit_stats/abilities/tables/ability_casting.csv\", \"sha256\": \"9ec08ddc3ddb7bde9cacb4e50823940c97bcdedfad16f8901f7fe66edc80143d\", \"owner\": \"shared_abilities\"}, \"s_15464982ee45\": {\"path\": \"data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv\", \"sha256\": \"40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab\", \"owner\": \"units\"}, \"s_19f14f3f232f\": {\"path\": \"data/unit_stats/normalized/greenskins__wh3__9.0__ultra.csv\", \"sha256\": \"e6ee95fe10d840f8a37c5bfa1ab5ecc17ac9566dd527468f89c4c240ad4c6a91\", \"owner\": \"units\"}, \"s_23de8daf4e75\": {\"path\": \"data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv\", \"sha256\": \"9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036\", \"owner\": \"units\"}, \"s_2ed3f783ed26\": {\"path\": \"data/unit_stats/source_exports/db/melee_weapons_tables/data__.tsv\", \"sha256\": \"7f6921dda8cc528f9ae7e21f103d63344f9159e7362b84612792b7f1c34cd4b6\", \"owner\": \"units\"}, \"s_32babbd7b0ea\": {\"path\": \"data/unit_stats/abilities/tables/special_ability_to_auto_deactivate_flags.csv\", \"sha256\": \"89db18866a1c7b54c6cf0d7bca7682a3ec23b6fba6e271a391e875fbb2ad638e\", \"owner\": \"shared_abilities\"}, \"s_5513bd8dbb85\": {\"path\": \"data/unit_stats/abilities/tables/phase_stat_effects.csv\", \"sha256\": \"1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f\", \"owner\": \"shared_abilities\"}, \"s_567e934ed6df\": {\"path\": \"data/unit_stats/source_exports/db/land_units_tables/data__.tsv\", \"sha256\": \"deca81795dd1af2a894406423779e4730e322d365ffd41150e34271d82410a38\", \"owner\": \"units\"}, \"s_5e78e24b332a\": {\"path\": \"data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv\", \"sha256\": \"8f1f18d37042a216284924094820ce57d26bd67212225cb9ac3921f6c4e8c7ae\", \"owner\": \"units\"}, \"s_69a2a77f6deb\": {\"path\": \"data/unit_stats/abilities/tables/ability_definitions.csv\", \"sha256\": \"8535065555857989be3fd6c10c9f04fdcb9fd7ad9d390d6c0dec7da246d5c318\", \"owner\": \"shared_abilities\"}, \"s_7b179242cbee\": {\"path\": \"data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv\", \"sha256\": \"831966e3ab48dd3660d2dcf232a8742d92643368433f90ddd7eec8017c83f42b\", \"owner\": \"units\"}, \"s_87676ff951da\": {\"path\": \"data/unit_stats/source_exports/text/db/unit_stat_localisations__.loc.tsv\", \"sha256\": \"79cddda990a17e0b92af16b11f89cd95b6481c5ae99d88c8863aa7e230174c74\", \"owner\": \"units\"}, \"s_896fbc4327b1\": {\"path\": \"data/unit_stats/normalized/skaven__wh3__9.0__ultra.csv\", \"sha256\": \"3f4f074fd72e73df949d4c1ea6d5df2253c4afb4f437a8c77028f80493a08c26\", \"owner\": \"units\"}, \"s_9d85f8e27f99\": {\"path\": \"data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv\", \"sha256\": \"9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac\", \"owner\": \"units\"}, \"s_b15247192383\": {\"path\": \"data/unit_stats/source_exports/text/db/unit_abilities__.loc.tsv\", \"sha256\": \"2b807e5332383eabf4370c84310af4b896bfea436e14e4a8377a5cc344aca3a9\", \"owner\": \"units\"}, \"s_b3620445ce0f\": {\"path\": \"data/unit_stats/source_exports/text/db/special_ability_invalid_usage_flags__.loc.tsv\", \"sha256\": \"cbdb36a9b57fb51c40e9b8b404c36c04d7419db2af64c9b337298c6065b1c232\", \"owner\": \"units\"}, \"s_c79a63825141\": {\"path\": \"data/unit_stats/abilities/tables/ability_phase_links.csv\", \"sha256\": \"73c101b5e00eb2656ba8906c210f02ea2d1acbaadc5a58260a1f1f2ed9529816\", \"owner\": \"shared_abilities\"}, \"s_cb3a51dedbb2\": {\"path\": \"data/unit_stats/lookups/unit_abilities__wh3__9.0__ultra.csv\", \"sha256\": \"9377e967b64ca76fa0a7aabcf49bf86fd8260a915f13bda1f947f4ed0626ec9c\", \"owner\": \"units\"}, \"s_d53bb00c3d74\": {\"path\": \"data/unit_stats/source_exports/text/db/ui_unit_bullet_point_enums__.loc.tsv\", \"sha256\": \"b48f34e77303db2ba9b62115a5d9ef0b51bfb56ab0ea74b4de8836f383028939\", \"owner\": \"units\"}, \"s_d56bb4dc1aae\": {\"path\": \"data/unit_stats/abilities/tables/ability_phases.csv\", \"sha256\": \"cc4a090f13abfb62745008de5b949174ffde1464b62dc0eb94e2e7284da25081\", \"owner\": \"shared_abilities\"}}, \"source_provenance\": {\"05412a0a8b985eef08d7:859\": {\"source_id\": \"s_05412a0a8b98\", \"logical_record\": 859, \"key\": {\"key\": \"wh2_main_unit_passive_scurry_away\"}, \"source_line\": 860, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/abilities/source_exports/db/unit_special_abilities_tables/data__.tsv\"}, \"05412a0a8b985eef08d7:861\": {\"source_id\": \"s_05412a0a8b98\", \"logical_record\": 861, \"key\": {\"key\": \"wh2_main_unit_passive_strength_in_numbers\"}, \"source_line\": 862, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/abilities/source_exports/db/unit_special_abilities_tables/data__.tsv\"}, \"15464982ee45f35d824d:15\": {\"source_id\": \"s_15464982ee45\", \"logical_record\": 15, \"key\": {\"key\": \"unit_attributes_bullet_text_charge_defense_vs_large\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"15464982ee45f35d824d:16\": {\"source_id\": \"s_15464982ee45\", \"logical_record\": 16, \"key\": {\"key\": \"unit_attributes_bullet_text_charge_reflection\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"15464982ee45f35d824d:25\": {\"source_id\": \"s_15464982ee45\", \"logical_record\": 25, \"key\": {\"key\": \"unit_attributes_bullet_text_expendable\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"15464982ee45f35d824d:39\": {\"source_id\": \"s_15464982ee45\", \"logical_record\": 39, \"key\": {\"key\": \"unit_attributes_bullet_text_hide_forest\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"19f14f3f232faf63e26f:92\": {\"source_id\": \"s_19f14f3f232f\", \"logical_record\": 92, \"key\": {\"game\": \"warhammer_3\", \"patch\": \"9.0\", \"subculture_key\": \"wh_main_sc_grn_greenskins\", \"unit_key\": \"wh_main_grn_inf_goblin_spearmen\", \"unit_scale\": \"ultra\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"23de8daf4e757f0860fb:1149\": {\"source_id\": \"s_23de8daf4e75\", \"logical_record\": 1149, \"key\": {\"battle_entity_key\": \"wh_main_grn_inf_goblin_blood_dismembers\", \"component_count\": \"160\", \"component_role\": \"man\", \"is_primary_health_pool\": \"true\", \"relationship_key\": \"\", \"unit_key\": \"wh_main_grn_inf_goblin_spearmen\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"23de8daf4e757f0860fb:1989\": {\"source_id\": \"s_23de8daf4e75\", \"logical_record\": 1989, \"key\": {\"battle_entity_key\": \"wh2_main_skv_infantry\", \"component_count\": \"160\", \"component_role\": \"man\", \"is_primary_health_pool\": \"true\", \"relationship_key\": \"\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"2ed3f783ed26bfdde51a:1221\": {\"source_id\": \"s_2ed3f783ed26\", \"logical_record\": 1221, \"key\": {\"key\": \"wh_main_grn_goblin_spear\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"2ed3f783ed26bfdde51a:371\": {\"source_id\": \"s_2ed3f783ed26\", \"logical_record\": 371, \"key\": {\"key\": \"wh2_main_skv_spear\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"32babbd7b0ea3ed79a68:148\": {\"source_id\": \"s_32babbd7b0ea\", \"logical_record\": 148, \"key\": {\"deactivate_flag\": \"morale_is_higher_than_wavering\", \"special_ability\": \"wh2_main_unit_passive_scurry_away\"}, \"source_line\": 149, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv\"}, \"32babbd7b0ea3ed79a68:149\": {\"source_id\": \"s_32babbd7b0ea\", \"logical_record\": 149, \"key\": {\"deactivate_flag\": \"health_below_50%_base\", \"special_ability\": \"wh2_main_unit_passive_strength_in_numbers\"}, \"source_line\": 150, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv\"}, \"5513bd8dbb859f88e746:789\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 789, \"key\": {\"phase\": \"wh2_main_unit_passive_scurry_away\", \"stat\": \"scalar_speed\"}, \"source_line\": 790, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}, \"5513bd8dbb859f88e746:792\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 792, \"key\": {\"phase\": \"wh2_main_unit_passive_strength_in_numbers\", \"stat\": \"scalar_speed\"}, \"source_line\": 793, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}, \"5513bd8dbb859f88e746:793\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 793, \"key\": {\"phase\": \"wh2_main_unit_passive_strength_in_numbers\", \"stat\": \"stat_melee_defence\"}, \"source_line\": 794, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}, \"5513bd8dbb859f88e746:794\": {\"source_id\": \"s_5513bd8dbb85\", \"logical_record\": 794, \"key\": {\"phase\": \"wh2_main_unit_passive_strength_in_numbers\", \"stat\": \"stat_morale\"}, \"source_line\": 795, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv\"}, \"567e934ed6df7cfa34a0:2550\": {\"source_id\": \"s_567e934ed6df\", \"logical_record\": 2550, \"key\": {\"key\": \"wh_main_grn_inf_goblin_spearmen\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"567e934ed6df7cfa34a0:819\": {\"source_id\": \"s_567e934ed6df\", \"logical_record\": 819, \"key\": {\"key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"5e78e24b332add8fcb5e:1409\": {\"source_id\": \"s_5e78e24b332a\", \"logical_record\": 1409, \"key\": {\"attack_type\": \"melee\", \"component_role\": \"unit\", \"melee_weapon_key\": \"wh_main_grn_goblin_spear\", \"missile_weapon_key\": \"\", \"projectile_key\": \"\", \"slot\": \"primary\", \"unit_key\": \"wh_main_grn_inf_goblin_spearmen\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"5e78e24b332add8fcb5e:2405\": {\"source_id\": \"s_5e78e24b332a\", \"logical_record\": 2405, \"key\": {\"attack_type\": \"melee\", \"component_role\": \"unit\", \"melee_weapon_key\": \"wh2_main_skv_spear\", \"missile_weapon_key\": \"\", \"projectile_key\": \"\", \"slot\": \"primary\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"69a2a77f6deb5608cc87:860\": {\"source_id\": \"s_69a2a77f6deb\", \"logical_record\": 860, \"key\": {\"key\": \"wh2_main_unit_passive_scurry_away\"}, \"source_line\": 861, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/unit_abilities_tables/data__.tsv\"}, \"69a2a77f6deb5608cc87:862\": {\"source_id\": \"s_69a2a77f6deb\", \"logical_record\": 862, \"key\": {\"key\": \"wh2_main_unit_passive_strength_in_numbers\"}, \"source_line\": 863, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/unit_abilities_tables/data__.tsv\"}, \"7b179242cbee121c7c14:1249\": {\"source_id\": \"s_7b179242cbee\", \"logical_record\": 1249, \"key\": {\"key\": \"wh_main_grn_inf_goblin_blood_dismembers\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"7b179242cbee121c7c14:381\": {\"source_id\": \"s_7b179242cbee\", \"logical_record\": 381, \"key\": {\"key\": \"wh2_main_skv_infantry\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"87676ff951dae38b1434:85\": {\"source_id\": \"s_87676ff951da\", \"logical_record\": 85, \"key\": {\"key\": \"unit_stat_localisations_tooltip_text_stat_bonus_vs_large\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"896fbc4327b171767d9d:63\": {\"source_id\": \"s_896fbc4327b1\", \"logical_record\": 63, \"key\": {\"game\": \"warhammer_3\", \"patch\": \"9.0\", \"subculture_key\": \"wh2_main_sc_skv_skaven\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\", \"unit_scale\": \"ultra\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"9d85f8e27f99c7a0ada2:3396\": {\"source_id\": \"s_9d85f8e27f99\", \"logical_record\": 3396, \"key\": {\"attribute_key\": \"charge_defense_vs_large\", \"unit_key\": \"wh_main_grn_inf_goblin_spearmen\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"9d85f8e27f99c7a0ada2:3397\": {\"source_id\": \"s_9d85f8e27f99\", \"logical_record\": 3397, \"key\": {\"attribute_key\": \"charge_reflection\", \"unit_key\": \"wh_main_grn_inf_goblin_spearmen\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"9d85f8e27f99c7a0ada2:3398\": {\"source_id\": \"s_9d85f8e27f99\", \"logical_record\": 3398, \"key\": {\"attribute_key\": \"expendable\", \"unit_key\": \"wh_main_grn_inf_goblin_spearmen\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"9d85f8e27f99c7a0ada2:3399\": {\"source_id\": \"s_9d85f8e27f99\", \"logical_record\": 3399, \"key\": {\"attribute_key\": \"hide_forest\", \"unit_key\": \"wh_main_grn_inf_goblin_spearmen\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"9d85f8e27f99c7a0ada2:5676\": {\"source_id\": \"s_9d85f8e27f99\", \"logical_record\": 5676, \"key\": {\"attribute_key\": \"charge_defense_vs_large\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"9d85f8e27f99c7a0ada2:5677\": {\"source_id\": \"s_9d85f8e27f99\", \"logical_record\": 5677, \"key\": {\"attribute_key\": \"charge_reflection\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"9d85f8e27f99c7a0ada2:5678\": {\"source_id\": \"s_9d85f8e27f99\", \"logical_record\": 5678, \"key\": {\"attribute_key\": \"hide_forest\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"b152471923832465081f:861\": {\"source_id\": \"s_b15247192383\", \"logical_record\": 861, \"key\": {\"key\": \"unit_abilities_onscreen_name_wh2_main_unit_passive_scurry_away\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"b152471923832465081f:863\": {\"source_id\": \"s_b15247192383\", \"logical_record\": 863, \"key\": {\"key\": \"unit_abilities_onscreen_name_wh2_main_unit_passive_strength_in_numbers\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"b3620445ce0f95efd2a1:101\": {\"source_id\": \"s_b3620445ce0f\", \"logical_record\": 101, \"key\": {\"key\": \"special_ability_invalid_usage_flags_alt_description_morale_is_higher_than_wavering\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"b3620445ce0f95efd2a1:74\": {\"source_id\": \"s_b3620445ce0f\", \"logical_record\": 74, \"key\": {\"key\": \"special_ability_invalid_usage_flags_alt_description_health_below_50%_base\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"c79a638251410aaad17e:655\": {\"source_id\": \"s_c79a63825141\", \"logical_record\": 655, \"key\": {\"order\": \"1\", \"special_ability\": \"wh2_main_unit_passive_scurry_away\", \"target_enemies\": \"false\", \"target_friends\": \"false\", \"target_self\": \"true\"}, \"source_line\": 656, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/abilities/source_exports/db/special_ability_to_special_ability_phase_junctions_tables/data__.tsv\"}, \"c79a638251410aaad17e:657\": {\"source_id\": \"s_c79a63825141\", \"logical_record\": 657, \"key\": {\"order\": \"1\", \"special_ability\": \"wh2_main_unit_passive_strength_in_numbers\", \"target_enemies\": \"false\", \"target_friends\": \"false\", \"target_self\": \"true\"}, \"source_line\": 658, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/abilities/source_exports/db/special_ability_to_special_ability_phase_junctions_tables/data__.tsv\"}, \"cb3a51dedbb2920f9bb2:5441\": {\"source_id\": \"s_cb3a51dedbb2\", \"logical_record\": 5441, \"key\": {\"ability_key\": \"wh2_main_unit_passive_scurry_away\", \"culture_key\": \"*\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"cb3a51dedbb2920f9bb2:5442\": {\"source_id\": \"s_cb3a51dedbb2\", \"logical_record\": 5442, \"key\": {\"ability_key\": \"wh2_main_unit_passive_strength_in_numbers\", \"culture_key\": \"*\", \"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"d53bb00c3d740abf5992:234\": {\"source_id\": \"s_d53bb00c3d74\", \"logical_record\": 234, \"key\": {\"key\": \"ui_unit_bullet_point_enums_tooltip_anti_large\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"d53bb00c3d740abf5992:273\": {\"source_id\": \"s_d53bb00c3d74\", \"logical_record\": 273, \"key\": {\"key\": \"ui_unit_bullet_point_enums_tooltip_charge_reflector_vs_large\"}, \"source_line\": null, \"source_patch\": null, \"source_path\": null}, \"d56bb4dc1aae3feef5b2:640\": {\"source_id\": \"s_d56bb4dc1aae\", \"logical_record\": 640, \"key\": {\"id\": \"wh2_main_unit_passive_scurry_away\"}, \"source_line\": 641, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv\"}, \"d56bb4dc1aae3feef5b2:642\": {\"source_id\": \"s_d56bb4dc1aae\", \"logical_record\": 642, \"key\": {\"id\": \"wh2_main_unit_passive_strength_in_numbers\"}, \"source_line\": 643, \"source_patch\": \"9.0.1\", \"source_path\": \"data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv\"}}, \"source_payload_graph\": {\"nodes\": [{\"id\": \"attack_payload:melee:5e78e24b332add8fcb5e:2405\", \"kind\": \"attack_payload\", \"key\": \"melee:5e78e24b332add8fcb5e:2405\", \"native_parameters\": {}, \"provenance_refs\": [\"2ed3f783ed26bfdde51a:371\"]}, {\"id\": \"attack_payload:melee:5e78e24b332add8fcb5e:1409\", \"kind\": \"attack_payload\", \"key\": \"melee:5e78e24b332add8fcb5e:1409\", \"native_parameters\": {}, \"provenance_refs\": [\"2ed3f783ed26bfdde51a:1221\"]}], \"edges\": []}, \"identities\": [{\"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\", \"profile_unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\", \"unit_keys\": [\"wh2_main_skv_inf_clanrat_spearmen_0\"], \"subculture_key\": \"wh2_main_sc_skv_skaven\", \"faction_name\": [\"Skaven\"], \"name\": \"Clanrat Spears\", \"unit_type\": \"infantry\"}, {\"unit_key\": \"wh_main_grn_inf_goblin_spearmen\", \"profile_unit_key\": \"wh_main_grn_inf_goblin_spearmen\", \"unit_keys\": [\"wh_main_grn_inf_goblin_spearmen\"], \"subculture_key\": \"wh_main_sc_grn_greenskins\", \"faction_name\": [\"Greenskins\"], \"name\": \"Goblins (Spears)\", \"unit_type\": \"infantry\"}], \"source_facts\": [{\"identity\": {\"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\", \"profile_unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\", \"unit_keys\": [\"wh2_main_skv_inf_clanrat_spearmen_0\"], \"subculture_key\": \"wh2_main_sc_skv_skaven\", \"faction_name\": [\"Skaven\"], \"name\": \"Clanrat Spears\", \"unit_type\": \"infantry\"}, \"body\": {\"entity_count\": 160.0, \"hp_per_entity\": 60.0, \"total_hp\": 9600.0, \"barrier_health\": 0.0, \"size\": \"small\", \"components\": [{\"id\": \"component:23de8daf4e757f0860fb:1989\", \"role\": \"man\", \"count\": 160.0, \"hp_per_component\": 8.0, \"bonus_hp_per_component\": 52.0, \"known_hp_total\": 9600.0, \"size\": \"small\", \"targetable\": true, \"primary\": true, \"provenance_refs\": [\"23de8daf4e757f0860fb:1989\"], \"health_contribution\": 9600.0}], \"target_classification\": {\"combat_class\": \"infantry\", \"status\": \"reviewed_mapping\", \"summary\": \"Combat target class: infantry. Native body size remains small. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.\", \"provenance_refs\": [\"7b179242cbee121c7c14:381\", \"d53bb00c3d740abf5992:234\", \"d53bb00c3d740abf5992:273\"]}, \"firing_arc\": {\"primary_body_key\": \"wh2_main_skv_infantry\", \"native_fire_arc_close\": 60.0, \"interpretation\": \"Native primary-body setting; weapon coverage and angular units are not established.\", \"provenance_refs\": [\"7b179242cbee121c7c14:381\"]}, \"health_aggregation\": {\"rule\": \"primary_body_only\", \"summary\": \"Unit health uses the primary bodies; secondary component totals are not additional health.\", \"provenance_refs\": [\"567e934ed6df7cfa34a0:819\"]}}, \"movement\": {\"speed\": 4.2, \"mass\": 100.0, \"speed_basis\": \"primary_body_run_speed\", \"primary_body_key\": \"wh2_main_skv_infantry\", \"ground_speed\": 4.2, \"flight_speed\": 0.0, \"provenance_refs\": [\"7b179242cbee121c7c14:381\"]}, \"leadership\": 45.0, \"melee\": {\"id\": \"melee:5e78e24b332add8fcb5e:2405\", \"weapon_key\": \"wh2_main_skv_spear\", \"component_ref\": null, \"slot\": \"primary\", \"attack\": 18.0, \"defence\": 24.0, \"charge_bonus\": 6.0, \"base_damage\": 18.0, \"ap_damage\": 5.0, \"attack_interval\": 4.3, \"max_splash_targets\": 1.0, \"native_parameters\": {\"weapon_length\": 1.0, \"splash_attack_target_size\": null, \"splash_attack_power_multiplier\": 1.0, \"building_damage_multiplier\": 0.5, \"contact_phase\": null, \"collision_attack_max_targets\": 0.0, \"collision_attack_max_targets_cooldown\": 10.0, \"scaling_damage\": null}, \"provenance_refs\": [\"5e78e24b332add8fcb5e:2405\", \"2ed3f783ed26bfdde51a:371\", \"896fbc4327b171767d9d:63\"], \"detail_ref\": \"record:2ed3f783ed26bfdde51a:371\", \"parameter_explanations\": {\"building_damage_multiplier\": \"Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated.\"}, \"variants\": []}, \"ranged\": null, \"protection\": {\"armour\": 25.0, \"shield_block_chance\": 0.0, \"physical_resistance\": 0.0, \"missile_resistance\": 0.0, \"spell_resistance\": 0.0, \"fire_resistance\": 0.0, \"ward_save\": 0.0}, \"attack_traits\": {\"melee\": {\"scope\": {\"attack_ref\": \"melee:5e78e24b332add8fcb5e:2405\", \"component_ref\": null}, \"bonus_vs_infantry\": 0.0, \"bonus_vs_large\": 9.0, \"magical\": false, \"flaming\": false, \"provenance_refs\": [\"896fbc4327b171767d9d:63\"]}, \"ranged\": null, \"explosion\": null, \"additional\": []}, \"attributes\": [{\"key\": \"charge_defense_vs_large\", \"name\": null, \"summary\": \"Charge Defence vs. Large||When bracing, this unit negates the charge bonus of any large attacker.\", \"provenance_refs\": [\"9d85f8e27f99c7a0ada2:5676\", \"15464982ee45f35d824d:15\"]}, {\"key\": \"charge_reflection\", \"name\": null, \"summary\": \"Charge Reflection||When bracing, this unit causes additional damage when attacking charging enemies.\", \"provenance_refs\": [\"9d85f8e27f99c7a0ada2:5677\", \"15464982ee45f35d824d:16\"]}, {\"key\": \"hide_forest\", \"name\": null, \"summary\": \"Hide (forest)||This unit can hide in forests until enemy units get too close.\", \"provenance_refs\": [\"9d85f8e27f99c7a0ada2:5678\", \"15464982ee45f35d824d:39\"]}], \"abilities\": [{\"key\": \"wh2_main_unit_passive_scurry_away\", \"name\": \"Scurry Away!\", \"culture_key\": \"*\", \"requires_effect_enabling\": false, \"classification_evidence\": [\"69a2a77f6deb5608cc87:860\", \"05412a0a8b985eef08d7:859\"], \"summary\": \"While active \u2014 Affects the bearer: Speed x1.1. Deactivates when: morale is higher than wavering.\", \"native_parameters\": {\"active_time\": -1.0, \"recharge_time\": -1.0, \"num_uses\": -1, \"effect_range\": 0.0, \"affect_self\": true, \"num_effected_friendly_units\": 0, \"num_effected_enemy_units\": 0, \"update_targets_every_frame\": false, \"initial_recharge\": -1.0, \"activated_projectile\": null, \"target_friends\": false, \"target_enemies\": false, \"target_ground\": false, \"target_intercept_range\": 0.0, \"always_affect_self\": false, \"only_affect_target\": false, \"wind_up_time\": 0.0, \"bombardment\": null, \"spawned_unit\": null, \"min_range\": 0.0, \"vortex\": null, \"spawn_type\": null, \"target_self\": false, \"update_phase_by_ability_duration\": false, \"spawn_is_transformation\": false, \"spawn_is_decoy\": false, \"only_affect_owned_units\": false, \"formation\": null, \"behaviour\": null, \"spawn_shares_health_and_fatigue\": false, \"shared_recharge_time\": -1.0, \"intensity_based_activation\": false, \"mom_vortex_key\": null}, \"conditions\": {\"activates_when\": [], \"deactivates_when\": [{\"key\": \"morale_is_higher_than_wavering\", \"summary\": \"morale is higher than wavering\", \"provenance_refs\": [\"32babbd7b0ea3ed79a68:148\", \"b3620445ce0f95efd2a1:101\"]}], \"recipient_requirements\": [], \"recharges_when\": [], \"unavailable_when\": [], \"invalid_targets\": [], \"unresolved\": []}, \"phases\": [{\"key\": \"wh2_main_unit_passive_scurry_away\", \"order\": 1, \"target_self\": true, \"target_friends\": false, \"target_enemies\": false, \"duration\": -1.0, \"lifecycle\": {\"effect_type\": \"positive\", \"requested_stance\": null, \"cant_move\": false, \"freeze_fatigue\": false, \"fatigue_change_ratio\": 0.0, \"inspiration_aura_range_mod\": 0.0, \"ability_recharge_change\": 0.0, \"mana_regen_mod\": 0.0, \"mana_max_depletion_mod\": 0.0, \"imbue_magical\": false, \"imbue_ignition\": 0, \"imbue_contact\": null, \"affects_allies\": true, \"affects_enemies\": true, \"replenish_ammo\": 0.0, \"spreading\": null, \"freeze_recharge\": false, \"remove_magical\": false, \"execute_ratio\": 0.0}, \"provenance_refs\": [\"c79a638251410aaad17e:655\", \"d56bb4dc1aae3feef5b2:640\"]}], \"effects\": [{\"kind\": \"stat_modifier\", \"phase_ref\": \"wh2_main_unit_passive_scurry_away\", \"stat\": \"speed\", \"operation\": \"multiply\", \"native_operation\": \"mult\", \"value\": 1.1, \"provenance_refs\": [\"5513bd8dbb859f88e746:789\"]}], \"provenance_refs\": [\"cb3a51dedbb2920f9bb2:5441\", \"69a2a77f6deb5608cc87:860\", \"05412a0a8b985eef08d7:859\", \"b152471923832465081f:861\"], \"detail_ref\": \"record:69a2a77f6deb5608cc87:860\", \"spreadings\": []}, {\"key\": \"wh2_main_unit_passive_strength_in_numbers\", \"name\": \"Strength in Numbers\", \"culture_key\": \"*\", \"requires_effect_enabling\": false, \"classification_evidence\": [\"69a2a77f6deb5608cc87:862\", \"05412a0a8b985eef08d7:861\"], \"summary\": \"While active \u2014 Affects the bearer: Speed x0.9; Melee defence +8; Leadership +6. Deactivates when: health below 50% of base health.\", \"native_parameters\": {\"active_time\": -1.0, \"recharge_time\": -1.0, \"num_uses\": -1, \"effect_range\": 0.0, \"affect_self\": true, \"num_effected_friendly_units\": 0, \"num_effected_enemy_units\": 0, \"update_targets_every_frame\": false, \"initial_recharge\": -1.0, \"activated_projectile\": null, \"target_friends\": false, \"target_enemies\": false, \"target_ground\": false, \"target_intercept_range\": 0.0, \"always_affect_self\": false, \"only_affect_target\": false, \"wind_up_time\": 0.0, \"bombardment\": null, \"spawned_unit\": null, \"min_range\": 0.0, \"vortex\": null, \"spawn_type\": null, \"target_self\": false, \"update_phase_by_ability_duration\": false, \"spawn_is_transformation\": false, \"spawn_is_decoy\": false, \"only_affect_owned_units\": false, \"formation\": null, \"behaviour\": null, \"spawn_shares_health_and_fatigue\": false, \"shared_recharge_time\": -1.0, \"intensity_based_activation\": false, \"mom_vortex_key\": null}, \"conditions\": {\"activates_when\": [], \"deactivates_when\": [{\"key\": \"health_below_50%_base\", \"summary\": \"health below 50% of base health\", \"provenance_refs\": [\"32babbd7b0ea3ed79a68:149\", \"b3620445ce0f95efd2a1:74\"]}], \"recipient_requirements\": [], \"recharges_when\": [], \"unavailable_when\": [], \"invalid_targets\": [], \"unresolved\": []}, \"phases\": [{\"key\": \"wh2_main_unit_passive_strength_in_numbers\", \"order\": 1, \"target_self\": true, \"target_friends\": false, \"target_enemies\": false, \"duration\": -1.0, \"lifecycle\": {\"effect_type\": \"positive\", \"requested_stance\": null, \"cant_move\": false, \"freeze_fatigue\": false, \"fatigue_change_ratio\": 0.0, \"inspiration_aura_range_mod\": 0.0, \"ability_recharge_change\": 0.0, \"mana_regen_mod\": 0.0, \"mana_max_depletion_mod\": 0.0, \"imbue_magical\": false, \"imbue_ignition\": 0, \"imbue_contact\": null, \"affects_allies\": true, \"affects_enemies\": true, \"replenish_ammo\": 0.0, \"spreading\": null, \"freeze_recharge\": false, \"remove_magical\": false, \"execute_ratio\": 0.0}, \"provenance_refs\": [\"c79a638251410aaad17e:657\", \"d56bb4dc1aae3feef5b2:642\"]}], \"effects\": [{\"kind\": \"stat_modifier\", \"phase_ref\": \"wh2_main_unit_passive_strength_in_numbers\", \"stat\": \"speed\", \"operation\": \"multiply\", \"native_operation\": \"mult\", \"value\": 0.9, \"provenance_refs\": [\"5513bd8dbb859f88e746:792\"]}, {\"kind\": \"stat_modifier\", \"phase_ref\": \"wh2_main_unit_passive_strength_in_numbers\", \"stat\": \"melee_defence\", \"operation\": \"add\", \"native_operation\": \"add\", \"value\": 8.0, \"provenance_refs\": [\"5513bd8dbb859f88e746:793\"]}, {\"kind\": \"stat_modifier\", \"phase_ref\": \"wh2_main_unit_passive_strength_in_numbers\", \"stat\": \"stat_morale\", \"operation\": \"add\", \"native_operation\": \"add\", \"value\": 6.0, \"provenance_refs\": [\"5513bd8dbb859f88e746:794\"]}], \"provenance_refs\": [\"cb3a51dedbb2920f9bb2:5442\", \"69a2a77f6deb5608cc87:862\", \"05412a0a8b985eef08d7:861\", \"b152471923832465081f:863\"], \"detail_ref\": \"record:69a2a77f6deb5608cc87:862\", \"spreadings\": []}], \"activated_options\": [], \"coverage\": {\"melee\": \"present\", \"ranged\": \"known_none\", \"sections\": [{\"name\": \"components\", \"state\": \"complete\", \"returned\": 1, \"offset\": 0, \"total\": 1, \"cursor\": null}, {\"name\": \"weapons\", \"state\": \"complete\", \"returned\": 1, \"offset\": 0, \"total\": 1, \"cursor\": null}, {\"name\": \"attributes\", \"state\": \"complete\", \"returned\": 3, \"offset\": 0, \"total\": 3, \"cursor\": null}, {\"name\": \"abilities\", \"state\": \"complete\", \"returned\": 2, \"offset\": 0, \"total\": 2, \"cursor\": null}, {\"name\": \"activated_options\", \"state\": \"complete\", \"returned\": 0, \"offset\": 0, \"total\": 0, \"cursor\": null}], \"gaps\": [{\"code\": \"activation_boundary\", \"section\": \"abilities\", \"summary\": \"wh2_main_unit_passive_scurry_away: deactivation evidence alone does not establish activation, threshold equality or refresh.\", \"provenance_refs\": [\"cb3a51dedbb2920f9bb2:5441\", \"69a2a77f6deb5608cc87:860\", \"05412a0a8b985eef08d7:859\"]}, {\"code\": \"activation_boundary\", \"section\": \"abilities\", \"summary\": \"wh2_main_unit_passive_strength_in_numbers: deactivation evidence alone does not establish activation, threshold equality or refresh.\", \"provenance_refs\": [\"cb3a51dedbb2920f9bb2:5442\", \"69a2a77f6deb5608cc87:862\", \"05412a0a8b985eef08d7:861\"]}], \"diagnostic_count\": 2}}, {\"identity\": {\"unit_key\": \"wh_main_grn_inf_goblin_spearmen\", \"profile_unit_key\": \"wh_main_grn_inf_goblin_spearmen\", \"unit_keys\": [\"wh_main_grn_inf_goblin_spearmen\"], \"subculture_key\": \"wh_main_sc_grn_greenskins\", \"faction_name\": [\"Greenskins\"], \"name\": \"Goblins (Spears)\", \"unit_type\": \"infantry\"}, \"body\": {\"entity_count\": 160.0, \"hp_per_entity\": 56.0, \"total_hp\": 8960.0, \"barrier_health\": 0.0, \"size\": \"small\", \"components\": [{\"id\": \"component:23de8daf4e757f0860fb:1149\", \"role\": \"man\", \"count\": 160.0, \"hp_per_component\": 8.0, \"bonus_hp_per_component\": 48.0, \"known_hp_total\": 8960.0, \"size\": \"small\", \"targetable\": true, \"primary\": true, \"provenance_refs\": [\"23de8daf4e757f0860fb:1149\"], \"health_contribution\": 8960.0}], \"target_classification\": {\"combat_class\": \"infantry\", \"status\": \"reviewed_mapping\", \"summary\": \"Combat target class: infantry. Native body size remains small. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.\", \"provenance_refs\": [\"7b179242cbee121c7c14:1249\", \"d53bb00c3d740abf5992:234\", \"d53bb00c3d740abf5992:273\"]}, \"firing_arc\": {\"primary_body_key\": \"wh_main_grn_inf_goblin_blood_dismembers\", \"native_fire_arc_close\": 60.0, \"interpretation\": \"Native primary-body setting; weapon coverage and angular units are not established.\", \"provenance_refs\": [\"7b179242cbee121c7c14:1249\"]}, \"health_aggregation\": {\"rule\": \"primary_body_only\", \"summary\": \"Unit health uses the primary bodies; secondary component totals are not additional health.\", \"provenance_refs\": [\"567e934ed6df7cfa34a0:2550\"]}}, \"movement\": {\"speed\": 3.3, \"mass\": 90.0, \"speed_basis\": \"primary_body_run_speed\", \"primary_body_key\": \"wh_main_grn_inf_goblin_blood_dismembers\", \"ground_speed\": 3.3, \"flight_speed\": 0.0, \"provenance_refs\": [\"7b179242cbee121c7c14:1249\"]}, \"leadership\": 50.0, \"melee\": {\"id\": \"melee:5e78e24b332add8fcb5e:1409\", \"weapon_key\": \"wh_main_grn_goblin_spear\", \"component_ref\": null, \"slot\": \"primary\", \"attack\": 18.0, \"defence\": 28.0, \"charge_bonus\": 8.0, \"base_damage\": 17.0, \"ap_damage\": 6.0, \"attack_interval\": 4.6, \"max_splash_targets\": 1.0, \"native_parameters\": {\"weapon_length\": 1.0, \"splash_attack_target_size\": null, \"splash_attack_power_multiplier\": 1.0, \"building_damage_multiplier\": 0.5, \"contact_phase\": null, \"collision_attack_max_targets\": 0.0, \"collision_attack_max_targets_cooldown\": 10.0, \"scaling_damage\": null}, \"provenance_refs\": [\"5e78e24b332add8fcb5e:1409\", \"2ed3f783ed26bfdde51a:1221\", \"19f14f3f232faf63e26f:92\"], \"detail_ref\": \"record:2ed3f783ed26bfdde51a:1221\", \"parameter_explanations\": {\"building_damage_multiplier\": \"Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated.\"}, \"variants\": []}, \"ranged\": null, \"protection\": {\"armour\": 25.0, \"shield_block_chance\": 35.0, \"physical_resistance\": 0.0, \"missile_resistance\": 0.0, \"spell_resistance\": 0.0, \"fire_resistance\": 0.0, \"ward_save\": 0.0}, \"attack_traits\": {\"melee\": {\"scope\": {\"attack_ref\": \"melee:5e78e24b332add8fcb5e:1409\", \"component_ref\": null}, \"bonus_vs_infantry\": 0.0, \"bonus_vs_large\": 9.0, \"magical\": false, \"flaming\": false, \"provenance_refs\": [\"19f14f3f232faf63e26f:92\"]}, \"ranged\": null, \"explosion\": null, \"additional\": []}, \"attributes\": [{\"key\": \"charge_defense_vs_large\", \"name\": null, \"summary\": \"Charge Defence vs. Large||When bracing, this unit negates the charge bonus of any large attacker.\", \"provenance_refs\": [\"9d85f8e27f99c7a0ada2:3396\", \"15464982ee45f35d824d:15\"]}, {\"key\": \"charge_reflection\", \"name\": null, \"summary\": \"Charge Reflection||When bracing, this unit causes additional damage when attacking charging enemies.\", \"provenance_refs\": [\"9d85f8e27f99c7a0ada2:3397\", \"15464982ee45f35d824d:16\"]}, {\"key\": \"expendable\", \"name\": null, \"summary\": \"Expendable||Witnessing friendly expendable units rout does not reduce other units' leadership, unless they are themselves expendable.\", \"provenance_refs\": [\"9d85f8e27f99c7a0ada2:3398\", \"15464982ee45f35d824d:25\"]}, {\"key\": \"hide_forest\", \"name\": null, \"summary\": \"Hide (forest)||This unit can hide in forests until enemy units get too close.\", \"provenance_refs\": [\"9d85f8e27f99c7a0ada2:3399\", \"15464982ee45f35d824d:39\"]}], \"abilities\": [], \"activated_options\": [], \"coverage\": {\"melee\": \"present\", \"ranged\": \"known_none\", \"sections\": [{\"name\": \"components\", \"state\": \"complete\", \"returned\": 1, \"offset\": 0, \"total\": 1, \"cursor\": null}, {\"name\": \"weapons\", \"state\": \"complete\", \"returned\": 1, \"offset\": 0, \"total\": 1, \"cursor\": null}, {\"name\": \"attributes\", \"state\": \"complete\", \"returned\": 4, \"offset\": 0, \"total\": 4, \"cursor\": null}, {\"name\": \"abilities\", \"state\": \"complete\", \"returned\": 0, \"offset\": 0, \"total\": 0, \"cursor\": null}, {\"name\": \"activated_options\", \"state\": \"complete\", \"returned\": 0, \"offset\": 0, \"total\": 0, \"cursor\": null}], \"gaps\": [], \"diagnostic_count\": 0}}], \"scenario_assumptions\": {\"mode\": \"custom_battle\", \"baseline\": \"unmodified_ultra_rank_0\", \"separation_metres\": 0.0, \"duration_seconds\": 120.0, \"metres_per_second_per_speed_point\": 1.0, \"path_length_factor\": 1.0, \"terrain_speed_factor\": 1.0, \"line_of_sight\": true, \"historical_relations_apply_to_patch_9\": true, \"barrier_damage_order\": \"barrier_first\", \"barrier_damage_order_explicit\": false, \"passive_step_seconds\": 0.1, \"sides\": {\"a\": {\"passives\": [{\"key\": \"wh2_main_unit_passive_strength_in_numbers\", \"initial_active\": false, \"equality\": \"active\", \"reactivation\": \"unresolved\", \"condition_assumptions\": {}}], \"initial_health_fraction\": 1.0, \"order\": \"hold\", \"fire\": false, \"fight\": true, \"facing\": \"front\", \"ranged_attack_id\": null, \"collision_probability\": 0.5, \"firing_entities\": null, \"cycle_seconds\": null, \"first_shot_delay_seconds\": 1.0, \"projectiles_per_cycle\": null, \"flight_seconds\": null, \"explosion_entities_per_collision\": 1.0, \"active_contacts\": 8.0, \"charge_duration_seconds\": 0.0, \"target_component_role\": \"primary\", \"assume_targetable\": false, \"assume_unit_protection_for_component\": false, \"combat_effective_fraction\": 0.5}, \"b\": {\"passives\": [], \"initial_health_fraction\": 1.0, \"order\": \"hold\", \"fire\": false, \"fight\": true, \"facing\": \"front\", \"ranged_attack_id\": null, \"collision_probability\": 0.5, \"firing_entities\": null, \"cycle_seconds\": null, \"first_shot_delay_seconds\": 1.0, \"projectiles_per_cycle\": null, \"flight_seconds\": null, \"explosion_entities_per_collision\": 1.0, \"active_contacts\": 8.0, \"charge_duration_seconds\": 0.0, \"target_component_role\": \"primary\", \"assume_targetable\": false, \"assume_unit_protection_for_component\": false, \"combat_effective_fraction\": 0.5}}}, \"passive_coverage\": [{\"side\": \"a\", \"key\": \"wh2_main_unit_passive_scurry_away\", \"status\": \"omitted_base_stats_only\", \"source_refs\": [\"cb3a51dedbb2920f9bb2:5441\", \"69a2a77f6deb5608cc87:860\", \"05412a0a8b985eef08d7:859\", \"b152471923832465081f:861\"], \"activation_basis\": null, \"choice\": null, \"unsupported_effects\": [], \"unsupported_lifecycle\": {}, \"unresolved_rules\": []}, {\"side\": \"a\", \"key\": \"wh2_main_unit_passive_strength_in_numbers\", \"status\": \"conditional_scenario\", \"source_refs\": [\"cb3a51dedbb2920f9bb2:5442\", \"69a2a77f6deb5608cc87:862\", \"05412a0a8b985eef08d7:861\", \"b152471923832465081f:863\", \"c79a638251410aaad17e:657\", \"d56bb4dc1aae3feef5b2:642\", \"32babbd7b0ea3ed79a68:149\", \"b3620445ce0f95efd2a1:74\", \"5513bd8dbb859f88e746:792\", \"5513bd8dbb859f88e746:793\", \"5513bd8dbb859f88e746:794\"], \"activation_basis\": \"explicit_scenario_assumption_not_inferred_from_deactivation\", \"choice\": {\"key\": \"wh2_main_unit_passive_strength_in_numbers\", \"initial_active\": false, \"equality\": \"active\", \"reactivation\": \"unresolved\", \"condition_assumptions\": {}}, \"unsupported_effects\": [], \"unsupported_lifecycle\": {}, \"unresolved_rules\": [\"engine activation, equality, refresh and reactivation unverified; scenario choices apply\"]}], \"passive_event_policy\": {\"health_basis\": \"sum of component health / immutable base total; barrier excluded\", \"equality_tolerance_fraction\": 1e-09, \"transition_window_seconds\": 0.1, \"order\": \"initial conditions; simultaneous melee segment; health transitions; ordered arrivals with transitions; simultaneous launches; zero-flight arrivals\", \"movement\": \"recompute remaining distance/contact on state change; before first launch restart assumed wind-up from new range entry\", \"reactivation\": \"only explicit when_eligible assumption; otherwise scoped unresolved on recovery\"}, \"empirical_calibration\": null, \"assumption_notes\": [\"Speed scale, path factor and terrain factor are illustrative; no measured map coordinates or acceleration.\", \"Default collision probability 0.5 is uncalibrated and is not the card accuracy value.\", \"When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.\", \"Unspecified active contacts use min(8, living primary bodies); firing entities use the attached component count.\", \"Direct and explosion are separate expected hit events; default splash reach is one entity per collision.\", \"Positive listed velocity gives straight flight time from exact shot distance. Missing or nonpositive velocity uses an immediate-arrival firing-opportunity approximation unless flight_seconds is supplied; this is an earliest-arrival scenario, not measured flight time. Collision probability remains independent.\", \"Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.\", \"Barrier-before-entity-cap is the represented default, not a verified game damage order; the alternate order is tested.\", \"Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.\", \"Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled.\"], \"derived\": {\"phase_timing\": {\"closing_speed_metres_per_second\": 0.0, \"contact\": {\"status\": \"already_reached\", \"seconds\": 0.0}, \"range_entry\": [{\"status\": \"unknown_input\", \"seconds\": null}, {\"status\": \"unknown_input\", \"seconds\": null}], \"minimum_range\": [null, null], \"flight_speed\": [null, null]}, \"event_mechanics\": [{\"side\": \"a\", \"missile\": null, \"melee\": {\"attack_id\": \"melee:5e78e24b332add8fcb5e:2405\", \"unmodified_hit_probability\": 0.24999999999999997, \"target_combat_class\": \"infantry\", \"target_component_role\": \"man\", \"targetability_source\": true, \"target_supported\": true, \"target_facing\": \"front\", \"active_contacts_assumed\": 8.0, \"attack_interval_source_seconds\": 4.3, \"charge_bonus_source\": 6.0, \"charge_decay_duration_assumed_seconds\": 0.0, \"per_hit\": {\"per_unblocked_hit\": 19.625, \"size_bonus_as_base\": 0.0, \"armour_survival\": 0.8125, \"resistance_points\": 0, \"spell_resistance_applied\": false, \"shield_block_probability\": 0.0}}}, {\"side\": \"b\", \"missile\": null, \"melee\": {\"attack_id\": \"melee:5e78e24b332add8fcb5e:1409\", \"unmodified_hit_probability\": 0.29, \"target_combat_class\": \"infantry\", \"target_component_role\": \"man\", \"targetability_source\": true, \"target_supported\": true, \"target_facing\": \"front\", \"active_contacts_assumed\": 8.0, \"attack_interval_source_seconds\": 4.6, \"charge_bonus_source\": 8.0, \"charge_decay_duration_assumed_seconds\": 0.0, \"per_hit\": {\"per_unblocked_hit\": 19.8125, \"size_bonus_as_base\": 0.0, \"armour_survival\": 0.8125, \"resistance_points\": 0, \"spell_resistance_applied\": false, \"shield_block_probability\": 0.0}}}], \"ledgers\": [{\"unit_key\": \"wh2_main_skv_inf_clanrat_spearmen_0\", \"incoming_damage\": {\"direct\": 0.0, \"explosion\": 0.0, \"melee\": 1199.0869565217347, \"overkill\": 0.0, \"attempted_damage\": 1199.0869565217347, \"barrier_absorbed\": 0.0}, \"remaining_health\": 8400.913043478067, \"initial_health\": 9600.0, \"scenario_starting_health\": 9600.0, \"remaining_health_fraction\": 0.875095108695632, \"remaining_barrier\": 0.0, \"initial_barrier\": 0.0, \"effective_survivability_fraction\": 0.875095108695632, \"components\": [{\"role\": \"man\", \"primary\": true, \"remaining_health\": 8400.913043478067, \"initial_health\": 9600.0, \"estimated_living_entities\": 141, \"initial_entities\": 160.0}], \"shots_fired_per_shooter\": 0, \"discrete_firing_events\": 0, \"stopping\": {\"health_depleted_seconds\": null, \"combat_ineffective_seconds\": null, \"firing_ceased_seconds\": null, \"contact_seconds\": 0.0, \"routing\": \"unknown_no_morale_model\", \"firing_cessation_basis\": \"ammo, firing-component depletion or modeled contact policy\", \"engine_disabled\": \"not_applicable\", \"crew_firing_cessation\": \"not_applicable\", \"ammunition_exhausted\": false}, \"coverage_gaps\": [], \"effect_phases\": [{\"start_seconds\": 0.0, \"end_seconds\": 120.0, \"transition_cause\": \"explicit_initial_state\", \"active_keys\": [], \"modifiers\": [], \"effective_inputs\": {\"melee\": {\"id\": \"melee:5e78e24b332add8fcb5e:2405\", \"weapon_key\": \"wh2_main_skv_spear\", \"component_ref\": null, \"slot\": \"primary\", \"attack\": 18.0, \"defence\": 24.0, \"charge_bonus\": 6.0, \"base_damage\": 18.0, \"ap_damage\": 5.0, \"attack_interval\": 4.3, \"max_splash_targets\": 1.0, \"native_parameters\": {\"weapon_length\": 1.0, \"splash_attack_target_size\": null, \"splash_attack_power_multiplier\": 1.0, \"building_damage_multiplier\": 0.5, \"contact_phase\": null, \"collision_attack_max_targets\": 0.0, \"collision_attack_max_targets_cooldown\": 10.0, \"scaling_damage\": null}, \"provenance_refs\": [\"5e78e24b332add8fcb5e:2405\", \"2ed3f783ed26bfdde51a:371\", \"896fbc4327b171767d9d:63\"], \"detail_ref\": \"record:2ed3f783ed26bfdde51a:371\", \"parameter_explanations\": {\"building_damage_multiplier\": \"Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated.\"}, \"variants\": []}, \"movement\": {\"speed\": 4.2, \"mass\": 100.0, \"speed_basis\": \"primary_body_run_speed\", \"primary_body_key\": \"wh2_main_skv_infantry\", \"ground_speed\": 4.2, \"flight_speed\": 0.0, \"provenance_refs\": [\"7b179242cbee121c7c14:381\"]}, \"leadership\": 45.0}}], \"passive_diagnostics\": []}, {\"unit_key\": \"wh_main_grn_inf_goblin_spearmen\", \"incoming_damage\": {\"direct\": 0.0, \"explosion\": 0.0, \"melee\": 1095.3488372093102, \"overkill\": 0.0, \"attempted_damage\": 1095.3488372093102, \"barrier_absorbed\": 0.0}, \"remaining_health\": 7864.651162791234, \"initial_health\": 8960.0, \"scenario_starting_health\": 8960.0, \"remaining_health_fraction\": 0.877751245847236, \"remaining_barrier\": 0.0, \"initial_barrier\": 0.0, \"effective_survivability_fraction\": 0.877751245847236, \"components\": [{\"role\": \"man\", \"primary\": true, \"remaining_health\": 7864.651162791234, \"initial_health\": 8960.0, \"estimated_living_entities\": 141, \"initial_entities\": 160.0}], \"shots_fired_per_shooter\": 0, \"discrete_firing_events\": 0, \"stopping\": {\"health_depleted_seconds\": null, \"combat_ineffective_seconds\": null, \"firing_ceased_seconds\": null, \"contact_seconds\": 0.0, \"routing\": \"unknown_no_morale_model\", \"firing_cessation_basis\": \"ammo, firing-component depletion or modeled contact policy\", \"engine_disabled\": \"not_applicable\", \"crew_firing_cessation\": \"not_applicable\", \"ammunition_exhausted\": false}, \"coverage_gaps\": [], \"effect_phases\": [{\"start_seconds\": 0.0, \"end_seconds\": 120.0, \"transition_cause\": \"explicit_initial_state\", \"active_keys\": [], \"modifiers\": [], \"effective_inputs\": {\"melee\": {\"id\": \"melee:5e78e24b332add8fcb5e:1409\", \"weapon_key\": \"wh_main_grn_goblin_spear\", \"component_ref\": null, \"slot\": \"primary\", \"attack\": 18.0, \"defence\": 28.0, \"charge_bonus\": 8.0, \"base_damage\": 17.0, \"ap_damage\": 6.0, \"attack_interval\": 4.6, \"max_splash_targets\": 1.0, \"native_parameters\": {\"weapon_length\": 1.0, \"splash_attack_target_size\": null, \"splash_attack_power_multiplier\": 1.0, \"building_damage_multiplier\": 0.5, \"contact_phase\": null, \"collision_attack_max_targets\": 0.0, \"collision_attack_max_targets_cooldown\": 10.0, \"scaling_damage\": null}, \"provenance_refs\": [\"5e78e24b332add8fcb5e:1409\", \"2ed3f783ed26bfdde51a:1221\", \"19f14f3f232faf63e26f:92\"], \"detail_ref\": \"record:2ed3f783ed26bfdde51a:1221\", \"parameter_explanations\": {\"building_damage_multiplier\": \"Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated.\"}, \"variants\": []}, \"movement\": {\"speed\": 3.3, \"mass\": 90.0, \"speed_basis\": \"primary_body_run_speed\", \"primary_body_key\": \"wh_main_grn_inf_goblin_blood_dismembers\", \"ground_speed\": 3.3, \"flight_speed\": 0.0, \"provenance_refs\": [\"7b179242cbee121c7c14:1249\"]}, \"leadership\": 50.0}}], \"passive_diagnostics\": []}]}, \"verdict\": {\"status\": \"conditional\", \"nominal_favored\": \"b\", \"represented_point_ordering\": \"b\", \"criterion\": \"remaining modeled health plus barrier fraction at horizon\", \"collision_probability_corners\": [{\"collision_probability_a\": 0, \"collision_probability_b\": 0, \"favored\": \"b\", \"effective_survivability_fraction\": [0.875095108695632, 0.877751245847236]}, {\"collision_probability_a\": 0, \"collision_probability_b\": 1, \"favored\": \"b\", \"effective_survivability_fraction\": [0.875095108695632, 0.877751245847236]}, {\"collision_probability_a\": 1, \"collision_probability_b\": 0, \"favored\": \"b\", \"effective_survivability_fraction\": [0.875095108695632, 0.877751245847236]}, {\"collision_probability_a\": 1, \"collision_probability_b\": 1, \"favored\": \"b\", \"effective_survivability_fraction\": [0.875095108695632, 0.877751245847236]}], \"barrier_damage_order_sensitivity\": [], \"bounds_cross\": true, \"material_mechanic_unresolved\": false, \"unresolved_inputs\": [], \"one_parameter_flip_thresholds\": [{\"side\": \"a\", \"parameter\": \"active_contacts\", \"current\": 8.0, \"approximate_flip_threshold\": 8.173797607421875, \"absolute_change\": 0.173797607421875, \"method\": \"one-at-a-time sampled threshold; not a global minimum\"}, {\"side\": \"b\", \"parameter\": \"active_contacts\", \"current\": 8.0, \"approximate_flip_threshold\": 7.8299560546875, \"absolute_change\": 0.1700439453125, \"method\": \"one-at-a-time sampled threshold; not a global minimum\"}], \"qualification\": \"Nominal result depends on uncalibrated firing/contact assumptions; routing is unknown.\"}, \"limitations\": [\"source coverage: activation_boundary - wh2_main_unit_passive_scurry_away: deactivation evidence alone does not establish activation, threshold equality or refresh.\", \"source coverage: activation_boundary - wh2_main_unit_passive_strength_in_numbers: deactivation evidence alone does not establish activation, threshold equality or refresh.\", \"no routing or morale model\", \"entity casualties use pooled expected damage, not hit allocation\", \"shield facing and projectile block eligibility are simplified\", \"unselected passive and activated modifiers, penetration, collision attacks, shrapnel and special death behavior are not applied\", \"8.1.1 relations are assumed applicable to 9.0; no live validation\", \"base stats only; Scurry Away! omitted\"], \"tactical_contingencies\": [\"Distance, sight obstruction and terrain alter firing windows.\", \"Facing can change shield blocking and melee defence.\", \"Formation and interception change actual firing entities and active contacts.\", \"Fatigue, charge disruption, passives and target selection require separate validation.\"]}}"
+      }
+    ],
+    "structuredContent": {
+      "status": "ok",
+      "adapter_version": "0.1.0",
+      "model_version": "combat-0.2.0",
+      "snapshot": {
+        "id": "595e22764b22e748afdbafafcb0a6258973e2451:81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16:store3",
+        "schema_version": 3,
+        "source_commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+        "contract_sha256": "81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16",
+        "baseline_json": "{\"build\":\"25507028\",\"context\":\"unmodified custom battle\",\"game\":\"warhammer_3\",\"patch\":\"9.0\",\"rank\":0,\"unit_scale\":\"ultra\"}",
+        "owners_json": "{\"effect_semantics\":{\"build\":\"25546563\",\"extraction_patch\":\"9.0.1\",\"schema\":1,\"scope\":\"native stat definitions only\"},\"shared_abilities\":{\"base_patch\":\"9.0\",\"build\":\"25546563\",\"coverage\":\"partial\",\"extraction_patch\":\"9.0.1\",\"schema\":1},\"units\":{\"build\":\"25507028\",\"patch\":\"9.0\",\"schema\":4}}",
+        "coverage_json": "{\"activated_payloads\":\"deferred\",\"packet_interface\":\"versioned read-only query packets implemented; downstream consumers are separate\",\"runtime\":\"unverified; engine behavior is not fully reconstructed\",\"semantic\":\"partial; raw conditions/effects retained without application\",\"structural\":\"validated selected records and dependency edges\"}"
+      },
+      "data": {
+        "model_version": "combat-0.2.0",
+        "source_packet_version": "1.19.0",
+        "snapshot": {
+          "commit": "595e22764b22e748afdbafafcb0a6258973e2451",
+          "owners": {
+            "effect_semantics": {
+              "patch": "9.0.1",
+              "build": "25546563",
+              "schema": 1
+            },
+            "shared_abilities": {
+              "patch": "9.0.1",
+              "build": "25546563",
+              "schema": 1
+            },
+            "units": {
+              "patch": "9.0",
+              "build": "25507028",
+              "schema": 4
+            }
+          },
+          "baseline": {
+            "context": "unmodified custom battle",
+            "game": "warhammer_3",
+            "rank": 0,
+            "unit_scale": "ultra"
+          },
+          "coverage": {
+            "activated_payloads": "deferred",
+            "runtime": "unverified; engine behavior is not fully reconstructed",
+            "semantic": "partial; raw conditions/effects retained without application",
+            "structural": "validated selected records and dependency edges"
+          },
+          "serving_contract_sha256": "81e4d944387f0dc77a8e527c424261e8816fa49451c6dae3cd82d8220d0fae16"
+        },
+        "source_fingerprints": {
+          "s_05412a0a8b98": {
+            "path": "data/unit_stats/abilities/tables/ability_casting.csv",
+            "sha256": "9ec08ddc3ddb7bde9cacb4e50823940c97bcdedfad16f8901f7fe66edc80143d",
+            "owner": "shared_abilities"
+          },
+          "s_15464982ee45": {
+            "path": "data/unit_stats/source_exports/text/db/unit_attributes__.loc.tsv",
+            "sha256": "40f745932b894310d2516beb2d70baf9de22aa58ad605229de059c73272cb2ab",
+            "owner": "units"
+          },
+          "s_19f14f3f232f": {
+            "path": "data/unit_stats/normalized/greenskins__wh3__9.0__ultra.csv",
+            "sha256": "e6ee95fe10d840f8a37c5bfa1ab5ecc17ac9566dd527468f89c4c240ad4c6a91",
+            "owner": "units"
+          },
+          "s_23de8daf4e75": {
+            "path": "data/unit_stats/lookups/unit_components__wh3__9.0__ultra.csv",
+            "sha256": "9dc15796dfee6c2a9a7a77e3c5c2f9066c2be8527f87cf4029d711956a0ea036",
+            "owner": "units"
+          },
+          "s_2ed3f783ed26": {
+            "path": "data/unit_stats/source_exports/db/melee_weapons_tables/data__.tsv",
+            "sha256": "7f6921dda8cc528f9ae7e21f103d63344f9159e7362b84612792b7f1c34cd4b6",
+            "owner": "units"
+          },
+          "s_32babbd7b0ea": {
+            "path": "data/unit_stats/abilities/tables/special_ability_to_auto_deactivate_flags.csv",
+            "sha256": "89db18866a1c7b54c6cf0d7bca7682a3ec23b6fba6e271a391e875fbb2ad638e",
+            "owner": "shared_abilities"
+          },
+          "s_5513bd8dbb85": {
+            "path": "data/unit_stats/abilities/tables/phase_stat_effects.csv",
+            "sha256": "1f8e4723efa61dc66afb479bb074ae4217c325a956100f00fc82eb6f8c3f780f",
+            "owner": "shared_abilities"
+          },
+          "s_567e934ed6df": {
+            "path": "data/unit_stats/source_exports/db/land_units_tables/data__.tsv",
+            "sha256": "deca81795dd1af2a894406423779e4730e322d365ffd41150e34271d82410a38",
+            "owner": "units"
+          },
+          "s_5e78e24b332a": {
+            "path": "data/unit_stats/lookups/unit_weapon_links__wh3__9.0__ultra.csv",
+            "sha256": "8f1f18d37042a216284924094820ce57d26bd67212225cb9ac3921f6c4e8c7ae",
+            "owner": "units"
+          },
+          "s_69a2a77f6deb": {
+            "path": "data/unit_stats/abilities/tables/ability_definitions.csv",
+            "sha256": "8535065555857989be3fd6c10c9f04fdcb9fd7ad9d390d6c0dec7da246d5c318",
+            "owner": "shared_abilities"
+          },
+          "s_7b179242cbee": {
+            "path": "data/unit_stats/source_exports/db/battle_entities_tables/data__.tsv",
+            "sha256": "831966e3ab48dd3660d2dcf232a8742d92643368433f90ddd7eec8017c83f42b",
+            "owner": "units"
+          },
+          "s_87676ff951da": {
+            "path": "data/unit_stats/source_exports/text/db/unit_stat_localisations__.loc.tsv",
+            "sha256": "79cddda990a17e0b92af16b11f89cd95b6481c5ae99d88c8863aa7e230174c74",
+            "owner": "units"
+          },
+          "s_896fbc4327b1": {
+            "path": "data/unit_stats/normalized/skaven__wh3__9.0__ultra.csv",
+            "sha256": "3f4f074fd72e73df949d4c1ea6d5df2253c4afb4f437a8c77028f80493a08c26",
+            "owner": "units"
+          },
+          "s_9d85f8e27f99": {
+            "path": "data/unit_stats/lookups/unit_attributes__wh3__9.0__ultra.csv",
+            "sha256": "9af1e487662475d6e2ce38d2a0e06fbf273bd17191f8ab8c2240f05d0e5d0dac",
+            "owner": "units"
+          },
+          "s_b15247192383": {
+            "path": "data/unit_stats/source_exports/text/db/unit_abilities__.loc.tsv",
+            "sha256": "2b807e5332383eabf4370c84310af4b896bfea436e14e4a8377a5cc344aca3a9",
+            "owner": "units"
+          },
+          "s_b3620445ce0f": {
+            "path": "data/unit_stats/source_exports/text/db/special_ability_invalid_usage_flags__.loc.tsv",
+            "sha256": "cbdb36a9b57fb51c40e9b8b404c36c04d7419db2af64c9b337298c6065b1c232",
+            "owner": "units"
+          },
+          "s_c79a63825141": {
+            "path": "data/unit_stats/abilities/tables/ability_phase_links.csv",
+            "sha256": "73c101b5e00eb2656ba8906c210f02ea2d1acbaadc5a58260a1f1f2ed9529816",
+            "owner": "shared_abilities"
+          },
+          "s_cb3a51dedbb2": {
+            "path": "data/unit_stats/lookups/unit_abilities__wh3__9.0__ultra.csv",
+            "sha256": "9377e967b64ca76fa0a7aabcf49bf86fd8260a915f13bda1f947f4ed0626ec9c",
+            "owner": "units"
+          },
+          "s_d53bb00c3d74": {
+            "path": "data/unit_stats/source_exports/text/db/ui_unit_bullet_point_enums__.loc.tsv",
+            "sha256": "b48f34e77303db2ba9b62115a5d9ef0b51bfb56ab0ea74b4de8836f383028939",
+            "owner": "units"
+          },
+          "s_d56bb4dc1aae": {
+            "path": "data/unit_stats/abilities/tables/ability_phases.csv",
+            "sha256": "cc4a090f13abfb62745008de5b949174ffde1464b62dc0eb94e2e7284da25081",
+            "owner": "shared_abilities"
+          }
+        },
+        "source_provenance": {
+          "05412a0a8b985eef08d7:859": {
+            "source_id": "s_05412a0a8b98",
+            "logical_record": 859,
+            "key": {
+              "key": "wh2_main_unit_passive_scurry_away"
+            },
+            "source_line": 860,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/abilities/source_exports/db/unit_special_abilities_tables/data__.tsv"
+          },
+          "05412a0a8b985eef08d7:861": {
+            "source_id": "s_05412a0a8b98",
+            "logical_record": 861,
+            "key": {
+              "key": "wh2_main_unit_passive_strength_in_numbers"
+            },
+            "source_line": 862,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/abilities/source_exports/db/unit_special_abilities_tables/data__.tsv"
+          },
+          "15464982ee45f35d824d:15": {
+            "source_id": "s_15464982ee45",
+            "logical_record": 15,
+            "key": {
+              "key": "unit_attributes_bullet_text_charge_defense_vs_large"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "15464982ee45f35d824d:16": {
+            "source_id": "s_15464982ee45",
+            "logical_record": 16,
+            "key": {
+              "key": "unit_attributes_bullet_text_charge_reflection"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "15464982ee45f35d824d:25": {
+            "source_id": "s_15464982ee45",
+            "logical_record": 25,
+            "key": {
+              "key": "unit_attributes_bullet_text_expendable"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "15464982ee45f35d824d:39": {
+            "source_id": "s_15464982ee45",
+            "logical_record": 39,
+            "key": {
+              "key": "unit_attributes_bullet_text_hide_forest"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "19f14f3f232faf63e26f:92": {
+            "source_id": "s_19f14f3f232f",
+            "logical_record": 92,
+            "key": {
+              "game": "warhammer_3",
+              "patch": "9.0",
+              "subculture_key": "wh_main_sc_grn_greenskins",
+              "unit_key": "wh_main_grn_inf_goblin_spearmen",
+              "unit_scale": "ultra"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "23de8daf4e757f0860fb:1149": {
+            "source_id": "s_23de8daf4e75",
+            "logical_record": 1149,
+            "key": {
+              "battle_entity_key": "wh_main_grn_inf_goblin_blood_dismembers",
+              "component_count": "160",
+              "component_role": "man",
+              "is_primary_health_pool": "true",
+              "relationship_key": "",
+              "unit_key": "wh_main_grn_inf_goblin_spearmen"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "23de8daf4e757f0860fb:1989": {
+            "source_id": "s_23de8daf4e75",
+            "logical_record": 1989,
+            "key": {
+              "battle_entity_key": "wh2_main_skv_infantry",
+              "component_count": "160",
+              "component_role": "man",
+              "is_primary_health_pool": "true",
+              "relationship_key": "",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "2ed3f783ed26bfdde51a:1221": {
+            "source_id": "s_2ed3f783ed26",
+            "logical_record": 1221,
+            "key": {
+              "key": "wh_main_grn_goblin_spear"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "2ed3f783ed26bfdde51a:371": {
+            "source_id": "s_2ed3f783ed26",
+            "logical_record": 371,
+            "key": {
+              "key": "wh2_main_skv_spear"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "32babbd7b0ea3ed79a68:148": {
+            "source_id": "s_32babbd7b0ea",
+            "logical_record": 148,
+            "key": {
+              "deactivate_flag": "morale_is_higher_than_wavering",
+              "special_ability": "wh2_main_unit_passive_scurry_away"
+            },
+            "source_line": 149,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv"
+          },
+          "32babbd7b0ea3ed79a68:149": {
+            "source_id": "s_32babbd7b0ea",
+            "logical_record": 149,
+            "key": {
+              "deactivate_flag": "health_below_50%_base",
+              "special_ability": "wh2_main_unit_passive_strength_in_numbers"
+            },
+            "source_line": 150,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_auto_deactivate_flags_tables/data__.tsv"
+          },
+          "5513bd8dbb859f88e746:789": {
+            "source_id": "s_5513bd8dbb85",
+            "logical_record": 789,
+            "key": {
+              "phase": "wh2_main_unit_passive_scurry_away",
+              "stat": "scalar_speed"
+            },
+            "source_line": 790,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+          },
+          "5513bd8dbb859f88e746:792": {
+            "source_id": "s_5513bd8dbb85",
+            "logical_record": 792,
+            "key": {
+              "phase": "wh2_main_unit_passive_strength_in_numbers",
+              "stat": "scalar_speed"
+            },
+            "source_line": 793,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+          },
+          "5513bd8dbb859f88e746:793": {
+            "source_id": "s_5513bd8dbb85",
+            "logical_record": 793,
+            "key": {
+              "phase": "wh2_main_unit_passive_strength_in_numbers",
+              "stat": "stat_melee_defence"
+            },
+            "source_line": 794,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+          },
+          "5513bd8dbb859f88e746:794": {
+            "source_id": "s_5513bd8dbb85",
+            "logical_record": 794,
+            "key": {
+              "phase": "wh2_main_unit_passive_strength_in_numbers",
+              "stat": "stat_morale"
+            },
+            "source_line": 795,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/special_ability_phase_stat_effects_tables/data__.tsv"
+          },
+          "567e934ed6df7cfa34a0:2550": {
+            "source_id": "s_567e934ed6df",
+            "logical_record": 2550,
+            "key": {
+              "key": "wh_main_grn_inf_goblin_spearmen"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "567e934ed6df7cfa34a0:819": {
+            "source_id": "s_567e934ed6df",
+            "logical_record": 819,
+            "key": {
+              "key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "5e78e24b332add8fcb5e:1409": {
+            "source_id": "s_5e78e24b332a",
+            "logical_record": 1409,
+            "key": {
+              "attack_type": "melee",
+              "component_role": "unit",
+              "melee_weapon_key": "wh_main_grn_goblin_spear",
+              "missile_weapon_key": "",
+              "projectile_key": "",
+              "slot": "primary",
+              "unit_key": "wh_main_grn_inf_goblin_spearmen"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "5e78e24b332add8fcb5e:2405": {
+            "source_id": "s_5e78e24b332a",
+            "logical_record": 2405,
+            "key": {
+              "attack_type": "melee",
+              "component_role": "unit",
+              "melee_weapon_key": "wh2_main_skv_spear",
+              "missile_weapon_key": "",
+              "projectile_key": "",
+              "slot": "primary",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "69a2a77f6deb5608cc87:860": {
+            "source_id": "s_69a2a77f6deb",
+            "logical_record": 860,
+            "key": {
+              "key": "wh2_main_unit_passive_scurry_away"
+            },
+            "source_line": 861,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/unit_abilities_tables/data__.tsv"
+          },
+          "69a2a77f6deb5608cc87:862": {
+            "source_id": "s_69a2a77f6deb",
+            "logical_record": 862,
+            "key": {
+              "key": "wh2_main_unit_passive_strength_in_numbers"
+            },
+            "source_line": 863,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/unit_abilities_tables/data__.tsv"
+          },
+          "7b179242cbee121c7c14:1249": {
+            "source_id": "s_7b179242cbee",
+            "logical_record": 1249,
+            "key": {
+              "key": "wh_main_grn_inf_goblin_blood_dismembers"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "7b179242cbee121c7c14:381": {
+            "source_id": "s_7b179242cbee",
+            "logical_record": 381,
+            "key": {
+              "key": "wh2_main_skv_infantry"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "87676ff951dae38b1434:85": {
+            "source_id": "s_87676ff951da",
+            "logical_record": 85,
+            "key": {
+              "key": "unit_stat_localisations_tooltip_text_stat_bonus_vs_large"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "896fbc4327b171767d9d:63": {
+            "source_id": "s_896fbc4327b1",
+            "logical_record": 63,
+            "key": {
+              "game": "warhammer_3",
+              "patch": "9.0",
+              "subculture_key": "wh2_main_sc_skv_skaven",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0",
+              "unit_scale": "ultra"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "9d85f8e27f99c7a0ada2:3396": {
+            "source_id": "s_9d85f8e27f99",
+            "logical_record": 3396,
+            "key": {
+              "attribute_key": "charge_defense_vs_large",
+              "unit_key": "wh_main_grn_inf_goblin_spearmen"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "9d85f8e27f99c7a0ada2:3397": {
+            "source_id": "s_9d85f8e27f99",
+            "logical_record": 3397,
+            "key": {
+              "attribute_key": "charge_reflection",
+              "unit_key": "wh_main_grn_inf_goblin_spearmen"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "9d85f8e27f99c7a0ada2:3398": {
+            "source_id": "s_9d85f8e27f99",
+            "logical_record": 3398,
+            "key": {
+              "attribute_key": "expendable",
+              "unit_key": "wh_main_grn_inf_goblin_spearmen"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "9d85f8e27f99c7a0ada2:3399": {
+            "source_id": "s_9d85f8e27f99",
+            "logical_record": 3399,
+            "key": {
+              "attribute_key": "hide_forest",
+              "unit_key": "wh_main_grn_inf_goblin_spearmen"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "9d85f8e27f99c7a0ada2:5676": {
+            "source_id": "s_9d85f8e27f99",
+            "logical_record": 5676,
+            "key": {
+              "attribute_key": "charge_defense_vs_large",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "9d85f8e27f99c7a0ada2:5677": {
+            "source_id": "s_9d85f8e27f99",
+            "logical_record": 5677,
+            "key": {
+              "attribute_key": "charge_reflection",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "9d85f8e27f99c7a0ada2:5678": {
+            "source_id": "s_9d85f8e27f99",
+            "logical_record": 5678,
+            "key": {
+              "attribute_key": "hide_forest",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "b152471923832465081f:861": {
+            "source_id": "s_b15247192383",
+            "logical_record": 861,
+            "key": {
+              "key": "unit_abilities_onscreen_name_wh2_main_unit_passive_scurry_away"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "b152471923832465081f:863": {
+            "source_id": "s_b15247192383",
+            "logical_record": 863,
+            "key": {
+              "key": "unit_abilities_onscreen_name_wh2_main_unit_passive_strength_in_numbers"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "b3620445ce0f95efd2a1:101": {
+            "source_id": "s_b3620445ce0f",
+            "logical_record": 101,
+            "key": {
+              "key": "special_ability_invalid_usage_flags_alt_description_morale_is_higher_than_wavering"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "b3620445ce0f95efd2a1:74": {
+            "source_id": "s_b3620445ce0f",
+            "logical_record": 74,
+            "key": {
+              "key": "special_ability_invalid_usage_flags_alt_description_health_below_50%_base"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "c79a638251410aaad17e:655": {
+            "source_id": "s_c79a63825141",
+            "logical_record": 655,
+            "key": {
+              "order": "1",
+              "special_ability": "wh2_main_unit_passive_scurry_away",
+              "target_enemies": "false",
+              "target_friends": "false",
+              "target_self": "true"
+            },
+            "source_line": 656,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_special_ability_phase_junctions_tables/data__.tsv"
+          },
+          "c79a638251410aaad17e:657": {
+            "source_id": "s_c79a63825141",
+            "logical_record": 657,
+            "key": {
+              "order": "1",
+              "special_ability": "wh2_main_unit_passive_strength_in_numbers",
+              "target_enemies": "false",
+              "target_friends": "false",
+              "target_self": "true"
+            },
+            "source_line": 658,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/abilities/source_exports/db/special_ability_to_special_ability_phase_junctions_tables/data__.tsv"
+          },
+          "cb3a51dedbb2920f9bb2:5441": {
+            "source_id": "s_cb3a51dedbb2",
+            "logical_record": 5441,
+            "key": {
+              "ability_key": "wh2_main_unit_passive_scurry_away",
+              "culture_key": "*",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "cb3a51dedbb2920f9bb2:5442": {
+            "source_id": "s_cb3a51dedbb2",
+            "logical_record": 5442,
+            "key": {
+              "ability_key": "wh2_main_unit_passive_strength_in_numbers",
+              "culture_key": "*",
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "d53bb00c3d740abf5992:234": {
+            "source_id": "s_d53bb00c3d74",
+            "logical_record": 234,
+            "key": {
+              "key": "ui_unit_bullet_point_enums_tooltip_anti_large"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "d53bb00c3d740abf5992:273": {
+            "source_id": "s_d53bb00c3d74",
+            "logical_record": 273,
+            "key": {
+              "key": "ui_unit_bullet_point_enums_tooltip_charge_reflector_vs_large"
+            },
+            "source_line": null,
+            "source_patch": null,
+            "source_path": null
+          },
+          "d56bb4dc1aae3feef5b2:640": {
+            "source_id": "s_d56bb4dc1aae",
+            "logical_record": 640,
+            "key": {
+              "id": "wh2_main_unit_passive_scurry_away"
+            },
+            "source_line": 641,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv"
+          },
+          "d56bb4dc1aae3feef5b2:642": {
+            "source_id": "s_d56bb4dc1aae",
+            "logical_record": 642,
+            "key": {
+              "id": "wh2_main_unit_passive_strength_in_numbers"
+            },
+            "source_line": 643,
+            "source_patch": "9.0.1",
+            "source_path": "data/unit_stats/source_exports/db/special_ability_phases_tables/data__.tsv"
+          }
+        },
+        "source_payload_graph": {
+          "nodes": [
+            {
+              "id": "attack_payload:melee:5e78e24b332add8fcb5e:2405",
+              "kind": "attack_payload",
+              "key": "melee:5e78e24b332add8fcb5e:2405",
+              "native_parameters": {},
+              "provenance_refs": [
+                "2ed3f783ed26bfdde51a:371"
+              ]
+            },
+            {
+              "id": "attack_payload:melee:5e78e24b332add8fcb5e:1409",
+              "kind": "attack_payload",
+              "key": "melee:5e78e24b332add8fcb5e:1409",
+              "native_parameters": {},
+              "provenance_refs": [
+                "2ed3f783ed26bfdde51a:1221"
+              ]
+            }
+          ],
+          "edges": []
+        },
+        "identities": [
+          {
+            "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0",
+            "profile_unit_key": "wh2_main_skv_inf_clanrat_spearmen_0",
+            "unit_keys": [
+              "wh2_main_skv_inf_clanrat_spearmen_0"
+            ],
+            "subculture_key": "wh2_main_sc_skv_skaven",
+            "faction_name": [
+              "Skaven"
+            ],
+            "name": "Clanrat Spears",
+            "unit_type": "infantry"
+          },
+          {
+            "unit_key": "wh_main_grn_inf_goblin_spearmen",
+            "profile_unit_key": "wh_main_grn_inf_goblin_spearmen",
+            "unit_keys": [
+              "wh_main_grn_inf_goblin_spearmen"
+            ],
+            "subculture_key": "wh_main_sc_grn_greenskins",
+            "faction_name": [
+              "Greenskins"
+            ],
+            "name": "Goblins (Spears)",
+            "unit_type": "infantry"
+          }
+        ],
+        "source_facts": [
+          {
+            "identity": {
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0",
+              "profile_unit_key": "wh2_main_skv_inf_clanrat_spearmen_0",
+              "unit_keys": [
+                "wh2_main_skv_inf_clanrat_spearmen_0"
+              ],
+              "subculture_key": "wh2_main_sc_skv_skaven",
+              "faction_name": [
+                "Skaven"
+              ],
+              "name": "Clanrat Spears",
+              "unit_type": "infantry"
+            },
+            "body": {
+              "entity_count": 160.0,
+              "hp_per_entity": 60.0,
+              "total_hp": 9600.0,
+              "barrier_health": 0.0,
+              "size": "small",
+              "components": [
+                {
+                  "id": "component:23de8daf4e757f0860fb:1989",
+                  "role": "man",
+                  "count": 160.0,
+                  "hp_per_component": 8.0,
+                  "bonus_hp_per_component": 52.0,
+                  "known_hp_total": 9600.0,
+                  "size": "small",
+                  "targetable": true,
+                  "primary": true,
+                  "provenance_refs": [
+                    "23de8daf4e757f0860fb:1989"
+                  ],
+                  "health_contribution": 9600.0
+                }
+              ],
+              "target_classification": {
+                "combat_class": "infantry",
+                "status": "reviewed_mapping",
+                "summary": "Combat target class: infantry. Native body size remains small. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.",
+                "provenance_refs": [
+                  "7b179242cbee121c7c14:381",
+                  "d53bb00c3d740abf5992:234",
+                  "d53bb00c3d740abf5992:273"
+                ]
+              },
+              "firing_arc": {
+                "primary_body_key": "wh2_main_skv_infantry",
+                "native_fire_arc_close": 60.0,
+                "interpretation": "Native primary-body setting; weapon coverage and angular units are not established.",
+                "provenance_refs": [
+                  "7b179242cbee121c7c14:381"
+                ]
+              },
+              "health_aggregation": {
+                "rule": "primary_body_only",
+                "summary": "Unit health uses the primary bodies; secondary component totals are not additional health.",
+                "provenance_refs": [
+                  "567e934ed6df7cfa34a0:819"
+                ]
+              }
+            },
+            "movement": {
+              "speed": 4.2,
+              "mass": 100.0,
+              "speed_basis": "primary_body_run_speed",
+              "primary_body_key": "wh2_main_skv_infantry",
+              "ground_speed": 4.2,
+              "flight_speed": 0.0,
+              "provenance_refs": [
+                "7b179242cbee121c7c14:381"
+              ]
+            },
+            "leadership": 45.0,
+            "melee": {
+              "id": "melee:5e78e24b332add8fcb5e:2405",
+              "weapon_key": "wh2_main_skv_spear",
+              "component_ref": null,
+              "slot": "primary",
+              "attack": 18.0,
+              "defence": 24.0,
+              "charge_bonus": 6.0,
+              "base_damage": 18.0,
+              "ap_damage": 5.0,
+              "attack_interval": 4.3,
+              "max_splash_targets": 1.0,
+              "native_parameters": {
+                "weapon_length": 1.0,
+                "splash_attack_target_size": null,
+                "splash_attack_power_multiplier": 1.0,
+                "building_damage_multiplier": 0.5,
+                "contact_phase": null,
+                "collision_attack_max_targets": 0.0,
+                "collision_attack_max_targets_cooldown": 10.0,
+                "scaling_damage": null
+              },
+              "provenance_refs": [
+                "5e78e24b332add8fcb5e:2405",
+                "2ed3f783ed26bfdde51a:371",
+                "896fbc4327b171767d9d:63"
+              ],
+              "detail_ref": "record:2ed3f783ed26bfdde51a:371",
+              "parameter_explanations": {
+                "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+              },
+              "variants": []
+            },
+            "ranged": null,
+            "protection": {
+              "armour": 25.0,
+              "shield_block_chance": 0.0,
+              "physical_resistance": 0.0,
+              "missile_resistance": 0.0,
+              "spell_resistance": 0.0,
+              "fire_resistance": 0.0,
+              "ward_save": 0.0
+            },
+            "attack_traits": {
+              "melee": {
+                "scope": {
+                  "attack_ref": "melee:5e78e24b332add8fcb5e:2405",
+                  "component_ref": null
+                },
+                "bonus_vs_infantry": 0.0,
+                "bonus_vs_large": 9.0,
+                "magical": false,
+                "flaming": false,
+                "provenance_refs": [
+                  "896fbc4327b171767d9d:63"
+                ]
+              },
+              "ranged": null,
+              "explosion": null,
+              "additional": []
+            },
+            "attributes": [
+              {
+                "key": "charge_defense_vs_large",
+                "name": null,
+                "summary": "Charge Defence vs. Large||When bracing, this unit negates the charge bonus of any large attacker.",
+                "provenance_refs": [
+                  "9d85f8e27f99c7a0ada2:5676",
+                  "15464982ee45f35d824d:15"
+                ]
+              },
+              {
+                "key": "charge_reflection",
+                "name": null,
+                "summary": "Charge Reflection||When bracing, this unit causes additional damage when attacking charging enemies.",
+                "provenance_refs": [
+                  "9d85f8e27f99c7a0ada2:5677",
+                  "15464982ee45f35d824d:16"
+                ]
+              },
+              {
+                "key": "hide_forest",
+                "name": null,
+                "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+                "provenance_refs": [
+                  "9d85f8e27f99c7a0ada2:5678",
+                  "15464982ee45f35d824d:39"
+                ]
+              }
+            ],
+            "abilities": [
+              {
+                "key": "wh2_main_unit_passive_scurry_away",
+                "name": "Scurry Away!",
+                "culture_key": "*",
+                "requires_effect_enabling": false,
+                "classification_evidence": [
+                  "69a2a77f6deb5608cc87:860",
+                  "05412a0a8b985eef08d7:859"
+                ],
+                "summary": "While active \u2014 Affects the bearer: Speed x1.1. Deactivates when: morale is higher than wavering.",
+                "native_parameters": {
+                  "active_time": -1.0,
+                  "recharge_time": -1.0,
+                  "num_uses": -1,
+                  "effect_range": 0.0,
+                  "affect_self": true,
+                  "num_effected_friendly_units": 0,
+                  "num_effected_enemy_units": 0,
+                  "update_targets_every_frame": false,
+                  "initial_recharge": -1.0,
+                  "activated_projectile": null,
+                  "target_friends": false,
+                  "target_enemies": false,
+                  "target_ground": false,
+                  "target_intercept_range": 0.0,
+                  "always_affect_self": false,
+                  "only_affect_target": false,
+                  "wind_up_time": 0.0,
+                  "bombardment": null,
+                  "spawned_unit": null,
+                  "min_range": 0.0,
+                  "vortex": null,
+                  "spawn_type": null,
+                  "target_self": false,
+                  "update_phase_by_ability_duration": false,
+                  "spawn_is_transformation": false,
+                  "spawn_is_decoy": false,
+                  "only_affect_owned_units": false,
+                  "formation": null,
+                  "behaviour": null,
+                  "spawn_shares_health_and_fatigue": false,
+                  "shared_recharge_time": -1.0,
+                  "intensity_based_activation": false,
+                  "mom_vortex_key": null
+                },
+                "conditions": {
+                  "activates_when": [],
+                  "deactivates_when": [
+                    {
+                      "key": "morale_is_higher_than_wavering",
+                      "summary": "morale is higher than wavering",
+                      "provenance_refs": [
+                        "32babbd7b0ea3ed79a68:148",
+                        "b3620445ce0f95efd2a1:101"
+                      ]
+                    }
+                  ],
+                  "recipient_requirements": [],
+                  "recharges_when": [],
+                  "unavailable_when": [],
+                  "invalid_targets": [],
+                  "unresolved": []
+                },
+                "phases": [
+                  {
+                    "key": "wh2_main_unit_passive_scurry_away",
+                    "order": 1,
+                    "target_self": true,
+                    "target_friends": false,
+                    "target_enemies": false,
+                    "duration": -1.0,
+                    "lifecycle": {
+                      "effect_type": "positive",
+                      "requested_stance": null,
+                      "cant_move": false,
+                      "freeze_fatigue": false,
+                      "fatigue_change_ratio": 0.0,
+                      "inspiration_aura_range_mod": 0.0,
+                      "ability_recharge_change": 0.0,
+                      "mana_regen_mod": 0.0,
+                      "mana_max_depletion_mod": 0.0,
+                      "imbue_magical": false,
+                      "imbue_ignition": 0,
+                      "imbue_contact": null,
+                      "affects_allies": true,
+                      "affects_enemies": true,
+                      "replenish_ammo": 0.0,
+                      "spreading": null,
+                      "freeze_recharge": false,
+                      "remove_magical": false,
+                      "execute_ratio": 0.0
+                    },
+                    "provenance_refs": [
+                      "c79a638251410aaad17e:655",
+                      "d56bb4dc1aae3feef5b2:640"
+                    ]
+                  }
+                ],
+                "effects": [
+                  {
+                    "kind": "stat_modifier",
+                    "phase_ref": "wh2_main_unit_passive_scurry_away",
+                    "stat": "speed",
+                    "operation": "multiply",
+                    "native_operation": "mult",
+                    "value": 1.1,
+                    "provenance_refs": [
+                      "5513bd8dbb859f88e746:789"
+                    ]
+                  }
+                ],
+                "provenance_refs": [
+                  "cb3a51dedbb2920f9bb2:5441",
+                  "69a2a77f6deb5608cc87:860",
+                  "05412a0a8b985eef08d7:859",
+                  "b152471923832465081f:861"
+                ],
+                "detail_ref": "record:69a2a77f6deb5608cc87:860",
+                "spreadings": []
+              },
+              {
+                "key": "wh2_main_unit_passive_strength_in_numbers",
+                "name": "Strength in Numbers",
+                "culture_key": "*",
+                "requires_effect_enabling": false,
+                "classification_evidence": [
+                  "69a2a77f6deb5608cc87:862",
+                  "05412a0a8b985eef08d7:861"
+                ],
+                "summary": "While active \u2014 Affects the bearer: Speed x0.9; Melee defence +8; Leadership +6. Deactivates when: health below 50% of base health.",
+                "native_parameters": {
+                  "active_time": -1.0,
+                  "recharge_time": -1.0,
+                  "num_uses": -1,
+                  "effect_range": 0.0,
+                  "affect_self": true,
+                  "num_effected_friendly_units": 0,
+                  "num_effected_enemy_units": 0,
+                  "update_targets_every_frame": false,
+                  "initial_recharge": -1.0,
+                  "activated_projectile": null,
+                  "target_friends": false,
+                  "target_enemies": false,
+                  "target_ground": false,
+                  "target_intercept_range": 0.0,
+                  "always_affect_self": false,
+                  "only_affect_target": false,
+                  "wind_up_time": 0.0,
+                  "bombardment": null,
+                  "spawned_unit": null,
+                  "min_range": 0.0,
+                  "vortex": null,
+                  "spawn_type": null,
+                  "target_self": false,
+                  "update_phase_by_ability_duration": false,
+                  "spawn_is_transformation": false,
+                  "spawn_is_decoy": false,
+                  "only_affect_owned_units": false,
+                  "formation": null,
+                  "behaviour": null,
+                  "spawn_shares_health_and_fatigue": false,
+                  "shared_recharge_time": -1.0,
+                  "intensity_based_activation": false,
+                  "mom_vortex_key": null
+                },
+                "conditions": {
+                  "activates_when": [],
+                  "deactivates_when": [
+                    {
+                      "key": "health_below_50%_base",
+                      "summary": "health below 50% of base health",
+                      "provenance_refs": [
+                        "32babbd7b0ea3ed79a68:149",
+                        "b3620445ce0f95efd2a1:74"
+                      ]
+                    }
+                  ],
+                  "recipient_requirements": [],
+                  "recharges_when": [],
+                  "unavailable_when": [],
+                  "invalid_targets": [],
+                  "unresolved": []
+                },
+                "phases": [
+                  {
+                    "key": "wh2_main_unit_passive_strength_in_numbers",
+                    "order": 1,
+                    "target_self": true,
+                    "target_friends": false,
+                    "target_enemies": false,
+                    "duration": -1.0,
+                    "lifecycle": {
+                      "effect_type": "positive",
+                      "requested_stance": null,
+                      "cant_move": false,
+                      "freeze_fatigue": false,
+                      "fatigue_change_ratio": 0.0,
+                      "inspiration_aura_range_mod": 0.0,
+                      "ability_recharge_change": 0.0,
+                      "mana_regen_mod": 0.0,
+                      "mana_max_depletion_mod": 0.0,
+                      "imbue_magical": false,
+                      "imbue_ignition": 0,
+                      "imbue_contact": null,
+                      "affects_allies": true,
+                      "affects_enemies": true,
+                      "replenish_ammo": 0.0,
+                      "spreading": null,
+                      "freeze_recharge": false,
+                      "remove_magical": false,
+                      "execute_ratio": 0.0
+                    },
+                    "provenance_refs": [
+                      "c79a638251410aaad17e:657",
+                      "d56bb4dc1aae3feef5b2:642"
+                    ]
+                  }
+                ],
+                "effects": [
+                  {
+                    "kind": "stat_modifier",
+                    "phase_ref": "wh2_main_unit_passive_strength_in_numbers",
+                    "stat": "speed",
+                    "operation": "multiply",
+                    "native_operation": "mult",
+                    "value": 0.9,
+                    "provenance_refs": [
+                      "5513bd8dbb859f88e746:792"
+                    ]
+                  },
+                  {
+                    "kind": "stat_modifier",
+                    "phase_ref": "wh2_main_unit_passive_strength_in_numbers",
+                    "stat": "melee_defence",
+                    "operation": "add",
+                    "native_operation": "add",
+                    "value": 8.0,
+                    "provenance_refs": [
+                      "5513bd8dbb859f88e746:793"
+                    ]
+                  },
+                  {
+                    "kind": "stat_modifier",
+                    "phase_ref": "wh2_main_unit_passive_strength_in_numbers",
+                    "stat": "stat_morale",
+                    "operation": "add",
+                    "native_operation": "add",
+                    "value": 6.0,
+                    "provenance_refs": [
+                      "5513bd8dbb859f88e746:794"
+                    ]
+                  }
+                ],
+                "provenance_refs": [
+                  "cb3a51dedbb2920f9bb2:5442",
+                  "69a2a77f6deb5608cc87:862",
+                  "05412a0a8b985eef08d7:861",
+                  "b152471923832465081f:863"
+                ],
+                "detail_ref": "record:69a2a77f6deb5608cc87:862",
+                "spreadings": []
+              }
+            ],
+            "activated_options": [],
+            "coverage": {
+              "melee": "present",
+              "ranged": "known_none",
+              "sections": [
+                {
+                  "name": "components",
+                  "state": "complete",
+                  "returned": 1,
+                  "offset": 0,
+                  "total": 1,
+                  "cursor": null
+                },
+                {
+                  "name": "weapons",
+                  "state": "complete",
+                  "returned": 1,
+                  "offset": 0,
+                  "total": 1,
+                  "cursor": null
+                },
+                {
+                  "name": "attributes",
+                  "state": "complete",
+                  "returned": 3,
+                  "offset": 0,
+                  "total": 3,
+                  "cursor": null
+                },
+                {
+                  "name": "abilities",
+                  "state": "complete",
+                  "returned": 2,
+                  "offset": 0,
+                  "total": 2,
+                  "cursor": null
+                },
+                {
+                  "name": "activated_options",
+                  "state": "complete",
+                  "returned": 0,
+                  "offset": 0,
+                  "total": 0,
+                  "cursor": null
+                }
+              ],
+              "gaps": [
+                {
+                  "code": "activation_boundary",
+                  "section": "abilities",
+                  "summary": "wh2_main_unit_passive_scurry_away: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+                  "provenance_refs": [
+                    "cb3a51dedbb2920f9bb2:5441",
+                    "69a2a77f6deb5608cc87:860",
+                    "05412a0a8b985eef08d7:859"
+                  ]
+                },
+                {
+                  "code": "activation_boundary",
+                  "section": "abilities",
+                  "summary": "wh2_main_unit_passive_strength_in_numbers: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+                  "provenance_refs": [
+                    "cb3a51dedbb2920f9bb2:5442",
+                    "69a2a77f6deb5608cc87:862",
+                    "05412a0a8b985eef08d7:861"
+                  ]
+                }
+              ],
+              "diagnostic_count": 2
+            }
+          },
+          {
+            "identity": {
+              "unit_key": "wh_main_grn_inf_goblin_spearmen",
+              "profile_unit_key": "wh_main_grn_inf_goblin_spearmen",
+              "unit_keys": [
+                "wh_main_grn_inf_goblin_spearmen"
+              ],
+              "subculture_key": "wh_main_sc_grn_greenskins",
+              "faction_name": [
+                "Greenskins"
+              ],
+              "name": "Goblins (Spears)",
+              "unit_type": "infantry"
+            },
+            "body": {
+              "entity_count": 160.0,
+              "hp_per_entity": 56.0,
+              "total_hp": 8960.0,
+              "barrier_health": 0.0,
+              "size": "small",
+              "components": [
+                {
+                  "id": "component:23de8daf4e757f0860fb:1149",
+                  "role": "man",
+                  "count": 160.0,
+                  "hp_per_component": 8.0,
+                  "bonus_hp_per_component": 48.0,
+                  "known_hp_total": 8960.0,
+                  "size": "small",
+                  "targetable": true,
+                  "primary": true,
+                  "provenance_refs": [
+                    "23de8daf4e757f0860fb:1149"
+                  ],
+                  "health_contribution": 8960.0
+                }
+              ],
+              "target_classification": {
+                "combat_class": "infantry",
+                "status": "reviewed_mapping",
+                "summary": "Combat target class: infantry. Native body size remains small. Reviewed WH3 schema mapping; separate from the historical normalized is_large flag.",
+                "provenance_refs": [
+                  "7b179242cbee121c7c14:1249",
+                  "d53bb00c3d740abf5992:234",
+                  "d53bb00c3d740abf5992:273"
+                ]
+              },
+              "firing_arc": {
+                "primary_body_key": "wh_main_grn_inf_goblin_blood_dismembers",
+                "native_fire_arc_close": 60.0,
+                "interpretation": "Native primary-body setting; weapon coverage and angular units are not established.",
+                "provenance_refs": [
+                  "7b179242cbee121c7c14:1249"
+                ]
+              },
+              "health_aggregation": {
+                "rule": "primary_body_only",
+                "summary": "Unit health uses the primary bodies; secondary component totals are not additional health.",
+                "provenance_refs": [
+                  "567e934ed6df7cfa34a0:2550"
+                ]
+              }
+            },
+            "movement": {
+              "speed": 3.3,
+              "mass": 90.0,
+              "speed_basis": "primary_body_run_speed",
+              "primary_body_key": "wh_main_grn_inf_goblin_blood_dismembers",
+              "ground_speed": 3.3,
+              "flight_speed": 0.0,
+              "provenance_refs": [
+                "7b179242cbee121c7c14:1249"
+              ]
+            },
+            "leadership": 50.0,
+            "melee": {
+              "id": "melee:5e78e24b332add8fcb5e:1409",
+              "weapon_key": "wh_main_grn_goblin_spear",
+              "component_ref": null,
+              "slot": "primary",
+              "attack": 18.0,
+              "defence": 28.0,
+              "charge_bonus": 8.0,
+              "base_damage": 17.0,
+              "ap_damage": 6.0,
+              "attack_interval": 4.6,
+              "max_splash_targets": 1.0,
+              "native_parameters": {
+                "weapon_length": 1.0,
+                "splash_attack_target_size": null,
+                "splash_attack_power_multiplier": 1.0,
+                "building_damage_multiplier": 0.5,
+                "contact_phase": null,
+                "collision_attack_max_targets": 0.0,
+                "collision_attack_max_targets_cooldown": 10.0,
+                "scaling_damage": null
+              },
+              "provenance_refs": [
+                "5e78e24b332add8fcb5e:1409",
+                "2ed3f783ed26bfdde51a:1221",
+                "19f14f3f232faf63e26f:92"
+              ],
+              "detail_ref": "record:2ed3f783ed26bfdde51a:1221",
+              "parameter_explanations": {
+                "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+              },
+              "variants": []
+            },
+            "ranged": null,
+            "protection": {
+              "armour": 25.0,
+              "shield_block_chance": 35.0,
+              "physical_resistance": 0.0,
+              "missile_resistance": 0.0,
+              "spell_resistance": 0.0,
+              "fire_resistance": 0.0,
+              "ward_save": 0.0
+            },
+            "attack_traits": {
+              "melee": {
+                "scope": {
+                  "attack_ref": "melee:5e78e24b332add8fcb5e:1409",
+                  "component_ref": null
+                },
+                "bonus_vs_infantry": 0.0,
+                "bonus_vs_large": 9.0,
+                "magical": false,
+                "flaming": false,
+                "provenance_refs": [
+                  "19f14f3f232faf63e26f:92"
+                ]
+              },
+              "ranged": null,
+              "explosion": null,
+              "additional": []
+            },
+            "attributes": [
+              {
+                "key": "charge_defense_vs_large",
+                "name": null,
+                "summary": "Charge Defence vs. Large||When bracing, this unit negates the charge bonus of any large attacker.",
+                "provenance_refs": [
+                  "9d85f8e27f99c7a0ada2:3396",
+                  "15464982ee45f35d824d:15"
+                ]
+              },
+              {
+                "key": "charge_reflection",
+                "name": null,
+                "summary": "Charge Reflection||When bracing, this unit causes additional damage when attacking charging enemies.",
+                "provenance_refs": [
+                  "9d85f8e27f99c7a0ada2:3397",
+                  "15464982ee45f35d824d:16"
+                ]
+              },
+              {
+                "key": "expendable",
+                "name": null,
+                "summary": "Expendable||Witnessing friendly expendable units rout does not reduce other units' leadership, unless they are themselves expendable.",
+                "provenance_refs": [
+                  "9d85f8e27f99c7a0ada2:3398",
+                  "15464982ee45f35d824d:25"
+                ]
+              },
+              {
+                "key": "hide_forest",
+                "name": null,
+                "summary": "Hide (forest)||This unit can hide in forests until enemy units get too close.",
+                "provenance_refs": [
+                  "9d85f8e27f99c7a0ada2:3399",
+                  "15464982ee45f35d824d:39"
+                ]
+              }
+            ],
+            "abilities": [],
+            "activated_options": [],
+            "coverage": {
+              "melee": "present",
+              "ranged": "known_none",
+              "sections": [
+                {
+                  "name": "components",
+                  "state": "complete",
+                  "returned": 1,
+                  "offset": 0,
+                  "total": 1,
+                  "cursor": null
+                },
+                {
+                  "name": "weapons",
+                  "state": "complete",
+                  "returned": 1,
+                  "offset": 0,
+                  "total": 1,
+                  "cursor": null
+                },
+                {
+                  "name": "attributes",
+                  "state": "complete",
+                  "returned": 4,
+                  "offset": 0,
+                  "total": 4,
+                  "cursor": null
+                },
+                {
+                  "name": "abilities",
+                  "state": "complete",
+                  "returned": 0,
+                  "offset": 0,
+                  "total": 0,
+                  "cursor": null
+                },
+                {
+                  "name": "activated_options",
+                  "state": "complete",
+                  "returned": 0,
+                  "offset": 0,
+                  "total": 0,
+                  "cursor": null
+                }
+              ],
+              "gaps": [],
+              "diagnostic_count": 0
+            }
+          }
+        ],
+        "scenario_assumptions": {
+          "mode": "custom_battle",
+          "baseline": "unmodified_ultra_rank_0",
+          "separation_metres": 0.0,
+          "duration_seconds": 120.0,
+          "metres_per_second_per_speed_point": 1.0,
+          "path_length_factor": 1.0,
+          "terrain_speed_factor": 1.0,
+          "line_of_sight": true,
+          "historical_relations_apply_to_patch_9": true,
+          "barrier_damage_order": "barrier_first",
+          "barrier_damage_order_explicit": false,
+          "passive_step_seconds": 0.1,
+          "sides": {
+            "a": {
+              "passives": [
+                {
+                  "key": "wh2_main_unit_passive_strength_in_numbers",
+                  "initial_active": false,
+                  "equality": "active",
+                  "reactivation": "unresolved",
+                  "condition_assumptions": {}
+                }
+              ],
+              "initial_health_fraction": 1.0,
+              "order": "hold",
+              "fire": false,
+              "fight": true,
+              "facing": "front",
+              "ranged_attack_id": null,
+              "collision_probability": 0.5,
+              "firing_entities": null,
+              "cycle_seconds": null,
+              "first_shot_delay_seconds": 1.0,
+              "projectiles_per_cycle": null,
+              "flight_seconds": null,
+              "explosion_entities_per_collision": 1.0,
+              "active_contacts": 8.0,
+              "charge_duration_seconds": 0.0,
+              "target_component_role": "primary",
+              "assume_targetable": false,
+              "assume_unit_protection_for_component": false,
+              "combat_effective_fraction": 0.5
+            },
+            "b": {
+              "passives": [],
+              "initial_health_fraction": 1.0,
+              "order": "hold",
+              "fire": false,
+              "fight": true,
+              "facing": "front",
+              "ranged_attack_id": null,
+              "collision_probability": 0.5,
+              "firing_entities": null,
+              "cycle_seconds": null,
+              "first_shot_delay_seconds": 1.0,
+              "projectiles_per_cycle": null,
+              "flight_seconds": null,
+              "explosion_entities_per_collision": 1.0,
+              "active_contacts": 8.0,
+              "charge_duration_seconds": 0.0,
+              "target_component_role": "primary",
+              "assume_targetable": false,
+              "assume_unit_protection_for_component": false,
+              "combat_effective_fraction": 0.5
+            }
+          }
+        },
+        "passive_coverage": [
+          {
+            "side": "a",
+            "key": "wh2_main_unit_passive_scurry_away",
+            "status": "omitted_base_stats_only",
+            "source_refs": [
+              "cb3a51dedbb2920f9bb2:5441",
+              "69a2a77f6deb5608cc87:860",
+              "05412a0a8b985eef08d7:859",
+              "b152471923832465081f:861"
+            ],
+            "activation_basis": null,
+            "choice": null,
+            "unsupported_effects": [],
+            "unsupported_lifecycle": {},
+            "unresolved_rules": []
+          },
+          {
+            "side": "a",
+            "key": "wh2_main_unit_passive_strength_in_numbers",
+            "status": "conditional_scenario",
+            "source_refs": [
+              "cb3a51dedbb2920f9bb2:5442",
+              "69a2a77f6deb5608cc87:862",
+              "05412a0a8b985eef08d7:861",
+              "b152471923832465081f:863",
+              "c79a638251410aaad17e:657",
+              "d56bb4dc1aae3feef5b2:642",
+              "32babbd7b0ea3ed79a68:149",
+              "b3620445ce0f95efd2a1:74",
+              "5513bd8dbb859f88e746:792",
+              "5513bd8dbb859f88e746:793",
+              "5513bd8dbb859f88e746:794"
+            ],
+            "activation_basis": "explicit_scenario_assumption_not_inferred_from_deactivation",
+            "choice": {
+              "key": "wh2_main_unit_passive_strength_in_numbers",
+              "initial_active": false,
+              "equality": "active",
+              "reactivation": "unresolved",
+              "condition_assumptions": {}
+            },
+            "unsupported_effects": [],
+            "unsupported_lifecycle": {},
+            "unresolved_rules": [
+              "engine activation, equality, refresh and reactivation unverified; scenario choices apply"
+            ]
+          }
+        ],
+        "passive_event_policy": {
+          "health_basis": "sum of component health / immutable base total; barrier excluded",
+          "equality_tolerance_fraction": 1e-09,
+          "transition_window_seconds": 0.1,
+          "order": "initial conditions; simultaneous melee segment; health transitions; ordered arrivals with transitions; simultaneous launches; zero-flight arrivals",
+          "movement": "recompute remaining distance/contact on state change; before first launch restart assumed wind-up from new range entry",
+          "reactivation": "only explicit when_eligible assumption; otherwise scoped unresolved on recovery"
+        },
+        "empirical_calibration": null,
+        "assumption_notes": [
+          "Speed scale, path factor and terrain factor are illustrative; no measured map coordinates or acceleration.",
+          "Default collision probability 0.5 is uncalibrated and is not the card accuracy value.",
+          "When omitted, complete cycle is illustratively 1.25 times projectile reload; it is not an engine rule.",
+          "Unspecified active contacts use min(8, living primary bodies); firing entities use the attached component count.",
+          "Direct and explosion are separate expected hit events; default splash reach is one entity per collision.",
+          "Positive listed velocity gives straight flight time from exact shot distance. Missing or nonpositive velocity uses an immediate-arrival firing-opportunity approximation unless flight_seconds is supplied; this is an earliest-arrival scenario, not measured flight time. Collision probability remains independent.",
+          "Charge decays from the sourced bonus over the assumed duration and is bounded between zero and that bonus.",
+          "Barrier-before-entity-cap is the represented default, not a verified game damage order; the alternate order is tested.",
+          "Sourced explosion is_spell tags add the target's spell resistance to the assumed historical relation.",
+          "Historical 8.1.1 hit, armour and resistance relations are assumed applicable to 9.0 only when enabled."
+        ],
+        "derived": {
+          "phase_timing": {
+            "closing_speed_metres_per_second": 0.0,
+            "contact": {
+              "status": "already_reached",
+              "seconds": 0.0
+            },
+            "range_entry": [
+              {
+                "status": "unknown_input",
+                "seconds": null
+              },
+              {
+                "status": "unknown_input",
+                "seconds": null
+              }
+            ],
+            "minimum_range": [
+              null,
+              null
+            ],
+            "flight_speed": [
+              null,
+              null
+            ]
+          },
+          "event_mechanics": [
+            {
+              "side": "a",
+              "missile": null,
+              "melee": {
+                "attack_id": "melee:5e78e24b332add8fcb5e:2405",
+                "unmodified_hit_probability": 0.24999999999999997,
+                "target_combat_class": "infantry",
+                "target_component_role": "man",
+                "targetability_source": true,
+                "target_supported": true,
+                "target_facing": "front",
+                "active_contacts_assumed": 8.0,
+                "attack_interval_source_seconds": 4.3,
+                "charge_bonus_source": 6.0,
+                "charge_decay_duration_assumed_seconds": 0.0,
+                "per_hit": {
+                  "per_unblocked_hit": 19.625,
+                  "size_bonus_as_base": 0.0,
+                  "armour_survival": 0.8125,
+                  "resistance_points": 0,
+                  "spell_resistance_applied": false,
+                  "shield_block_probability": 0.0
+                }
+              }
+            },
+            {
+              "side": "b",
+              "missile": null,
+              "melee": {
+                "attack_id": "melee:5e78e24b332add8fcb5e:1409",
+                "unmodified_hit_probability": 0.29,
+                "target_combat_class": "infantry",
+                "target_component_role": "man",
+                "targetability_source": true,
+                "target_supported": true,
+                "target_facing": "front",
+                "active_contacts_assumed": 8.0,
+                "attack_interval_source_seconds": 4.6,
+                "charge_bonus_source": 8.0,
+                "charge_decay_duration_assumed_seconds": 0.0,
+                "per_hit": {
+                  "per_unblocked_hit": 19.8125,
+                  "size_bonus_as_base": 0.0,
+                  "armour_survival": 0.8125,
+                  "resistance_points": 0,
+                  "spell_resistance_applied": false,
+                  "shield_block_probability": 0.0
+                }
+              }
+            }
+          ],
+          "ledgers": [
+            {
+              "unit_key": "wh2_main_skv_inf_clanrat_spearmen_0",
+              "incoming_damage": {
+                "direct": 0.0,
+                "explosion": 0.0,
+                "melee": 1199.0869565217347,
+                "overkill": 0.0,
+                "attempted_damage": 1199.0869565217347,
+                "barrier_absorbed": 0.0
+              },
+              "remaining_health": 8400.913043478067,
+              "initial_health": 9600.0,
+              "scenario_starting_health": 9600.0,
+              "remaining_health_fraction": 0.875095108695632,
+              "remaining_barrier": 0.0,
+              "initial_barrier": 0.0,
+              "effective_survivability_fraction": 0.875095108695632,
+              "components": [
+                {
+                  "role": "man",
+                  "primary": true,
+                  "remaining_health": 8400.913043478067,
+                  "initial_health": 9600.0,
+                  "estimated_living_entities": 141,
+                  "initial_entities": 160.0
+                }
+              ],
+              "shots_fired_per_shooter": 0,
+              "discrete_firing_events": 0,
+              "stopping": {
+                "health_depleted_seconds": null,
+                "combat_ineffective_seconds": null,
+                "firing_ceased_seconds": null,
+                "contact_seconds": 0.0,
+                "routing": "unknown_no_morale_model",
+                "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+                "engine_disabled": "not_applicable",
+                "crew_firing_cessation": "not_applicable",
+                "ammunition_exhausted": false
+              },
+              "coverage_gaps": [],
+              "effect_phases": [
+                {
+                  "start_seconds": 0.0,
+                  "end_seconds": 120.0,
+                  "transition_cause": "explicit_initial_state",
+                  "active_keys": [],
+                  "modifiers": [],
+                  "effective_inputs": {
+                    "melee": {
+                      "id": "melee:5e78e24b332add8fcb5e:2405",
+                      "weapon_key": "wh2_main_skv_spear",
+                      "component_ref": null,
+                      "slot": "primary",
+                      "attack": 18.0,
+                      "defence": 24.0,
+                      "charge_bonus": 6.0,
+                      "base_damage": 18.0,
+                      "ap_damage": 5.0,
+                      "attack_interval": 4.3,
+                      "max_splash_targets": 1.0,
+                      "native_parameters": {
+                        "weapon_length": 1.0,
+                        "splash_attack_target_size": null,
+                        "splash_attack_power_multiplier": 1.0,
+                        "building_damage_multiplier": 0.5,
+                        "contact_phase": null,
+                        "collision_attack_max_targets": 0.0,
+                        "collision_attack_max_targets_cooldown": 10.0,
+                        "scaling_damage": null
+                      },
+                      "provenance_refs": [
+                        "5e78e24b332add8fcb5e:2405",
+                        "2ed3f783ed26bfdde51a:371",
+                        "896fbc4327b171767d9d:63"
+                      ],
+                      "detail_ref": "record:2ed3f783ed26bfdde51a:371",
+                      "parameter_explanations": {
+                        "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+                      },
+                      "variants": []
+                    },
+                    "movement": {
+                      "speed": 4.2,
+                      "mass": 100.0,
+                      "speed_basis": "primary_body_run_speed",
+                      "primary_body_key": "wh2_main_skv_infantry",
+                      "ground_speed": 4.2,
+                      "flight_speed": 0.0,
+                      "provenance_refs": [
+                        "7b179242cbee121c7c14:381"
+                      ]
+                    },
+                    "leadership": 45.0
+                  }
+                }
+              ],
+              "passive_diagnostics": []
+            },
+            {
+              "unit_key": "wh_main_grn_inf_goblin_spearmen",
+              "incoming_damage": {
+                "direct": 0.0,
+                "explosion": 0.0,
+                "melee": 1095.3488372093102,
+                "overkill": 0.0,
+                "attempted_damage": 1095.3488372093102,
+                "barrier_absorbed": 0.0
+              },
+              "remaining_health": 7864.651162791234,
+              "initial_health": 8960.0,
+              "scenario_starting_health": 8960.0,
+              "remaining_health_fraction": 0.877751245847236,
+              "remaining_barrier": 0.0,
+              "initial_barrier": 0.0,
+              "effective_survivability_fraction": 0.877751245847236,
+              "components": [
+                {
+                  "role": "man",
+                  "primary": true,
+                  "remaining_health": 7864.651162791234,
+                  "initial_health": 8960.0,
+                  "estimated_living_entities": 141,
+                  "initial_entities": 160.0
+                }
+              ],
+              "shots_fired_per_shooter": 0,
+              "discrete_firing_events": 0,
+              "stopping": {
+                "health_depleted_seconds": null,
+                "combat_ineffective_seconds": null,
+                "firing_ceased_seconds": null,
+                "contact_seconds": 0.0,
+                "routing": "unknown_no_morale_model",
+                "firing_cessation_basis": "ammo, firing-component depletion or modeled contact policy",
+                "engine_disabled": "not_applicable",
+                "crew_firing_cessation": "not_applicable",
+                "ammunition_exhausted": false
+              },
+              "coverage_gaps": [],
+              "effect_phases": [
+                {
+                  "start_seconds": 0.0,
+                  "end_seconds": 120.0,
+                  "transition_cause": "explicit_initial_state",
+                  "active_keys": [],
+                  "modifiers": [],
+                  "effective_inputs": {
+                    "melee": {
+                      "id": "melee:5e78e24b332add8fcb5e:1409",
+                      "weapon_key": "wh_main_grn_goblin_spear",
+                      "component_ref": null,
+                      "slot": "primary",
+                      "attack": 18.0,
+                      "defence": 28.0,
+                      "charge_bonus": 8.0,
+                      "base_damage": 17.0,
+                      "ap_damage": 6.0,
+                      "attack_interval": 4.6,
+                      "max_splash_targets": 1.0,
+                      "native_parameters": {
+                        "weapon_length": 1.0,
+                        "splash_attack_target_size": null,
+                        "splash_attack_power_multiplier": 1.0,
+                        "building_damage_multiplier": 0.5,
+                        "contact_phase": null,
+                        "collision_attack_max_targets": 0.0,
+                        "collision_attack_max_targets_cooldown": 10.0,
+                        "scaling_damage": null
+                      },
+                      "provenance_refs": [
+                        "5e78e24b332add8fcb5e:1409",
+                        "2ed3f783ed26bfdde51a:1221",
+                        "19f14f3f232faf63e26f:92"
+                      ],
+                      "detail_ref": "record:2ed3f783ed26bfdde51a:1221",
+                      "parameter_explanations": {
+                        "building_damage_multiplier": "Native weapon building-damage multiplier; separate from attack eligibility, Wallbreaker and Flaming. Combined siege damage is not calculated."
+                      },
+                      "variants": []
+                    },
+                    "movement": {
+                      "speed": 3.3,
+                      "mass": 90.0,
+                      "speed_basis": "primary_body_run_speed",
+                      "primary_body_key": "wh_main_grn_inf_goblin_blood_dismembers",
+                      "ground_speed": 3.3,
+                      "flight_speed": 0.0,
+                      "provenance_refs": [
+                        "7b179242cbee121c7c14:1249"
+                      ]
+                    },
+                    "leadership": 50.0
+                  }
+                }
+              ],
+              "passive_diagnostics": []
+            }
+          ]
+        },
+        "verdict": {
+          "status": "conditional",
+          "nominal_favored": "b",
+          "represented_point_ordering": "b",
+          "criterion": "remaining modeled health plus barrier fraction at horizon",
+          "collision_probability_corners": [
+            {
+              "collision_probability_a": 0,
+              "collision_probability_b": 0,
+              "favored": "b",
+              "effective_survivability_fraction": [
+                0.875095108695632,
+                0.877751245847236
+              ]
+            },
+            {
+              "collision_probability_a": 0,
+              "collision_probability_b": 1,
+              "favored": "b",
+              "effective_survivability_fraction": [
+                0.875095108695632,
+                0.877751245847236
+              ]
+            },
+            {
+              "collision_probability_a": 1,
+              "collision_probability_b": 0,
+              "favored": "b",
+              "effective_survivability_fraction": [
+                0.875095108695632,
+                0.877751245847236
+              ]
+            },
+            {
+              "collision_probability_a": 1,
+              "collision_probability_b": 1,
+              "favored": "b",
+              "effective_survivability_fraction": [
+                0.875095108695632,
+                0.877751245847236
+              ]
+            }
+          ],
+          "barrier_damage_order_sensitivity": [],
+          "bounds_cross": true,
+          "material_mechanic_unresolved": false,
+          "unresolved_inputs": [],
+          "one_parameter_flip_thresholds": [
+            {
+              "side": "a",
+              "parameter": "active_contacts",
+              "current": 8.0,
+              "approximate_flip_threshold": 8.173797607421875,
+              "absolute_change": 0.173797607421875,
+              "method": "one-at-a-time sampled threshold; not a global minimum"
+            },
+            {
+              "side": "b",
+              "parameter": "active_contacts",
+              "current": 8.0,
+              "approximate_flip_threshold": 7.8299560546875,
+              "absolute_change": 0.1700439453125,
+              "method": "one-at-a-time sampled threshold; not a global minimum"
+            }
+          ],
+          "qualification": "Nominal result depends on uncalibrated firing/contact assumptions; routing is unknown."
+        },
+        "limitations": [
+          "source coverage: activation_boundary - wh2_main_unit_passive_scurry_away: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+          "source coverage: activation_boundary - wh2_main_unit_passive_strength_in_numbers: deactivation evidence alone does not establish activation, threshold equality or refresh.",
+          "no routing or morale model",
+          "entity casualties use pooled expected damage, not hit allocation",
+          "shield facing and projectile block eligibility are simplified",
+          "unselected passive and activated modifiers, penetration, collision attacks, shrapnel and special death behavior are not applied",
+          "8.1.1 relations are assumed applicable to 9.0; no live validation",
+          "base stats only; Scurry Away! omitted"
+        ],
+        "tactical_contingencies": [
+          "Distance, sight obstruction and terrain alter firing windows.",
+          "Facing can change shield blocking and melee defence.",
+          "Formation and interception change actual firing entities and active contacts.",
+          "Fatigue, charge disruption, passives and target selection require separate validation."
+        ]
+      }
+    }
+  }
+}

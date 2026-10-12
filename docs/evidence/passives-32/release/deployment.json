@@ -1,0 +1,30 @@
+{
+  "deployments": [
+    {
+      "id": "529c1686-9aa9-491d-8cfc-4a9547713044",
+      "status": "SUCCESS",
+      "createdAt": "2026-10-12T04:44:50.755Z",
+      "updatedAt": "2026-10-12T04:45:25.800Z",
+      "serviceId": "ec9aff14-4f04-4386-a62b-d83657a0c927",
+      "environmentId": "79823054-462e-4d00-b962-94ad526c4b4f",
+      "url": null,
+      "snapshotId": "926c4149-b3ce-4bdb-85bc-3b74f33ffcf5",
+      "creator": {
+        "id": "da9dc87c-bf02-4434-a325-318cf805b871",
+        "name": null,
+        "email": "otmooper12@gmail.com"
+      },
+      "canRollback": true,
+      "canRedeploy": true,
+      "regions": [
+        "sfo"
+      ],
+      "meta": {
+        "reason": "deploy",
+        "commitMessage": "Package Advisor release without Datasette-only Railway config\n\nDeployment-only branch: evaluator and source pin exactly match reviewed PR33 merge c310b54. Main retains Datasette config. Existing Advisor service selects Dockerfile.mcp and /healthz.",
+        "commitHash": "c5963072723a88bb2de13a141710533d54f3a970",
+        "branch": "steve/mcp-release-32"
+      }
+    }
+  ]
+}

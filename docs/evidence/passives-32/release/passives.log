@@ -1,0 +1,1 @@
+{"status": "passed", "model": "combat-0.2.0", "cases": {"enabled": {"exact_equal_to_library_cli": true, "goblin_damage": 868.3043478260697}, "disabled": {"exact_equal_to_library_cli": true, "goblin_damage": 1199.0869565217347}}}
