@@ -96,6 +96,7 @@ test_negative_source_recipient_operation_refs_and_missing_values (test_passives.
 test_projectile_crossing_recomputes_remaining_approach (test_passives.PassiveGates.test_projectile_crossing_recomputes_remaining_approach) ... ok
 test_recovery_trace_explicit_vs_unresolved_and_never (test_passives.PassiveGates.test_recovery_trace_explicit_vs_unresolved_and_never) ... ok
 test_separate_channels_and_source_backed_second_passive (test_passives.PassiveGates.test_separate_channels_and_source_backed_second_passive) ... ok
+test_speed_transition_starts_previously_unreachable_firing (test_passives.PassiveGates.test_speed_transition_starts_previously_unreachable_firing) ... ok
 test_threshold_crossing_and_convergence (test_passives.PassiveGates.test_threshold_crossing_and_convergence) ... ok
 test_unsupported_channel_stays_visible (test_passives.PassiveGates.test_unsupported_channel_stays_visible) ... ok
 test_abomination_failure_branch_is_conditional_and_separate (test_queries.QueryTests.test_abomination_failure_branch_is_conditional_and_separate) ... ok
@@ -208,6 +209,6 @@ test_requested_60_threshold_and_native_speed (test_unit_search.SearchTests.test_
 test_roster_family_pagination_and_profile_followthrough (test_unit_search.SearchTests.test_roster_family_pagination_and_profile_followthrough) ... ok
 
 ----------------------------------------------------------------------
-Ran 208 tests in 97.280s
+Ran 209 tests in 94.115s
 
 OK

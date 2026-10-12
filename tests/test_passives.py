@@ -112,6 +112,26 @@ class PassiveGates(unittest.TestCase):
         self.assertEqual(rows[0]['effect_phases'][1]['start_seconds'],event['seconds'])
         self.assertEqual(rows[0]['effect_phases'][1]['active_keys'],[])
 
+    def test_speed_transition_starts_previously_unreachable_firing(self):
+        # Independent-review source-backed reproduction: no packet mutation.
+        p=self.q.get_matchup_evidence('wh2_main_skv_inf_skavenslave_slingers_0',
+            'wh2_dlc10_hef_inf_shadow_warriors_0',limit=256,include_diagnostics=True,include_provenance=True)
+        sc={'separation_metres':121,'duration_seconds':20,'sides':{
+            'a':{'order':'approach','initial_health_fraction':.5001,'cycle_seconds':5,
+                 'first_shot_delay_seconds':0,'flight_seconds':0,
+                 'passives':[{'key':SIN,'initial_active':True}]},
+            'b':{'order':'retreat','cycle_seconds':100,'first_shot_delay_seconds':0,'flight_seconds':0}}}
+        timing,on=self.fast(sc,p)
+        self.assertLess(timing['closing_speed_metres_per_second'],0)
+        self.assertGreater(timing['movement_transitions'][0]['closing_speed_metres_per_second'],0)
+        self.assertEqual(on[0]['effect_phases'][0]['end_seconds'],0)
+        sc['sides']['a']['passives'][0]['initial_active']=False
+        _,off=self.fast(sc,p)
+        self.assertEqual(on[0]['shots_fired_per_shooter'],3)
+        self.assertEqual(on[0]['shots_fired_per_shooter'],off[0]['shots_fired_per_shooter'])
+        self.assertAlmostEqual(on[1]['incoming_damage']['direct'],off[1]['incoming_damage']['direct'])
+        self.assertGreater(on[1]['incoming_damage']['direct'],0)
+
     def test_negative_source_recipient_operation_refs_and_missing_values(self):
         with self.assertRaises(ValueError): resolve_passives(self.packet['units'][1],normalize_choices([{'key':SIN,'initial_active':True}]),self.packet['provenance'])
         for field,value in (('value',None),('value',float('nan')),('operation','divide'),('phase_ref','missing'),('provenance_refs',['missing'])):

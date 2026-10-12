@@ -3,12 +3,14 @@
 Implementation: `combat-0.2.0`, branch `steve/conditional-passives-32`.
 This is a reviewable implementation, not a completed production release.
 See [machine-readable cases](evidence/passives-32/receipt.json),
-[full test log](evidence/passives-32/tests.log), and
+[full test log](evidence/passives-32/tests.log),
+[independent review and recheck](evidence/passives-32/independent-review.md), and
 [actual connected baseline](evidence/passives-32/connected-control.json).
 
 ## Versions and provenance
 
 - Local implementation commit: `5a57ced25d061178cf643befc4eafb862593c5ea`.
+- Local reviewed repair commit: `5a58fc4462277c76450bdd96dba4dd4275e5e426`.
 - Installed skill save: `a89f6975c4ddf8123ba0654389b6c9226ef530e0`, pushed and remote head verified.
 - Base main: `331fbe8cc06cee2ed6019c2c25539ef0fa270b51` (PR #31 already merged).
 - Source pin remains `595e22764b22e748afdbafafcb0a6258973e2451`.
@@ -24,7 +26,7 @@ See [machine-readable cases](evidence/passives-32/receipt.json),
 
 ## Gates
 
-Final full pinned-source suite: **208 tests passed, zero skips**, 97.280 s.
+Final full pinned-source suite: **209 tests passed, zero skips**, 94.115 s.
 Command: `python -m unittest discover -s tests -v`. The receipt generator
 additionally verifies full 120-second library/CLI/local-adapter equality.
 
@@ -42,6 +44,16 @@ additionally verifies full 120-second library/CLI/local-adapter equality.
 | Library/CLI/adapter | **Local pass**, complete structured result equality for exact 120-second scenario, not just metadata. **Actual new connected-tool acceptance pending release.** |
 | Skill/workflow | **Canonical and installed instructions updated**, validated and pushed. Independent fresh conversation used real connector: correctly reported base-only omission because its schema lacks passives; did not fabricate an enabled result. **New enabled conversation pending release.** |
 | Evidence | Exact requests, normalized assumptions, source/model versions, ledgers, provenance, convergence outputs and tolerances retained in JSON. Automated consistency is not battle accuracy. |
+
+## Independent review
+
+An independent agent reviewed published head `d155b345cc193a712004a8842fc6de20ff776763`
+in an isolated checkout. One P2 finding: passive speed transitions did not schedule
+firing when range had previously been unreachable. The repair adds the sourced
+Skavenslave Slingers/Shadow Warriors regression. A focused independent recheck
+passed all 11 passive tests plus disabled-fire, unreachable-range, wind-up and
+delayed-impact assertions, and recommends accepting the revised code. The report
+is recorded through the author connector, not a separate GitHub-account approval.
 
 ## Deployment and remaining limitations
 

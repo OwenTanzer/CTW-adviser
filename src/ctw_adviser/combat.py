@@ -416,7 +416,11 @@ def _run(states, scenario, timing):
                 'closing_speed_metres_per_second': closing, 'contact_seconds': contact})
             for i, state in enumerate(states):
                 # Before the first launch, recompute entry and the assumed wind-up.
-                if state['shots_fired'] == 0 and state['next_shot'] is not None:
+                cfg = scenario['sides'][SIDES[i]]
+                # A previously unreachable range has no next_shot. Re-evaluate
+                # eligibility, not the old schedule's existence, after speed changes.
+                if (state['shots_fired'] == 0 and state['ranged'] is not None
+                        and cfg['fire'] and cfg['cycle_seconds'] is not None):
                     entry = new['range_entry'][i]['seconds']
                     state['next_shot'] = None if entry is None else t + entry + scenario['sides'][SIDES[i]]['first_shot_delay_seconds']
 
