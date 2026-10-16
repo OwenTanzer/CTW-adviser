@@ -16,7 +16,7 @@ def main():
     args = parser.parse_args()
     results = []
     for path in sorted(Path(args.receipts).glob('*/calls.json')):
-        for index, call in enumerate(json.loads(path.read_text())):
+        for index, call in enumerate(json.loads(path.read_text(encoding='utf-8'))):
             name = call.get('tool', call.get('name', ''))
             if not name.endswith('evaluate_single_unit_matchup'):
                 continue
@@ -33,7 +33,9 @@ def main():
                 if inputs.get('subculture_' + side):
                     command.extend(['--subculture-' + side, inputs['subculture_' + side]])
             run = subprocess.run(command, capture_output=True, text=True,
-                                 env={**os.environ, 'PYTHONPATH': 'src'})
+                                 encoding='utf-8',
+                                 env={**os.environ, 'PYTHONPATH': 'src',
+                                      'PYTHONIOENCODING': 'utf-8'})
             actual = json.loads(run.stdout) if run.returncode == 0 else None
             results.append({'conversation': path.parent.name, 'call_index': index,
                             'arguments': inputs, 'exit_code': run.returncode,
@@ -45,7 +47,7 @@ def main():
               'evaluations': len(results), 'results': results}
     rendered = json.dumps(report, indent=2) + '\n'
     if args.output:
-        Path(args.output).write_text(rendered)
+        Path(args.output).write_text(rendered, encoding='utf-8')
     print(json.dumps({'status': report['status'], 'evaluations': len(results)}))
     return 0 if passed else 1
 
